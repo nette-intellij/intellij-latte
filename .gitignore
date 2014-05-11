@@ -1,0 +1,8 @@
+/.idea/misc.xml
+/.idea/tasks.xml
+/.idea/vcs.xml
+/.idea/workspace.xml
+/gen
+/out
+
+!latte-plugin.iml

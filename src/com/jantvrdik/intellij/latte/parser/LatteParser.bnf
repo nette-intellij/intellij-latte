@@ -1,0 +1,137 @@
+{
+	parserClass="com.jantvrdik.intellij.latte.parser.LatteParser"
+	parserUtilClass="com.jantvrdik.intellij.latte.parser.LatteParserUtil"
+
+	extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+	psiClassPrefix="Latte"
+	psiImplClassSuffix="Impl"
+	psiPackage="com.jantvrdik.intellij.latte.psi"
+	psiImplPackage="com.jantvrdik.intellij.latte.psi.impl"
+	psiImplUtilClass="com.jantvrdik.intellij.latte.psi.impl.LattePsiImplUtil"
+
+	elementTypeHolderClass="com.jantvrdik.intellij.latte.psi.LatteTypes"
+	elementTypeClass="com.jantvrdik.intellij.latte.psi.LatteElementType"
+	tokenTypeClass="com.jantvrdik.intellij.latte.psi.LatteTokenType"
+}
+
+root             ::= (structureToken)* autoClosedBlock?
+
+// macro
+private
+macro            ::= macroComment | macroClassic
+
+macroComment     ::= T_MACRO_COMMENT
+macroClassic     ::= <<checkPairMacro true>> (pairMacro | emptyMacro) | <<checkPairMacro false>> unpairedMacro {
+                     	methods = [
+                     		openTag="macroTag[0]"
+                     		closeTag="macroTag[1]"
+                     	]
+                     }
+
+private
+pairMacro        ::= macroOpenTag fragmentToken* macroCloseTag
+
+private
+emptyMacro       ::= emptyMacroTag;
+
+private
+unpairedMacro    ::= macroOpenTag
+
+fake
+macroTag         ::= macroContent {
+                     	methods = [
+                     		getMacroName
+                     	]
+                     }
+
+macroOpenTag     ::= T_MACRO_OPEN_TAG_OPEN macroContent T_MACRO_TAG_CLOSE {
+                     	extends = macroTag
+                     }
+macroCloseTag    ::= T_MACRO_CLOSE_TAG_OPEN macroContent T_MACRO_TAG_CLOSE {
+                     	extends = macroTag
+                     }
+emptyMacroTag    ::= T_MACRO_OPEN_TAG_OPEN macroContent T_MACRO_TAG_CLOSE_EMPTY {
+                     	extends = macroTag
+                     }
+
+
+private
+macroContent     ::= macroName macroArgs? T_MACRO_MODIFIERS?
+
+private
+macroName        ::= T_MACRO_NAME
+                   | T_MACRO_NOESCAPE? T_MACRO_SHORTNAME?
+
+private
+macroArgs        ::= (T_MACRO_ARGS | T_MACRO_ARGS_VAR | T_MACRO_ARGS_STRING | T_MACRO_ARGS_NUMBER)+
+
+// autoClosedBlock
+autoClosedBlock  ::= &("{block" macroArgs? T_MACRO_MODIFIERS? "}") macroOpenTag structureToken*
+
+// htmlTag
+htmlTag          ::= voidHtmlTag      // <el>
+                   | emptyHtmlTag     // <el />
+                   | pairHtmlTag      // <el>...</el>
+                   | htmlComment      // <!-- ... -->
+
+pairHtmlTag      ::= pairHtmlTagOpen structureToken* pairHtmlTagClose
+pairHtmlTagOpen  ::= T_HTML_OPEN_TAG_OPEN T_HTML_TAG_NAME anyAttrs? T_HTML_TAG_CLOSE {
+                        methods = [
+                            getTagName
+                        ]
+                     }
+pairHtmlTagClose ::= T_HTML_CLOSE_TAG_OPEN T_HTML_TAG_NAME anyAttrs? T_HTML_TAG_CLOSE {
+                        methods = [
+                            getTagName
+                        ]
+                     }
+emptyHtmlTag     ::= T_HTML_OPEN_TAG_OPEN T_HTML_TAG_NAME anyAttrs? T_HTML_TAG_CLOSE_EMPTY
+voidHtmlTag      ::= T_HTML_OPEN_TAG_OPEN <<checkVoidTag>> T_HTML_TAG_NAME anyAttrs? T_HTML_TAG_CLOSE
+
+
+anyAttrs         ::= (T_WHITESPACE+ | T_TEXT+ | netteAttr | htmlAttr | macro)+
+
+
+// netteAttr
+netteAttr        ::= T_HTML_TAG_NATTR_NAME T_WHITESPACE* (T_HTML_TAG_ATTR_EQUAL_SIGN netteAttrValue)? {
+                        methods = [
+                            attrName="T_HTML_TAG_NATTR_NAME"
+                            attrValue="netteAttrValue"
+                        ]
+                     }
+
+netteAttrValue   ::= T_HTML_TAG_ATTR_SQ T_HTML_TAG_ATTR_SQ_VALUE? T_HTML_TAG_ATTR_SQ
+                   | T_HTML_TAG_ATTR_DQ T_HTML_TAG_ATTR_DQ_VALUE? T_HTML_TAG_ATTR_DQ
+                   | T_HTML_TAG_ATTR_UQ_VALUE
+
+
+// htmlAttr
+htmlAttr         ::= T_HTML_TAG_ATTR_NAME T_WHITESPACE* (T_HTML_TAG_ATTR_EQUAL_SIGN htmlAttrValue)?
+
+private
+htmlAttrValue    ::= T_HTML_TAG_ATTR_SQ (T_HTML_TAG_ATTR_SQ_VALUE | macro)* T_HTML_TAG_ATTR_SQ
+                   | T_HTML_TAG_ATTR_DQ (T_HTML_TAG_ATTR_DQ_VALUE | macro)* T_HTML_TAG_ATTR_DQ
+                   | T_HTML_TAG_ATTR_UQ_VALUE
+
+
+// htmlComment
+htmlComment      ::= T_HTML_COMMENT_OPEN (T_HTML_COMMENT_TEXT | macro)* T_HTML_COMMENT_CLOSE
+
+
+// tokens sets
+private
+structureToken   ::= T_TEXT+ | T_WHITESPACE+ | macro | htmlTag
+
+private
+fragmentToken    ::= structureToken
+                   | T_HTML_TAG_ATTR_NAME
+                   | T_HTML_TAG_ATTR_EQUAL_SIGN
+                   | T_HTML_TAG_ATTR_SQ
+                   | T_HTML_TAG_ATTR_SQ_VALUE
+                   | T_HTML_TAG_ATTR_DQ
+                   | T_HTML_TAG_ATTR_DQ_VALUE
+                   | T_HTML_TAG_ATTR_UQ_VALUE
+
+private
+topLevelTokens   ::= T_MACRO_CLASSIC topLevelTokens
