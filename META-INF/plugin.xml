@@ -1,7 +1,7 @@
 <idea-plugin version="2">
 	<id>com.jantvrdik.intellij.latte</id>
 	<name>Latte</name>
-	<version>0.1.0-rc1</version>
+	<version>0.1.0</version>
 	<vendor>Jan Tvrdík</vendor>
 
 	<description><![CDATA[
@@ -9,7 +9,7 @@
 	]]></description>
 
 	<change-notes><![CDATA[
-		<p>0.1.0-rc1</p>
+		<p>0.1.0-rc1 / 0.1.0</p>
 		<ul>
 			<li>selecting attribute macro from code-completion list auto-inserts =&quot;&quot; and put caret inside those quotes</li>
 		</ul>
