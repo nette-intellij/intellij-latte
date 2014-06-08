@@ -107,9 +107,13 @@ netteAttrValue   ::= T_HTML_TAG_ATTR_SQ T_HTML_TAG_ATTR_SQ_VALUE? T_HTML_TAG_ATT
 
 
 // htmlAttr
-htmlAttr         ::= T_HTML_TAG_ATTR_NAME T_WHITESPACE* (T_HTML_TAG_ATTR_EQUAL_SIGN htmlAttrValue)?
+htmlAttr         ::= T_HTML_TAG_ATTR_NAME T_WHITESPACE* (T_HTML_TAG_ATTR_EQUAL_SIGN htmlAttrValue)? {
+                        methods = [
+                            attrName="T_HTML_TAG_ATTR_NAME"
+                            attrValue="htmlAttrValue"
+                        ]
+                     }
 
-private
 htmlAttrValue    ::= T_HTML_TAG_ATTR_SQ (T_HTML_TAG_ATTR_SQ_VALUE | macro)* T_HTML_TAG_ATTR_SQ
                    | T_HTML_TAG_ATTR_DQ (T_HTML_TAG_ATTR_DQ_VALUE | macro)* T_HTML_TAG_ATTR_DQ
                    | T_HTML_TAG_ATTR_UQ_VALUE

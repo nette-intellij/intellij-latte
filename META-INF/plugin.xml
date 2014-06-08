@@ -68,6 +68,7 @@
 		<lang.commenter language="Latte" implementationClass="com.jantvrdik.intellij.latte.commenter.LatteCommenter"/>
 		<lang.parserDefinition language="Latte" implementationClass="com.jantvrdik.intellij.latte.parser.LatteParserDefinition"/>
 		<lang.syntaxHighlighterFactory key="Latte" implementationClass="com.jantvrdik.intellij.latte.syntaxHighlighter.LatteSyntaxHighlighterFactory"/>
+		<lang.foldingBuilder language="Latte" implementationClass="com.jantvrdik.intellij.latte.folding.LatteFoldingBuilder"/>
 		<colorSettingsPage implementation="com.jantvrdik.intellij.latte.syntaxHighlighter.LatteColorSettingsPage"/>
 		<completion.contributor language="Latte" implementationClass="com.jantvrdik.intellij.latte.completion.LatteCompletionContributor"/>
 		<annotator language="Latte" implementationClass="com.jantvrdik.intellij.latte.annotator.LatteAnnotator"/>
