@@ -34,21 +34,8 @@ public class LatteSyntaxHighlighter extends SyntaxHighlighterBase {
 	@NotNull
 	@Override
 	public TextAttributesKey[] getTokenHighlights(IElementType token) {
-
-		if (token == LatteTypes.T_HTML_TAG_NAME || token == LatteTypes.T_HTML_OPEN_TAG_OPEN || token == LatteTypes.T_HTML_CLOSE_TAG_OPEN || token == LatteTypes.T_HTML_TAG_CLOSE || token == LatteTypes.T_HTML_TAG_CLOSE_EMPTY) {
-			return pack(XmlHighlighterColors.HTML_TAG_NAME);
-
-		} else if (token == LatteTypes.T_HTML_TAG_ATTR_NAME) {
-			return pack(XmlHighlighterColors.HTML_ATTRIBUTE_NAME);
-
-		} else if (token == LatteTypes.T_HTML_TAG_ATTR_SQ_VALUE || token == LatteTypes.T_HTML_TAG_ATTR_SQ || token == LatteTypes.T_HTML_TAG_ATTR_DQ_VALUE || token == LatteTypes.T_HTML_TAG_ATTR_DQ) {
-			return pack(XmlHighlighterColors.HTML_ATTRIBUTE_VALUE);
-
-		} else if (token == LatteTypes.T_HTML_TAG_NATTR_NAME) {
+		if (token == LatteTypes.T_HTML_TAG_NATTR_NAME) {
 			return pack(HTML_NATTR_NAME);
-
-		} else if (token == LatteTypes.T_HTML_COMMENT_OPEN || token == LatteTypes.T_HTML_COMMENT_CLOSE || token == LatteTypes.T_HTML_COMMENT_TEXT) {
-			return pack(XmlHighlighterColors.HTML_COMMENT);
 
 		} else if (token == LatteTypes.T_MACRO_OPEN_TAG_OPEN || token == LatteTypes.T_MACRO_CLOSE_TAG_OPEN || token == LatteTypes.T_MACRO_TAG_CLOSE || token == LatteTypes.T_MACRO_TAG_CLOSE_EMPTY) {
 			return pack(MACRO_DELIMITERS);
