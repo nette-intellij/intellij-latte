@@ -67,6 +67,7 @@
 
 	<!-- http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products -->
 	<depends>com.intellij.modules.lang</depends>
+	<depends>com.jetbrains.php</depends>
 
 	<extensions defaultExtensionNs="com.intellij">
 		<fileTypeFactory implementation="com.jantvrdik.intellij.latte.LatteFileTypeFactory"/>
@@ -75,10 +76,12 @@
 		<lang.syntaxHighlighterFactory key="Latte" implementationClass="com.jantvrdik.intellij.latte.syntaxHighlighter.LatteSyntaxHighlighterFactory"/>
 		<lang.foldingBuilder language="Latte" implementationClass="com.jantvrdik.intellij.latte.folding.LatteFoldingBuilder"/>
 		<lang.fileViewProviderFactory language="Latte" implementationClass="com.jantvrdik.intellij.latte.psi.LatteFileViewProviderFactory"/>
+		<lang.formatter language="Latte" implementationClass="com.jantvrdik.intellij.latte.formatter.LatteFormattingModelBuilder"/>
 		<colorSettingsPage implementation="com.jantvrdik.intellij.latte.syntaxHighlighter.LatteColorSettingsPage"/>
 		<completion.contributor language="Latte" implementationClass="com.jantvrdik.intellij.latte.completion.LatteCompletionContributor"/>
 		<annotator language="Latte" implementationClass="com.jantvrdik.intellij.latte.annotator.LatteAnnotator"/>
 		<typedHandler implementation="com.jantvrdik.intellij.latte.editorActions.LatteTypedHandler"/>
+
 	</extensions>
 
 	<application-components>
