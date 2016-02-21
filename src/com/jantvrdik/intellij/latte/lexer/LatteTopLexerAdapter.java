@@ -1,7 +1,11 @@
 package com.jantvrdik.intellij.latte.lexer;
 
 import com.intellij.lexer.FlexAdapter;
+import com.intellij.lexer.Lexer;
+import com.intellij.lexer.MergeFunction;
 import com.intellij.lexer.MergingLexerAdapter;
+import com.intellij.lexer.MergingLexerAdapterBase;
+import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
@@ -16,7 +20,7 @@ public class LatteTopLexerAdapter extends MergingLexerAdapter {
 	public LatteTopLexerAdapter() {
 		super(
 			new FlexAdapter(new LatteTopLexer((java.io.Reader) null)),
-			TokenSet.create(T_TEXT, T_HTML_COMMENT_TEXT, T_HTML_TAG_ATTR_SQ_VALUE, T_HTML_TAG_ATTR_DQ_VALUE)
+			TokenSet.create(T_TEXT)
 		);
 	}
 }

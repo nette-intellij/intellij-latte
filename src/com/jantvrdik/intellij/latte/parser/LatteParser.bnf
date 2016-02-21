@@ -30,7 +30,7 @@ macroClassic     ::= <<checkPairMacro true>> (pairMacro | emptyMacro) | <<checkP
                      }
 
 private
-pairMacro        ::= macroOpenTag fragmentToken* macroCloseTag
+pairMacro        ::= macroOpenTag structureToken* macroCloseTag
 
 private
 emptyMacro       ::= emptyMacroTag;
@@ -69,28 +69,6 @@ macroArgs        ::= (T_MACRO_ARGS | T_MACRO_ARGS_VAR | T_MACRO_ARGS_STRING | T_
 // autoClosedBlock
 autoClosedBlock  ::= &("{block" macroArgs? T_MACRO_MODIFIERS? "}") macroOpenTag structureToken*
 
-// htmlTag
-htmlTag          ::= voidHtmlTag      // <el>
-                   | emptyHtmlTag     // <el />
-                   | pairHtmlTag      // <el>...</el>
-                   | htmlComment      // <!-- ... -->
-
-pairHtmlTag      ::= pairHtmlTagOpen structureToken* pairHtmlTagClose
-pairHtmlTagOpen  ::= T_HTML_OPEN_TAG_OPEN T_HTML_TAG_NAME anyAttrs? T_HTML_TAG_CLOSE {
-                        methods = [
-                            getTagName
-                        ]
-                     }
-pairHtmlTagClose ::= T_HTML_CLOSE_TAG_OPEN T_HTML_TAG_NAME anyAttrs? T_HTML_TAG_CLOSE {
-                        methods = [
-                            getTagName
-                        ]
-                     }
-emptyHtmlTag     ::= T_HTML_OPEN_TAG_OPEN T_HTML_TAG_NAME anyAttrs? T_HTML_TAG_CLOSE_EMPTY
-voidHtmlTag      ::= T_HTML_OPEN_TAG_OPEN <<checkVoidTag>> T_HTML_TAG_NAME anyAttrs? T_HTML_TAG_CLOSE
-
-
-anyAttrs         ::= (T_WHITESPACE+ | T_TEXT+ | netteAttr | htmlAttr | macro)+
 
 
 // netteAttr
@@ -105,37 +83,14 @@ netteAttrValue   ::= T_HTML_TAG_ATTR_SQ T_HTML_TAG_ATTR_SQ_VALUE? T_HTML_TAG_ATT
                    | T_HTML_TAG_ATTR_DQ T_HTML_TAG_ATTR_DQ_VALUE? T_HTML_TAG_ATTR_DQ
                    | T_HTML_TAG_ATTR_UQ_VALUE
 
-
-// htmlAttr
-htmlAttr         ::= T_HTML_TAG_ATTR_NAME T_WHITESPACE* (T_HTML_TAG_ATTR_EQUAL_SIGN htmlAttrValue)? {
-                        methods = [
-                            attrName="T_HTML_TAG_ATTR_NAME"
-                            attrValue="htmlAttrValue"
-                        ]
-                     }
-
-htmlAttrValue    ::= T_HTML_TAG_ATTR_SQ (T_HTML_TAG_ATTR_SQ_VALUE | macro)* T_HTML_TAG_ATTR_SQ
-                   | T_HTML_TAG_ATTR_DQ (T_HTML_TAG_ATTR_DQ_VALUE | macro)* T_HTML_TAG_ATTR_DQ
-                   | T_HTML_TAG_ATTR_UQ_VALUE
-
-
-// htmlComment
-htmlComment      ::= T_HTML_COMMENT_OPEN (T_HTML_COMMENT_TEXT | macro)* T_HTML_COMMENT_CLOSE
-
+outerHtml ::= T_TEXT+;
 
 // tokens sets
 private
-structureToken   ::= T_TEXT+ | T_WHITESPACE+ | macro | htmlTag
+structureToken   ::= outerHtml | macro | netteAttr
 
-private
-fragmentToken    ::= structureToken
-                   | T_HTML_TAG_ATTR_NAME
-                   | T_HTML_TAG_ATTR_EQUAL_SIGN
-                   | T_HTML_TAG_ATTR_SQ
-                   | T_HTML_TAG_ATTR_SQ_VALUE
-                   | T_HTML_TAG_ATTR_DQ
-                   | T_HTML_TAG_ATTR_DQ_VALUE
-                   | T_HTML_TAG_ATTR_UQ_VALUE
 
 private
 topLevelTokens   ::= T_MACRO_CLASSIC topLevelTokens
+
+private htmlElements ::= T_HTML_COMMENT_OPEN | T_HTML_COMMENT_CLOSE | T_HTML_COMMENT_TEXT | T_HTML_OPEN_TAG_OPEN | T_HTML_CLOSE_TAG_OPEN | T_HTML_TAG_NAME | T_HTML_TAG_CLOSE_EMPTY | T_HTML_TAG_CLOSE | T_HTML_TAG_ATTR_NAME;

@@ -74,6 +74,7 @@
 		<lang.parserDefinition language="Latte" implementationClass="com.jantvrdik.intellij.latte.parser.LatteParserDefinition"/>
 		<lang.syntaxHighlighterFactory key="Latte" implementationClass="com.jantvrdik.intellij.latte.syntaxHighlighter.LatteSyntaxHighlighterFactory"/>
 		<lang.foldingBuilder language="Latte" implementationClass="com.jantvrdik.intellij.latte.folding.LatteFoldingBuilder"/>
+		<lang.fileViewProviderFactory language="Latte" implementationClass="com.jantvrdik.intellij.latte.psi.LatteFileViewProviderFactory"/>
 		<colorSettingsPage implementation="com.jantvrdik.intellij.latte.syntaxHighlighter.LatteColorSettingsPage"/>
 		<completion.contributor language="Latte" implementationClass="com.jantvrdik.intellij.latte.completion.LatteCompletionContributor"/>
 		<annotator language="Latte" implementationClass="com.jantvrdik.intellij.latte.annotator.LatteAnnotator"/>

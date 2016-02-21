@@ -60,16 +60,6 @@ public class LatteAnnotator implements Annotator {
 				holder.createErrorAnnotation(attrName, "Attribute macro n:" + macroName + " can not be used with prefix.");
 			}
 
-		} else if (element instanceof LattePairHtmlTag) {
-			LattePairHtmlTagOpen openTag = ((LattePairHtmlTag) element).getPairHtmlTagOpen();
-			LattePairHtmlTagClose closeTag = ((LattePairHtmlTag) element).getPairHtmlTagClose();
-
-			String openTagName = openTag.getTagName();
-			String closeTagName = closeTag.getTagName();
-
-			if (!closeTagName.equalsIgnoreCase(openTagName)) {
-				holder.createErrorAnnotation(closeTag, "Unexpected </" + closeTagName + ">, expected </" + openTagName + ">");
-			}
 		}
 	}
 }

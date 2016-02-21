@@ -59,17 +59,17 @@ MACRO_STRING_UQ = [^'\"{}]
 <HTML_TEXT> {
 	"<!--" {
 		pushState(HTML_COMMENT);
-		return T_HTML_COMMENT_OPEN;
+		return T_TEXT;
 	}
 
 	"<" / [a-zA-Z0-9:] {
 		pushState(HTML_OPEN_TAG_OPEN);
-		return T_HTML_OPEN_TAG_OPEN;
+		return T_TEXT;
 	}
 
 	"</" / [a-zA-Z0-9:]  {
 		pushState(HTML_CLOSE_TAG_OPEN);
-		return T_HTML_CLOSE_TAG_OPEN;
+		return T_TEXT;
 	}
 
 	[^<{]+ {
@@ -84,19 +84,19 @@ MACRO_STRING_UQ = [^'\"{}]
 <HTML_OPEN_TAG_OPEN> {
 	"script" / [^a-zA-Z0-9:] {
 		pushState(SCRIPT_TAG);
-		return T_HTML_TAG_NAME;
+		return T_TEXT;
 	}
 
 	"style" / [^a-zA-Z0-9:] {
 		pushState(STYLE_TAG);
-		return T_HTML_TAG_NAME;
+		return T_TEXT;
 	}
 }
 
 <HTML_OPEN_TAG_OPEN, HTML_CLOSE_TAG_OPEN> {
 	[a-zA-Z0-9:]+ {
 		pushState(HTML_TAG);
-		return T_HTML_TAG_NAME;
+		return T_TEXT;
 	}
 }
 
@@ -105,14 +105,14 @@ MACRO_STRING_UQ = [^'\"{}]
 		popState(HTML_OPEN_TAG_OPEN);
 		popState(HTML_TEXT);
 		pushState(SCRIPT_CDATA);
-		return T_HTML_TAG_CLOSE_EMPTY;
+		return T_TEXT;
 	}
 
 	">" {
 		popState(HTML_OPEN_TAG_OPEN);
 		popState(HTML_TEXT);
 		pushState(SCRIPT_CDATA);
-		return T_HTML_TAG_CLOSE;
+		return T_TEXT;
 	}
 }
 
@@ -120,7 +120,7 @@ MACRO_STRING_UQ = [^'\"{}]
 	"</" / "script" [^a-zA-Z0-9:] {
 		popState(HTML_TEXT);
 		pushState(HTML_CLOSE_TAG_OPEN);
-		return T_HTML_CLOSE_TAG_OPEN;
+		return T_TEXT;
 	}
 
 	[^] {
@@ -133,14 +133,14 @@ MACRO_STRING_UQ = [^'\"{}]
 		popState(HTML_OPEN_TAG_OPEN);
 		popState(HTML_TEXT);
 		pushState(STYLE_CDATA);
-		return T_HTML_TAG_CLOSE_EMPTY;
+		return T_TEXT;
 	}
 
 	">" {
 		popState(HTML_OPEN_TAG_OPEN);
 		popState(HTML_TEXT);
 		pushState(STYLE_CDATA);
-		return T_HTML_TAG_CLOSE;
+		return T_TEXT;
 	}
 }
 
@@ -148,7 +148,7 @@ MACRO_STRING_UQ = [^'\"{}]
 	"</" / "style" [^a-zA-Z0-9:] {
 		popState(HTML_TEXT);
 		pushState(HTML_CLOSE_TAG_OPEN);
-		return T_HTML_CLOSE_TAG_OPEN;
+		return T_TEXT;
 	}
 
 	[^] {
@@ -160,13 +160,13 @@ MACRO_STRING_UQ = [^'\"{}]
 	"/>" {
 		popState(HTML_OPEN_TAG_OPEN, HTML_CLOSE_TAG_OPEN);
 		popState(HTML_TEXT);
-		return T_HTML_TAG_CLOSE_EMPTY;
+		return T_TEXT;
 	}
 
 	">" {
 		popState(HTML_OPEN_TAG_OPEN, HTML_CLOSE_TAG_OPEN);
 		popState(HTML_TEXT);
-		return T_HTML_TAG_CLOSE;
+		return T_TEXT;
 	}
 }
 
@@ -179,11 +179,11 @@ MACRO_STRING_UQ = [^'\"{}]
 	// TODO: missing !'n:' (sth. like [^n] | [n][^:])
 	[^ \t\r\n/>={]+ {
 		pushState(HTML_ATTR);
-		return T_HTML_TAG_ATTR_NAME;
+		return T_TEXT;
 	}
 
 	{WHITE_SPACE} {
-		return T_WHITESPACE;
+		return T_TEXT;
 	}
 
 	[^] {
@@ -264,11 +264,11 @@ MACRO_STRING_UQ = [^'\"{}]
 <HTML_ATTR> {
 	"=" / [ \t\r\n]* [^ \t\r\n/>{] {
 		pushState(HTML_ATTR_VALUE);
-		return T_HTML_TAG_ATTR_EQUAL_SIGN;
+		return T_TEXT;
 	}
 
 	{WHITE_SPACE} {
-		return T_WHITESPACE;
+		return T_TEXT;
 	}
 
 	[^] {
@@ -280,22 +280,22 @@ MACRO_STRING_UQ = [^'\"{}]
 <HTML_ATTR_VALUE> {
 	['] {
 		pushState(HTML_ATTR_SQ);
-		return T_HTML_TAG_ATTR_SQ;
+		return T_TEXT;
 	}
 
 	[\"] {
 		pushState(HTML_ATTR_DQ);
-		return T_HTML_TAG_ATTR_DQ;
+		return T_TEXT;
 	}
 
 	[^ \t\r\n/>{'\"][^ \t\r\n/>{]* {
 		popState(HTML_ATTR);
 		popState(SCRIPT_TAG, STYLE_TAG, HTML_TAG);
-		return T_HTML_TAG_ATTR_UQ_VALUE;
+		return T_TEXT;
 	}
 
 	{WHITE_SPACE} {
-		return T_WHITESPACE;
+		return T_TEXT;
 	}
 
 	[^] {
@@ -310,15 +310,15 @@ MACRO_STRING_UQ = [^'\"{}]
 		popState(HTML_ATTR_VALUE);
 		popState(HTML_ATTR);
 		popState(SCRIPT_TAG, STYLE_TAG, HTML_TAG);
-		return T_HTML_TAG_ATTR_SQ;
+		return T_TEXT;
 	}
 
 	[^'{]+ {
-		return T_HTML_TAG_ATTR_SQ_VALUE;
+		return T_TEXT;
 	}
 
 	"{" {
-		return T_HTML_TAG_ATTR_SQ_VALUE;
+		return T_TEXT;
 	}
 }
 
@@ -327,26 +327,26 @@ MACRO_STRING_UQ = [^'\"{}]
 		popState(HTML_ATTR_VALUE);
 		popState(HTML_ATTR);
 		popState(SCRIPT_TAG, STYLE_TAG, HTML_TAG);
-		return T_HTML_TAG_ATTR_DQ;
+		return T_TEXT;
 	}
 
 	[^\"{]+ {
-		return T_HTML_TAG_ATTR_DQ_VALUE;
+		return T_TEXT;
 	}
 
 	"{" {
-		return T_HTML_TAG_ATTR_DQ_VALUE;
+		return T_TEXT;
 	}
 }
 
 <HTML_COMMENT> {
 	"-->" {
 		popState(HTML_TEXT);
-		return T_HTML_COMMENT_CLOSE;
+		return T_TEXT;
 	}
 
 	[^] {
-		return T_HTML_COMMENT_TEXT;
+		return T_TEXT;
 	}
 }
 
