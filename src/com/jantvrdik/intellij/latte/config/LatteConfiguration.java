@@ -19,12 +19,8 @@ public class LatteConfiguration {
 	/** list of custom  macros, indexed by project and macro name */
 	private Map<Project, Map<String, LatteMacro>> customMacros = new HashMap<Project, Map<String, LatteMacro>>();
 
-	/** list of void html tags */
-	private Set<String> voidHtmlTags = new HashSet<String>();
-
 	public LatteConfiguration() {
 		initStandardMacros();
-		initVoidHtmlTags();
 	}
 
 	/**
@@ -104,31 +100,6 @@ public class LatteConfiguration {
 
 		addStandardMacro("contentType", UNPAIRED);
 		addStandardMacro("status", UNPAIRED);
-	}
-
-	/**
-	 * Initializes void elements, based on Nette\Utils\Html::$emptyElements in Nette 2.1.2.
-	 */
-	private void initVoidHtmlTags() {
-		voidHtmlTags.add("img");
-		voidHtmlTags.add("hr");
-		voidHtmlTags.add("br");
-		voidHtmlTags.add("input");
-		voidHtmlTags.add("meta");
-		voidHtmlTags.add("area");
-		voidHtmlTags.add("embed");
-		voidHtmlTags.add("keygen");
-		voidHtmlTags.add("source");
-		voidHtmlTags.add("base");
-		voidHtmlTags.add("col");
-		voidHtmlTags.add("link");
-		voidHtmlTags.add("param");
-		voidHtmlTags.add("basefont");
-		voidHtmlTags.add("frame");
-		voidHtmlTags.add("isindex");
-		voidHtmlTags.add("wbr");
-		voidHtmlTags.add("command");
-		voidHtmlTags.add("track");
 	}
 
 	/**
@@ -215,11 +186,4 @@ public class LatteConfiguration {
 		return key;
 	}
 
-	/**
-	 * @param tagName e.g. 'img' or 'div'
-	 * @return true if tag is void (can never have any children), false otherwise
-	 */
-	public boolean isHtmlTagVoid(String tagName) {
-		return voidHtmlTags.contains(tagName);
-	}
 }

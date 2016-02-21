@@ -55,12 +55,4 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 		return result;
 	}
 
-	/**
-	 * Looks for token T_HTML_TAG_NAME and returns true if the HTML tag is void (e.g. <img>).
-	 */
-	public static boolean checkVoidTag(PsiBuilder builder, int level) {
-		if (builder.getTokenType() != T_HTML_TAG_NAME) return false;
-		String tagName = builder.getTokenText();
-		return LatteConfiguration.INSTANCE.isHtmlTagVoid(tagName);
-	}
 }
