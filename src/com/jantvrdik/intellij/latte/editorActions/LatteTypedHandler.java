@@ -16,7 +16,7 @@ public class LatteTypedHandler extends TypedHandlerDelegate {
 	@Override
 	public Result beforeCharTyped(char charTyped, Project project, Editor editor, PsiFile file, FileType fileType) {
 		// ignores typing '}' before '}'
-		if (charTyped == '}' && project != null && file.getLanguage() == LatteLanguage.INSTANCE) {
+		if (charTyped == '}' && project != null && file.getViewProvider().getLanguages().contains(LatteLanguage.INSTANCE)) {
 			CaretModel caretModel = editor.getCaretModel();
 			String text = editor.getDocument().getText();
 			int offset = caretModel.getOffset();
@@ -32,10 +32,13 @@ public class LatteTypedHandler extends TypedHandlerDelegate {
 	@Override
 	public Result charTyped(char charTyped, Project project, @NotNull Editor editor, @NotNull PsiFile file) {
 		// auto-inserts '}' after typing '{'
-		if (charTyped == '{' && project != null && file.getLanguage() == LatteLanguage.INSTANCE) {
+		if (charTyped == '{' && project != null && file.getViewProvider().getLanguages().contains(LatteLanguage.INSTANCE)) {
 			int offset = editor.getCaretModel().getOffset();
-			editor.getDocument().insertString(offset, "}");
-			return Result.STOP;
+			String text = editor.getDocument().getText();
+			if (text.length() == offset || text.charAt(offset) != '}') {
+				editor.getDocument().insertString(offset, "}");
+				return Result.STOP;
+			}
 		}
 
 		return super.charTyped(charTyped, project, editor, file);
