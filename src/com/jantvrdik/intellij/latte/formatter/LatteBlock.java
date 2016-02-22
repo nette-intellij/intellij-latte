@@ -6,11 +6,15 @@ import com.intellij.formatting.Indent;
 import com.intellij.formatting.Spacing;
 import com.intellij.formatting.Wrap;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.psi.formatter.xml.XmlFormattingPolicy;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.webcore.template.formatter.AbstractTemplateLanguageFormattingModelBuilder;
 import com.intellij.webcore.template.formatter.TemplateLanguageBlock;
+import com.jantvrdik.intellij.latte.psi.LatteMacroClassic;
+import com.jantvrdik.intellij.latte.psi.LatteMacroOpenTag;
+import com.jantvrdik.intellij.latte.psi.LatteMacroTag;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,10 +37,18 @@ public class LatteBlock extends TemplateLanguageBlock {
 	@NotNull
 	@Override
 	protected Indent getChildIndent(@NotNull ASTNode astNode) {
-		if (isPair && !isOpening(astNode) && !isClosing(astNode)) {
+		if (!isPair || isOpening(astNode) || isClosing(astNode)) {
+			return Indent.getNoneIndent();
+		}
+		if (!(astNode.getPsi() instanceof LatteMacroClassic)) {
 			return Indent.getNormalIndent();
 		}
-		return Indent.getNoneIndent();
+		PsiElement el = astNode.getPsi();
+		LatteMacroTag openTag = ((LatteMacroClassic) el).getOpenTag();
+		if (openTag.getMacroName().equals("else") || openTag.getMacroName().equals("elseif")) {
+			return Indent.getNoneIndent();
+		}
+		return Indent.getNormalIndent();
 	}
 
 	@Override
