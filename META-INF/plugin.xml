@@ -81,6 +81,7 @@
 		<completion.contributor language="Latte" implementationClass="com.jantvrdik.intellij.latte.completion.LatteCompletionContributor"/>
 		<annotator language="Latte" implementationClass="com.jantvrdik.intellij.latte.annotator.LatteAnnotator"/>
 		<typedHandler implementation="com.jantvrdik.intellij.latte.editorActions.LatteTypedHandler"/>
+		<highlightErrorFilter implementation="com.jantvrdik.intellij.latte.psi.ErrorFilter"/>
 
 	</extensions>
 
