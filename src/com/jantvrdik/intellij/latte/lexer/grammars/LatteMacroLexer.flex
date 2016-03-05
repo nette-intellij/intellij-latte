@@ -18,10 +18,6 @@ import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
 %state ARGS
 
 NAME_FULL = [a-zA-Z][a-zA-Z0-9_]* ([.:][a-zA-Z0-9_]+)*
-MODIFIERS = [a-zA-Z] ({STRING} | [^'\"])*
-STRING = {STRING_SQ} | {STRING_DQ}
-STRING_SQ = "'" ("\\" [^] | [^'\\])* "'"
-STRING_DQ = "\"" ("\\" [^] | [^\"\\])* "\""
 
 %%
 <YYINITIAL> {
@@ -56,7 +52,7 @@ STRING_DQ = "\"" ("\\" [^] | [^\"\\])* "\""
 
 	{NAME_FULL} ("::" | "(" | "\\") {
 		yybegin(ARGS);
-		return T_MACRO_ARGS;
+		return T_MACRO_CONTENT;
 	}
 }
 
@@ -75,7 +71,7 @@ STRING_DQ = "\"" ("\\" [^] | [^\"\\])* "\""
 
 	"}" / [^] {
 		yybegin(ARGS);
-		return T_MACRO_ARGS;
+		return T_MACRO_CONTENT;
 	}
 
 	"/}" {
@@ -85,36 +81,11 @@ STRING_DQ = "\"" ("\\" [^] | [^\"\\])* "\""
 
 	"/}" / [^] {
 		yybegin(ARGS);
-		return T_MACRO_ARGS;
-	}
-
-	"|" {MODIFIERS} / "/"? "}" {
-		yybegin(ARGS);
-		return T_MACRO_MODIFIERS;
-	}
-
-	"|" / {MODIFIERS} "/"? "}" [^] {
-		yybegin(ARGS);
-		return T_MACRO_ARGS;
-	}
-
-	"$" [a-zA-Z_][a-zA-Z0-9_]* {
-		yybegin(ARGS);
-		return T_MACRO_ARGS_VAR;
-	}
-
-	{STRING} {
-		yybegin(ARGS);
-		return T_MACRO_ARGS_STRING;
-	}
-
-	[0-9]+ {
-		yybegin(ARGS);
-		return T_MACRO_ARGS_NUMBER;
+		return T_MACRO_CONTENT;
 	}
 
 	[^] {
 		yybegin(ARGS);
-		return T_MACRO_ARGS;
+		return T_MACRO_CONTENT;
 	}
 }

@@ -221,7 +221,7 @@ MACRO_STRING_UQ = [^'\"{}]
 	[^ \t\r\n/>{'\"][^ \t\r\n/>{]* {
 		popState(NETTE_ATTR);
 		popState(SCRIPT_TAG, STYLE_TAG, HTML_TAG);
-		return T_HTML_TAG_ATTR_UQ_VALUE;
+		return T_MACRO_CONTENT;
 	}
 
 	{WHITE_SPACE} {
@@ -244,7 +244,7 @@ MACRO_STRING_UQ = [^'\"{}]
 	}
 
 	[^']+ {
-		return T_HTML_TAG_ATTR_SQ_VALUE;
+		return T_MACRO_CONTENT;
 	}
 }
 
@@ -257,7 +257,7 @@ MACRO_STRING_UQ = [^'\"{}]
 	}
 
 	[^\"]+ {
-		return T_HTML_TAG_ATTR_DQ_VALUE;
+		return T_MACRO_CONTENT;
 	}
 }
 

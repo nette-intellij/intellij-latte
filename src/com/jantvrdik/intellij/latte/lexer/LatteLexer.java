@@ -11,6 +11,9 @@ import com.jantvrdik.intellij.latte.psi.LatteTypes;
 public class LatteLexer extends LayeredLexer {
 	public LatteLexer() {
 		super(new LatteTopLexerAdapter());
-		registerLayer(new LatteMacroLexerAdapter(), LatteTypes.T_MACRO_CLASSIC);
+		LayeredLexer macroLexer = new LayeredLexer(new LatteMacroLexerAdapter());
+		macroLexer.registerLayer(new LatteMacroContentLexerAdapter(), LatteTypes.T_MACRO_CONTENT);
+		registerLayer(macroLexer, LatteTypes.T_MACRO_CLASSIC);
+		registerLayer(new LatteMacroContentLexerAdapter(), LatteTypes.T_MACRO_CONTENT);
 	}
 }

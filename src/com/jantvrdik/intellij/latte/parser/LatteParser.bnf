@@ -39,25 +39,28 @@ private
 unpairedMacro    ::= macroOpenTag
 
 fake
-macroTag         ::= macroContent {
+macroTag         ::= classicMacroContent {
                      	methods = [
                      		getMacroName
                      	]
                      }
 
-macroOpenTag     ::= T_MACRO_OPEN_TAG_OPEN macroContent T_MACRO_TAG_CLOSE {
+macroOpenTag     ::= T_MACRO_OPEN_TAG_OPEN classicMacroContent T_MACRO_TAG_CLOSE {
                      	extends = macroTag
                      }
-macroCloseTag    ::= T_MACRO_CLOSE_TAG_OPEN macroContent T_MACRO_TAG_CLOSE {
+macroCloseTag    ::= T_MACRO_CLOSE_TAG_OPEN classicMacroContent T_MACRO_TAG_CLOSE {
                      	extends = macroTag
                      }
-emptyMacroTag    ::= T_MACRO_OPEN_TAG_OPEN macroContent T_MACRO_TAG_CLOSE_EMPTY {
+emptyMacroTag    ::= T_MACRO_OPEN_TAG_OPEN classicMacroContent T_MACRO_TAG_CLOSE_EMPTY {
                      	extends = macroTag
                      }
 
 
 private
-macroContent     ::= macroName macroArgs? T_MACRO_MODIFIERS?
+classicMacroContent     ::= macroName macroContent
+
+private
+macroContent ::= macroArgs? T_MACRO_MODIFIERS?
 
 private
 macroName        ::= T_MACRO_NAME
@@ -79,9 +82,9 @@ netteAttr        ::= T_HTML_TAG_NATTR_NAME T_WHITESPACE* (T_HTML_TAG_ATTR_EQUAL_
                         ]
                      }
 
-netteAttrValue   ::= T_HTML_TAG_ATTR_SQ T_HTML_TAG_ATTR_SQ_VALUE? T_HTML_TAG_ATTR_SQ
-                   | T_HTML_TAG_ATTR_DQ T_HTML_TAG_ATTR_DQ_VALUE? T_HTML_TAG_ATTR_DQ
-                   | T_HTML_TAG_ATTR_UQ_VALUE
+netteAttrValue   ::= T_HTML_TAG_ATTR_SQ macroContent T_HTML_TAG_ATTR_SQ
+                   | T_HTML_TAG_ATTR_DQ macroContent T_HTML_TAG_ATTR_DQ
+                   | macroContent
 
 outerHtml ::= T_TEXT+;
 
@@ -91,6 +94,6 @@ structureToken   ::= outerHtml | macro | netteAttr
 
 
 private
-topLevelTokens   ::= T_MACRO_CLASSIC topLevelTokens
+topLevelTokens   ::= T_MACRO_CLASSIC T_MACRO_CONTENT topLevelTokens
 
 private htmlElements ::= T_HTML_COMMENT_OPEN | T_HTML_COMMENT_CLOSE | T_HTML_COMMENT_TEXT | T_HTML_OPEN_TAG_OPEN | T_HTML_CLOSE_TAG_OPEN | T_HTML_TAG_NAME | T_HTML_TAG_CLOSE_EMPTY | T_HTML_TAG_CLOSE | T_HTML_TAG_ATTR_NAME;
