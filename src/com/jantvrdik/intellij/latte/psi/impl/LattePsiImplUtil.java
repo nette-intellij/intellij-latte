@@ -28,9 +28,4 @@ public class LattePsiImplUtil {
 		return (argsNode != null ? "=" : "");
 	}
 
-	public static String getTagName(PsiElement element) {
-		ASTNode nameNode = element.getNode().findChildByType(T_HTML_TAG_NAME);
-		assert nameNode != null;
-		return nameNode.getText();
-	}
 }

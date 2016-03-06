@@ -95,5 +95,3 @@ structureToken   ::= outerHtml | macro | netteAttr
 
 private
 topLevelTokens   ::= T_MACRO_CLASSIC T_MACRO_CONTENT topLevelTokens
-
-private htmlElements ::= T_HTML_COMMENT_OPEN | T_HTML_COMMENT_CLOSE | T_HTML_COMMENT_TEXT | T_HTML_OPEN_TAG_OPEN | T_HTML_CLOSE_TAG_OPEN | T_HTML_TAG_NAME | T_HTML_TAG_CLOSE_EMPTY | T_HTML_TAG_CLOSE | T_HTML_TAG_ATTR_NAME;
