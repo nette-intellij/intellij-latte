@@ -4,8 +4,10 @@ import com.intellij.lang.Language;
 import com.intellij.lang.LanguageParserDefinitions;
 import com.intellij.lang.ParserDefinition;
 import com.intellij.lang.html.HTMLLanguage;
+import com.intellij.lang.xml.XMLLanguage;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.MultiplePsiFilesPerDocumentFileViewProvider;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.impl.source.PsiFileImpl;
@@ -17,12 +19,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LatteFileViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider implements TemplateLanguageFileViewProvider {
 
 	public static LatteElementType OUTER_LATTE = new LatteElementType("Outer latte");
+	private static Pattern xmlContentType = Pattern.compile("^\\{contentType [^}]*xml[^}]*}.*");
 
 	public LatteFileViewProvider(PsiManager manager, VirtualFile virtualFile, boolean eventSystemEnabled) {
 		super(manager, virtualFile, eventSystemEnabled);
@@ -36,7 +41,11 @@ public class LatteFileViewProvider extends MultiplePsiFilesPerDocumentFileViewPr
 
 	@NotNull
 	public Set<Language> getLanguages() {
-		return new THashSet(Arrays.asList(new Language[]{LatteLanguage.INSTANCE, this.getTemplateDataLanguage()}));
+		Set<Language> languages = new HashSet<Language>(3);
+		languages.add(LatteLanguage.INSTANCE);
+		languages.add(getTemplateDataLanguage());
+
+		return languages;
 	}
 
 	@Override
@@ -47,7 +56,7 @@ public class LatteFileViewProvider extends MultiplePsiFilesPerDocumentFileViewPr
 	@NotNull
 	@Override
 	public Language getTemplateDataLanguage() {
-		return HTMLLanguage.INSTANCE;
+		return isXml() ? XMLLanguage.INSTANCE : HTMLLanguage.INSTANCE;
 	}
 
 	@Nullable
@@ -55,12 +64,24 @@ public class LatteFileViewProvider extends MultiplePsiFilesPerDocumentFileViewPr
 		ParserDefinition parser = LanguageParserDefinitions.INSTANCE.forLanguage(lang);
 		if (parser == null) {
 			return null;
-		} else if (lang == this.getTemplateDataLanguage()) {
+		} else if (lang == XMLLanguage.INSTANCE || lang == HTMLLanguage.INSTANCE) {
 			PsiFileImpl file = (PsiFileImpl) parser.createFile(this);
-			file.setContentElementType(new TemplateDataElementType("Outer HTML in Latte", getBaseLanguage(), LatteTypes.T_TEXT, OUTER_LATTE));
+			file.setContentElementType(new TemplateDataElementType("Outer HTML/XML in Latte", getBaseLanguage(), LatteTypes.T_TEXT, OUTER_LATTE));
 			return file;
 		} else {
 			return lang == this.getBaseLanguage() ? parser.createFile(this) : null;
 		}
+	}
+
+	private boolean isXml() {
+		if (this.getDocument() == null) {
+			return false;
+		}
+		String text = this.getDocument().getText();
+		int pos = text.indexOf("\n");
+		if (pos > 0) {
+			text = text.substring(0, pos);
+		}
+		return xmlContentType.matcher(text).matches();
 	}
 }
