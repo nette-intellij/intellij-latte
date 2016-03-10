@@ -17,6 +17,7 @@ MODIFIERS = [a-zA-Z] ({STRING} | [^'\"])*
 STRING = {STRING_SQ} | {STRING_DQ}
 STRING_SQ = "'" ("\\" [^] | [^'\\])* "'"
 STRING_DQ = "\"" ("\\" [^] | [^\"\\])* "\""
+SYMBOL = [_[:letter:]][_0-9[:letter:]]*(-[_0-9[:letter:]]+)* //todo: unicode letters
 
 %%
 
@@ -41,6 +42,10 @@ STRING_DQ = "\"" ("\\" [^] | [^\"\\])* "\""
 
 	[0-9]+ {
 		return T_MACRO_ARGS_NUMBER;
+	}
+
+	{SYMBOL} {
+		return T_MACRO_ARGS;
 	}
 
 	[^] {

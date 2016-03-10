@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import static com.jantvrdik.intellij.latte.Assert.assertTokens;
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.T_MACRO_ARGS;
+import static com.jantvrdik.intellij.latte.psi.LatteTypes.T_MACRO_ARGS_NUMBER;
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.T_MACRO_ARGS_STRING;
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.T_MACRO_ARGS_VAR;
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.T_MACRO_MODIFIERS;
@@ -96,6 +97,20 @@ public class LatteMacroContentLexerAdapterTest {
 				Pair.create(T_MACRO_ARGS_STRING, "'function() { $a = $b|c() }'"),
 				Pair.create(T_MACRO_ARGS, " "),
 				Pair.create(T_MACRO_MODIFIERS, "|mod"),
+		});
+
+		lexer.start("1");
+		assertTokens(lexer, new Pair[]{
+				Pair.create(T_MACRO_ARGS_NUMBER, "1"),
+		});
+		lexer.start("1a");
+		assertTokens(lexer, new Pair[]{
+				Pair.create(T_MACRO_ARGS_NUMBER, "1"),
+				Pair.create(T_MACRO_ARGS, "a"),
+		});
+		lexer.start("a1");
+		assertTokens(lexer, new Pair[]{
+				Pair.create(T_MACRO_ARGS, "a1"),
 		});
 	}
 }
