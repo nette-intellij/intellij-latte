@@ -24,7 +24,7 @@ SYMBOL = [_[:letter:]][_0-9[:letter:]]*(-[_0-9[:letter:]]+)* //todo: unicode let
 
 <YYINITIAL> {
 
-	"|" {MODIFIERS} {
+	"|" / {MODIFIERS} {
 		return T_MACRO_MODIFIERS;
 	}
 

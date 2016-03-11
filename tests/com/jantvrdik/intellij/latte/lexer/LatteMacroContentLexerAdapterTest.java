@@ -47,13 +47,18 @@ public class LatteMacroContentLexerAdapterTest {
 		lexer.start("$var|noescape");
 		assertTokens(lexer, new Pair[]{
 				Pair.create(T_MACRO_ARGS_VAR, "$var"),
-				Pair.create(T_MACRO_MODIFIERS, "|noescape"),
+				Pair.create(T_MACRO_MODIFIERS, "|"),
+				Pair.create(T_MACRO_ARGS, "noescape"),
 		});
 
 		lexer.start("$var|truncate:10|upper");
 		assertTokens(lexer, new Pair[]{
 				Pair.create(T_MACRO_ARGS_VAR, "$var"),
-				Pair.create(T_MACRO_MODIFIERS, "|truncate:10|upper"),
+				Pair.create(T_MACRO_MODIFIERS, "|"),
+				Pair.create(T_MACRO_ARGS, "truncate:"),
+				Pair.create(T_MACRO_ARGS_NUMBER, "10"),
+				Pair.create(T_MACRO_MODIFIERS, "|"),
+				Pair.create(T_MACRO_ARGS, "upper"),
 		});
 
 		// https://github.com/nette/latte/issues/13
@@ -63,7 +68,8 @@ public class LatteMacroContentLexerAdapterTest {
 				Pair.create(T_MACRO_ARGS_VAR, "$a"),
 				Pair.create(T_MACRO_ARGS, " as "),
 				Pair.create(T_MACRO_ARGS_VAR, "$v"),
-				Pair.create(T_MACRO_MODIFIERS, "|noiterator "),
+				Pair.create(T_MACRO_MODIFIERS, "|"),
+				Pair.create(T_MACRO_ARGS, "noiterator "),
 		});
 
 		lexer.start(" function() { } ");
@@ -75,20 +81,25 @@ public class LatteMacroContentLexerAdapterTest {
 		lexer.start("{a|b}");
 		assertTokens(lexer, new Pair[]{
 				Pair.create(T_MACRO_ARGS, "{a"),
-				Pair.create(T_MACRO_MODIFIERS, "|b}"),
+				Pair.create(T_MACRO_MODIFIERS, "|"),
+				Pair.create(T_MACRO_ARGS, "b}"),
 		});
 
 		lexer.start("a|b:{}");
 		assertTokens(lexer, new Pair[]{
 				Pair.create(T_MACRO_ARGS, "a"),
-				Pair.create(T_MACRO_MODIFIERS, "|b:{}"),
+				Pair.create(T_MACRO_MODIFIERS, "|"),
+				Pair.create(T_MACRO_ARGS, "b:{}"),
 		});
 
 		lexer.start("'{}}'{|a:'{}}'}");
 		assertTokens(lexer, new Pair[]{
 				Pair.create(T_MACRO_ARGS_STRING, "'{}}'"),
 				Pair.create(T_MACRO_ARGS, "{"),
-				Pair.create(T_MACRO_MODIFIERS, "|a:'{}}'}"),
+				Pair.create(T_MACRO_MODIFIERS, "|"),
+				Pair.create(T_MACRO_ARGS, "a:"),
+				Pair.create(T_MACRO_ARGS_STRING, "'{}}'"),
+				Pair.create(T_MACRO_ARGS, "}"),
 		});
 
 		lexer.start(" 'function() { $a = $b|c() }' |mod");
@@ -96,7 +107,8 @@ public class LatteMacroContentLexerAdapterTest {
 				Pair.create(T_MACRO_ARGS, " "),
 				Pair.create(T_MACRO_ARGS_STRING, "'function() { $a = $b|c() }'"),
 				Pair.create(T_MACRO_ARGS, " "),
-				Pair.create(T_MACRO_MODIFIERS, "|mod"),
+				Pair.create(T_MACRO_MODIFIERS, "|"),
+				Pair.create(T_MACRO_ARGS, "mod"),
 		});
 
 		lexer.start("1");

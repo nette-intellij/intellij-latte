@@ -60,7 +60,7 @@ private
 classicMacroContent     ::= macroName macroContent
 
 private
-macroContent ::= macroArgs? T_MACRO_MODIFIERS?
+macroContent ::= macroArgs? (T_MACRO_MODIFIERS macroArgs)*
 
 private
 macroName        ::= T_MACRO_NAME
