@@ -21,9 +21,6 @@ Supported Features
 Known Limitations
 -----------------
 
-* Low-level macros `{syntax}` and `{contentType}` are not supported.
-* HTML tags cannot overlap neither with each other nor with macros.
-* None of the PhpStorm's features for HTML, CSS or JS will work in Latte files.
-
+* Low-level macros `{syntax}` is not supported, `{contentType}` is supported partially.
 
 ![Screenshot](http://plugins.jetbrains.com/files/7457/screenshot_14518.png)

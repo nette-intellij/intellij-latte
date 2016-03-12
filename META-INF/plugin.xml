@@ -1,7 +1,7 @@
 <idea-plugin version="2">
 	<id>com.jantvrdik.intellij.latte</id>
 	<name>Latte</name>
-	<version>0.1.1</version>
+	<version>0.2.0</version>
 	<vendor>Jan Tvrdík</vendor>
 
 	<description><![CDATA[
@@ -9,6 +9,12 @@
 	]]></description>
 
 	<change-notes><![CDATA[
+		<p>0.2.0</p>
+		<ul>
+			<li>html/xml support</li>
+			<li>better macro content parsing</li>
+			<li>parsing of n:macros content</li>
+		</ul>
 		<p>0.1.1</p>
 		<ul>
 			<li>implemented basic html tags and macros folding</li>
@@ -63,7 +69,7 @@
 	</change-notes>
 
 	<!-- http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges -->
-	<idea-version since-build="133.326"/>
+	<idea-version since-build="139.0"/>
 
 	<!-- http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products -->
 	<depends>com.intellij.modules.lang</depends>
