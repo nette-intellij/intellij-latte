@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class LatteParserDefinition implements ParserDefinition {
 	public static final TokenSet WHITE_SPACES = TokenSet.create(LatteTypes.T_WHITESPACE, TokenType.WHITE_SPACE);
-	public static final TokenSet COMMENTS = TokenSet.create(LatteTypes.MACRO_COMMENT);
+	public static final TokenSet COMMENTS = TokenSet.create(LatteTypes.T_MACRO_COMMENT);
 	public static final TokenSet STRINGS = TokenSet.create(LatteTypes.T_MACRO_ARGS_STRING);
 
 	public static final IFileElementType FILE = new IFileElementType(LatteLanguage.INSTANCE);
