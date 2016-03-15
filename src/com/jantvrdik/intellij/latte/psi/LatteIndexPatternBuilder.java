@@ -1,11 +1,15 @@
 package com.jantvrdik.intellij.latte.psi;
 
+import com.intellij.lexer.LayeredLexer;
 import com.intellij.lexer.Lexer;
+import com.intellij.openapi.editor.highlighter.EditorHighlighter;
+import com.intellij.openapi.editor.highlighter.EditorHighlighterFactory;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.impl.search.IndexPatternBuilder;
+import com.intellij.psi.impl.search.LexerEditorHighlighterLexer;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
-import com.jantvrdik.intellij.latte.lexer.LatteLexer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,7 +19,21 @@ public class LatteIndexPatternBuilder implements IndexPatternBuilder {
 	@Nullable
 	@Override
 	public Lexer getIndexingLexer(@NotNull PsiFile file) {
-		return file instanceof LatteFile ? new LatteLexer() : null;
+		if (!(file instanceof LatteFile)) {
+			return null;
+		}
+		VirtualFile virtualFile = file.getVirtualFile();
+		if (virtualFile == null) {
+			virtualFile = file.getViewProvider().getVirtualFile();
+		}
+
+		try {
+			LayeredLexer.ourDisableLayersFlag.set(Boolean.TRUE);
+			EditorHighlighter highlighter = EditorHighlighterFactory.getInstance().createEditorHighlighter(file.getProject(), virtualFile);
+			return new LexerEditorHighlighterLexer(highlighter, false);
+		} finally {
+			LayeredLexer.ourDisableLayersFlag.set(Boolean.FALSE);
+		}
 	}
 
 	@Nullable
@@ -31,6 +49,9 @@ public class LatteIndexPatternBuilder implements IndexPatternBuilder {
 
 	@Override
 	public int getCommentEndDelta(IElementType tokenType) {
-		return 2;
+		if (tokenType == LatteTypes.T_MACRO_COMMENT) {
+			return 2;
+		}
+		return 0;
 	}
 }
