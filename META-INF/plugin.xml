@@ -90,6 +90,11 @@
 		<highlightErrorFilter implementation="com.jantvrdik.intellij.latte.psi.ErrorFilter"/>
 		<indexPatternBuilder implementation="com.jantvrdik.intellij.latte.psi.LatteIndexPatternBuilder"/>
 
+		<localInspection language="Latte" shortName="ModifierNotAllowed" id="ModifierNotAllowed"
+						 displayName="Modifier not allowed"
+						 groupName="Latte" enabledByDefault="true" level="WARNING"
+						 implementationClass="com.jantvrdik.intellij.latte.inspections.ModifierNotAllowedInspection"/>
+
 	</extensions>
 
 	<application-components>
