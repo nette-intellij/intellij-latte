@@ -89,6 +89,7 @@
 		<typedHandler implementation="com.jantvrdik.intellij.latte.editorActions.LatteTypedHandler"/>
 		<highlightErrorFilter implementation="com.jantvrdik.intellij.latte.psi.ErrorFilter"/>
 		<indexPatternBuilder implementation="com.jantvrdik.intellij.latte.psi.LatteIndexPatternBuilder"/>
+		<lang.psiStructureViewFactory language="Latte" implementationClass="com.jantvrdik.intellij.latte.editor.LatteStructureViewFactory"/>
 
 		<localInspection language="Latte" shortName="ModifierNotAllowed" id="ModifierNotAllowed"
 						 displayName="Modifier not allowed"
