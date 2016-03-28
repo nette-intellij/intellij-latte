@@ -24,9 +24,20 @@ public class LatteFoldingBuilder extends FoldingBuilderEx {
 		List<FoldingDescriptor> descriptors = new ArrayList<FoldingDescriptor>();
 
 		if (!quick) {
-			Collection<LatteMacroClassic> nodes = PsiTreeUtil.findChildrenOfType(root, LatteMacroClassic.class);
+			Collection<PsiElement> nodes = PsiTreeUtil.findChildrenOfAnyType(root, LatteMacroClassic.class, LatteAutoClosedBlock.class);
 			for (PsiElement node : nodes) {
-				descriptors.add(new FoldingDescriptor(node, TextRange.create(node.getTextRange())));
+				int start = node.getFirstChild().getTextRange().getEndOffset();
+				int end = node.getLastChild().getTextRange().getEndOffset();
+				if (end == start) {
+					continue;
+				}
+				if (node instanceof LatteMacroClassic) {
+					start--;
+					end--;
+				}
+
+				descriptors.add(new FoldingDescriptor(node, TextRange.create(start, end)));
+
 			}
 		}
 
@@ -36,13 +47,6 @@ public class LatteFoldingBuilder extends FoldingBuilderEx {
 	@Nullable
 	@Override
 	public String getPlaceholderText(@NotNull ASTNode node) {
-		PsiElement psi = node.getPsi();
-		if (psi instanceof LatteMacroClassic) {
-			String macroName = ((LatteMacroClassic) psi).getOpenTag().getMacroName();
-			return "{" + macroName + "}";
-
-		}
-
 		return null;
 	}
 
