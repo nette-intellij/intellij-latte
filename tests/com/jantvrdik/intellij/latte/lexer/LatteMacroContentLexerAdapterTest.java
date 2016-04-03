@@ -47,69 +47,15 @@ public class LatteMacroContentLexerAdapterTest {
 		lexer.start("$var|noescape");
 		assertTokens(lexer, new Pair[]{
 				Pair.create(T_MACRO_ARGS_VAR, "$var"),
-				Pair.create(T_MACRO_MODIFIERS, "|"),
-				Pair.create(T_MACRO_ARGS, "noescape"),
+				Pair.create(T_MACRO_ARGS, "|noescape"),
 		});
 
-		lexer.start("$var|truncate:10|upper");
-		assertTokens(lexer, new Pair[]{
-				Pair.create(T_MACRO_ARGS_VAR, "$var"),
-				Pair.create(T_MACRO_MODIFIERS, "|"),
-				Pair.create(T_MACRO_ARGS, "truncate:"),
-				Pair.create(T_MACRO_ARGS_NUMBER, "10"),
-				Pair.create(T_MACRO_MODIFIERS, "|"),
-				Pair.create(T_MACRO_ARGS, "upper"),
-		});
-
-		// https://github.com/nette/latte/issues/13
-		lexer.start(" $a as $v|noiterator ");
-		assertTokens(lexer, new Pair[]{
-				Pair.create(T_MACRO_ARGS, " "),
-				Pair.create(T_MACRO_ARGS_VAR, "$a"),
-				Pair.create(T_MACRO_ARGS, " as "),
-				Pair.create(T_MACRO_ARGS_VAR, "$v"),
-				Pair.create(T_MACRO_MODIFIERS, "|"),
-				Pair.create(T_MACRO_ARGS, "noiterator "),
-		});
 
 		lexer.start(" function() { } ");
 		assertTokens(lexer, new Pair[]{
 				Pair.create(T_MACRO_ARGS, " function() { } "),
 		});
 
-		// edge cases
-		lexer.start("{a|b}");
-		assertTokens(lexer, new Pair[]{
-				Pair.create(T_MACRO_ARGS, "{a"),
-				Pair.create(T_MACRO_MODIFIERS, "|"),
-				Pair.create(T_MACRO_ARGS, "b}"),
-		});
-
-		lexer.start("a|b:{}");
-		assertTokens(lexer, new Pair[]{
-				Pair.create(T_MACRO_ARGS, "a"),
-				Pair.create(T_MACRO_MODIFIERS, "|"),
-				Pair.create(T_MACRO_ARGS, "b:{}"),
-		});
-
-		lexer.start("'{}}'{|a:'{}}'}");
-		assertTokens(lexer, new Pair[]{
-				Pair.create(T_MACRO_ARGS_STRING, "'{}}'"),
-				Pair.create(T_MACRO_ARGS, "{"),
-				Pair.create(T_MACRO_MODIFIERS, "|"),
-				Pair.create(T_MACRO_ARGS, "a:"),
-				Pair.create(T_MACRO_ARGS_STRING, "'{}}'"),
-				Pair.create(T_MACRO_ARGS, "}"),
-		});
-
-		lexer.start(" 'function() { $a = $b|c() }' |mod");
-		assertTokens(lexer, new Pair[]{
-				Pair.create(T_MACRO_ARGS, " "),
-				Pair.create(T_MACRO_ARGS_STRING, "'function() { $a = $b|c() }'"),
-				Pair.create(T_MACRO_ARGS, " "),
-				Pair.create(T_MACRO_MODIFIERS, "|"),
-				Pair.create(T_MACRO_ARGS, "mod"),
-		});
 
 		lexer.start("1");
 		assertTokens(lexer, new Pair[]{
