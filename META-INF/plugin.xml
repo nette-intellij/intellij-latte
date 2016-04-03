@@ -1,7 +1,7 @@
 <idea-plugin version="2">
 	<id>com.jantvrdik.intellij.latte</id>
 	<name>Latte</name>
-	<version>0.2.0</version>
+	<version>0.3.0</version>
 	<vendor>Jan Tvrdík</vendor>
 
 	<description><![CDATA[
@@ -9,6 +9,14 @@
 	]]></description>
 
 	<change-notes><![CDATA[
+		<p>0.3.0</p>
+		<ul>
+			<li>fixed comment parsing ("todo" support)</li>
+			<li>added "modifier not allowed" inspection</li>
+			<li>added structure view</li>
+			<li>improved macro folding</li>
+
+		</ul>
 		<p>0.2.0</p>
 		<ul>
 			<li>html/xml support</li>
