@@ -1,7 +1,6 @@
 package com.jantvrdik.intellij.latte.parser;
 
 import com.intellij.lang.PsiBuilder;
-import com.intellij.lang.parser.GeneratedParserUtilBase;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.config.LatteMacro;
 
