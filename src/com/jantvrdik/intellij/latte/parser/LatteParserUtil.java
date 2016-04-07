@@ -44,8 +44,12 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 			}
 			result = (emptyArgs == pair);
 
-		// all other macros which respect rules
+		} else if (macroName.equals("syntax")) {
+			//also syntax macro requires special care
+			builder.advanceLexer();
+			result = builder.getTokenType() == T_MACRO_ARGS && builder.getTokenText().trim().equals("off");
 		} else {
+			// all other macros which respect rules
 			LatteMacro macro = LatteConfiguration.INSTANCE.getMacro(builder.getProject(), macroName);
 			result = (macro != null ? (macro.type == (pair ? LatteMacro.Type.PAIR : LatteMacro.Type.UNPAIRED)) : !pair);
 		}
