@@ -1,7 +1,7 @@
 <idea-plugin version="2">
 	<id>com.jantvrdik.intellij.latte</id>
 	<name>Latte</name>
-	<version>0.3.0</version>
+	<version>0.3.1</version>
 	<vendor>Jan Tvrdík</vendor>
 
 	<description><![CDATA[
@@ -9,6 +9,10 @@
 	]]></description>
 
 	<change-notes><![CDATA[
+		<p>0.3.1</p>
+		<ul>
+			<li>fixed phpstorm 9.0 compatibility</li>
+		</ul>
 		<p>0.3.0</p>
 		<ul>
 			<li>fixed comment parsing ("todo" support)</li>
