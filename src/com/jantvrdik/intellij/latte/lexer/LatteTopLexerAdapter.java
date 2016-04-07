@@ -19,7 +19,7 @@ import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
 public class LatteTopLexerAdapter extends MergingLexerAdapter {
 	public LatteTopLexerAdapter() {
 		super(
-			new FlexAdapter(new LatteTopLexer((java.io.Reader) null)),
+			new LatteSyntaxOffLexer(new FlexAdapter(new LatteTopLexer((java.io.Reader) null))),
 			TokenSet.create(T_TEXT)
 		);
 	}
