@@ -176,5 +176,11 @@ public class LatteTopLexerAdapterTest {
 			Pair.create(T_TEXT, ">{$foo}</script>"),
 			Pair.create(T_MACRO_CLASSIC, "{$lorem}"),
 		});
+		lexer.start("{$lorem}{syntax off}foo {$lorem}");
+		assertTokens(lexer, new Pair[] {
+			Pair.create(T_MACRO_CLASSIC, "{$lorem}"),
+			Pair.create(T_MACRO_CLASSIC, "{syntax off}"),
+			Pair.create(T_TEXT, "foo {$lorem}"),
+		});
 	}
 }

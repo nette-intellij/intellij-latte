@@ -8,10 +8,34 @@ import com.jantvrdik.intellij.latte.psi.LatteTypes;
 
 public class LatteSyntaxOffLexer extends MergingLexerAdapterBase {
 
-	private MergeFunction mergeFunction = new MyMergeFunction();
+	private MyMergeFunction mergeFunction = new MyMergeFunction();
 
 	public LatteSyntaxOffLexer(Lexer original) {
 		super(original);
+	}
+
+	@Override
+	public int getTokenEnd() {
+		this.mergeFunction.previousTokenText = getDelegate().getTokenText();
+		return super.getTokenEnd();
+	}
+
+	@Override
+	public IElementType getTokenType() {
+		this.mergeFunction.previousTokenText = getDelegate().getTokenText();
+		return super.getTokenType();
+	}
+
+	@Override
+	public int getTokenStart() {
+		this.mergeFunction.previousTokenText = getDelegate().getTokenText();
+		return super.getTokenStart();
+	}
+
+	@Override
+	public int getState() {
+		this.mergeFunction.previousTokenText = getDelegate().getTokenText();
+		return super.getState();
 	}
 
 	@Override
@@ -20,6 +44,8 @@ public class LatteSyntaxOffLexer extends MergingLexerAdapterBase {
 	}
 
 	private static class MyMergeFunction implements MergeFunction {
+
+		public String previousTokenText;
 
 		private String tagName;
 
@@ -31,25 +57,17 @@ public class LatteSyntaxOffLexer extends MergingLexerAdapterBase {
 
 		@Override
 		public IElementType merge(IElementType type, Lexer originalLexer) {
-			if (originalLexer.getState() == LatteTopLexer.HTML_OPEN_TAG_OPEN) {
-				tagName = originalLexer.getTokenText();
-			}
-			if (originalLexer.getTokenType() == LatteTypes.T_HTML_TAG_NATTR_NAME && originalLexer.getTokenText().equals("n:syntax")) {
-				expectingSyntax = true;
-			} else if (expectingSyntax && originalLexer.getTokenType() == LatteTypes.T_MACRO_CONTENT) {
-				expectingTagClose = originalLexer.getTokenText().equals("off");
-				expectingSyntax = false;
-			}
-			if (expectingTagClose
-					&& (originalLexer.getState() == LatteTopLexer.HTML_TAG || originalLexer.getState() == LatteTopLexer.SCRIPT_TAG)
-					&& originalLexer.getTokenText().equals(">")) {
+			if (type == LatteTypes.T_MACRO_CLASSIC && previousTokenText.equals("{syntax off}")) {
 				mergeText = true;
-				expectingTagClose = false;
-			} else if (mergeText) {
+				return type;
+			}
+			if (mergeText) {
 				mergeText = false;
 				int level = 1;
 				while (true) {
-					if (originalLexer.getState() == LatteTopLexer.HTML_OPEN_TAG_OPEN) {
+					if (tagName == null) {
+						//{syntax off} do nothing
+					} else if (originalLexer.getState() == LatteTopLexer.HTML_OPEN_TAG_OPEN) {
 						if (originalLexer.getTokenText().equals(tagName)) {
 							level++;
 						}
@@ -66,6 +84,22 @@ public class LatteSyntaxOffLexer extends MergingLexerAdapterBase {
 						return LatteTypes.T_TEXT;
 					}
 				}
+			}
+
+			if (originalLexer.getState() == LatteTopLexer.HTML_OPEN_TAG_OPEN) {
+				tagName = originalLexer.getTokenText();
+			}
+			if (originalLexer.getTokenType() == LatteTypes.T_HTML_TAG_NATTR_NAME && originalLexer.getTokenText().equals("n:syntax")) {
+				expectingSyntax = true;
+			} else if (expectingSyntax && originalLexer.getTokenType() == LatteTypes.T_MACRO_CONTENT) {
+				expectingTagClose = originalLexer.getTokenText().equals("off");
+				expectingSyntax = false;
+			}
+			if (expectingTagClose
+				&& (originalLexer.getState() == LatteTopLexer.HTML_TAG || originalLexer.getState() == LatteTopLexer.SCRIPT_TAG)
+				&& originalLexer.getTokenText().equals(">")) {
+				mergeText = true;
+				expectingTagClose = false;
 			}
 
 			return type;
