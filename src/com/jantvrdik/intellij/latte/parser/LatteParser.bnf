@@ -21,7 +21,7 @@ root             ::= (structureToken)* autoClosedBlock?
 private
 macro            ::= macroComment | macroClassic
 
-macroComment     ::= T_MACRO_COMMENT
+macroComment     ::= T_MACRO_COMMENT | T_MACRO_COMMENT_DOUBLE
 macroClassic     ::= <<checkPairMacro true>> (pairMacro | emptyMacro) | <<checkPairMacro false>> unpairedMacro {
                      	methods = [
                      		openTag="macroTag[0]"
@@ -94,4 +94,4 @@ structureToken   ::= outerHtml | macro | netteAttr
 
 
 private
-topLevelTokens   ::= T_MACRO_CLASSIC T_MACRO_CONTENT topLevelTokens
+topLevelTokens   ::= T_MACRO_CLASSIC T_MACRO_CLASSIC_DOUBLE T_MACRO_CONTENT topLevelTokens

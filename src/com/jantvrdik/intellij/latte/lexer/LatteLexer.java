@@ -14,6 +14,9 @@ public class LatteLexer extends LayeredLexer {
 		LayeredLexer macroLexer = new LayeredLexer(new LatteMacroLexerAdapter());
 		macroLexer.registerLayer(new LatteMacroContentLexerAdapter(), LatteTypes.T_MACRO_CONTENT);
 		registerLayer(macroLexer, LatteTypes.T_MACRO_CLASSIC);
+		LayeredLexer macroDoubleLexer = new LayeredLexer(new LatteMacroDoubleLexerAdapter());
+		macroDoubleLexer.registerLayer(new LatteMacroContentLexerAdapter(), LatteTypes.T_MACRO_CONTENT);
+		registerLayer(macroDoubleLexer, LatteTypes.T_MACRO_CLASSIC_DOUBLE);
 		registerLayer(new LatteMacroContentLexerAdapter(), LatteTypes.T_MACRO_CONTENT);
 	}
 }

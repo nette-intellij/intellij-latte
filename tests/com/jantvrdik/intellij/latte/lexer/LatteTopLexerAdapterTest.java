@@ -182,5 +182,33 @@ public class LatteTopLexerAdapterTest {
 			Pair.create(T_MACRO_CLASSIC, "{syntax off}"),
 			Pair.create(T_TEXT, "foo {$lorem}"),
 		});
+
+		lexer.start("{$lorem}{syntax double}{{$lorem}}{$lorem}");
+		assertTokens(lexer, new Pair[] {
+			Pair.create(T_MACRO_CLASSIC, "{$lorem}"),
+			Pair.create(T_MACRO_CLASSIC, "{syntax double}"),
+			Pair.create(T_MACRO_CLASSIC_DOUBLE, "{{$lorem}}"),
+			Pair.create(T_TEXT, "{$lorem}"),
+		});
+		lexer.start("{$lorem}{syntax double}{{/syntax}}{$lorem}");
+		assertTokens(lexer, new Pair[] {
+			Pair.create(T_MACRO_CLASSIC, "{$lorem}"),
+			Pair.create(T_MACRO_CLASSIC, "{syntax double}"),
+			Pair.create(T_MACRO_CLASSIC_DOUBLE, "{{/syntax}}"),
+			Pair.create(T_MACRO_CLASSIC, "{$lorem}"),
+		});
+		lexer.start("<div n:syntax='double'>{$foo}{{$foo}}</div>{$foo}");
+		assertTokens(lexer, new Pair[] {
+			Pair.create(T_TEXT, "<div "),
+			Pair.create(T_HTML_TAG_NATTR_NAME, "n:syntax"),
+			Pair.create(T_HTML_TAG_ATTR_EQUAL_SIGN, "="),
+			Pair.create(T_HTML_TAG_ATTR_SQ, "'"),
+			Pair.create(T_MACRO_CONTENT, "double"),
+			Pair.create(T_HTML_TAG_ATTR_SQ, "'"),
+			Pair.create(T_TEXT, ">{$foo}"),
+			Pair.create(T_MACRO_CLASSIC_DOUBLE, "{{$foo}}"),
+			Pair.create(T_TEXT, "</div>"),
+			Pair.create(T_MACRO_CLASSIC, "{$foo}"),
+		});
 	}
 }

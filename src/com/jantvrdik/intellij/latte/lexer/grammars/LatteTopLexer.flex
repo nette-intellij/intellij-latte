@@ -29,10 +29,20 @@ import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
 %state HTML_ATTR_SQ
 %state HTML_ATTR_DQ
 %state HTML_COMMENT
+%state FORCE_CURLY_BRACKET
+
+%{
+	public int syntax = 0;
+
+%}
+
 
 WHITE_SPACE=[ \t\r\n]+
 MACRO_COMMENT = "{*" ~"*}"
-MACRO_CLASSIC = "{" [^ \t\r\n'\"{}] ({MACRO_STRING} | "{" {MACRO_STRING}* "}")* "}"
+MACRO_COMMENT_DOUBLE = "{{*" ~"*}}"
+MACRO_CLASSIC_INNER = [^ \t\r\n'\"{}] ({MACRO_STRING} | "{" {MACRO_STRING}* "}")*
+MACRO_CLASSIC = "{" {MACRO_CLASSIC_INNER} "}"
+MACRO_CLASSIC_DOUBLE = "{{" {MACRO_CLASSIC_INNER} "}}"
 MACRO_STRING = {MACRO_STRING_SQ} | {MACRO_STRING_DQ} | {MACRO_STRING_UQ}
 MACRO_STRING_SQ = "'" ("\\" [^] | [^'\\])* "'"
 MACRO_STRING_DQ = "\"" ("\\" [^] | [^\"\\])* "\""
@@ -47,12 +57,45 @@ MACRO_STRING_UQ = [^'\"{}]
 }
 
 <HTML_TEXT, SCRIPT_TAG, SCRIPT_CDATA, STYLE_TAG, STYLE_CDATA, HTML_TAG, HTML_ATTR_SQ, HTML_ATTR_DQ, HTML_COMMENT> {
-	{MACRO_COMMENT} / [^]* {
-		return T_MACRO_COMMENT;
-	}
+	{MACRO_COMMENT_DOUBLE} / [^]* {
+		if (syntax != 1) {
+			rollbackMatch();
+			pushState(FORCE_CURLY_BRACKET);
+		} else {
+	    	return T_MACRO_COMMENT_DOUBLE;
+		}
+    }
 
+	{MACRO_COMMENT} / [^]* {
+		if (syntax != 0) {
+			rollbackMatch();
+            pushState(FORCE_CURLY_BRACKET);
+		} else {
+			return T_MACRO_COMMENT;
+		}
+	}
+	{MACRO_CLASSIC_DOUBLE} {
+		if (syntax != 1) {
+    		rollbackMatch();
+    		pushState(FORCE_CURLY_BRACKET);
+    	} else {
+			return T_MACRO_CLASSIC_DOUBLE;
+		}
+	}
 	{MACRO_CLASSIC} {
-		return T_MACRO_CLASSIC;
+		if (syntax != 0) {
+    		rollbackMatch();
+    		pushState(FORCE_CURLY_BRACKET);
+    	} else {
+			return T_MACRO_CLASSIC;
+		}
+	}
+}
+
+<FORCE_CURLY_BRACKET> {
+	"{" {
+		popState();
+		return T_TEXT;
 	}
 }
 
