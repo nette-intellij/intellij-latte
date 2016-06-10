@@ -64,6 +64,7 @@ public class LatteConfiguration {
 		addStandardMacro("_", PAIR);
 		addStandardMacro("=", UNPAIRED);
 		addStandardMacro("?", UNPAIRED);
+		addStandardMacro("php", UNPAIRED);
 
 		addStandardMacro("capture", PAIR);
 		addStandardMacro("include", UNPAIRED);
@@ -80,8 +81,9 @@ public class LatteConfiguration {
 		addStandardMacro("name", ATTR_ONLY);
 		addStandardMacro("inputError", UNPAIRED);
 
-		// UIMacros
+		// BlockMacros
 		addStandardMacro("includeblock", UNPAIRED);
+		addStandardMacro("import", UNPAIRED);
 		addStandardMacro("extends", UNPAIRED);
 		addStandardMacro("layout", UNPAIRED);
 		addStandardMacro("block", PAIR);
