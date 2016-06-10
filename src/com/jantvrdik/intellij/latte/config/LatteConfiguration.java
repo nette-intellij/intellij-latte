@@ -82,7 +82,8 @@ public class LatteConfiguration {
 		addStandardMacro("inputError", UNPAIRED);
 
 		// BlockMacros
-		addStandardMacro("includeblock", UNPAIRED);
+		LatteMacro includeBlock = addStandardMacro("includeblock", UNPAIRED);
+		includeBlock.deprecated = true;
 		addStandardMacro("import", UNPAIRED);
 		addStandardMacro("extends", UNPAIRED);
 		addStandardMacro("layout", UNPAIRED);
@@ -150,8 +151,10 @@ public class LatteConfiguration {
 		standardMacros.put(macro.name, macro);
 	}
 
-	private void addStandardMacro(String name, LatteMacro.Type type) {
-		addStandardMacro(new LatteMacro(name, type));
+	private LatteMacro addStandardMacro(String name, LatteMacro.Type type) {
+		LatteMacro macro = new LatteMacro(name, type);
+		addStandardMacro(macro);
+		return macro;
 	}
 
 	/**

@@ -11,6 +11,8 @@ public class LatteMacro {
 	/** macro type */
 	public final Type type;
 
+	public boolean deprecated = false;
+
 	public LatteMacro(String name, Type type) {
 		this.name = name;
 		this.type = type;

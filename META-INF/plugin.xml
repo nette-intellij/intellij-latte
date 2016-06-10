@@ -108,6 +108,10 @@
 						 groupName="Latte" enabledByDefault="true" level="WARNING"
 						 implementationClass="com.jantvrdik.intellij.latte.inspections.ModifierNotAllowedInspection"/>
 
+		<localInspection language="Latte" shortName="DeprecatedMacro" id="DeprecatedMacro"
+						 displayName="Deprecated macro"
+						 groupName="Latte" enabledByDefault="true"
+						 implementationClass="com.jantvrdik.intellij.latte.inspections.DeprecatedMacroInspection"/>
 	</extensions>
 
 	<application-components>
