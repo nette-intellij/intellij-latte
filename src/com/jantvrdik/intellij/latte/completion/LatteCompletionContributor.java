@@ -87,7 +87,7 @@ public class LatteCompletionContributor extends CompletionContributor {
 		for (LatteMacro macro : macros.values()) {
 			if (macro.type != LatteMacro.Type.UNPAIRED) {
 				lookupElements.add(LookupElementBuilder.create("n:" + macro.name).withInsertHandler(attrMacroInsertHandler));
-				if (macro.type == LatteMacro.Type.PAIR) {
+				if (macro.type == LatteMacro.Type.PAIR || macro.type == LatteMacro.Type.AUTO_EMPTY) {
 					lookupElements.add(LookupElementBuilder.create("n:tag-" + macro.name).withInsertHandler(attrMacroInsertHandler));
 					lookupElements.add(LookupElementBuilder.create("n:inner-" + macro.name).withInsertHandler(attrMacroInsertHandler));
 				}

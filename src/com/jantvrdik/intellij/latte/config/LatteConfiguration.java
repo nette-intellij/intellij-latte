@@ -75,7 +75,7 @@ public class LatteConfiguration {
 		// FormMacros
 		addStandardMacro("form", PAIR);
 		addStandardMacro("formContainer", PAIR);
-		addStandardMacro("label", PAIR);
+		addStandardMacro("label", AUTO_EMPTY);
 		addStandardMacro("input", UNPAIRED);
 		addStandardMacro("name", ATTR_ONLY);
 		addStandardMacro("inputError", UNPAIRED);
@@ -182,6 +182,7 @@ public class LatteConfiguration {
 		if (macroType == PAIR) key += "pair";
 		else if (macroType == UNPAIRED) key += "unpaired";
 		else if (macroType == ATTR_ONLY) key += "attr_only";
+		else if (macroType == AUTO_EMPTY) key += "auto_empty";
 		else key += "wtf";
 		return key;
 	}

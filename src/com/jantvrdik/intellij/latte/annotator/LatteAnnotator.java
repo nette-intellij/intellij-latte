@@ -56,7 +56,7 @@ public class LatteAnnotator implements Annotator {
 				annotation.registerFix(new AddCustomPairMacro(macroName));
 				if (!prefixed) annotation.registerFix(new AddCustomAttrOnlyMacro(macroName));
 
-			} else if (prefixed && macro.type != LatteMacro.Type.PAIR) {
+			} else if (prefixed && macro.type != LatteMacro.Type.PAIR && macro.type != LatteMacro.Type.AUTO_EMPTY) {
 				holder.createErrorAnnotation(attrName, "Attribute macro n:" + macroName + " can not be used with prefix.");
 			}
 

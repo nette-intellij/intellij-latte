@@ -25,5 +25,7 @@ public class LatteMacro {
 
 		/** macro is available only as unpaired classic macro, e.g. 'var' or 'link' */
 		UNPAIRED,
+
+		AUTO_EMPTY,
 	}
 }
