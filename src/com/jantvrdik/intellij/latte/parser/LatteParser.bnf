@@ -86,7 +86,7 @@ netteAttrValue   ::= T_HTML_TAG_ATTR_SQ macroContent? T_HTML_TAG_ATTR_SQ
                    | T_HTML_TAG_ATTR_DQ macroContent? T_HTML_TAG_ATTR_DQ
                    | macroContent?
 
-outerHtml ::= T_TEXT+;
+outerHtml ::= T_TEXT;
 
 // tokens sets
 private
