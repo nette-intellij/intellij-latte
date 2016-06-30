@@ -84,6 +84,7 @@ public class LatteConfiguration {
 		// BlockMacros
 		LatteMacro includeBlock = addStandardMacro("includeblock", UNPAIRED);
 		includeBlock.deprecated = true;
+		includeBlock.deprecatedMessage = "Macro includeblock is deprecated in Latte 2.4. Use import macro instead.";
 		addStandardMacro("import", UNPAIRED);
 		addStandardMacro("extends", UNPAIRED);
 		addStandardMacro("layout", UNPAIRED);

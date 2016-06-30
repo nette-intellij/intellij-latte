@@ -39,7 +39,8 @@ public class DeprecatedMacroInspection extends LocalInspectionTool {
 					String macroName = ((LatteMacroTag) element).getMacroName();
 					LatteMacro macro = LatteConfiguration.INSTANCE.getMacro(element.getProject(), macroName);
 					if (macro.deprecated) {
-						ProblemDescriptor problem = manager.createProblemDescriptor(element, "Macro " + macroName + " is deprecated", true, ProblemHighlightType.LIKE_DEPRECATED, isOnTheFly);
+						String description = macro.deprecatedMessage != null ? macro.deprecatedMessage : "Macro " + macroName + " is deprecated";
+						ProblemDescriptor problem = manager.createProblemDescriptor(element, description, true, ProblemHighlightType.LIKE_DEPRECATED, isOnTheFly);
 						problems.add(problem);
 
 					}

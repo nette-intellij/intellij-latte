@@ -13,6 +13,8 @@ public class LatteMacro {
 
 	public boolean deprecated = false;
 
+	public String deprecatedMessage;
+
 	public LatteMacro(String name, Type type) {
 		this.name = name;
 		this.type = type;
