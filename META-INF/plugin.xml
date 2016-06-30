@@ -1,7 +1,7 @@
 <idea-plugin version="2">
 	<id>com.jantvrdik.intellij.latte</id>
 	<name>Latte</name>
-	<version>0.3.1</version>
+	<version>0.3.2</version>
 	<vendor>Jan Tvrdík</vendor>
 
 	<description><![CDATA[
@@ -9,6 +9,13 @@
 	]]></description>
 
 	<change-notes><![CDATA[
+		<p>0.3.2</p>
+		<ul>
+			<li>fixed disappearing comments</li>
+			<li>Latte 2.4: added new macros</li>
+			<li>Latte 2.4: added AUTO_EMPTY support</li>
+			<li>Latte 2.4: added info about deprecated macro(s)</li>
+		</ul>
 		<p>0.3.1</p>
 		<ul>
 			<li>fixed phpstorm 9.0 compatibility</li>
