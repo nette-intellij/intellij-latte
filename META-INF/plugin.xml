@@ -1,7 +1,7 @@
 <idea-plugin version="2">
 	<id>com.jantvrdik.intellij.latte</id>
 	<name>Latte</name>
-	<version>0.3.2</version>
+	<version>0.3.3</version>
 	<vendor>Jan Tvrdík</vendor>
 
 	<description><![CDATA[
@@ -9,6 +9,10 @@
 	]]></description>
 
 	<change-notes><![CDATA[
+		<p>0.3.3</p>
+		<ul>
+			<li>fixed null pointer exception</li>
+		</ul>
 		<p>0.3.2</p>
 		<ul>
 			<li>fixed disappearing comments</li>
