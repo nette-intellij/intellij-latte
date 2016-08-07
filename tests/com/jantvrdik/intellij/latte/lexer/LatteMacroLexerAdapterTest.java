@@ -97,20 +97,14 @@ public class LatteMacroLexerAdapterTest {
 		lexer.start("{$var|noescape}");
 		assertTokens(lexer, new Pair[] {
 			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
-			Pair.create(T_MACRO_CONTENT, "$var"),
-			Pair.create(T_MACRO_MODIFIERS, "|"),
-			Pair.create(T_MACRO_CONTENT, "noescape"),
+			Pair.create(T_MACRO_CONTENT, "$var|noescape"),
 			Pair.create(T_MACRO_TAG_CLOSE, "}"),
 		});
 
 		lexer.start("{$var|truncate:10|upper}");
 		assertTokens(lexer, new Pair[] {
 			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
-			Pair.create(T_MACRO_CONTENT, "$var"),
-			Pair.create(T_MACRO_MODIFIERS, "|"),
-			Pair.create(T_MACRO_CONTENT, "truncate:10"),
-			Pair.create(T_MACRO_MODIFIERS, "|"),
-			Pair.create(T_MACRO_CONTENT, "upper"),
+			Pair.create(T_MACRO_CONTENT, "$var|truncate:10|upper"),
 			Pair.create(T_MACRO_TAG_CLOSE, "}"),
 		});
 
@@ -119,9 +113,7 @@ public class LatteMacroLexerAdapterTest {
 		assertTokens(lexer, new Pair[] {
 			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
 			Pair.create(T_MACRO_NAME, "foreach"),
-			Pair.create(T_MACRO_CONTENT, " $a as $v"),
-			Pair.create(T_MACRO_MODIFIERS, "|"),
-			Pair.create(T_MACRO_CONTENT, "noiterator "),
+			Pair.create(T_MACRO_CONTENT, " $a as $v|noiterator "),
 			Pair.create(T_MACRO_TAG_CLOSE_EMPTY, "/}"),
 		});
 
@@ -138,9 +130,7 @@ public class LatteMacroLexerAdapterTest {
 		assertTokens(lexer, new Pair[] {
 			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
 			Pair.create(T_MACRO_SHORTNAME, "="),
-			Pair.create(T_MACRO_CONTENT, "{a"),
-			Pair.create(T_MACRO_MODIFIERS, "|"),
-			Pair.create(T_MACRO_CONTENT, "b}"),
+			Pair.create(T_MACRO_CONTENT, "{a|b}"),
 			Pair.create(T_MACRO_TAG_CLOSE, "}"),
 		});
 
@@ -148,9 +138,7 @@ public class LatteMacroLexerAdapterTest {
 		assertTokens(lexer, new Pair[] {
 			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
 			Pair.create(T_MACRO_SHORTNAME, "="),
-			Pair.create(T_MACRO_CONTENT, "a"),
-			Pair.create(T_MACRO_MODIFIERS, "|"),
-			Pair.create(T_MACRO_CONTENT, "b:{}"),
+			Pair.create(T_MACRO_CONTENT, "a|b:{}"),
 			Pair.create(T_MACRO_TAG_CLOSE, "}"),
 		});
 
@@ -158,9 +146,7 @@ public class LatteMacroLexerAdapterTest {
 		assertTokens(lexer, new Pair[] {
 			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
 			Pair.create(T_MACRO_SHORTNAME, "="),
-			Pair.create(T_MACRO_CONTENT, "'{}}'{"),
-			Pair.create(T_MACRO_MODIFIERS, "|"),
-			Pair.create(T_MACRO_CONTENT, "a:'{}}'}"),
+			Pair.create(T_MACRO_CONTENT, "'{}}'{|a:'{}}'}"),
 			Pair.create(T_MACRO_TAG_CLOSE_EMPTY, "/}"),
 		});
 
@@ -168,9 +154,30 @@ public class LatteMacroLexerAdapterTest {
 		assertTokens(lexer, new Pair[] {
 			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
 			Pair.create(T_MACRO_NAME, "?"),
-			Pair.create(T_MACRO_CONTENT, " 'function() { $a = $b|c() }' "),
-			Pair.create(T_MACRO_MODIFIERS, "|"),
-			Pair.create(T_MACRO_CONTENT, "mod"),
+			Pair.create(T_MACRO_CONTENT, " 'function() { $a = $b|c() }' |mod"),
+			Pair.create(T_MACRO_TAG_CLOSE, "}"),
+		});
+
+
+		//incomplete
+		lexer.start("{$var");
+		assertTokens(lexer, new Pair[] {
+			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
+			Pair.create(T_MACRO_CONTENT, "$var"),
+		});
+		//incomplete
+		lexer.start("{foo '}");
+		assertTokens(lexer, new Pair[] {
+			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
+			Pair.create(T_MACRO_NAME, "foo"),
+			Pair.create(T_MACRO_CONTENT, " '}"),
+		});
+
+		lexer.start("{foo 'aa'}");
+		assertTokens(lexer, new Pair[] {
+			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
+			Pair.create(T_MACRO_NAME, "foo"),
+			Pair.create(T_MACRO_CONTENT, " 'aa'"),
 			Pair.create(T_MACRO_TAG_CLOSE, "}"),
 		});
 	}

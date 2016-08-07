@@ -1,8 +1,7 @@
 package com.jantvrdik.intellij.latte.psi.impl;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.tree.TokenSet;
+import com.jantvrdik.intellij.latte.psi.LatteMacroCloseTag;
 import com.jantvrdik.intellij.latte.psi.LatteMacroContent;
 import com.jantvrdik.intellij.latte.psi.LatteMacroTag;
 import org.jetbrains.annotations.NotNull;
@@ -26,11 +25,10 @@ public class LattePsiImplUtil {
 		if (content == null) {
 			return "";
 		}
-
-		ASTNode argsNode = content.getNode().findChildByType(
-			TokenSet.create(T_MACRO_ARGS, T_MACRO_ARGS_VAR, T_MACRO_ARGS_STRING, T_MACRO_ARGS_NUMBER)
-		);
-		return (argsNode != null ? "=" : "");
+		if (element instanceof LatteMacroCloseTag) {
+			return "";
+		}
+		return "=";
 	}
 
 }
