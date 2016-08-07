@@ -7,27 +7,25 @@ import com.intellij.lang.html.HTMLLanguage;
 import com.intellij.lang.xml.XMLLanguage;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.MultiplePsiFilesPerDocumentFileViewProvider;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.impl.source.PsiFileImpl;
 import com.intellij.psi.templateLanguages.TemplateDataElementType;
 import com.intellij.psi.templateLanguages.TemplateLanguageFileViewProvider;
+import com.intellij.psi.tree.IElementType;
 import com.jantvrdik.intellij.latte.LatteLanguage;
-import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class LatteFileViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider implements TemplateLanguageFileViewProvider {
 
 	public static LatteElementType OUTER_LATTE = new LatteElementType("Outer latte");
 	private static Pattern xmlContentType = Pattern.compile("^\\{contentType [^}]*xml[^}]*}.*");
+	private static IElementType templateDataElement = new TemplateDataElementType("Outer HTML/XML in Latte", LatteLanguage.INSTANCE, LatteTypes.T_TEXT, OUTER_LATTE);
 
 	public LatteFileViewProvider(PsiManager manager, VirtualFile virtualFile, boolean eventSystemEnabled) {
 		super(manager, virtualFile, eventSystemEnabled);
@@ -66,7 +64,7 @@ public class LatteFileViewProvider extends MultiplePsiFilesPerDocumentFileViewPr
 			return null;
 		} else if (lang == XMLLanguage.INSTANCE || lang == HTMLLanguage.INSTANCE) {
 			PsiFileImpl file = (PsiFileImpl) parser.createFile(this);
-			file.setContentElementType(new TemplateDataElementType("Outer HTML/XML in Latte", getBaseLanguage(), LatteTypes.T_TEXT, OUTER_LATTE));
+			file.setContentElementType(templateDataElement);
 			return file;
 		} else {
 			return lang == this.getBaseLanguage() ? parser.createFile(this) : null;
