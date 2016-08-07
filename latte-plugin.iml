@@ -42,6 +42,8 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" scope="PROVIDED" name="css-openapi" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="javascript-openapi" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="php-openapi" level="project" />
   </component>
 </module>
-
