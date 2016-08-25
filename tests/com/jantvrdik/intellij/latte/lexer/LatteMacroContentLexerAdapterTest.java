@@ -51,18 +51,18 @@ public class LatteMacroContentLexerAdapterTest {
 		lexer.start("$var|noescape");
 		assertTokens(lexer, new Pair[]{
 			Pair.create(T_MACRO_ARGS_VAR, "$var"),
-			Pair.create(T_MACRO_MODIFIERS, "|"),
+			Pair.create(T_MACRO_ARGS_MODIFIERS, "|"),
 			Pair.create(T_MACRO_ARGS_SYMBOL, "noescape"),
 		});
 
 		lexer.start("$var|truncate:10|upper");
 		assertTokens(lexer, new Pair[]{
 			Pair.create(T_MACRO_ARGS_VAR, "$var"),
-			Pair.create(T_MACRO_MODIFIERS, "|"),
+			Pair.create(T_MACRO_ARGS_MODIFIERS, "|"),
 			Pair.create(T_MACRO_ARGS_SYMBOL, "truncate"),
 			Pair.create(T_MACRO_ARGS_COLON, ":"),
 			Pair.create(T_MACRO_ARGS_NUMBER, "10"),
-			Pair.create(T_MACRO_MODIFIERS, "|"),
+			Pair.create(T_MACRO_ARGS_MODIFIERS, "|"),
 			Pair.create(T_MACRO_ARGS_SYMBOL, "upper"),
 		});
 
@@ -75,7 +75,7 @@ public class LatteMacroContentLexerAdapterTest {
 			Pair.create(T_MACRO_ARGS_SYMBOL, "as"),
 			Pair.create(T_WHITESPACE, " "),
 			Pair.create(T_MACRO_ARGS_VAR, "$v"),
-			Pair.create(T_MACRO_MODIFIERS, "|"),
+			Pair.create(T_MACRO_ARGS_MODIFIERS, "|"),
 			Pair.create(T_MACRO_ARGS_SYMBOL, "noiterator"),
 			Pair.create(T_WHITESPACE, " "),
 		});
@@ -98,7 +98,7 @@ public class LatteMacroContentLexerAdapterTest {
 		assertTokens(lexer, new Pair[]{
 			Pair.create(T_MACRO_ARGS_LEFT_CURLY_BRACKET, "{"),
 			Pair.create(T_MACRO_ARGS_SYMBOL, "a"),
-			Pair.create(T_MACRO_MODIFIERS, "|"),
+			Pair.create(T_MACRO_ARGS_MODIFIERS, "|"),
 			Pair.create(T_MACRO_ARGS_SYMBOL, "b"),
 			Pair.create(T_MACRO_ARGS_RIGHT_CURLY_BRACKET, "}"),
 		});
@@ -106,7 +106,7 @@ public class LatteMacroContentLexerAdapterTest {
 		lexer.start("a|b:{}");
 		assertTokens(lexer, new Pair[]{
 			Pair.create(T_MACRO_ARGS_SYMBOL, "a"),
-			Pair.create(T_MACRO_MODIFIERS, "|"),
+			Pair.create(T_MACRO_ARGS_MODIFIERS, "|"),
 			Pair.create(T_MACRO_ARGS_SYMBOL, "b"),
 			Pair.create(T_MACRO_ARGS_COLON, ":"),
 			Pair.create(T_MACRO_ARGS_LEFT_CURLY_BRACKET, "{"),
@@ -119,7 +119,7 @@ public class LatteMacroContentLexerAdapterTest {
 			Pair.create(T_MACRO_ARGS_STRING, "{}}"),
 			Pair.create(T_MACRO_ARGS_SINGLE_QUOTE_RIGHT, "'"),
 			Pair.create(T_MACRO_ARGS_LEFT_CURLY_BRACKET, "{"),
-			Pair.create(T_MACRO_MODIFIERS, "|"),
+			Pair.create(T_MACRO_ARGS_MODIFIERS, "|"),
 			Pair.create(T_MACRO_ARGS_SYMBOL, "a"),
 			Pair.create(T_MACRO_ARGS_COLON, ":"),
 			Pair.create(T_MACRO_ARGS_SINGLE_QUOTE_LEFT, "'"),
@@ -135,7 +135,7 @@ public class LatteMacroContentLexerAdapterTest {
 			Pair.create(T_MACRO_ARGS_STRING, "function() { $a = $b|c() }"),
 			Pair.create(T_MACRO_ARGS_SINGLE_QUOTE_RIGHT, "'"),
 			Pair.create(T_WHITESPACE, " "),
-			Pair.create(T_MACRO_MODIFIERS, "|"),
+			Pair.create(T_MACRO_ARGS_MODIFIERS, "|"),
 			Pair.create(T_MACRO_ARGS_SYMBOL, "mod"),
 		});
 

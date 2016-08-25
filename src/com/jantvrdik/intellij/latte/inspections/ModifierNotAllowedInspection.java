@@ -66,7 +66,7 @@ public class ModifierNotAllowedInspection extends LocalInspectionTool {
 		if (content == null) {
 			return false;
 		}
-		return content.getNode().getChildren(TokenSet.create(LatteTypes.T_MACRO_MODIFIERS)).length > 0;
+		return content.getNode().getChildren(TokenSet.create(LatteTypes.T_MACRO_ARGS_MODIFIERS)).length > 0;
 	}
 
 	static {

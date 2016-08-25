@@ -91,7 +91,7 @@ WHITE_SPACE=[ \t\r\n]+
 	}
 
 	"|" {
-		return T_MACRO_MODIFIERS;
+		return T_MACRO_ARGS_MODIFIERS;
 	}
 
 	"++" {

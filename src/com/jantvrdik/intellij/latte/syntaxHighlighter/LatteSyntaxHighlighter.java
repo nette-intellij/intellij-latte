@@ -52,7 +52,7 @@ public class LatteSyntaxHighlighter extends SyntaxHighlighterBase {
 		} else if (token == LatteTypes.T_MACRO_ARGS_NUMBER) {
 			return pack(MACRO_ARGS_NUMBER);
 
-		} else if (token == LatteTypes.T_MACRO_MODIFIERS) {
+		} else if (token == LatteTypes.T_MACRO_ARGS_MODIFIERS) {
 			return pack(MACRO_MODIFIERS);
 
 		} else if (token == LatteTypes.T_MACRO_COMMENT) {
