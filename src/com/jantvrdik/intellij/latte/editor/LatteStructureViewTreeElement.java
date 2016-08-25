@@ -10,10 +10,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-/**
- * Created by matej21 on 28.3.16.
- */
 public class LatteStructureViewTreeElement extends PsiTreeElementBase<PsiElement> {
 
 	public LatteStructureViewTreeElement(PsiElement psiElement) {
@@ -35,12 +34,22 @@ public class LatteStructureViewTreeElement extends PsiTreeElementBase<PsiElement
 	@Nullable
 	@Override
 	public String getPresentableText() {
-		if (getElement() instanceof LatteMacroClassic) {
-			return ((LatteMacroClassic) getElement()).getOpenTag().getMacroName();
-		} else if (getElement() instanceof LatteAutoClosedBlock) {
-			return ((LatteAutoClosedBlock) getElement()).getMacroOpenTag().getMacroName();
-		} else if (getElement() instanceof LatteFile) {
-			return ((LatteFile) getElement()).getName();
+		PsiElement element = getElement();
+		if (element instanceof LatteMacroClassic) {
+			LatteMacroClassic macroClassic = (LatteMacroClassic) element;
+			String presentableText = macroClassic.getOpenTag().getMacroName();
+			if (macroClassic.getOpenTag().getMacroContent() != null) {
+				String macroText = macroClassic.getOpenTag().getMacroContent().getText().trim();
+				Pattern pattern  = Pattern.compile("([\\S]+).*");
+				Matcher matcher = pattern.matcher(macroText);
+				if (matcher.matches()) {
+					presentableText += " " + matcher.group(1);
+				}
+
+			}
+			return presentableText;
+		} else if (element instanceof LatteFile) {
+			return ((LatteFile) element).getName();
 		}
 		return "";
 	}
