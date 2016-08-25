@@ -30,7 +30,7 @@ public class LatteFileType extends LanguageFileType {
 	@NotNull
 	@Override
 	public String getName() {
-		return "Latte file";
+		return "Latte";
 	}
 
 	@NotNull
