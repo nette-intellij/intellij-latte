@@ -7,6 +7,7 @@ import com.intellij.formatting.Spacing;
 import com.intellij.formatting.Wrap;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.TokenType;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.psi.formatter.xml.XmlFormattingPolicy;
 import com.intellij.psi.tree.IElementType;
@@ -37,6 +38,11 @@ public class LatteBlock extends TemplateLanguageBlock {
 	@NotNull
 	@Override
 	protected Indent getChildIndent(@NotNull ASTNode astNode) {
+		if (isBellowType(astNode, LatteTypes.MACRO_CONTENT)
+			&& astNode.getTreePrev() != null
+			&& astNode.getTreePrev().getElementType() == TokenType.WHITE_SPACE) {
+			return Indent.getNormalIndent();
+		}
 		if (!isPair || isOpening(astNode) || isClosing(astNode)) {
 			return Indent.getNoneIndent();
 		}
@@ -75,8 +81,11 @@ public class LatteBlock extends TemplateLanguageBlock {
 			if (node.getElementType() == type) {
 				return true;
 			}
+			if (node == getNode()) {
+				return false;
+			}
 			node = node.getTreeParent();
-		} while (node != null && node != getNode());
+		} while (node != null);
 		return false;
 	}
 
