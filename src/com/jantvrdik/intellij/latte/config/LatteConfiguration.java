@@ -43,6 +43,7 @@ public class LatteConfiguration {
 
 		addStandardMacro("switch", PAIR);
 		addStandardMacro("case", UNPAIRED);
+		addStandardMacro("spaceless", PAIR);
 
 		addStandardMacro("foreach", PAIR);
 		addStandardMacro("for", PAIR);
