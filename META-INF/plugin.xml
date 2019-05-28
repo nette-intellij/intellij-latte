@@ -5,7 +5,7 @@
 	<vendor>Jan Tvrdík</vendor>
 
 	<description><![CDATA[
-		Provides support for <a href="https://github.com/nette/latte/">Latte</a> &ndash; a template engine for PHP.
+		Provides support for <a href="https://github.com/nette/latte/">Latte</a> &ndash; a template engine for PHP. It's a must have plugin for Nette developers.
 	]]></description>
 
 	<change-notes><![CDATA[
