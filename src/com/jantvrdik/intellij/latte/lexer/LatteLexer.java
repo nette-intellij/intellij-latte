@@ -12,8 +12,15 @@ public class LatteLexer extends LayeredLexer {
 	public LatteLexer() {
 		super(new LatteTopLexerAdapter());
 		LayeredLexer macroLexer = new LayeredLexer(new LatteMacroLexerAdapter());
-		macroLexer.registerLayer(new LatteMacroContentLexerAdapter(), LatteTypes.T_MACRO_CONTENT);
+		macroLexer.registerLayer(createContentLexerAdapter(), LatteTypes.T_MACRO_CONTENT);
+
 		registerLayer(macroLexer, LatteTypes.T_MACRO_CLASSIC);
-		registerLayer(new LatteMacroContentLexerAdapter(), LatteTypes.T_MACRO_CONTENT);
+		registerLayer(createContentLexerAdapter(), LatteTypes.T_MACRO_CONTENT);
+	}
+
+	private LayeredLexer createContentLexerAdapter() {
+		LayeredLexer contentMacroLexer = new LayeredLexer(new LatteMacroContentLexerAdapter());
+		contentMacroLexer.registerLayer(new LattePhpLexerAdapter(), LatteTypes.T_PHP_CONTENT);
+		return contentMacroLexer;
 	}
 }

@@ -15,13 +15,15 @@ import java.util.Map;
 public class LatteColorSettingsPage implements ColorSettingsPage {
 	private static final AttributesDescriptor[] DESCRIPTORS = new AttributesDescriptor[] {
 		new AttributesDescriptor("Macro name", LatteSyntaxHighlighter.MACRO_NAME),
-		new AttributesDescriptor("Macro variable", LatteSyntaxHighlighter.MACRO_ARGS_VAR),
-		new AttributesDescriptor("Macro string", LatteSyntaxHighlighter.MACRO_ARGS_STRING),
-		new AttributesDescriptor("Macro number", LatteSyntaxHighlighter.MACRO_ARGS_NUMBER),
 		new AttributesDescriptor("Macro modifiers", LatteSyntaxHighlighter.MACRO_MODIFIERS),
 		new AttributesDescriptor("Macro delimiters", LatteSyntaxHighlighter.MACRO_DELIMITERS),
 		new AttributesDescriptor("Macro comment", LatteSyntaxHighlighter.MACRO_COMMENT),
 		new AttributesDescriptor("Attribute macro name", LatteSyntaxHighlighter.HTML_NATTR_NAME),
+		new AttributesDescriptor("PHP variable", LatteSyntaxHighlighter.MACRO_ARGS_VAR),
+		new AttributesDescriptor("PHP string", LatteSyntaxHighlighter.MACRO_ARGS_STRING),
+		new AttributesDescriptor("PHP number", LatteSyntaxHighlighter.MACRO_ARGS_NUMBER),
+		new AttributesDescriptor("PHP method", LatteSyntaxHighlighter.PHP_METHOD),
+		new AttributesDescriptor("PHP keyword", LatteSyntaxHighlighter.PHP_KEYWORD),
 	};
 
 	@Nullable
@@ -43,7 +45,10 @@ public class LatteColorSettingsPage implements ColorSettingsPage {
 			"{var $string = \"abc\", $number = 123}\n" +
 			"<div class=\"perex\" n:if=\"$content\">\n" +
 			"    {$content|truncate:250}\n" +
-			"</div>";
+			"</div>\n" +
+			"{foreach $data as $key => $value}\n" +
+			"    {$key} {$value}\n" +
+			"{/foreach}";
 	}
 
 	@Nullable

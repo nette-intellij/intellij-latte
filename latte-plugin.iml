@@ -42,8 +42,11 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" scope="PROVIDED" name="css-openapi" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="javascript-openapi" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="php-openapi" level="project" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="php-openapi" level="project" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="php-openapi-src" level="project" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="com.github.adedayo.intellij.sdk:java-psi-api:142.1" level="project" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="php" level="project" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="css-openapi" level="project" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="javascript-openapi" level="project" />
   </component>
 </module>

@@ -16,12 +16,13 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 	/**
 	 * Looks for a classic macro a returns true if it finds the macro a and it is pair or unpaired (based on pair parameter).
 	 */
-	public static boolean checkPairMacro(PsiBuilder builder, int level, boolean pair) {
+	public static boolean checkPairMacro(PsiBuilder builder, int level, String pairValue) {
 		if (builder.getTokenType() != T_MACRO_OPEN_TAG_OPEN) return false;
 
 		PsiBuilder.Marker marker = builder.mark();
 		String macroName = getMacroName(builder);
 
+		boolean pair = pairValue.equals("pair");
 		boolean result;
 
 		LatteMacro macro = LatteConfiguration.INSTANCE.getMacro(builder.getProject(), macroName);
@@ -42,6 +43,26 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 		// all other macros which respect rules
 		} else {
 			result = (macro != null ? (macro.type == (pair ? LatteMacro.Type.PAIR : LatteMacro.Type.UNPAIRED)) : !pair);
+		}
+
+		marker.rollbackTo();
+		return result;
+	}
+
+	/**
+	 * Looks for a classic macro a returns true if it finds the macro a and it is pair or unpaired (based on pair parameter).
+	 */
+	public static boolean checkPhpMethod(PsiBuilder builder, int level, String type) {
+		if (builder.getTokenType() != T_PHP_DOUBLE_COLON && builder.getTokenType() != T_PHP_DOUBLE_ARROW) return false;
+
+		PsiBuilder.Marker marker = builder.mark();
+
+		boolean result;
+
+		if (type.equals("constant")) {
+			result = isPhpConstant(builder);
+		} else {
+			result = isPhpMethod(builder);
 		}
 
 		marker.rollbackTo();
@@ -83,6 +104,38 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 				return type == T_MACRO_CLOSE_TAG_OPEN;
 			} else if(type == T_HTML_TAG_NATTR_NAME && ("n:" + macroName).equals(builder.getTokenText())) {
 				return false;
+			}
+			builder.advanceLexer();
+			type = builder.getTokenType();
+		}
+		return false;
+	}
+
+	private static boolean isPhpConstant(PsiBuilder builder)
+	{
+		builder.advanceLexer();
+		IElementType type = builder.getTokenType();
+		while (type != null) {
+			/*if (type == T_MACRO_TAG_CLOSE_EMPTY) {
+				return true;
+			} else */if (type == T_MACRO_TAG_CLOSE) {
+				break;
+			}
+			builder.advanceLexer();
+			type = builder.getTokenType();
+		}
+		return false;
+	}
+
+	private static boolean isPhpMethod(PsiBuilder builder)
+	{
+		builder.advanceLexer();
+		IElementType type = builder.getTokenType();
+		while (type != null) {
+			/*if (type == T_MACRO_TAG_CLOSE_EMPTY) {
+				return true;
+			} else */if (type == T_MACRO_TAG_CLOSE) {
+				break;
 			}
 			builder.advanceLexer();
 			type = builder.getTokenType();

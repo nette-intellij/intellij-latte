@@ -23,9 +23,9 @@ SYMBOL = [_[:letter:]][_0-9[:letter:]]*(-[_0-9[:letter:]]+)* //todo: unicode let
 
 <YYINITIAL> {
 
-	"$" [a-zA-Z_][a-zA-Z0-9_]* {
-		return T_MACRO_ARGS_VAR;
-	}
+	("\\" | "$") .+ {
+        return T_PHP_CONTENT;
+    }
 
 	{STRING} {
 		return T_MACRO_ARGS_STRING;
@@ -36,7 +36,7 @@ SYMBOL = [_[:letter:]][_0-9[:letter:]]*(-[_0-9[:letter:]]+)* //todo: unicode let
 	}
 
 	{SYMBOL} {
-		return T_MACRO_ARGS;
+		return T_PHP_CONTENT;
 	}
 
 	[^] {

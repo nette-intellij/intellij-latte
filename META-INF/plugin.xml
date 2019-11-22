@@ -115,6 +115,8 @@
 		<indexPatternBuilder implementation="com.jantvrdik.intellij.latte.psi.LatteIndexPatternBuilder"/>
 		<lang.psiStructureViewFactory language="Latte" implementationClass="com.jantvrdik.intellij.latte.editor.LatteStructureViewFactory"/>
 
+		<psi.referenceContributor implementation="com.jantvrdik.intellij.latte.reference.LatteReferenceContributor"/>
+
 		<localInspection language="Latte" shortName="ModifierNotAllowed" id="ModifierNotAllowed"
 						 displayName="Modifier not allowed"
 						 groupName="Latte" enabledByDefault="true" level="WARNING"
@@ -124,6 +126,11 @@
 						 displayName="Deprecated macro"
 						 groupName="Latte" enabledByDefault="true"
 						 implementationClass="com.jantvrdik.intellij.latte.inspections.DeprecatedMacroInspection"/>
+
+		<localInspection language="Latte" shortName="VariablesProblems" id="VariablesProblems"
+						 displayName="Variables problems"
+						 groupName="Latte" enabledByDefault="true"
+						 implementationClass="com.jantvrdik.intellij.latte.inspections.VariablesInspection"/>
 	</extensions>
 
 	<application-components>

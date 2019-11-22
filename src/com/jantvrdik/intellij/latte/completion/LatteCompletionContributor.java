@@ -7,12 +7,18 @@ import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.patterns.PlatformPatterns;
+import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.jantvrdik.intellij.latte.LatteLanguage;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
+import com.jantvrdik.intellij.latte.config.LatteDefaultVariable;
 import com.jantvrdik.intellij.latte.config.LatteMacro;
+import com.jantvrdik.intellij.latte.psi.LattePhpVariable;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
+import com.jantvrdik.intellij.latte.utils.LatteUtil;
+import com.jantvrdik.intellij.latte.utils.PsiPositionedElement;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -55,6 +61,18 @@ public class LatteCompletionContributor extends CompletionContributor {
 				result.addAllElements(getAttrMacroCompletions(customMacros));
 			}
 		});
+
+		extend(CompletionType.BASIC, PlatformPatterns.psiElement(LatteTypes.T_MACRO_ARGS_VAR).withLanguage(LatteLanguage.INSTANCE), new CompletionProvider<CompletionParameters>() {
+			@Override
+			protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
+				PsiElement element = parameters.getPosition().getParent();
+				if (!(element instanceof LattePhpVariable)) {
+					return;
+				}
+				List<LookupElement> elements = getPhpVariableCompletions(element, parameters.getOriginalFile().getVirtualFile());
+				result.addAllElements(elements);
+			}
+		});
 	}
 
 	/**
@@ -92,6 +110,26 @@ public class LatteCompletionContributor extends CompletionContributor {
 					lookupElements.add(LookupElementBuilder.create("n:inner-" + macro.name).withInsertHandler(attrMacroInsertHandler));
 				}
 			}
+		}
+		return lookupElements;
+	}
+
+	private List<LookupElement> getPhpVariableCompletions(@NotNull PsiElement psiElement, @NotNull VirtualFile virtualFile) {
+		List<LookupElement> lookupElements = new ArrayList<LookupElement>();
+		for (PsiPositionedElement element : LatteUtil.findVariablesDefinitionsInFileBeforeElement(psiElement, virtualFile)) {
+			if (!(element.getElement() instanceof LattePhpVariable)) {
+				continue;
+			}
+			lookupElements.add(LookupElementBuilder.create(((LattePhpVariable) element.getElement()).getVariableName()));
+		}
+
+		List<LatteDefaultVariable> defaultVariables = LatteConfiguration.INSTANCE.getVariables(psiElement.getProject());
+		if (defaultVariables == null) {
+			return lookupElements;
+		}
+
+		for (LatteDefaultVariable variable : defaultVariables) {
+			lookupElements.add(LookupElementBuilder.create("$" + variable.name));
 		}
 		return lookupElements;
 	}
