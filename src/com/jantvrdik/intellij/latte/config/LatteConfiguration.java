@@ -44,6 +44,9 @@ public class LatteConfiguration {
 		addDefaultVariable("baseUri", "string");
 		addDefaultVariable("flashes", "array");
 		addDefaultVariable("presenter", "\\Nette\\Application\\UI\\Presenter");
+		addDefaultVariable("iterator", "\\Latte\\Runtime\\CachingIterator");
+		addDefaultVariable("form", "\\Nette\\Application\\UI\\Form");
+		addDefaultVariable("_form", "\\Nette\\Application\\UI\\Form");
 		addDefaultVariable("user", "\\Nette\\Security\\User");
 	}
 
@@ -78,6 +81,7 @@ public class LatteConfiguration {
 		addStandardMacro("sep", PAIR);
 
 		addStandardMacro("var", UNPAIRED);
+		addStandardMacro("varType", UNPAIRED);
 		addStandardMacro("assign", UNPAIRED);
 		addStandardMacro("default", UNPAIRED);
 		addStandardMacro("dump", UNPAIRED);

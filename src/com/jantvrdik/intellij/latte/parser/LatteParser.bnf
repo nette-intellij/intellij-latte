@@ -96,7 +96,7 @@ phpContent       ::= (phpForeach | phpFor | phpExpression)+
 phpVariable        ::= T_MACRO_ARGS_VAR {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpVariableElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpVariableElement"
-                        methods=[getName setName getNameIdentifier getVariableName isDefinition]
+                        methods=[getName setName getNameIdentifier getVariableName isDefinition getPhpType isVarTypeDefinition]
                     }
 
 phpStaticVariable  ::= T_MACRO_ARGS_VAR {
@@ -149,7 +149,7 @@ phpMethodArgs       ::= T_WHITESPACE? phpArgument+ ( T_WHITESPACE? "," T_WHITESP
 private
 phpArgument    ::=  T_MACRO_ARGS_STRING | T_MACRO_ARGS_NUMBER | phpClass | phpDefinition
                     | phpStatic | phpFunctionCall | phpInBrackets | phpVariable | T_PHP_OBJECT_OPERATOR
-                    | T_PHP_OPERATOR | T_PHP_DOUBLE_COLON | T_PHP_DOUBLE_ARROW | T_PHP_METHOD | T_PHP_KEYWORD
+                    | T_PHP_OPERATOR | T_PHP_DOUBLE_COLON | T_PHP_DOUBLE_ARROW | T_PHP_METHOD | T_PHP_TYPE | T_PHP_KEYWORD
                     | T_PHP_CLASS | T_PHP_AS | T_PHP_CAST | T_PHP_EXPRESSION | T_PHP_LEFT_BRACKET | T_PHP_RIGHT_BRACKET
 
 private

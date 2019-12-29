@@ -10,29 +10,24 @@ import com.jantvrdik.intellij.latte.utils.PsiPositionedElement;
 import org.jetbrains.annotations.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
 
-    private String key;
+    private String variableName;
 
     public LattePhpVariableReference(@NotNull LattePhpVariable element, TextRange textRange) {
         super(element, textRange);
-        key = element.getVariableName();
+        variableName = element.getVariableName();
     }
 
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
-        final List<PsiPositionedElement> properties = LatteUtil.findVariablesInFileBeforeElement(getElement(), getElement().getContainingFile().getVirtualFile(), key);
-        List<PsiPositionedElement> definitions = properties.stream().filter(
-                psiPositionedElement -> psiPositionedElement.getElement() instanceof LattePhpVariable
-                && ((LattePhpVariable) psiPositionedElement.getElement()).isDefinition()
-        ).collect(Collectors.toList());
+        final List<PsiPositionedElement> variables = LatteUtil.findVariablesInFileBeforeElement(getElement(), getElement().getContainingFile().getVirtualFile(), variableName);
 
         List<ResolveResult> results = new ArrayList<ResolveResult>();
-        for (PsiPositionedElement property : definitions) {
-            results.add(new PsiElementResolveResult(property.getElement()));
+        for (PsiPositionedElement variable : variables) {
+            results.add(new PsiElementResolveResult(variable.getElement()));
         }
         return results.toArray(new ResolveResult[results.size()]);
     }
@@ -52,9 +47,9 @@ public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> impl
         List<LookupElement> variants = new ArrayList<LookupElement>();
         for (final LattePhpVariable property : properties) {
             if (property.getName() != null && property.getName().length() > 0) {
-                variants.add(LookupElementBuilder.create(property).
-                        //withIcon(SimpleIcons.FILE).
-                        withTypeText(property.getContainingFile().getName())
+                variants.add(LookupElementBuilder.create(property)
+                        //.withIcon(SimpleIcons.FILE)
+                        .withTypeText(property.getContainingFile().getName())
                 );
             }
         }

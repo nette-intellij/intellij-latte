@@ -145,7 +145,7 @@ public class LatteUtil {
             }
 
             String varName = ((BaseLattePhpElement) constant).getPhpElementName();
-            if (!((BaseLattePhpElement) constant).getPhpType().getType().equals(phpClass.getFQN())) {
+            if (!((BaseLattePhpElement) constant).getPhpType().hasClass(phpClass.getFQN())) {
                 continue;
             }
 

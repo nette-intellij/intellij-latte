@@ -1,0 +1,42 @@
+package com.jantvrdik.intellij.latte.completion.handlers;
+
+import com.intellij.codeInsight.completion.InsertionContext;
+import com.intellij.codeInsight.lookup.LookupElement;
+import com.intellij.openapi.editor.CaretModel;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.EditorModificationUtil;
+import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.PsiElement;
+import com.jantvrdik.intellij.latte.psi.LatteTypes;
+import com.jetbrains.php.completion.insert.PhpReferenceInsertHandler;
+import org.jetbrains.annotations.NotNull;
+
+public class PhpClassInsertHandler extends PhpReferenceInsertHandler {
+
+	private static final PhpClassInsertHandler instance = new PhpClassInsertHandler();
+
+	public PhpClassInsertHandler() {
+		super();
+	}
+
+	public void handleInsert(@NotNull InsertionContext context, @NotNull LookupElement lookupElement) {
+		super.handleInsert(context, lookupElement);
+
+		// for removing first `\` (because class completion is triggered if prev element is `\` and PHP completion adding `\` before)
+		PsiElement element = context.getFile().findElementAt(context.getStartOffset());
+		if (element != null && element.getNode().getElementType() == LatteTypes.T_PHP_VAR_TYPE) {
+			Editor editor = context.getEditor();
+			CaretModel caretModel = editor.getCaretModel();
+			int offset = caretModel.getOffset();
+			caretModel.moveToOffset(element.getTextOffset());
+			editor.getSelectionModel().setSelection(element.getTextOffset(), element.getTextOffset() + 1);
+			EditorModificationUtil.deleteSelectedText(editor);
+			caretModel.moveToOffset(offset - 1);
+			PsiDocumentManager.getInstance(context.getProject()).commitDocument(editor.getDocument());
+		}
+	}
+
+	public static PhpClassInsertHandler getInstance() {
+		return instance;
+	}
+}

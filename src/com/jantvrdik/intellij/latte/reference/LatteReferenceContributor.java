@@ -103,7 +103,7 @@ public class LatteReferenceContributor extends PsiReferenceContributor {
                         LattePhpStaticVariable constantElement = (LattePhpStaticVariable) element;
                         String value = constantElement.getVariableName();
                         if (value != null) {
-                            return new PsiReference[]{new LattePhpStaticVariableReference(constantElement, new TextRange(0, value.length()))};
+                            return new PsiReference[]{new LattePhpStaticVariableReference(constantElement, new TextRange(0, value.length() + 1))};
                         }
 
                         return PsiReference.EMPTY_ARRAY;

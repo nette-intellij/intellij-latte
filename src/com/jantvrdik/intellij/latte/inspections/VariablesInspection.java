@@ -52,6 +52,9 @@ public class VariablesInspection extends LocalInspectionTool {
 					List<PsiPositionedElement> beforeElement = definitions.stream()
 							.filter(variableElement -> variableElement.getPosition() <= offset)
 							.collect(Collectors.toList());
+					List<PsiPositionedElement> varDefinitions = definitions.stream()
+							.filter(variableElement -> variableElement.getElement() instanceof LattePhpVariable && !((LattePhpVariable) variableElement.getElement()).isVarTypeDefinition())
+							.collect(Collectors.toList());
 
 					ProblemHighlightType type = null;
 					String description = null;
@@ -64,9 +67,24 @@ public class VariablesInspection extends LocalInspectionTool {
 								)
 								.collect(Collectors.toList());
 
-						if (definitions.size() > 1) {
+						if (varDefinitions.size() > 0 && !((LattePhpVariable) element).isVarTypeDefinition()) {
+							LatteDefaultVariable defaultVariable = LatteConfiguration.INSTANCE.getVariable(element.getProject(), variableName);
+							if (defaultVariable != null) {
+								ProblemDescriptor descriptor = manager.createProblemDescriptor(
+										element,
+										"Rewrite default variable '" + variableName + "' defined as template parameters",
+										true,
+										ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
+										isOnTheFly
+								);
+								problems.add(descriptor);
+							}
+						}
+
+						if (varDefinitions.size() > 1) {
 							type = ProblemHighlightType.GENERIC_ERROR_OR_WARNING;
 							description = "Multiple definitions for variable '" + variableName + "'";
+
 						} else if (usages.size() == 0) {
 							type = ProblemHighlightType.LIKE_UNUSED_SYMBOL;
 							description = "Unused variable '" + variableName + "'";

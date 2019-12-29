@@ -78,6 +78,10 @@ VAR_STRING=[a-zA-Z_][a-zA-Z0-9_]*
         return T_PHP_KEYWORD;
     }
 
+    ("string" | "int" | "bool" | "object" | "float" | "array") {
+        return T_PHP_TYPE;
+    }
+
     {VAR_STRING} {
         return T_PHP_METHOD;
     }

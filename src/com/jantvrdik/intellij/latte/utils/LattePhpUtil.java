@@ -14,6 +14,12 @@ import java.util.Collection;
 
 public class LattePhpUtil {
 
+    private static String[] nativeClassConstants = new String[]{"class"};
+
+    public static String[] getNativeClassConstants() {
+        return nativeClassConstants;
+    }
+
     public static Collection<PhpNamedElement> getAllClassNamesAndInterfaces(Project project, Collection<String> classNames) {
         Collection<PhpNamedElement> variants = new THashSet<PhpNamedElement>();
         PhpIndex phpIndex = getPhpIndex(project);

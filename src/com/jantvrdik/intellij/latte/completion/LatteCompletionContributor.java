@@ -7,23 +7,18 @@ import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.patterns.PlatformPatterns;
-import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.jantvrdik.intellij.latte.LatteLanguage;
+import com.jantvrdik.intellij.latte.completion.providers.LattePhpClassCompletionProvider;
+import com.jantvrdik.intellij.latte.completion.providers.LattePhpCompletionProvider;
+import com.jantvrdik.intellij.latte.completion.providers.LatteVariableCompletionProvider;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.config.LatteDefaultVariable;
 import com.jantvrdik.intellij.latte.config.LatteMacro;
-import com.jantvrdik.intellij.latte.psi.LattePhpVariable;
-import com.jantvrdik.intellij.latte.psi.LatteTypes;
-import com.jantvrdik.intellij.latte.utils.LatteUtil;
-import com.jantvrdik.intellij.latte.utils.PsiPositionedElement;
+import com.jantvrdik.intellij.latte.psi.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Provides basic code completion for names of both classic and attribute macros.
@@ -62,17 +57,25 @@ public class LatteCompletionContributor extends CompletionContributor {
 			}
 		});
 
-		extend(CompletionType.BASIC, PlatformPatterns.psiElement(LatteTypes.T_MACRO_ARGS_VAR).withLanguage(LatteLanguage.INSTANCE), new CompletionProvider<CompletionParameters>() {
-			@Override
-			protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
-				PsiElement element = parameters.getPosition().getParent();
-				if (!(element instanceof LattePhpVariable)) {
-					return;
-				}
-				List<LookupElement> elements = getPhpVariableCompletions(element, parameters.getOriginalFile().getVirtualFile());
-				result.addAllElements(elements);
-			}
-		});
+		extend(
+				CompletionType.BASIC,
+				PlatformPatterns.psiElement(LatteTypes.T_MACRO_ARGS_VAR).withLanguage(LatteLanguage.INSTANCE),
+				new LatteVariableCompletionProvider()
+		);
+
+		extend(CompletionType.BASIC, PlatformPatterns.psiElement(), new LattePhpCompletionProvider());
+
+		extend(
+				CompletionType.CLASS_NAME,
+				PlatformPatterns.psiElement()
+						.andOr(
+								PlatformPatterns.or(
+										PlatformPatterns.psiElement().withElementType(LatteTypes.T_PHP_VAR_TYPE),
+										PlatformPatterns.psiElement().withElementType(LatteTypes.T_MACRO_ARGS)
+								)
+						),
+				new LattePhpClassCompletionProvider()
+		);
 	}
 
 	/**
@@ -114,30 +117,10 @@ public class LatteCompletionContributor extends CompletionContributor {
 		return lookupElements;
 	}
 
-	private List<LookupElement> getPhpVariableCompletions(@NotNull PsiElement psiElement, @NotNull VirtualFile virtualFile) {
-		List<LookupElement> lookupElements = new ArrayList<LookupElement>();
-		for (PsiPositionedElement element : LatteUtil.findVariablesDefinitionsInFileBeforeElement(psiElement, virtualFile)) {
-			if (!(element.getElement() instanceof LattePhpVariable)) {
-				continue;
-			}
-			lookupElements.add(LookupElementBuilder.create(((LattePhpVariable) element.getElement()).getVariableName()));
-		}
-
-		List<LatteDefaultVariable> defaultVariables = LatteConfiguration.INSTANCE.getVariables(psiElement.getProject());
-		if (defaultVariables == null) {
-			return lookupElements;
-		}
-
-		for (LatteDefaultVariable variable : defaultVariables) {
-			lookupElements.add(LookupElementBuilder.create("$" + variable.name));
-		}
-		return lookupElements;
-	}
-
 	/**
 	 * Inserts ="" after attribute macro and moves caret inside those quotes.
 	 */
-	private class AttrMacroInsertHandler<T extends LookupElement> implements InsertHandler<T> {
+	private static class AttrMacroInsertHandler<T extends LookupElement> implements InsertHandler<T> {
 		@Override
 		public void handleInsert(InsertionContext context, LookupElement item) {
 			Editor editor = context.getEditor();

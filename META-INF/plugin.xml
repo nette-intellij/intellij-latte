@@ -9,6 +9,25 @@
 	]]></description>
 
 	<change-notes><![CDATA[
+		<p>0.4.0@beta</p>
+		<ul>
+			<li>added PHP content</li>
+			<li>added variable types</li>
+			<li>added variables highlighting</li>
+			<li>added support for define custom variables in project</li>
+			<li>added completions for variables, methods, constants and properties</li>
+			<li>added varType macro</li>
+			<li>added go to source for class names, methods, constants and properties</li>
+			<li>
+				added inspections for:
+				<ul>
+					<li>Class usages (Undefined class)</li>
+					<li>Checking constant, property and methods visibility (if is not public it make warning)</li>
+					<li>Checking not existing constants, properties and methods</li>
+					<li>Checking static methods and properties used non statically and vice versa</li>
+				</ul>
+			</li>
+		</ul>
 		<p>0.3.3</p>
 		<ul>
 			<li>fixed null pointer exception</li>
