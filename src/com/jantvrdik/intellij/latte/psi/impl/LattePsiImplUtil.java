@@ -1,15 +1,21 @@
 package com.jantvrdik.intellij.latte.psi.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jantvrdik.intellij.latte.psi.*;
+import com.jantvrdik.intellij.latte.utils.LattePhpType;
 import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
+import com.jetbrains.php.lang.psi.elements.Field;
+import com.jetbrains.php.lang.psi.elements.Method;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.List;
 
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
@@ -47,7 +53,7 @@ public class LattePsiImplUtil {
 	public static String getVariableName(@NotNull PsiElement element) {
 		ASTNode keyNode = element.getNode().findChildByType(T_MACRO_ARGS_VAR);
 		if (keyNode != null) {
-			return keyNode.getPsi().getText();
+			return LattePhpUtil.normalizePhpVariable(keyNode.getPsi().getText());
 		} else {
 			return null;
 		}
@@ -68,6 +74,121 @@ public class LattePsiImplUtil {
 
 	public static String getPropertyName(@NotNull PsiElement element) {
 		return getMethodName(element);
+	}
+
+	public static String getClassName(@NotNull PsiElement element) {
+		ASTNode keyNode = element.getNode().findChildByType(T_PHP_VAR_TYPE);
+		if (keyNode != null) {
+			return keyNode.getPsi().getText();
+		} else {
+			return null;
+		}
+	}
+
+	public static @NotNull LattePhpType getPhpType(@NotNull PsiElement element) {
+		PsiElement prev = PsiTreeUtil.skipWhitespacesBackward(element);
+		if (prev == null || (prev.getNode().getElementType() != T_PHP_DOUBLE_COLON && prev.getNode().getElementType() != T_PHP_OBJECT_OPERATOR)) {
+			return new LattePhpType("mixed", false);
+		}
+
+		PsiElement prevElement = PsiTreeUtil.skipWhitespacesBackward(prev);
+		if (prevElement != null && prevElement.getText().equals(")")) {
+			PsiElement beforeBraces = PsiTreeUtil.skipWhitespacesBackward(prevElement);
+			if (beforeBraces instanceof LattePhpMethodArgs) {
+				beforeBraces = PsiTreeUtil.skipWhitespacesBackward(beforeBraces);
+			}
+
+			if (beforeBraces != null && beforeBraces.getText().equals("(")) {
+				prevElement = PsiTreeUtil.skipWhitespacesBackward(beforeBraces);
+			}
+		}
+
+		LattePhpType type = null;
+		if (prevElement instanceof LattePhpStaticVariable) {
+			type = ((LattePhpStaticVariable) prevElement).getPropertyType();
+		} else if (prevElement instanceof LattePhpClass) {
+			type = ((LattePhpClass) prevElement).getPhpType();
+		} else if (prevElement instanceof LattePhpMethod) {
+			type = ((LattePhpMethod) prevElement).getReturnType();
+		} else if (prevElement instanceof LattePhpProperty) {
+			type = ((LattePhpProperty) prevElement).getPropertyType();
+		} else if (prevElement instanceof LattePhpConstant) {
+			type = ((LattePhpConstant) prevElement).getConstantType();
+		}
+		return type != null ? type : new LattePhpType("mixed", false);
+	}
+
+	public static boolean isStatic(@NotNull PsiElement element) {
+		PsiElement prev = PsiTreeUtil.skipWhitespacesBackward(element);
+		return prev != null && prev.getNode().getElementType() == T_PHP_DOUBLE_COLON;
+	}
+
+	public static boolean isFunction(@NotNull PsiElement element) {
+		PsiElement prev = PsiTreeUtil.skipWhitespacesBackward(element);
+		return prev != null && prev.getNode().getElementType() != T_PHP_DOUBLE_COLON && prev.getNode().getElementType() != T_PHP_OBJECT_OPERATOR;
+	}
+
+	public static LattePhpType getReturnType(@NotNull LattePhpMethod element) {
+		return getMethodType(element.getProject(), element.getPhpType(), element.getMethodName());
+	}
+
+	public static LattePhpType getPropertyType(@NotNull LattePhpStaticVariable element) {
+		return getPropertyType(element.getProject(), element.getPhpType(), element.getVariableName());
+	}
+
+	public static LattePhpType getConstantType(@NotNull LattePhpConstant element) {
+		return getPropertyType(element.getProject(), element.getPhpType(), element.getConstantName());
+	}
+
+	public static LattePhpType getPropertyType(@NotNull LattePhpProperty element) {
+		return getPropertyType(element.getProject(), element.getPhpType(), element.getPropertyName());
+	}
+
+	private static LattePhpType getPropertyType(@NotNull Project project, @NotNull LattePhpType type, @NotNull String elementName) {
+		PhpClass first = getClassType(project, type, elementName);
+		if (first == null) {
+			return null;
+		}
+
+		for (Field field : first.getFields()) {
+			if (field.getName().equals(LattePhpUtil.normalizePhpVariable(elementName))) {
+				return new LattePhpType(field.getType().toString(), field.getType().isNullable());
+			}
+		}
+		return null;
+	}
+
+	private static LattePhpType getMethodType(@NotNull Project project, @NotNull LattePhpType type, @NotNull String elementName) {
+		PhpClass first = getClassType(project, type, elementName);
+		if (first == null) {
+			return null;
+		}
+
+		for (Method phpMethod : first.getMethods()) {
+			if (phpMethod.getName().equals(elementName)) {
+				return new LattePhpType(phpMethod.getType().toString(), phpMethod.getType().isNullable());
+			}
+		}
+		return null;
+	}
+
+	private static PhpClass getClassType(@NotNull Project project, @NotNull LattePhpType type, @NotNull String elementName) {
+		if (!type.isClassOrInterfaceType()) {
+			return null;
+		}
+		Collection<PhpClass> phpClasses = type.getPhpClasses(project);
+		if (phpClasses == null) {
+			return null;
+		}
+		PhpClass first = phpClasses.stream().findFirst().isPresent() ? phpClasses.stream().findFirst().get() : null;
+		if (first == null) {
+			return null;
+		}
+		return first;
+	}
+
+	public static LattePhpType getPhpType(@NotNull LattePhpClass element) {
+		return new LattePhpType(element.getClassName(), false);
 	}
 
 	public static boolean isDefinition(@NotNull LattePhpVariable element) {
@@ -164,6 +285,15 @@ public class LattePsiImplUtil {
 
 	public static PsiElement getNameIdentifier(PsiElement element) {
 		ASTNode keyNode = element.getNode().findChildByType(T_PHP_METHOD);
+		if (keyNode != null) {
+			return keyNode.getPsi();
+		} else {
+			return null;
+		}
+	}
+
+	public static PsiElement getNameIdentifier(LattePhpClass element) {
+		ASTNode keyNode = element.getNode().findChildByType(T_PHP_VAR_TYPE);
 		if (keyNode != null) {
 			return keyNode.getPsi();
 		} else {

@@ -58,7 +58,10 @@ public class VariablesInspection extends LocalInspectionTool {
 					boolean isUndefined = false;
 					if (((LattePhpVariable) element).isDefinition()) {
 						List<PsiPositionedElement> usages = all.stream()
-								.filter(variableElement -> variableElement.getElement() instanceof LattePhpVariable && !((LattePhpVariable) variableElement.getElement()).isDefinition())
+								.filter(
+										variableElement -> variableElement.getElement() instanceof LattePhpVariable
+										&& !((LattePhpVariable) variableElement.getElement()).isDefinition()
+								)
 								.collect(Collectors.toList());
 
 						if (definitions.size() > 1) {

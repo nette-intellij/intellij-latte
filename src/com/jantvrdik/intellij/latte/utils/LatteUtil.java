@@ -1,7 +1,9 @@
 package com.jantvrdik.intellij.latte.utils;
 
 import com.intellij.psi.PsiElement;
-import com.jantvrdik.intellij.latte.psi.LattePhpVariable;
+import com.jantvrdik.intellij.latte.psi.*;
+import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -9,7 +11,6 @@ import com.intellij.psi.*;
 import com.intellij.psi.search.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jantvrdik.intellij.latte.LatteFileType;
-import com.jantvrdik.intellij.latte.psi.LatteFile;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -32,8 +33,6 @@ public class LatteUtil {
     public static List<PsiPositionedElement> findVariablesInFileBeforeElement(@NotNull PsiElement element, @NotNull VirtualFile virtualFile, @Nullable String key) {
         List<PsiPositionedElement> variables = findVariablesInFile(element.getProject(), virtualFile, key);
 
-        //PsiElement mainParent = PsiTreeUtil.getParentOfType(element, LatteMacroClassic.class, LatteNetteAttr.class);
-        //int offset = mainParent != null ? mainParent.getNode().getStartOffsetInParent() : 0;
         int offset = getStartOffsetInFile(element);
         return variables.stream()
                 .filter(variableElement -> variableElement.getPosition() <= offset)
@@ -46,7 +45,7 @@ public class LatteUtil {
         if (simpleFile != null) {
             List<PsiPositionedElement> properties = new ArrayList<PsiPositionedElement>();
             for (PsiElement element : simpleFile.getChildren()) {
-                findElementsByType(properties, element);
+                findLattePhpVariables(properties, element);
             }
 
             for (PsiPositionedElement variable : properties) {
@@ -66,6 +65,96 @@ public class LatteUtil {
         return result != null ? result : Collections.<PsiPositionedElement>emptyList();
     }
 
+    public static Collection<BaseLattePhpElement> findMethods(Project project, String key, @NotNull PhpClass phpClass) {
+        List<BaseLattePhpElement> result = new ArrayList<BaseLattePhpElement>();
+        Collection<VirtualFile> virtualFiles =
+                FileTypeIndex.getFiles(LatteFileType.INSTANCE, GlobalSearchScope.allScope(project));
+        for (VirtualFile virtualFile : virtualFiles) {
+            LatteFile simpleFile = (LatteFile) PsiManager.getInstance(project).findFile(virtualFile);
+            if (simpleFile != null) {
+                List<PsiElement> elements = new ArrayList<PsiElement>();
+                for (PsiElement element : simpleFile.getChildren()) {
+                    findLattePhpMethods(elements, element);
+                }
+
+                attachResults(result, key, elements, phpClass);
+            }
+        }
+        return result;
+    }
+
+    public static Collection<BaseLattePhpElement> findProperties(Project project, String key, @NotNull PhpClass phpClass) {
+        List<BaseLattePhpElement> result = new ArrayList<BaseLattePhpElement>();
+        Collection<VirtualFile> virtualFiles =
+                FileTypeIndex.getFiles(LatteFileType.INSTANCE, GlobalSearchScope.allScope(project));
+        for (VirtualFile virtualFile : virtualFiles) {
+            LatteFile simpleFile = (LatteFile) PsiManager.getInstance(project).findFile(virtualFile);
+            if (simpleFile != null) {
+                List<PsiElement> elements = new ArrayList<PsiElement>();
+                for (PsiElement element : simpleFile.getChildren()) {
+                    findLattePhpProperties(elements, element);
+                }
+
+                attachResults(result, key, elements, phpClass);
+            }
+        }
+        return result;
+    }
+
+    public static Collection<BaseLattePhpElement> findConstants(Project project, String key, @NotNull PhpClass phpClass) {
+        List<BaseLattePhpElement> result = new ArrayList<BaseLattePhpElement>();
+        Collection<VirtualFile> virtualFiles =
+                FileTypeIndex.getFiles(LatteFileType.INSTANCE, GlobalSearchScope.allScope(project));
+        for (VirtualFile virtualFile : virtualFiles) {
+            LatteFile simpleFile = (LatteFile) PsiManager.getInstance(project).findFile(virtualFile);
+            if (simpleFile != null) {
+                List<PsiElement> elements = new ArrayList<PsiElement>();
+                for (PsiElement element : simpleFile.getChildren()) {
+                    findLattePhpConstants(elements, element);
+                }
+
+                attachResults(result, key, elements, phpClass);
+            }
+        }
+        return result;
+    }
+
+    public static Collection<BaseLattePhpElement> findStaticVariables(Project project, String key, @NotNull PhpClass phpClass) {
+        List<BaseLattePhpElement> result = new ArrayList<BaseLattePhpElement>();
+        Collection<VirtualFile> virtualFiles =
+                FileTypeIndex.getFiles(LatteFileType.INSTANCE, GlobalSearchScope.allScope(project));
+        for (VirtualFile virtualFile : virtualFiles) {
+            LatteFile simpleFile = (LatteFile) PsiManager.getInstance(project).findFile(virtualFile);
+            if (simpleFile != null) {
+                List<PsiElement> elements = new ArrayList<PsiElement>();
+                for (PsiElement element : simpleFile.getChildren()) {
+                    findLattePhpStaticVariables(elements, element);
+                }
+
+                attachResults(result, key, elements, phpClass);
+            }
+        }
+        return result;
+    }
+
+    private static void attachResults(@NotNull List<BaseLattePhpElement> result, String key, List<PsiElement> elements, @NotNull PhpClass phpClass)
+    {
+        for (PsiElement constant : elements) {
+            if (!(constant instanceof BaseLattePhpElement)) {
+                continue;
+            }
+
+            String varName = ((BaseLattePhpElement) constant).getPhpElementName();
+            if (!((BaseLattePhpElement) constant).getPhpType().getType().equals(phpClass.getFQN())) {
+                continue;
+            }
+
+            if (key.equals(varName)) {
+                result.add((BaseLattePhpElement) constant);
+            }
+        }
+    }
+
     @NotNull
     private static List<PsiElement> collectPsiElementsRecursive(@NotNull PsiElement psiElement) {
         final List<PsiElement> elements = new ArrayList<PsiElement>();
@@ -81,10 +170,42 @@ public class LatteUtil {
         return elements;
     }
 
-    public static void findElementsByType(List<PsiPositionedElement> properties, PsiElement psiElement) {
+    private static void findLattePhpVariables(List<PsiPositionedElement> properties, PsiElement psiElement) {
         for (PsiElement element : collectPsiElementsRecursive(psiElement)) {
             if (element instanceof LattePhpVariable) {
                 properties.add(new PsiPositionedElement(getStartOffsetInFile(psiElement), element));
+            }
+        }
+    }
+
+    private static void findLattePhpMethods(List<PsiElement> properties, PsiElement psiElement) {
+        for (PsiElement element : collectPsiElementsRecursive(psiElement)) {
+            if (element instanceof LattePhpMethod) {
+                properties.add(element);
+            }
+        }
+    }
+
+    private static void findLattePhpProperties(List<PsiElement> properties, PsiElement psiElement) {
+        for (PsiElement element : collectPsiElementsRecursive(psiElement)) {
+            if (element instanceof LattePhpProperty) {
+                properties.add(element);
+            }
+        }
+    }
+
+    private static void findLattePhpConstants(List<PsiElement> properties, PsiElement psiElement) {
+        for (PsiElement element : collectPsiElementsRecursive(psiElement)) {
+            if (element instanceof LattePhpConstant) {
+                properties.add(element);
+            }
+        }
+    }
+
+    private static void findLattePhpStaticVariables(List<PsiElement> properties, PsiElement psiElement) {
+        for (PsiElement element : collectPsiElementsRecursive(psiElement)) {
+            if (element instanceof LattePhpStaticVariable) {
+                properties.add(element);
             }
         }
     }

@@ -14,6 +14,12 @@ public abstract class LattePhpStaticVariableElementImpl extends ASTWrapperPsiEle
 		super(node);
 	}
 
+	@Override
+	public String getPhpElementName()
+	{
+		return getVariableName();
+	}
+
 	@Nullable
 	public PsiReference getReference() {
 		PsiReference[] references = getReferences();

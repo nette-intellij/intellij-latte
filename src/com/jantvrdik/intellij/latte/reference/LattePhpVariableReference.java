@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
+
     private String key;
 
     public LattePhpVariableReference(@NotNull LattePhpVariable element, TextRange textRange) {
@@ -40,7 +41,7 @@ public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> impl
     @Override
     public PsiElement resolve() {
         ResolveResult[] resolveResults = multiResolve(false);
-        return resolveResults.length == 1 ? resolveResults[0].getElement() : null;
+        return resolveResults.length > 0 ? resolveResults[0].getElement() : null;
     }
 
     @NotNull

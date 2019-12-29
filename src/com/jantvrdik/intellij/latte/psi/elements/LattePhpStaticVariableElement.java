@@ -1,8 +1,6 @@
 package com.jantvrdik.intellij.latte.psi.elements;
 
-import com.intellij.psi.PsiNameIdentifierOwner;
-
-public interface LattePhpStaticVariableElement extends PsiNameIdentifierOwner {
+public interface LattePhpStaticVariableElement extends BaseLattePhpElement {
 
 	public abstract String getVariableName();
 

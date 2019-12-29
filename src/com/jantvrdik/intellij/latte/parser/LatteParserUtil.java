@@ -4,6 +4,7 @@ import com.intellij.lang.PsiBuilder;
 import com.intellij.psi.tree.IElementType;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.config.LatteMacro;
+import com.jantvrdik.intellij.latte.psi.LatteTypes;
 import org.jetbrains.annotations.NotNull;
 
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
@@ -52,18 +53,15 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 	/**
 	 * Looks for a classic macro a returns true if it finds the macro a and it is pair or unpaired (based on pair parameter).
 	 */
-	public static boolean checkPhpMethod(PsiBuilder builder, int level, String type) {
+	public static boolean checkPhpMethod(PsiBuilder builder, int level) {
+		IElementType type = builder.getTokenType();
+		String text = builder.getTokenText();
 		if (builder.getTokenType() != T_PHP_DOUBLE_COLON && builder.getTokenType() != T_PHP_DOUBLE_ARROW) return false;
 
+		int depth = 0;
 		PsiBuilder.Marker marker = builder.mark();
 
-		boolean result;
-
-		if (type.equals("constant")) {
-			result = isPhpConstant(builder);
-		} else {
-			result = isPhpMethod(builder);
-		}
+		boolean result = isPhpMethod(builder);
 
 		marker.rollbackTo();
 		return result;

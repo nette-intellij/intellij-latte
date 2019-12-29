@@ -92,7 +92,7 @@
 	</change-notes>
 
 	<!-- http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges -->
-	<idea-version since-build="139.0"/>
+	<idea-version since-build="173.2099.1"/>
 
 	<!-- http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products -->
 	<depends>com.intellij.modules.lang</depends>
@@ -114,8 +114,11 @@
 		<quoteHandler className="com.jantvrdik.intellij.latte.editorActions.LatteQuoteHandler" fileType="Latte"/>
 		<indexPatternBuilder implementation="com.jantvrdik.intellij.latte.psi.LatteIndexPatternBuilder"/>
 		<lang.psiStructureViewFactory language="Latte" implementationClass="com.jantvrdik.intellij.latte.editor.LatteStructureViewFactory"/>
+		<lang.findUsagesProvider language="Latte" implementationClass="com.jantvrdik.intellij.latte.reference.LatteFindUsagesProvider"/>
 
 		<psi.referenceContributor implementation="com.jantvrdik.intellij.latte.reference.LatteReferenceContributor"/>
+
+		<gotoDeclarationHandler implementation="com.jantvrdik.intellij.latte.reference.handlers.GoToElementDeclarationHandler"/>
 
 		<localInspection language="Latte" shortName="ModifierNotAllowed" id="ModifierNotAllowed"
 						 displayName="Modifier not allowed"
@@ -131,6 +134,31 @@
 						 displayName="Variables problems"
 						 groupName="Latte" enabledByDefault="true"
 						 implementationClass="com.jantvrdik.intellij.latte.inspections.VariablesInspection"/>
+
+		<localInspection language="Latte" shortName="ClassUsages" id="ClassUsages"
+						 displayName="Class usages"
+						 groupName="Latte" enabledByDefault="true"
+						 implementationClass="com.jantvrdik.intellij.latte.inspections.ClassUsagesInspection"/>
+
+		<localInspection language="Latte" shortName="MethodUsages" id="MethodUsages"
+						 displayName="Method usages"
+						 groupName="Latte" enabledByDefault="true"
+						 implementationClass="com.jantvrdik.intellij.latte.inspections.MethodUsagesInspection"/>
+
+		<localInspection language="Latte" shortName="StaticPropertyUsages" id="StaticPropertyUsages"
+						 displayName="Static property usages"
+						 groupName="Latte" enabledByDefault="true"
+						 implementationClass="com.jantvrdik.intellij.latte.inspections.StaticPropertyUsagesInspection"/>
+
+		<localInspection language="Latte" shortName="ConstantUsages" id="ConstantUsages"
+						 displayName="Constant usages"
+						 groupName="Latte" enabledByDefault="true"
+						 implementationClass="com.jantvrdik.intellij.latte.inspections.ConstantUsagesInspection"/>
+
+		<localInspection language="Latte" shortName="PropertyUsages" id="PropertyUsages"
+						 displayName="Property usages"
+						 groupName="Latte" enabledByDefault="true"
+						 implementationClass="com.jantvrdik.intellij.latte.inspections.PropertyUsagesInspection"/>
 	</extensions>
 
 	<application-components>

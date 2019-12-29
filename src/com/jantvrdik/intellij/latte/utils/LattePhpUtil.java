@@ -4,6 +4,7 @@ import com.intellij.codeInsight.completion.PrefixMatcher;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIndex;
+import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
 import gnu.trove.THashSet;
@@ -22,6 +23,15 @@ public class LattePhpUtil {
             variants.addAll(filterClasses(phpIndex.getInterfacesByName(name), null));
         }
         return variants;
+    }
+
+    public static Collection<Method> findMethods(Collection<PhpClass> classes, String methodName) {
+        Collection<Method> methods = new ArrayList<Method>();
+        classes.stream().map(
+                phpClass -> phpClass.getMethods().stream()
+                    .filter(method -> method.getName().equals(methodName))
+                    .map(methods::add));
+        return methods;
     }
 
     public static String normalizePhpVariable(String name) {

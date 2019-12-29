@@ -46,16 +46,36 @@ VAR_STRING=[a-zA-Z_][a-zA-Z0-9_]*
 		return T_MACRO_ARGS_STRING;
 	}
 
+    ("[") {
+        return T_PHP_LEFT_BRACKET;
+    }
+
+    ("]") {
+        return T_PHP_RIGHT_BRACKET;
+    }
+
     ("<=>" | "<>" | "<=" | ">=" | "<" | ">" | "==" | "===" | "\!=" | "\==") {
         return T_PHP_OPERATOR;
     }
 
-    ("class" | "false" | "true" | "null" | "break" | "continue" | "case" | "default" | "die" | "exit" | "do" | "while" | "foreach" | "for" | "function" | "echo" | "print" | "catch" | "finally" | "try" | "instanceof" | "if" | "else" | "elseif" | "endif" | "endforeach" | "endfor" | "endwhile" | "endswitch" | "isset" | "or" | "new" | "switch" | "use") {
-        return T_PHP_KEYWORD;
+    ("(bool)" | "(boolean)" | "(array)" | "(real)" | "(double)" | "(float)" | "(int)" | "(integer)" | "(object)" | "(string)" | "(unset)") {
+        return T_PHP_CAST;
+    }
+
+    ("||" | "&&" | "**=" | "**" | ".=" | "^=" | "-=" | "+=" | "%=" | "*=" | "|=" | "&=" | "??" | "--" | "/=" | "..." | "++" | "<<<" | "<<=" | ">>=" | "<<" | ">>") {
+        return T_PHP_EXPRESSION;
+    }
+
+    ("+" | "-" | "?" | ":" | "&" | "." | "*" | "/") {
+        return T_PHP_EXPRESSION;
     }
 
     "as" {
         return T_PHP_AS;
+    }
+
+    ("class" | "false" | "true" | "null" | "break" | "continue" | "case" | "default" | "die" | "exit" | "do" | "while" | "foreach" | "for" | "function" | "echo" | "print" | "catch" | "finally" | "try" | "instanceof" | "if" | "else" | "elseif" | "endif" | "endforeach" | "endfor" | "endwhile" | "endswitch" | "isset" | "or" | "new" | "switch" | "use") {
+        return T_PHP_KEYWORD;
     }
 
     {VAR_STRING} {
