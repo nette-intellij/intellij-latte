@@ -11,4 +11,5 @@ public class LatteIcons {
 
 	/** file icon */
 	public static final Icon FILE = IconLoader.getIcon("/icons/Latte.png");
+	public static final Icon MACRO = IconLoader.getIcon("/icons/Macro.png");
 }

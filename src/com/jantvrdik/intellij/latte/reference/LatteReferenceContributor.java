@@ -130,5 +130,28 @@ public class LatteReferenceContributor extends PsiReferenceContributor {
                         return PsiReference.EMPTY_ARRAY;
                     }
                 });
+
+        registrar.registerReferenceProvider(
+                PlatformPatterns.or(
+                        PlatformPatterns.psiElement(LatteTypes.MACRO_OPEN_TAG),
+                        PlatformPatterns.psiElement(LatteTypes.MACRO_CLOSE_TAG)
+                ),
+                new PsiReferenceProvider() {
+                    @NotNull
+                    @Override
+                    public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
+                        if (!(element instanceof LatteMacroTag)) {
+                            return PsiReference.EMPTY_ARRAY;
+                        }
+
+                        LatteMacroTag constantElement = (LatteMacroTag) element;
+                        String value = constantElement.getMacroName();
+                        if (value.length() == 0) {
+                            return PsiReference.EMPTY_ARRAY;
+                        }
+                        int length = element instanceof LatteMacroCloseTag ? 2 : 1;
+                        return new PsiReference[]{new LatteMacroTagReference(constantElement, new TextRange(0, value.length() + length))};
+                    }
+                });
     }
 }

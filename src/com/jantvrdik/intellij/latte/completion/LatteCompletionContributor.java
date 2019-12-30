@@ -66,7 +66,7 @@ public class LatteCompletionContributor extends CompletionContributor {
 		extend(CompletionType.BASIC, PlatformPatterns.psiElement(), new LattePhpCompletionProvider());
 
 		extend(
-				CompletionType.CLASS_NAME,
+				CompletionType.BASIC,
 				PlatformPatterns.psiElement()
 						.andOr(
 								PlatformPatterns.or(

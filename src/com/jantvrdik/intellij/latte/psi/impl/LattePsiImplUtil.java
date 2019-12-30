@@ -20,9 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -157,7 +155,13 @@ public class LattePsiImplUtil {
 			return new LattePhpType("mixed", false);
 		}
 
-		PsiElement prevElement = PsiTreeUtil.skipWhitespacesBackward(prev);
+		PsiElement prevElement;
+		if (prev.getParent().getNode().getElementType() == PHP_FOREACH) {
+			prevElement = PsiTreeUtil.skipWhitespacesBackward(prev.getParent());
+		} else {
+			prevElement = PsiTreeUtil.skipWhitespacesBackward(prev);
+		}
+
 		if (prevElement != null && prevElement.getText().equals(")")) {
 			PsiElement beforeBraces = PsiTreeUtil.skipWhitespacesBackward(prevElement);
 			if (beforeBraces instanceof LattePhpMethodArgs) {
@@ -357,6 +361,33 @@ public class LattePsiImplUtil {
 		} else {
 			return null;
 		}
+	}
+
+	@NotNull
+	public static String getMacroName(LatteAutoClosedBlock element) {
+		return "block";
+	}
+
+	public static PsiElement getNameIdentifier(LatteAutoClosedBlock element) {
+		ASTNode keyNode = element.getNode().findChildByType(T_MACRO_NAME);
+		if (keyNode != null) {
+			return keyNode.getPsi();
+		} else {
+			return null;
+		}
+	}
+
+	public static PsiElement getNameIdentifier(LatteMacroTag element) {
+		ASTNode keyNode = element.getNode().findChildByType(T_MACRO_NAME);
+		if (keyNode != null) {
+			return keyNode.getPsi();
+		} else {
+			return null;
+		}
+	}
+
+	public static String getName(LatteMacroTag element) {
+		return element.getMacroName();
 	}
 
 	public static PsiElement getNameIdentifier(LattePhpClass element) {

@@ -1,7 +1,7 @@
 <idea-plugin version="2">
 	<id>com.jantvrdik.intellij.latte</id>
 	<name>Latte</name>
-	<version>0.3.3</version>
+	<version>0.4.0</version>
 	<vendor>Jan Tvrdík</vendor>
 
 	<description><![CDATA[
@@ -9,17 +9,18 @@
 	]]></description>
 
 	<change-notes><![CDATA[
-		<p>0.4.0@beta</p>
+		<p>0.4.0</p>
 		<ul>
-			<li>added PHP content</li>
+			<li>added support for PHP content</li>
 			<li>added variable types</li>
-			<li>added variables highlighting</li>
-			<li>added support for define custom variables in project</li>
+			<li>added highlighting and go to source support for latte variables</li>
+			<li>added support for define custom default variables per project</li>
 			<li>added completions for variables, methods, constants and properties</li>
 			<li>added varType macro</li>
-			<li>added reference search for usages from PHP to Latte</li>
+			<li>added reference search for usages from PHP to Latte (for classes, methods, properties and constants)</li>
 			<li>added brace matcher for highlight braces</li>
 			<li>added go to source for class names, methods, constants and properties</li>
+			<li>added support for highlighting macro name and pair macro</li>
 			<li>
 				added inspections for:
 				<ul>
@@ -29,6 +30,7 @@
 					<li>Checking static methods and properties used non statically and vice versa</li>
 				</ul>
 			</li>
+			<li>Increased minimum compatibility with PhpStorm version to 2017.3 from PhpStorm 8 (pre-2016.2 IDE version)</li>
 		</ul>
 		<p>0.3.3</p>
 		<ul>

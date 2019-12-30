@@ -23,6 +23,10 @@ public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> impl
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
+        if (getElement().getContainingFile().getVirtualFile() == null) {
+            return new ResolveResult[0];
+        }
+
         final List<PsiPositionedElement> variables = LatteUtil.findVariablesInFileBeforeElement(getElement(), getElement().getContainingFile().getVirtualFile(), variableName);
 
         List<ResolveResult> results = new ArrayList<ResolveResult>();

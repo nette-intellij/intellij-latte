@@ -35,7 +35,7 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 			// see https://github.com/nette/nette/blob/v2.1.2/Nette/Latte/Macros/CoreMacros.php#L193
 			boolean emptyArgs = true;
 			builder.advanceLexer();
-			while (emptyArgs && nextTokenIsFast(builder, T_MACRO_ARGS, T_MACRO_ARGS_NUMBER, T_MACRO_ARGS_STRING, T_MACRO_ARGS_VAR)) {
+			while (emptyArgs && nextTokenIsFast(builder, T_MACRO_ARGS, T_MACRO_ARGS_NUMBER, T_MACRO_ARGS_STRING, T_MACRO_ARGS_VAR, T_PHP_METHOD)) {
 				emptyArgs = (builder.getTokenText().trim().length() == 0);
 				builder.advanceLexer();
 			}

@@ -5,10 +5,10 @@ import com.intellij.lang.ASTNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
-import com.jantvrdik.intellij.latte.completion.handlers.PhpClassInsertHandler;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
 import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
 import com.jetbrains.php.completion.PhpLookupElement;
+import com.jetbrains.php.completion.insert.PhpReferenceInsertHandler;
 import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,7 +52,7 @@ public class LattePhpClassCompletionProvider extends CompletionProvider<Completi
 		// Add variants
 		for (PhpNamedElement item : variants) {
 			PhpLookupElement lookupItem = LattePhpClassCompletionProvider.getPhpLookupElement(item, null);
-			lookupItem.handler = PhpClassInsertHandler.getInstance();
+			lookupItem.handler = PhpReferenceInsertHandler.getInstance();
 			results.addElement(lookupItem);
 		}
 	}

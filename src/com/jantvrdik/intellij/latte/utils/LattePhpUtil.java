@@ -6,9 +6,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveResult;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
 import com.jetbrains.php.PhpIndex;
-import com.jetbrains.php.lang.psi.elements.Method;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
+import com.jetbrains.php.lang.psi.elements.*;
 import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,15 +32,6 @@ public class LattePhpUtil {
         return variants;
     }
 
-    public static Collection<Method> findMethods(Collection<PhpClass> classes, String methodName) {
-        Collection<Method> methods = new ArrayList<Method>();
-        classes.stream().map(
-                phpClass -> phpClass.getMethods().stream()
-                    .filter(method -> method.getName().equals(methodName))
-                    .map(methods::add));
-        return methods;
-    }
-
     public static String normalizePhpVariable(String name) {
         return name.startsWith("$") ? name.substring(1) : name;
     }
@@ -59,8 +48,19 @@ public class LattePhpUtil {
                 continue;
             }
 
-            if (name.equals(((BaseLattePhpElement) result.getElement()).getPhpElementName()) && originalClass.getFQN().equals(phpClass.getFQN())) {
+            if (!name.equals(((BaseLattePhpElement) result.getElement()).getPhpElementName())) {
+                continue;
+            }
+
+            if (originalClass.getFQN().equals(phpClass.getFQN())) {
                 return true;
+            }
+
+            ExtendsList extendsList = phpClass.getExtendsList();
+            for (ClassReference reference : extendsList.getReferenceElements()) {
+                if (reference.getFQN().equals(originalClass.getFQN())) {
+                    return true;
+                }
             }
         }
         return false;
