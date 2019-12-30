@@ -1,4 +1,4 @@
-package com.jantvrdik.intellij.latte.reference;
+package com.jantvrdik.intellij.latte.reference.references;
 
 import com.intellij.codeInsight.lookup.*;
 import com.intellij.openapi.project.Project;

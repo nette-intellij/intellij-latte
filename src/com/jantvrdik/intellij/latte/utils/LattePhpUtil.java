@@ -3,11 +3,14 @@ package com.jantvrdik.intellij.latte.utils;
 import com.intellij.codeInsight.completion.PrefixMatcher;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.ResolveResult;
+import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
 import gnu.trove.THashSet;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,8 +47,23 @@ public class LattePhpUtil {
         return name.startsWith("$") ? name.substring(1) : name;
     }
 
-    public static Collection<PhpClass> getClassesByFQN(PsiElement element) {
-        return getClassesByFQN(element.getProject(), element.getText());
+    public static boolean isReferenceTo(@NotNull PhpClass originalClass, @NotNull ResolveResult[] results, @NotNull PsiElement element, @NotNull String name)
+    {
+        for (ResolveResult result : results) {
+            if (!(result.getElement() instanceof BaseLattePhpElement)) {
+                continue;
+            }
+
+            PhpClass phpClass = ((BaseLattePhpElement) result.getElement()).getPhpType().getFirstPhpClass(element.getProject());
+            if (phpClass == null) {
+                continue;
+            }
+
+            if (name.equals(((BaseLattePhpElement) result.getElement()).getPhpElementName()) && originalClass.getFQN().equals(phpClass.getFQN())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static Collection<PhpClass> getClassesByFQN(Project project, String className) {

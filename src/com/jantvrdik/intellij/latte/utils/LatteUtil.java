@@ -119,6 +119,24 @@ public class LatteUtil {
         return result;
     }
 
+    public static Collection<BaseLattePhpElement> findClasses(Project project, String key) {
+        List<BaseLattePhpElement> result = new ArrayList<BaseLattePhpElement>();
+        Collection<VirtualFile> virtualFiles =
+                FileTypeIndex.getFiles(LatteFileType.INSTANCE, GlobalSearchScope.allScope(project));
+        for (VirtualFile virtualFile : virtualFiles) {
+            LatteFile simpleFile = (LatteFile) PsiManager.getInstance(project).findFile(virtualFile);
+            if (simpleFile != null) {
+                List<PsiElement> elements = new ArrayList<PsiElement>();
+                for (PsiElement element : simpleFile.getChildren()) {
+                    findLattePhpClasses(elements, element);
+                }
+
+                attachResults(result, key, elements);
+            }
+        }
+        return result;
+    }
+
     public static Collection<BaseLattePhpElement> findStaticVariables(Project project, String key, @NotNull PhpClass phpClass) {
         List<BaseLattePhpElement> result = new ArrayList<BaseLattePhpElement>();
         Collection<VirtualFile> virtualFiles =
@@ -140,15 +158,25 @@ public class LatteUtil {
     private static void attachResults(@NotNull List<BaseLattePhpElement> result, String key, List<PsiElement> elements, @NotNull PhpClass phpClass)
     {
         for (PsiElement constant : elements) {
+            if (!(constant instanceof BaseLattePhpElement) || !((BaseLattePhpElement) constant).getPhpType().hasClass(phpClass.getFQN())) {
+                continue;
+            }
+
+            String varName = ((BaseLattePhpElement) constant).getPhpElementName();
+            if (key.equals(varName)) {
+                result.add((BaseLattePhpElement) constant);
+            }
+        }
+    }
+
+    private static void attachResults(@NotNull List<BaseLattePhpElement> result, String key, List<PsiElement> elements)
+    {
+        for (PsiElement constant : elements) {
             if (!(constant instanceof BaseLattePhpElement)) {
                 continue;
             }
 
             String varName = ((BaseLattePhpElement) constant).getPhpElementName();
-            if (!((BaseLattePhpElement) constant).getPhpType().hasClass(phpClass.getFQN())) {
-                continue;
-            }
-
             if (key.equals(varName)) {
                 result.add((BaseLattePhpElement) constant);
             }
@@ -197,6 +225,14 @@ public class LatteUtil {
     private static void findLattePhpConstants(List<PsiElement> properties, PsiElement psiElement) {
         for (PsiElement element : collectPsiElementsRecursive(psiElement)) {
             if (element instanceof LattePhpConstant) {
+                properties.add(element);
+            }
+        }
+    }
+
+    private static void findLattePhpClasses(List<PsiElement> properties, PsiElement psiElement) {
+        for (PsiElement element : collectPsiElementsRecursive(psiElement)) {
+            if (element instanceof LattePhpClass) {
                 properties.add(element);
             }
         }

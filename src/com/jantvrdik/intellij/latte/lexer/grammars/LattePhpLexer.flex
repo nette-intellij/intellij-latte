@@ -46,6 +46,22 @@ VAR_STRING=[a-zA-Z_][a-zA-Z0-9_]*
 		return T_MACRO_ARGS_STRING;
 	}
 
+    ("(") {
+        return T_PHP_LEFT_NORMAL_BRACE;
+    }
+
+    (")") {
+        return T_PHP_RIGHT_NORMAL_BRACE;
+    }
+
+    ("{") {
+        return T_PHP_LEFT_CURLY_BRACE;
+    }
+
+    ("}") {
+        return T_PHP_RIGHT_CURLY_BRACE;
+    }
+
     ("[") {
         return T_PHP_LEFT_BRACKET;
     }

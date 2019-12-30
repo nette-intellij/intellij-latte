@@ -1,10 +1,12 @@
-package com.jantvrdik.intellij.latte.reference;
+package com.jantvrdik.intellij.latte.reference.references;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.jantvrdik.intellij.latte.psi.LattePhpProperty;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
+import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
+import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -54,6 +56,27 @@ public class LattePhpPropertyReference extends PsiReferenceBase<PsiElement> impl
     @Override
     public Object[] getVariants() {
         return new Object[0];
+    }
+
+    @Override
+    public boolean isReferenceTo(@NotNull PsiElement element) {
+        if (element instanceof LattePhpProperty) {
+            PhpClass originalClass = ((LattePhpProperty) element).getPhpType().getFirstPhpClass(element.getProject());
+            if (originalClass != null) {
+                if (LattePhpUtil.isReferenceTo(originalClass, multiResolve(false), element, ((LattePhpProperty) element).getPropertyName())) {
+                    return true;
+                }
+            }
+        }
+
+        if (!(element instanceof Field)) {
+            return false;
+        }
+        PhpClass originalClass = ((Field) element).getContainingClass();
+        if (originalClass == null) {
+            return false;
+        }
+        return LattePhpUtil.isReferenceTo(originalClass, multiResolve(false), element, ((Field) element).getName());
     }
 
 }

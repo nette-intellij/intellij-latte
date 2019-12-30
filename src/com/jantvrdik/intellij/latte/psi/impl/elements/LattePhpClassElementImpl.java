@@ -14,6 +14,12 @@ public abstract class LattePhpClassElementImpl extends ASTWrapperPsiElement impl
 		super(node);
 	}
 
+	@Override
+	public String getPhpElementName()
+	{
+		return getClassName();
+	}
+
 	@Nullable
 	public PsiReference getReference() {
 		PsiReference[] references = getReferences();

@@ -5,6 +5,7 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
 import com.intellij.util.ProcessingContext;
 import com.jantvrdik.intellij.latte.psi.*;
+import com.jantvrdik.intellij.latte.reference.references.*;
 import org.jetbrains.annotations.NotNull;
 
 public class LatteReferenceContributor extends PsiReferenceContributor {
@@ -104,6 +105,26 @@ public class LatteReferenceContributor extends PsiReferenceContributor {
                         String value = constantElement.getVariableName();
                         if (value != null) {
                             return new PsiReference[]{new LattePhpStaticVariableReference(constantElement, new TextRange(0, value.length() + 1))};
+                        }
+
+                        return PsiReference.EMPTY_ARRAY;
+                    }
+                });
+
+        registrar.registerReferenceProvider(
+                PlatformPatterns.psiElement(LatteTypes.PHP_CLASS),
+                new PsiReferenceProvider() {
+                    @NotNull
+                    @Override
+                    public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
+                        if (!(element instanceof LattePhpClass)) {
+                            return PsiReference.EMPTY_ARRAY;
+                        }
+
+                        LattePhpClass constantElement = (LattePhpClass) element;
+                        String value = constantElement.getClassName();
+                        if (value != null) {
+                            return new PsiReference[]{new LattePhpClassReference(constantElement, new TextRange(0, value.length()))};
                         }
 
                         return PsiReference.EMPTY_ARRAY;
