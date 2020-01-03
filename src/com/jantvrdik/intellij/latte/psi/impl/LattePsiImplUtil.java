@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -91,11 +92,42 @@ public class LattePsiImplUtil {
 		}
 	}
 
+	@Nullable
+	public static LattePhpType detectVariableTypeFromTemplateType(@NotNull PsiElement element, @NotNull String variableName)
+	{
+		if (!(element.getContainingFile() instanceof LatteFile)) {
+			return null;
+		}
+
+		LattePhpType templateType = LatteUtil.findFirstLatteTemplateType((LatteFile) element.getContainingFile());
+		if (templateType == null) {
+			return null;
+		}
+
+		Collection<PhpClass> classes = templateType.getPhpClasses(element.getProject());
+		if (classes == null) {
+			return null;
+		}
+		for (PhpClass phpClass : classes) {
+			for (Field field : phpClass.getFields()) {
+				if (!field.isConstant() && field.getModifier().isPublic() && variableName.equals(field.getName())) {
+					return new LattePhpType(field.getName(), field.getType().toString(), field.getType().isNullable());
+				}
+			}
+		}
+		return null;
+	}
+
 	private static LattePhpType detectVariableType(@NotNull PsiElement element, @NotNull String variableName)
 	{
 		LatteDefaultVariable defaultVariable = LatteConfiguration.INSTANCE.getVariable(element.getProject(), variableName);
 		if (defaultVariable != null) {
 			return defaultVariable.type;
+		}
+
+		LattePhpType templateType = detectVariableTypeFromTemplateType(element, variableName);
+		if (templateType != null) {
+			return templateType;
 		}
 
 		List<PsiPositionedElement> all = LatteUtil.findVariablesInFileBeforeElement(element, element.getContainingFile().getOriginalFile().getVirtualFile(), variableName);
@@ -246,6 +278,16 @@ public class LattePsiImplUtil {
 
 	public static LattePhpType getPhpType(@NotNull LattePhpClass element) {
 		return new LattePhpType(element.getClassName(), false);
+	}
+
+	public static boolean isTemplateType(@NotNull LattePhpClass element) {
+		PsiElement parent = element.getParent();
+		if (parent == null) {
+			return false;
+		}
+
+		PsiElement prevParent = PsiTreeUtil.prevLeaf(parent.getParent(), true);
+		return prevParent != null && prevParent.getText().equals("templateType");
 	}
 
 	public static boolean isVarTypeDefinition(@NotNull LattePhpVariable element) {

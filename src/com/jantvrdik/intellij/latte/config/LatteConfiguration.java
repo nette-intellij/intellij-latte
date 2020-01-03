@@ -82,6 +82,7 @@ public class LatteConfiguration {
 
 		addStandardMacro("var", UNPAIRED);
 		addStandardMacro("varType", UNPAIRED);
+		addStandardMacro("templateType", UNPAIRED);
 		addStandardMacro("assign", UNPAIRED);
 		addStandardMacro("default", UNPAIRED);
 		addStandardMacro("dump", UNPAIRED);

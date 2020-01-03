@@ -5,16 +5,22 @@ import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.jantvrdik.intellij.latte.completion.handlers.PhpVariableInsertHandler;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.config.LatteDefaultVariable;
+import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LattePhpVariable;
+import com.jantvrdik.intellij.latte.utils.LattePhpType;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import com.jantvrdik.intellij.latte.utils.PsiPositionedElement;
 import com.jetbrains.php.PhpIcons;
+import com.jetbrains.php.completion.PhpLookupElement;
+import com.jetbrains.php.lang.psi.elements.Field;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -38,6 +44,32 @@ public class LatteVariableCompletionProvider extends CompletionProvider<Completi
 
 		List<LookupElement> elements = attachPhpVariableCompletions(result, element, parameters.getOriginalFile().getVirtualFile());
 		result.addAllElements(elements);
+
+		if (parameters.getOriginalFile() instanceof LatteFile) {
+			attachTemplateTypeCompletions(result, element.getProject(), (LatteFile) parameters.getOriginalFile());
+		}
+	}
+
+	private void attachTemplateTypeCompletions(@NotNull CompletionResultSet result, @NotNull Project project, @NotNull LatteFile file) {
+		LattePhpType type = LatteUtil.findFirstLatteTemplateType(file);
+		if (type == null) {
+			return;
+		}
+
+		Collection<PhpClass> phpClasses = type.getPhpClasses(project);
+		if (phpClasses != null) {
+			for (PhpClass phpClass : phpClasses) {
+				for (Field field : phpClass.getFields()) {
+					if (!field.isConstant() && field.getModifier().isPublic()) {
+						PhpLookupElement lookupItem = LattePhpClassCompletionProvider.getPhpLookupElement(field, "$" + field.getName());
+						lookupItem.handler = PhpVariableInsertHandler.getInstance();
+						lookupItem.icon = PhpIcons.PROPERTY_ICON;
+						lookupItem.bold = true;
+						result.addElement(lookupItem);
+					}
+				}
+			}
+		}
 	}
 
 	private List<LookupElement> attachPhpVariableCompletions(@NotNull CompletionResultSet result, @NotNull PsiElement psiElement, @NotNull VirtualFile virtualFile) {

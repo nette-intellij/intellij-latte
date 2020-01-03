@@ -134,7 +134,7 @@ phpProperty        ::= T_PHP_METHOD {
 phpClass        ::= T_PHP_VAR_TYPE {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpClassElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpClassElement"
-                        methods=[getName setName getNameIdentifier getClassName getPhpType]
+                        methods=[getName setName getNameIdentifier getClassName getPhpType isTemplateType]
                     }
 
 phpForeach       ::= T_WHITESPACE? phpExpression T_WHITESPACE? T_PHP_AS T_WHITESPACE? (phpVariable | phpArrayOfVariables) (T_WHITESPACE? T_PHP_DOUBLE_ARROW T_WHITESPACE? (phpVariable | phpArrayOfVariables))?

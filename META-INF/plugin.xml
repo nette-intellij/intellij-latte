@@ -17,6 +17,7 @@
 			<li>added support for define custom default variables per project</li>
 			<li>added completions for variables, methods, constants and properties</li>
 			<li>added varType macro</li>
+			<li>added templateType macro</li>
 			<li>added reference search for usages from PHP to Latte (for classes, methods, properties and constants)</li>
 			<li>added brace matcher for highlight braces</li>
 			<li>added go to source for class names, methods, constants and properties</li>
@@ -184,6 +185,11 @@
 						 displayName="Property usages"
 						 groupName="Latte" enabledByDefault="true"
 						 implementationClass="com.jantvrdik.intellij.latte.inspections.PropertyUsagesInspection"/>
+
+		<localInspection language="Latte" shortName="TemplateType" id="TemplateType"
+						 displayName="Template type"
+						 groupName="Latte" enabledByDefault="true"
+						 implementationClass="com.jantvrdik.intellij.latte.inspections.TemplateTypeInspection"/>
 	</extensions>
 
 	<application-components>

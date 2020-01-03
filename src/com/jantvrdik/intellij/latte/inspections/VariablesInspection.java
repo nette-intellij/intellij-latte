@@ -12,6 +12,7 @@ import com.jantvrdik.intellij.latte.intentions.AddCustomNotNullVariable;
 import com.jantvrdik.intellij.latte.intentions.AddCustomNullableVariable;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LattePhpVariable;
+import com.jantvrdik.intellij.latte.psi.impl.LattePsiImplUtil;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import com.jantvrdik.intellij.latte.utils.PsiPositionedElement;
 import org.jetbrains.annotations.NotNull;
@@ -92,7 +93,7 @@ public class VariablesInspection extends LocalInspectionTool {
 
 					} else if (beforeElement.size() == 0) {
 						LatteDefaultVariable defaultVariable = LatteConfiguration.INSTANCE.getVariable(element.getProject(), variableName);
-						if (defaultVariable == null) {
+						if (defaultVariable == null && LattePsiImplUtil.detectVariableTypeFromTemplateType(element, variableName) == null) {
 							type = ProblemHighlightType.GENERIC_ERROR;
 							description = "Undefined variable '" + variableName + "'";
 							isUndefined = true;

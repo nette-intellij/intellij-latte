@@ -4,9 +4,15 @@ import com.intellij.codeInsight.lookup.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
+import com.jantvrdik.intellij.latte.psi.LatteFile;
+import com.jantvrdik.intellij.latte.psi.LattePhpClass;
+import com.jantvrdik.intellij.latte.psi.LattePhpProperty;
 import com.jantvrdik.intellij.latte.psi.LattePhpVariable;
+import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import com.jantvrdik.intellij.latte.utils.PsiPositionedElement;
+import com.jetbrains.php.lang.psi.elements.Field;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.*;
 
 import java.util.*;
@@ -27,7 +33,9 @@ public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> impl
             return new ResolveResult[0];
         }
 
-        final List<PsiPositionedElement> variables = LatteUtil.findVariablesInFileBeforeElement(getElement(), getElement().getContainingFile().getVirtualFile(), variableName);
+        //todo: complete resolving for variables
+        //final List<PsiPositionedElement> variables = LatteUtil.findVariablesInFileBeforeElement(getElement(), getElement().getContainingFile().getVirtualFile(), variableName);
+        final List<PsiPositionedElement> variables = LatteUtil.findVariablesInFile(getElement().getProject(), getElement().getContainingFile().getVirtualFile(), variableName);
         /*if (!(getElement() instanceof LattePhpVariable)) {
             return new ResolveResult[0];
         }
@@ -56,17 +64,13 @@ public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> impl
     @NotNull
     @Override
     public Object[] getVariants() {
-        Project project = myElement.getProject();
-        List<LattePhpVariable> properties = LatteUtil.findVariables(project);
-        List<LookupElement> variants = new ArrayList<LookupElement>();
-        for (final LattePhpVariable property : properties) {
-            if (property.getName() != null && property.getName().length() > 0) {
-                variants.add(LookupElementBuilder.create(property)
-                        //.withIcon(SimpleIcons.FILE)
-                        .withTypeText(property.getContainingFile().getName())
-                );
-            }
-        }
-        return variants.toArray();
+        return new Object[0];
     }
+
+    @NotNull
+    @Override
+    public String getCanonicalText() {
+        return LattePhpUtil.normalizePhpVariable(getElement().getText());
+    }
+
 }

@@ -43,24 +43,32 @@ public class LattePhpUtil {
                 continue;
             }
 
+            if (!name.equals(((BaseLattePhpElement) result.getElement()).getPhpElementName())) {
+                continue;
+            }
+
             PhpClass phpClass = ((BaseLattePhpElement) result.getElement()).getPhpType().getFirstPhpClass(element.getProject());
             if (phpClass == null) {
                 continue;
             }
 
-            if (!name.equals(((BaseLattePhpElement) result.getElement()).getPhpElementName())) {
-                continue;
-            }
-
-            if (originalClass.getFQN().equals(phpClass.getFQN())) {
+            if (isReferenceFor(originalClass, phpClass)) {
                 return true;
             }
+        }
+        return false;
+    }
 
-            ExtendsList extendsList = phpClass.getExtendsList();
-            for (ClassReference reference : extendsList.getReferenceElements()) {
-                if (reference.getFQN().equals(originalClass.getFQN())) {
-                    return true;
-                }
+    public static boolean isReferenceFor(@NotNull PhpClass originalClass, @NotNull PhpClass targetClass)
+    {
+        if (originalClass.getFQN().equals(targetClass.getFQN())) {
+            return true;
+        }
+
+        ExtendsList extendsList = targetClass.getExtendsList();
+        for (ClassReference reference : extendsList.getReferenceElements()) {
+            if (reference.getFQN().equals(originalClass.getFQN())) {
+                return true;
             }
         }
         return false;

@@ -6,6 +6,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiElement;
 import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.utils.LattePhpType;
+import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
@@ -44,7 +45,7 @@ public class GoToElementDeclarationHandler implements GotoDeclarationHandler {
 			}
 			return methods.toArray(new PsiElement[methods.size()]);
 
-		} else if (parent instanceof LattePhpConstant || parent instanceof LattePhpProperty || parent instanceof LattePhpStaticVariable) {
+		} else if (parent instanceof LattePhpConstant || parent instanceof LattePhpProperty || parent instanceof LattePhpStaticVariable || parent instanceof LattePhpVariable) {
 			LattePhpType phpType;
 			String name;
 			boolean isConstant;
@@ -56,9 +57,16 @@ public class GoToElementDeclarationHandler implements GotoDeclarationHandler {
 				phpType = ((LattePhpStaticVariable) parent).getPhpType();
 				name = ((LattePhpStaticVariable) parent).getVariableName();
 				isConstant = false;
-			} else {
+			} else if (parent instanceof LattePhpProperty) {
 				phpType = ((LattePhpProperty) parent).getPhpType();
 				name = ((LattePhpProperty) parent).getPropertyName();
+				isConstant = false;
+			} else {
+				phpType = LatteUtil.findFirstLatteTemplateType(parent.getContainingFile());
+				if (phpType == null) {
+					return new PsiElement[0];
+				}
+				name = ((LattePhpVariable) parent).getVariableName();
 				isConstant = false;
 			}
 

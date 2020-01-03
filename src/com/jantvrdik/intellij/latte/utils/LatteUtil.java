@@ -255,6 +255,29 @@ public class LatteUtil {
         }
     }
 
+    @Nullable
+    public static LattePhpType findFirstLatteTemplateType(PsiElement element) {
+        List<LattePhpClass> out = new ArrayList<LattePhpClass>();
+        findLatteTemplateType(out, element);
+        return out.isEmpty() ? null : out.get(0).getPhpType();
+    }
+
+    public static void findLatteTemplateType(List<LattePhpClass> classes, PsiElement parent) {
+        for (PsiElement element : collectPsiElementsRecursive(parent)) {
+            if (element instanceof LattePhpClass && ((LattePhpClass) element).isTemplateType()) {
+                classes.add((LattePhpClass) element);
+            }
+        }
+    }
+
+    public static void findLatteMacroTemplateType(List<LatteMacroTag> classes, LatteFile file) {
+        for (PsiElement element : collectPsiElementsRecursive(file)) {
+            if (element instanceof LatteMacroTag && ((LatteMacroTag) element).getMacroName().equals("templateType")) {
+                classes.add((LatteMacroTag) element);
+            }
+        }
+    }
+
     public static int getStartOffsetInFile(PsiElement psiElement) {
         return getStartOffsetInFile(psiElement, 0);
     }
