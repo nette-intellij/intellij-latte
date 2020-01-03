@@ -39,6 +39,15 @@ public class LatteUtil {
                 .collect(Collectors.toList());
     }
 
+    public static List<PsiPositionedElement> findVariablesInFileAfterElement(@NotNull PsiElement element, @NotNull VirtualFile virtualFile, @Nullable String key) {
+        List<PsiPositionedElement> variables = findVariablesInFile(element.getProject(), virtualFile, key);
+
+        int offset = getStartOffsetInFile(element);
+        return variables.stream()
+                .filter(variableElement -> variableElement.getPosition() >= offset)
+                .collect(Collectors.toList());
+    }
+
     public static List<PsiPositionedElement> findVariablesInFile(@NotNull Project project, @NotNull VirtualFile file, @Nullable String key) {
         List<PsiPositionedElement> result = null;
         LatteFile simpleFile = (LatteFile) PsiManager.getInstance(project).findFile(file);
@@ -201,7 +210,7 @@ public class LatteUtil {
     private static void findLattePhpVariables(List<PsiPositionedElement> properties, PsiElement psiElement) {
         for (PsiElement element : collectPsiElementsRecursive(psiElement)) {
             if (element instanceof LattePhpVariable) {
-                properties.add(new PsiPositionedElement(getStartOffsetInFile(psiElement), element));
+                properties.add(new PsiPositionedElement(getStartOffsetInFile(element), element));
             }
         }
     }
@@ -252,7 +261,7 @@ public class LatteUtil {
 
     private static int getStartOffsetInFile(PsiElement psiElement, int offset) {
         PsiElement parent = psiElement.getParent();
-        if (parent instanceof LatteFile) {
+        if (parent == null || parent instanceof LatteFile) {
             return psiElement.getStartOffsetInParent() + offset;
         }
         return getStartOffsetInFile(parent, psiElement.getStartOffsetInParent() + offset);

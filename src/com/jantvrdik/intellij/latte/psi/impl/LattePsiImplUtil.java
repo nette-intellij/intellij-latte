@@ -311,8 +311,7 @@ public class LattePsiImplUtil {
 	}
 
 	public static String getName(LattePhpVariable element) {
-		String text = element.getFirstChild().getText();
-		return text.startsWith("$") ? text.substring(1) : text;
+		return element.getVariableName();
 	}
 
 	public static PsiElement setName(LattePhpVariable element, String newName) {

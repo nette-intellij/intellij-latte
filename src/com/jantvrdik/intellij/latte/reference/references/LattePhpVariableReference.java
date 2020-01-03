@@ -28,6 +28,16 @@ public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> impl
         }
 
         final List<PsiPositionedElement> variables = LatteUtil.findVariablesInFileBeforeElement(getElement(), getElement().getContainingFile().getVirtualFile(), variableName);
+        /*if (!(getElement() instanceof LattePhpVariable)) {
+            return new ResolveResult[0];
+        }
+
+        final List<PsiPositionedElement> variables;
+        if (((LattePhpVariable) getElement()).isVarTypeDefinition()) {
+            variables = LatteUtil.findVariablesInFileAfterElement(getElement(), getElement().getContainingFile().getVirtualFile(), variableName);
+        } else {
+            variables = LatteUtil.findVariablesInFileBeforeElement(getElement(), getElement().getContainingFile().getVirtualFile(), variableName);
+        }*/
 
         List<ResolveResult> results = new ArrayList<ResolveResult>();
         for (PsiPositionedElement variable : variables) {
