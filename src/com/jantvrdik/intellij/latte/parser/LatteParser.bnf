@@ -22,7 +22,7 @@ private
 macro            ::= macroComment | macroClassic
 
 macroComment     ::= T_MACRO_COMMENT
-macroClassic     ::= <<checkPairMacro "pair">> (pairMacro | emptyMacro) | <<checkPairMacro "unpair">> unpairedMacro {
+macroClassic     ::= <<checkPairMacro true>> (pairMacro | emptyMacro) | <<checkPairMacro false>> unpairedMacro {
                      	methods = [
                      		openTag="macroTag[0]"
                      		closeTag="macroTag[1]"

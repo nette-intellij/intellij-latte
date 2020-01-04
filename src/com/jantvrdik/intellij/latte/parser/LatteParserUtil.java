@@ -4,7 +4,6 @@ import com.intellij.lang.PsiBuilder;
 import com.intellij.psi.tree.IElementType;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.config.LatteMacro;
-import com.jantvrdik.intellij.latte.psi.LatteTypes;
 import org.jetbrains.annotations.NotNull;
 
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
@@ -17,13 +16,13 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 	/**
 	 * Looks for a classic macro a returns true if it finds the macro a and it is pair or unpaired (based on pair parameter).
 	 */
-	public static boolean checkPairMacro(PsiBuilder builder, int level, String pairValue) {
+	public static boolean checkPairMacro(PsiBuilder builder, int level, Parser parser) {
 		if (builder.getTokenType() != T_MACRO_OPEN_TAG_OPEN) return false;
 
 		PsiBuilder.Marker marker = builder.mark();
 		String macroName = getMacroName(builder);
 
-		boolean pair = pairValue.equals("pair");
+		boolean pair = parser == LatteParser.TRUE_parser_;
 		boolean result;
 
 		LatteMacro macro = LatteConfiguration.INSTANCE.getMacro(builder.getProject(), macroName);
@@ -45,23 +44,6 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 		} else {
 			result = (macro != null ? (macro.type == (pair ? LatteMacro.Type.PAIR : LatteMacro.Type.UNPAIRED)) : !pair);
 		}
-
-		marker.rollbackTo();
-		return result;
-	}
-
-	/**
-	 * Looks for a classic macro a returns true if it finds the macro a and it is pair or unpaired (based on pair parameter).
-	 */
-	public static boolean checkPhpMethod(PsiBuilder builder, int level) {
-		IElementType type = builder.getTokenType();
-		String text = builder.getTokenText();
-		if (builder.getTokenType() != T_PHP_DOUBLE_COLON && builder.getTokenType() != T_PHP_DOUBLE_ARROW) return false;
-
-		int depth = 0;
-		PsiBuilder.Marker marker = builder.mark();
-
-		boolean result = isPhpMethod(builder);
 
 		marker.rollbackTo();
 		return result;
@@ -102,38 +84,6 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 				return type == T_MACRO_CLOSE_TAG_OPEN;
 			} else if(type == T_HTML_TAG_NATTR_NAME && ("n:" + macroName).equals(builder.getTokenText())) {
 				return false;
-			}
-			builder.advanceLexer();
-			type = builder.getTokenType();
-		}
-		return false;
-	}
-
-	private static boolean isPhpConstant(PsiBuilder builder)
-	{
-		builder.advanceLexer();
-		IElementType type = builder.getTokenType();
-		while (type != null) {
-			/*if (type == T_MACRO_TAG_CLOSE_EMPTY) {
-				return true;
-			} else */if (type == T_MACRO_TAG_CLOSE) {
-				break;
-			}
-			builder.advanceLexer();
-			type = builder.getTokenType();
-		}
-		return false;
-	}
-
-	private static boolean isPhpMethod(PsiBuilder builder)
-	{
-		builder.advanceLexer();
-		IElementType type = builder.getTokenType();
-		while (type != null) {
-			/*if (type == T_MACRO_TAG_CLOSE_EMPTY) {
-				return true;
-			} else */if (type == T_MACRO_TAG_CLOSE) {
-				break;
 			}
 			builder.advanceLexer();
 			type = builder.getTokenType();
