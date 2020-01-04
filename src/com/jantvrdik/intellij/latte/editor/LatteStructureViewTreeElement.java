@@ -24,6 +24,9 @@ public class LatteStructureViewTreeElement extends PsiTreeElementBase<PsiElement
 	@Override
 	public Collection<StructureViewTreeElement> getChildrenBase() {
 		Collection<StructureViewTreeElement> elements = new ArrayList<StructureViewTreeElement>();
+		if (getElement() == null) {
+			return elements;
+		}
 		for (PsiElement el : getElement().getChildren()) {
 			if (el instanceof LatteMacroClassic || el instanceof LatteAutoClosedBlock) {
 				elements.add(new LatteStructureViewTreeElement(el));

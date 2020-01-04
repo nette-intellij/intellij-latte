@@ -17,25 +17,18 @@ STRING = {STRING_SQ} | {STRING_DQ}
 STRING_SQ = "'" ("\\" [^] | [^'\\])* "'"
 STRING_DQ = "\"" ("\\" [^] | [^\"\\])* "\""
 SYMBOL = [_[:letter:]][_0-9[:letter:]]*(-[_0-9[:letter:]]+)* //todo: unicode letters
+FUNCTION_CALL=[a-zA-Z_][a-zA-Z0-9_]* "("
 
 %%
 
 
 <YYINITIAL> {
 
-	("\\" | "$") .+ {
+	("\\" | "$" | {FUNCTION_CALL}) .+ {
         return T_PHP_CONTENT;
     }
 
-	{STRING} {
-		return T_MACRO_ARGS_STRING;
-	}
-
-	[0-9]+ {
-		return T_MACRO_ARGS_NUMBER;
-	}
-
-	{SYMBOL} {
+	({STRING} | [0-9]+ | {SYMBOL}) {
 		return T_PHP_CONTENT;
 	}
 

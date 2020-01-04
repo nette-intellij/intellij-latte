@@ -41,14 +41,10 @@ public class LattePsiImplUtil {
 			return nameNode.getText();
 		}
 		LatteMacroContent content = element.getMacroContent();
-		if (content == null) {
+		if (content == null || element instanceof LatteMacroCloseTag) {
 			return "";
 		}
-
-		ASTNode argsNode = content.getNode().findChildByType(
-			TokenSet.create(T_MACRO_ARGS, T_MACRO_ARGS_VAR, T_MACRO_ARGS_STRING, T_MACRO_ARGS_NUMBER)
-		);
-		return (argsNode != null ? "=" : "");
+		return "=";
 	}
 
 	@Nullable
@@ -58,38 +54,27 @@ public class LattePsiImplUtil {
 	}
 
 	public static String getVariableName(@NotNull PsiElement element) {
-		ASTNode keyNode = element.getNode().findChildByType(T_MACRO_ARGS_VAR);
-		if (keyNode != null) {
-			return LattePhpUtil.normalizePhpVariable(keyNode.getPsi().getText());
-		} else {
-			return null;
-		}
+		PsiElement found = findFirstChildWithType(element, T_MACRO_ARGS_VAR);
+		return found != null ? LattePhpUtil.normalizePhpVariable(found.getText()) : null;
 	}
 
 	public static String getConstantName(@NotNull PsiElement element) {
-		return getMethodName(element);
+		return getPropertyName(element);
 	}
 
 	public static String getMethodName(@NotNull PsiElement element) {
-		ASTNode keyNode = element.getNode().findChildByType(T_PHP_METHOD);
-		if (keyNode != null) {
-			return keyNode.getPsi().getText();
-		} else {
-			return null;
-		}
+		PsiElement found = findFirstChildWithType(element, T_PHP_METHOD);
+		return found != null ? found.getText() : null;
 	}
 
 	public static String getPropertyName(@NotNull PsiElement element) {
-		return getMethodName(element);
+		PsiElement found = findFirstChildWithType(element, T_PHP_IDENTIFIER);
+		return found != null ? found.getText() : null;
 	}
 
 	public static String getClassName(@NotNull PsiElement element) {
-		ASTNode keyNode = element.getNode().findChildByType(T_PHP_VAR_TYPE);
-		if (keyNode != null) {
-			return keyNode.getPsi().getText();
-		} else {
-			return null;
-		}
+		PsiElement found = findFirstChildWithType(element, T_PHP_VAR_TYPE);
+		return found != null ? found.getText() : null;
 	}
 
 	@Nullable
@@ -369,62 +354,32 @@ public class LattePsiImplUtil {
 	}
 
 	public static PsiElement getNameIdentifier(LattePhpVariable element) {
-		ASTNode keyNode = element.getNode().findChildByType(T_MACRO_ARGS_VAR);
-		if (keyNode != null) {
-			return keyNode.getPsi();
-		} else {
-			return null;
-		}
+		return findFirstChildWithType(element, T_MACRO_ARGS_VAR);
 	}
 
 	public static String getName(LattePhpStaticVariable element) {
-		ASTNode keyNode = element.getNode().findChildByType(T_MACRO_ARGS_VAR);
-		if (keyNode != null) {
-			return LattePhpUtil.normalizePhpVariable(keyNode.getText());
-		} else {
-			return null;
-		}
+		PsiElement found = findFirstChildWithType(element, T_MACRO_ARGS_VAR);
+		return found != null ? LattePhpUtil.normalizePhpVariable(found.getText()) : null;
 	}
 
 	public static PsiElement getNameIdentifier(LattePhpStaticVariable element) {
-		ASTNode keyNode = element.getNode().findChildByType(T_MACRO_ARGS_VAR);
-		if (keyNode != null) {
-			return keyNode.getPsi();
-		} else {
-			return null;
-		}
+		return findFirstChildWithType(element, T_MACRO_ARGS_VAR);
 	}
 
 	public static PsiElement getNameIdentifier(PsiElement element) {
-		ASTNode keyNode = element.getNode().findChildByType(T_PHP_METHOD);
-		if (keyNode != null) {
-			return keyNode.getPsi();
-		} else {
-			return null;
-		}
+		return findFirstChildWithType(element, T_PHP_METHOD);
 	}
 
-	@NotNull
-	public static String getMacroName(LatteAutoClosedBlock element) {
-		return "block";
+	public static PsiElement getNameIdentifier(LattePhpConstant element) {
+		return findFirstChildWithType(element, T_PHP_IDENTIFIER);
 	}
 
-	public static PsiElement getNameIdentifier(LatteAutoClosedBlock element) {
-		ASTNode keyNode = element.getNode().findChildByType(T_MACRO_NAME);
-		if (keyNode != null) {
-			return keyNode.getPsi();
-		} else {
-			return null;
-		}
+	public static PsiElement getNameIdentifier(LattePhpProperty element) {
+		return findFirstChildWithType(element, T_PHP_IDENTIFIER);
 	}
 
 	public static PsiElement getNameIdentifier(LatteMacroTag element) {
-		ASTNode keyNode = element.getNode().findChildByType(T_MACRO_NAME);
-		if (keyNode != null) {
-			return keyNode.getPsi();
-		} else {
-			return null;
-		}
+		return findFirstChildWithType(element, T_MACRO_NAME);
 	}
 
 	public static String getName(LatteMacroTag element) {
@@ -432,24 +387,34 @@ public class LattePsiImplUtil {
 	}
 
 	public static PsiElement getNameIdentifier(LattePhpClass element) {
-		ASTNode keyNode = element.getNode().findChildByType(T_PHP_VAR_TYPE);
+		return findFirstChildWithType(element, T_PHP_VAR_TYPE);
+	}
+
+	public static String getName(PsiElement element) {
+		PsiElement found = findFirstChildWithType(element, T_PHP_METHOD);
+		return found != null ? found.getText() : null;
+	}
+
+	public static String getName(LattePhpConstant element) {
+		PsiElement found = findFirstChildWithType(element, T_PHP_IDENTIFIER);
+		return found != null ? found.getText() : null;
+	}
+
+	public static String getName(LattePhpProperty element) {
+		PsiElement found = findFirstChildWithType(element, T_PHP_IDENTIFIER);
+		return found != null ? found.getText() : null;
+	}
+
+	public static PsiElement setName(PsiElement element, String newName) {
+		return element;
+	}
+
+	private static PsiElement findFirstChildWithType(PsiElement element, @NotNull IElementType type) {
+		ASTNode keyNode = element.getNode().findChildByType(type);
 		if (keyNode != null) {
 			return keyNode.getPsi();
 		} else {
 			return null;
 		}
-	}
-
-	public static String getName(PsiElement element) {
-		ASTNode keyNode = element.getNode().findChildByType(T_PHP_METHOD);
-		if (keyNode != null) {
-			return LattePhpUtil.normalizePhpVariable(keyNode.getText());
-		} else {
-			return null;
-		}
-	}
-
-	public static PsiElement setName(PsiElement element, String newName) {
-		return element;
 	}
 }

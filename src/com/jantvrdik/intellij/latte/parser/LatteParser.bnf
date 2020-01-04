@@ -19,24 +19,32 @@ root             ::= (structureToken)* autoClosedBlock?
 
 // macro
 private
-macro            ::= macroComment | macroClassic
+//macro            ::= macroComment | macroClassic
+macro            ::= macroComment | (
+                                          <<checkPairMacro true>> (<<checkEmptyMacro>> emptyMacro | pairMacro)
+                                        | <<checkPairMacro false>> unpairedMacro
+                                    )
 
 macroComment     ::= T_MACRO_COMMENT
-macroClassic     ::= <<checkPairMacro true>> (pairMacro | emptyMacro) | <<checkPairMacro false>> unpairedMacro {
+fake
+macroClassic     ::= macroTag macroTag?{
                      	methods = [
                      		openTag="macroTag[0]"
                      		closeTag="macroTag[1]"
                      	]
                      }
 
-private
-pairMacro        ::= macroOpenTag structureToken* macroCloseTag
+pairMacro        ::= macroOpenTag structureToken* macroCloseTag { //incomplete pair macro is handled in a annotator
+                            extends=macroClassic
+                        }
 
-private
-emptyMacro       ::= emptyMacroTag;
+emptyMacro       ::= emptyMacroTag {
+                            extends=macroClassic
+                        }
 
-private
-unpairedMacro    ::= macroOpenTag
+unpairedMacro    ::= macroOpenTag {
+                            extends=macroClassic
+                        }
 
 fake
 macroTag         ::= classicMacroContent {
@@ -47,6 +55,7 @@ macroTag         ::= classicMacroContent {
                      }
 
 macroOpenTag     ::= T_MACRO_OPEN_TAG_OPEN classicMacroContent T_MACRO_TAG_CLOSE {
+                        pin=1
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LatteMacroTagElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LatteMacroTagElement"
                         methods=[getName setName getNameIdentifier getMacroName]
@@ -54,6 +63,7 @@ macroOpenTag     ::= T_MACRO_OPEN_TAG_OPEN classicMacroContent T_MACRO_TAG_CLOSE
                      }
 
 macroCloseTag    ::= T_MACRO_CLOSE_TAG_OPEN classicMacroContent T_MACRO_TAG_CLOSE {
+                        pin=1
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LatteMacroTagElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LatteMacroTagElement"
                         methods=[getName setName getNameIdentifier getMacroName]
@@ -61,6 +71,7 @@ macroCloseTag    ::= T_MACRO_CLOSE_TAG_OPEN classicMacroContent T_MACRO_TAG_CLOS
                      }
 
 emptyMacroTag    ::= T_MACRO_OPEN_TAG_OPEN classicMacroContent T_MACRO_TAG_CLOSE_EMPTY {
+                        pin=1
                      	extends = macroTag
                      }
 
@@ -119,13 +130,13 @@ phpMethod        ::= T_PHP_METHOD {
                         methods=[getName setName getNameIdentifier getMethodName getPhpType getReturnType isStatic isFunction]
                     }
 
-phpConstant        ::= T_PHP_METHOD {
+phpConstant        ::= T_PHP_IDENTIFIER {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpConstantElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpConstantElement"
                         methods=[getName setName getNameIdentifier getConstantName getPhpType getConstantType]
                     }
 
-phpProperty        ::= T_PHP_METHOD {
+phpProperty        ::= T_PHP_IDENTIFIER {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpPropertyElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpPropertyElement"
                         methods=[getName setName getNameIdentifier getPropertyName getPhpType getPropertyType isStatic]
@@ -155,9 +166,9 @@ phpInBrackets       ::= T_PHP_LEFT_NORMAL_BRACE T_WHITESPACE? phpArgument+ T_WHI
 phpMethodArgs       ::= T_WHITESPACE? phpArgument+ ( T_WHITESPACE? "," T_WHITESPACE? phpArgument+ )* T_WHITESPACE?
 
 private
-phpArgument    ::=  T_MACRO_ARGS_STRING | T_MACRO_ARGS_NUMBER | phpClass | phpDefinition
+phpArgument    ::=  phpSingleQuotedString | phpDoubleQuotedString | T_MACRO_ARGS_STRING | T_MACRO_ARGS_NUMBER | phpClass | phpDefinition
                     | phpStatic | phpFunctionCall | phpInBrackets | phpVariable | T_PHP_OBJECT_OPERATOR
-                    | T_PHP_OPERATOR | T_PHP_DOUBLE_COLON | T_PHP_DOUBLE_ARROW | T_PHP_METHOD | T_PHP_TYPE | T_PHP_KEYWORD
+                    | T_PHP_OPERATOR | T_PHP_DOUBLE_COLON | T_PHP_DOUBLE_ARROW | T_PHP_METHOD | T_PHP_IDENTIFIER | T_PHP_TYPE | T_PHP_KEYWORD
                     | T_PHP_CLASS | T_PHP_AS | T_PHP_CAST | T_PHP_EXPRESSION | T_PHP_LEFT_BRACKET | T_PHP_RIGHT_BRACKET
                     | T_PHP_LEFT_CURLY_BRACE | T_PHP_RIGHT_CURLY_BRACE
 
@@ -178,6 +189,13 @@ phpConstantDefinition ::= T_WHITESPACE? T_PHP_DOUBLE_COLON T_WHITESPACE? phpCons
 
 private
 phpPropertyDefinition ::= T_WHITESPACE? T_PHP_OBJECT_OPERATOR T_WHITESPACE? phpProperty
+
+private
+phpSingleQuotedString ::= T_PHP_SINGLE_QUOTE_LEFT T_MACRO_ARGS_STRING? T_PHP_SINGLE_QUOTE_RIGHT {pin=1}
+
+private
+phpDoubleQuotedString ::= T_PHP_DOUBLE_QUOTE_LEFT (T_MACRO_ARGS_STRING | phpVariable)* T_PHP_DOUBLE_QUOTE_RIGHT {pin=1}
+
 
 // tokens sets
 private

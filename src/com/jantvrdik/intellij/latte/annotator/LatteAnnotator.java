@@ -4,6 +4,8 @@ import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiErrorElement;
+import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.config.LatteMacro;
 import com.jantvrdik.intellij.latte.intentions.*;
@@ -21,7 +23,16 @@ public class LatteAnnotator implements Annotator {
 
 		} else if (element instanceof LatteNetteAttr) {
 			checkNetteAttr((LatteNetteAttr) element, holder);
-		}
+
+		}/* else if (element instanceof LeafPsiElement && element.getParent().getLastChild() instanceof PsiErrorElement) {
+			LeafPsiElement leaf = (LeafPsiElement) element;
+			if (leaf.getElementType() == LatteTypes.T_PHP_DOUBLE_QUOTE_LEFT
+					|| leaf.getElementType() == LatteTypes.T_PHP_SINGLE_QUOTE_LEFT) {
+				holder.createErrorAnnotation(element, "Unclosed string");
+			} else if (leaf.getElementType() == LatteTypes.T_MACRO_OPEN_TAG_OPEN || leaf.getElementType() == LatteTypes.T_MACRO_CLOSE_TAG_OPEN) {
+				holder.createErrorAnnotation(element.getParent(), "Malformed macro. Missing closing }");
+			}
+		}*/
 	}
 
 	private void checkNetteAttr(@NotNull LatteNetteAttr element, @NotNull AnnotationHolder holder) {
@@ -76,6 +87,14 @@ public class LatteAnnotator implements Annotator {
 		String closeTagName = closeTag != null ? closeTag.getMacroName() : null;
 		if (closeTagName != null && !closeTagName.isEmpty() && !closeTagName.equals(openTagName)) {
 			holder.createErrorAnnotation(closeTag, "Unexpected {/" + closeTagName + "}, expected {/" + openTagName + "}");
+		}
+
+		if (macro != null
+				&& element instanceof LattePairMacro
+				&& (macro.type == LatteMacro.Type.PAIR || macro.type == LatteMacro.Type.AUTO_EMPTY)
+				&& closeTag == null
+				&& !openTagName.equals("block")) {
+			holder.createErrorAnnotation(openTag, "Unclosed macro " + openTagName);
 		}
 	}
 }

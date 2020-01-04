@@ -12,17 +12,17 @@ import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
 %unicode
 %ignorecase
 
-STRING = {STRING_SQ} | {STRING_DQ}
-STRING_SQ = "'" ("\\" [^] | [^'\\])* "'"
-STRING_DQ = "\"" ("\\" [^] | [^\"\\])* "\""
+%state SINGLE_QUOTED
+%state DOUBLE_QUOTED
+
 WHITE_SPACE=[ \t\r\n]+
-VAR_STRING=[a-zA-Z_][a-zA-Z0-9_]*
+IDENTIFIER=[a-zA-Z_][a-zA-Z0-9_]*
 
 %%
 
 <YYINITIAL> {
 
-	"$" {VAR_STRING} {
+	"$" {IDENTIFIER} {
         return T_MACRO_ARGS_VAR;
     }
 
@@ -42,31 +42,27 @@ VAR_STRING=[a-zA-Z_][a-zA-Z0-9_]*
         return T_PHP_OBJECT_OPERATOR;
     }
 
-	{STRING} {
-		return T_MACRO_ARGS_STRING;
-	}
-
-    ("(") {
+    "(" {
         return T_PHP_LEFT_NORMAL_BRACE;
     }
 
-    (")") {
+    ")" {
         return T_PHP_RIGHT_NORMAL_BRACE;
     }
 
-    ("{") {
+    "{" {
         return T_PHP_LEFT_CURLY_BRACE;
     }
 
-    ("}") {
+    "}" {
         return T_PHP_RIGHT_CURLY_BRACE;
     }
 
-    ("[") {
+    "[" {
         return T_PHP_LEFT_BRACKET;
     }
 
-    ("]") {
+    "]" {
         return T_PHP_RIGHT_BRACKET;
     }
 
@@ -98,8 +94,22 @@ VAR_STRING=[a-zA-Z_][a-zA-Z0-9_]*
         return T_PHP_TYPE;
     }
 
-    {VAR_STRING} {
+    {IDENTIFIER} / ("(") {
         return T_PHP_METHOD;
+    }
+
+    {IDENTIFIER} {
+        return T_PHP_IDENTIFIER;
+    }
+
+    "'"  {
+    	pushState(SINGLE_QUOTED);
+    	return T_PHP_SINGLE_QUOTE_LEFT;
+    }
+
+    "\"" {
+        pushState(DOUBLE_QUOTED);
+        return T_PHP_DOUBLE_QUOTE_LEFT;
     }
 
 	[0-9]+ {
@@ -114,4 +124,33 @@ VAR_STRING=[a-zA-Z_][a-zA-Z0-9_]*
         return T_MACRO_ARGS;
     }
 
+}
+
+<SINGLE_QUOTED> {
+	"'" {
+		pushState(YYINITIAL);
+		return T_PHP_SINGLE_QUOTE_RIGHT;
+	}
+	("\\" [^] | [^'\\])+ {
+		return T_MACRO_ARGS_STRING;
+	}
+}
+
+<DOUBLE_QUOTED> {
+	"\"" {
+		pushState(YYINITIAL);
+		return T_PHP_DOUBLE_QUOTE_RIGHT;
+	}
+
+	("\\" [^] | [^\"\\$]) {
+		return T_MACRO_ARGS_STRING;
+	}
+
+	"$" {IDENTIFIER} {
+    	return T_MACRO_ARGS_VAR;
+    }
+
+    "$" {
+		return T_MACRO_ARGS_STRING;
+    }
 }

@@ -6,7 +6,6 @@ import com.intellij.lang.folding.FoldingDescriptor;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jantvrdik.intellij.latte.psi.*;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +23,7 @@ public class LatteFoldingBuilder extends FoldingBuilderEx {
 		List<FoldingDescriptor> descriptors = new ArrayList<FoldingDescriptor>();
 
 		if (!quick) {
-			Collection<PsiElement> nodes = PsiTreeUtil.findChildrenOfAnyType(root, LatteMacroClassic.class, LatteAutoClosedBlock.class);
+			Collection<LatteMacroClassic> nodes = PsiTreeUtil.findChildrenOfAnyType(root, LatteMacroClassic.class);
 			for (PsiElement node : nodes) {
 				int start = node.getFirstChild().getTextRange().getEndOffset();
 				int end = node.getLastChild().getTextRange().getEndOffset();
