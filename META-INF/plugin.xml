@@ -133,10 +133,10 @@
 		<colorSettingsPage implementation="com.jantvrdik.intellij.latte.syntaxHighlighter.LatteColorSettingsPage"/>
 		<completion.contributor language="Latte" implementationClass="com.jantvrdik.intellij.latte.completion.LatteCompletionContributor"/>
 		<referencesSearch implementation="com.jantvrdik.intellij.latte.reference.LatteReferenceSearch"/>
+		<lang.quoteHandler language="Latte" implementationClass="com.jantvrdik.intellij.latte.editorActions.LatteQuoteHandler"/>
 		<annotator language="Latte" implementationClass="com.jantvrdik.intellij.latte.annotator.LatteAnnotator"/>
 		<typedHandler implementation="com.jantvrdik.intellij.latte.editorActions.LatteTypedHandler"/>
 		<highlightErrorFilter implementation="com.jantvrdik.intellij.latte.psi.ErrorFilter"/>
-		<quoteHandler className="com.jantvrdik.intellij.latte.editorActions.LatteQuoteHandler" fileType="Latte"/>
 		<indexPatternBuilder implementation="com.jantvrdik.intellij.latte.psi.LatteIndexPatternBuilder"/>
 		<lang.psiStructureViewFactory language="Latte" implementationClass="com.jantvrdik.intellij.latte.editor.LatteStructureViewFactory"/>
 		<lang.findUsagesProvider language="Latte" implementationClass="com.jantvrdik.intellij.latte.reference.LatteFindUsagesProvider"/>
@@ -161,7 +161,7 @@
 						 groupName="Latte" enabledByDefault="true"
 						 implementationClass="com.jantvrdik.intellij.latte.inspections.VariablesInspection"/>
 
-		<localInspection language="Latte" shortName="ClassUsages" id="ClassUsages"
+		<localInspection language="Latte" shortName="LatteClassUsages" id="LatteClassUsages"
 						 displayName="Class usages"
 						 groupName="Latte" enabledByDefault="true"
 						 implementationClass="com.jantvrdik.intellij.latte.inspections.ClassUsagesInspection"/>

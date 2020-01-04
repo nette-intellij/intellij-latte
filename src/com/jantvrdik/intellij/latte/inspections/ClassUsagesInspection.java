@@ -18,7 +18,7 @@ public class ClassUsagesInspection extends LocalInspectionTool {
 	@NotNull
 	@Override
 	public String getShortName() {
-		return "ClassUsages";
+		return "LatteClassUsages";
 	}
 
 	@Nullable
