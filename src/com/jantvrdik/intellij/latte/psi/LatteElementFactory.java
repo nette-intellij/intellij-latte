@@ -18,12 +18,27 @@ public class LatteElementFactory {
 		}
 		return null;
 	}
+
 	public static PsiElement createMethod(Project project, String name) {
 		final LatteFile file = createFileWithPhpMacro(project, "->" + name + "()");
 		PsiElement firstChild = file.getFirstChild().getFirstChild().getFirstChild();
 		if (firstChild != null) {
 			try {
 				return firstChild.getNextSibling().getNextSibling().getFirstChild().getFirstChild().getNextSibling();
+
+			} catch (NullPointerException e) {
+				return null;
+			}
+		}
+		return null;
+	}
+
+	public static PsiElement createProperty(Project project, String name) {
+		final LatteFile file = createFileWithPhpMacro(project, "$x->" + name);
+		PsiElement firstChild = file.getFirstChild().getFirstChild().getFirstChild();
+		if (firstChild != null) {
+			try {
+				return firstChild.getNextSibling().getNextSibling().getFirstChild().getLastChild();
 
 			} catch (NullPointerException e) {
 				return null;

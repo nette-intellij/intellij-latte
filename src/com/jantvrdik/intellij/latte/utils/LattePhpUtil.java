@@ -3,7 +3,9 @@ package com.jantvrdik.intellij.latte.utils;
 import com.intellij.codeInsight.completion.PrefixMatcher;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementResolveResult;
 import com.intellij.psi.ResolveResult;
+import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
@@ -12,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class LattePhpUtil {
 
@@ -72,6 +75,56 @@ public class LattePhpUtil {
             }
         }
         return false;
+    }
+
+    public static List<Field> getFieldsForPhpElement(@NotNull BaseLattePhpElement psiElement)
+    {
+        List<Field> out = new ArrayList<Field>();
+        LattePhpType phpType = psiElement.getPhpType();
+        String name = psiElement.getPhpElementName();
+        boolean isConstant = psiElement instanceof LattePhpConstant;
+        if (psiElement instanceof LattePhpVariable) {
+            phpType = LatteUtil.findFirstLatteTemplateType(psiElement.getContainingFile());
+            if (phpType == null) {
+                return out;
+            }
+            name = ((LattePhpVariable) psiElement).getVariableName();
+        }
+
+        Collection<PhpClass> phpClasses = phpType.getPhpClasses(psiElement.getProject());
+        if (phpClasses == null || phpClasses.size() == 0) {
+            return out;
+        }
+
+        List<Field> fields = new ArrayList<>();
+        for (PhpClass phpClass : phpClasses) {
+            for (Field field : phpClass.getFields()) {
+                if (
+                        ((isConstant && field.isConstant()) || (!isConstant && !field.isConstant()))
+                                && field.getName().equals(name)
+                ) {
+                    fields.add(field);
+                }
+            }
+        }
+        return fields;
+    }
+
+    public static List<Method> getMethodsForPhpElement(@NotNull LattePhpMethod psiElement)
+    {
+        List<Method> out = new ArrayList<Method>();
+        Collection<PhpClass> phpClasses = psiElement.getPhpType().getPhpClasses(psiElement.getProject());
+        if (phpClasses != null && phpClasses.size() > 0) {
+            String methodName = psiElement.getMethodName();
+            for (PhpClass phpClass : phpClasses) {
+                for (Method currentMethod : phpClass.getMethods()) {
+                    if (currentMethod.getName().equals(methodName)) {
+                        out.add(currentMethod);
+                    }
+                }
+            }
+        }
+        return out;
     }
 
     public static Collection<PhpClass> getClassesByFQN(Project project, String className) {

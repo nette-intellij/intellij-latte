@@ -4,7 +4,6 @@ import com.intellij.lang.ASTNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.config.LatteDefaultVariable;
@@ -351,6 +350,40 @@ public class LattePsiImplUtil {
 			}
 		}
 		return element;
+	}
+
+	public static PsiElement setName(LattePhpMethod element, String newName) {
+		ASTNode keyNode = element.getFirstChild().getNode();
+		PsiElement method = LatteElementFactory.createMethod(element.getProject(), newName);
+		if (method == null) {
+			return element;
+		}
+		return replaceChildNode(element, method, keyNode);
+	}
+
+	public static PsiElement setName(LattePhpProperty element, String newName) {
+		ASTNode keyNode = element.getFirstChild().getNode();
+		PsiElement property = LatteElementFactory.createProperty(element.getProject(), newName);
+		if (property == null) {
+			return element;
+		}
+		return replaceChildNode(element, property, keyNode);
+	}
+
+	@NotNull
+	private static PsiElement replaceChildNode(@NotNull PsiElement psiElement, @NotNull PsiElement newElement, @Nullable ASTNode keyNode) {
+		ASTNode newKeyNode = newElement.getFirstChild().getNode();
+		if (newKeyNode == null) {
+			return psiElement;
+		}
+
+		if (keyNode == null) {
+			psiElement.getNode().addChild(newKeyNode);
+
+		} else {
+			psiElement.getNode().replaceChild(keyNode, newKeyNode);
+		}
+		return psiElement;
 	}
 
 	public static PsiElement getNameIdentifier(LattePhpVariable element) {

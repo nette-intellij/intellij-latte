@@ -5,10 +5,9 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiElement;
 import com.jantvrdik.intellij.latte.psi.*;
-import com.jantvrdik.intellij.latte.utils.LattePhpType;
-import com.jantvrdik.intellij.latte.utils.LatteUtil;
+import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
+import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
 import com.jetbrains.php.lang.psi.elements.Field;
-import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,65 +27,16 @@ public class GoToElementDeclarationHandler implements GotoDeclarationHandler {
 			Collection<PhpClass> classes = ((LattePhpClass) parent).getPhpType().getPhpClasses(element.getProject());
 			return classes.toArray(new PsiElement[classes.size()]);
 
-		} else if (parent instanceof LattePhpMethod) {
-			Collection<PhpClass> phpClasses = ((LattePhpMethod) parent).getPhpType().getPhpClasses(element.getProject());
-			if (phpClasses == null || phpClasses.size() == 0) {
-				return new PsiElement[0];
-			}
-
-			String methodName = ((LattePhpMethod) parent).getMethodName();
-			List<Method> methods = new ArrayList<>();
-			for (PhpClass phpClass : phpClasses) {
-				for (Method method : phpClass.getMethods()) {
-					if (method.getName().equals(methodName)) {
-						methods.add(method);
-					}
+		} else if (parent instanceof LattePhpConstant || parent instanceof LattePhpStaticVariable || parent instanceof LattePhpVariable) {
+			List<Field> out = new ArrayList<Field>();
+			List<Field> fields = LattePhpUtil.getFieldsForPhpElement((BaseLattePhpElement) parent);
+			String elementName = ((BaseLattePhpElement) parent).getPhpElementName();
+			for (Field field : fields) {
+				if (field.getName().equals(elementName)) {
+					out.add(field);
 				}
 			}
-			return methods.toArray(new PsiElement[methods.size()]);
-
-		} else if (parent instanceof LattePhpConstant || parent instanceof LattePhpProperty || parent instanceof LattePhpStaticVariable || parent instanceof LattePhpVariable) {
-			LattePhpType phpType;
-			String name;
-			boolean isConstant;
-			if (parent instanceof LattePhpConstant) {
-				phpType = ((LattePhpConstant) parent).getPhpType();
-				name = ((LattePhpConstant) parent).getConstantName();
-				isConstant = true;
-			} else if (parent instanceof LattePhpStaticVariable) {
-				phpType = ((LattePhpStaticVariable) parent).getPhpType();
-				name = ((LattePhpStaticVariable) parent).getVariableName();
-				isConstant = false;
-			} else if (parent instanceof LattePhpProperty) {
-				phpType = ((LattePhpProperty) parent).getPhpType();
-				name = ((LattePhpProperty) parent).getPropertyName();
-				isConstant = false;
-			} else {
-				phpType = LatteUtil.findFirstLatteTemplateType(parent.getContainingFile());
-				if (phpType == null) {
-					return new PsiElement[0];
-				}
-				name = ((LattePhpVariable) parent).getVariableName();
-				isConstant = false;
-			}
-
-			Collection<PhpClass> phpClasses = phpType.getPhpClasses(element.getProject());
-			if (phpClasses == null || phpClasses.size() == 0) {
-				return new PsiElement[0];
-			}
-
-			List<Field> fields = new ArrayList<>();
-			for (PhpClass phpClass : phpClasses) {
-				for (Field field : phpClass.getFields()) {
-					if (
-							((isConstant && field.isConstant()) || (!isConstant && !field.isConstant()))
-							&& field.getName().equals(name)
-					) {
-						fields.add(field);
-					}
-				}
-			}
-			return fields.toArray(new PsiElement[fields.size()]);
+			return out.toArray(new PsiElement[out.size()]);
 
 		}
 		return new PsiElement[0];

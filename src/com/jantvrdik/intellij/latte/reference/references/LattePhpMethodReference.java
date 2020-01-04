@@ -42,14 +42,22 @@ public class LattePhpMethodReference extends PsiReferenceBase<PsiElement> implem
             results.add(new PsiElementResolveResult(method));
         }
 
+        List<Method> phpMethods = LattePhpUtil.getMethodsForPhpElement((LattePhpMethod) getElement());
+        String methodName = ((LattePhpMethod) getElement()).getMethodName();
+        for (Method currentMethod : phpMethods) {
+            if (currentMethod.getName().equals(methodName)) {
+                results.add(new PsiElementResolveResult(currentMethod));
+            }
+        }
+
         return results.toArray(new ResolveResult[results.size()]);
     }
 
     @Nullable
     @Override
     public PsiElement resolve() {
-        ResolveResult[] resolveResults = multiResolve(false);
-        return resolveResults.length > 1 ? resolveResults[0].getElement() : null;
+        List<Method> phpMethods = LattePhpUtil.getMethodsForPhpElement((LattePhpMethod) getElement());
+        return phpMethods.size() > 0 ? phpMethods.get(0) : null;
     }
 
     @NotNull
@@ -83,18 +91,13 @@ public class LattePhpMethodReference extends PsiReferenceBase<PsiElement> implem
     @Override
     public TextRange getRangeInElement() {
         return new TextRange(path.contains("-") ? path.lastIndexOf("-") + 2 : 1, path.length() + 1);
-    }
-
-    @Override
-    public PsiElement handleElementRename(@NotNull String newName) {
-        if (getElement() instanceof LattePhpMethod) {
-            //((LattePhpMethod) getElement()).setName(newName);
-        }
-        return getElement();
     }*/
 
     @Override
     public PsiElement handleElementRename(@NotNull String newName) {
+        if (getElement() instanceof LattePhpMethod) {
+            ((LattePhpMethod) getElement()).setName(newName);
+        }
         return getElement();
     }
 }
