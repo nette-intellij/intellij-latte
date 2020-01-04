@@ -71,7 +71,7 @@ public class MethodUsagesInspection extends BaseLocalInspectionTool {
 					}
 
 					if (!isFound) {
-						addProblem(manager, problems, element, "Method '" + methodName + "' not found", ProblemHighlightType.GENERIC_ERROR, isOnTheFly);
+						addProblem(manager, problems, element, "Method '" + methodName + "' not found", ProblemHighlightType.GENERIC_ERROR_OR_WARNING, isOnTheFly);
 					}
 
 				} else {

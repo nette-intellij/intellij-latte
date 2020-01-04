@@ -71,7 +71,7 @@ public class PropertyUsagesInspection extends BaseLocalInspectionTool {
 					}
 
 					if (!isFound) {
-						addProblem(manager, problems, element, "Property '" + variableName + "' not found", ProblemHighlightType.GENERIC_ERROR, isOnTheFly);
+						addProblem(manager, problems, element, "Property '" + variableName + "' not found", ProblemHighlightType.GENERIC_ERROR_OR_WARNING, isOnTheFly);
 					}
 
 				} else {

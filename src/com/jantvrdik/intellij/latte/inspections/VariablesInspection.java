@@ -94,7 +94,7 @@ public class VariablesInspection extends LocalInspectionTool {
 					} else if (beforeElement.size() == 0) {
 						LatteDefaultVariable defaultVariable = LatteConfiguration.INSTANCE.getVariable(element.getProject(), variableName);
 						if (defaultVariable == null && LattePsiImplUtil.detectVariableTypeFromTemplateType(element, variableName) == null) {
-							type = ProblemHighlightType.GENERIC_ERROR;
+							type = ProblemHighlightType.GENERIC_ERROR_OR_WARNING;
 							description = "Undefined variable '" + variableName + "'";
 							isUndefined = true;
 						}
