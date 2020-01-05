@@ -5,10 +5,7 @@ import com.intellij.openapi.application.QueryExecutorBase;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
-import com.intellij.psi.search.PsiSearchHelper;
-import com.intellij.psi.search.SearchScope;
-import com.intellij.psi.search.TextOccurenceProcessor;
-import com.intellij.psi.search.UsageSearchContext;
+import com.intellij.psi.search.*;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.util.Processor;
 import com.jantvrdik.intellij.latte.psi.LattePhpStaticVariable;
@@ -70,6 +67,7 @@ public class LatteReferenceSearch extends QueryExecutorBase<PsiReference, Refere
                             return true;
                         }
                     }, searchScope, "$" + fieldName, UsageSearchContext.IN_CODE, true);
+            // ProjectScope.getProjectScope(field.getProject())
         });
     }
 }

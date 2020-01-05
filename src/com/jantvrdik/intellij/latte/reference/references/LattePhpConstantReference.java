@@ -42,14 +42,22 @@ public class LattePhpConstantReference extends PsiReferenceBase<PsiElement> impl
             results.add(new PsiElementResolveResult(method));
         }
 
+        List<Field> fields = LattePhpUtil.getFieldsForPhpElement((BaseLattePhpElement) getElement());
+        String name = ((BaseLattePhpElement) getElement()).getPhpElementName();
+        for (Field field : fields) {
+            if (field.getName().equals(name)) {
+                results.add(new PsiElementResolveResult(field));
+            }
+        }
+
         return results.toArray(new ResolveResult[results.size()]);
     }
 
     @Nullable
     @Override
     public PsiElement resolve() {
-        ResolveResult[] resolveResults = multiResolve(false);
-        return resolveResults.length > 1 ? resolveResults[0].getElement() : null;
+        List<Field> fields = LattePhpUtil.getFieldsForPhpElement((BaseLattePhpElement) getElement());
+        return fields.size() > 0 ? fields.get(0) : null;
     }
 
     @NotNull
@@ -77,6 +85,14 @@ public class LattePhpConstantReference extends PsiReferenceBase<PsiElement> impl
             return false;
         }
         return LattePhpUtil.isReferenceTo(originalClass, multiResolve(false), element, ((Field) element).getName());
+    }
+
+    @Override
+    public PsiElement handleElementRename(@NotNull String newName) {
+        if (getElement() instanceof LattePhpConstant) {
+            ((LattePhpConstant) getElement()).setName(newName);
+        }
+        return getElement();
     }
 
 }

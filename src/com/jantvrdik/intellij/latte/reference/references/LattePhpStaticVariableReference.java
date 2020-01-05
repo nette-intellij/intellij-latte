@@ -2,7 +2,6 @@ package com.jantvrdik.intellij.latte.reference.references;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
-import com.jantvrdik.intellij.latte.psi.LattePhpConstant;
 import com.jantvrdik.intellij.latte.psi.LattePhpStaticVariable;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
 import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
@@ -43,14 +42,22 @@ public class LattePhpStaticVariableReference extends PsiReferenceBase<PsiElement
             results.add(new PsiElementResolveResult(method));
         }
 
+        List<Field> fields = LattePhpUtil.getFieldsForPhpElement((BaseLattePhpElement) getElement());
+        String name = ((BaseLattePhpElement) getElement()).getPhpElementName();
+        for (Field field : fields) {
+            if (field.getName().equals(name)) {
+                results.add(new PsiElementResolveResult(field));
+            }
+        }
+
         return results.toArray(new ResolveResult[results.size()]);
     }
 
     @Nullable
     @Override
     public PsiElement resolve() {
-        ResolveResult[] resolveResults = multiResolve(false);
-        return resolveResults.length > 1 ? resolveResults[0].getElement() : null;
+        List<Field> fields = LattePhpUtil.getFieldsForPhpElement((BaseLattePhpElement) getElement());
+        return fields.size() > 0 ? fields.get(0) : null;
     }
 
     @NotNull
@@ -63,6 +70,14 @@ public class LattePhpStaticVariableReference extends PsiReferenceBase<PsiElement
     @Override
     public String getCanonicalText() {
         return LattePhpUtil.normalizePhpVariable(getElement().getText());
+    }
+
+    @Override
+    public PsiElement handleElementRename(@NotNull String newName) {
+        if (getElement() instanceof LattePhpStaticVariable) {
+            ((LattePhpStaticVariable) getElement()).setName(newName);
+        }
+        return getElement();
     }
 /*
     @Override

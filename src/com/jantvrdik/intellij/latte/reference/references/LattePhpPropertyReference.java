@@ -42,7 +42,7 @@ public class LattePhpPropertyReference extends PsiReferenceBase<PsiElement> impl
             results.add(new PsiElementResolveResult(method));
         }
 
-        List<Field> fields = LattePhpUtil.getFieldsForPhpElement((LattePhpProperty) getElement());
+        List<Field> fields = LattePhpUtil.getFieldsForPhpElement((BaseLattePhpElement) getElement());
         String name = ((BaseLattePhpElement) getElement()).getPhpElementName();
         for (Field field : fields) {
             if (field.getName().equals(name)) {

@@ -1,13 +1,10 @@
 package com.jantvrdik.intellij.latte.reference.references;
 
-import com.intellij.codeInsight.lookup.*;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
-import com.jantvrdik.intellij.latte.psi.LatteFile;
-import com.jantvrdik.intellij.latte.psi.LattePhpClass;
-import com.jantvrdik.intellij.latte.psi.LattePhpProperty;
-import com.jantvrdik.intellij.latte.psi.LattePhpVariable;
+import com.jantvrdik.intellij.latte.psi.*;
+import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
+import com.jantvrdik.intellij.latte.utils.LattePhpType;
 import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import com.jantvrdik.intellij.latte.utils.PsiPositionedElement;
@@ -33,6 +30,19 @@ public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> impl
             return new ResolveResult[0];
         }
 
+        List<ResolveResult> results = new ArrayList<ResolveResult>();
+        LattePhpType fields = LatteUtil.findFirstLatteTemplateType(getElement().getContainingFile());
+        String name = ((BaseLattePhpElement) getElement()).getPhpElementName();
+        if (fields != null) {
+            for (PhpClass phpClass : fields.getPhpClasses(getElement().getProject())) {
+                for (Field field : phpClass.getFields()) {
+                    if (!field.isConstant() && field.getName().equals(name)) {
+                        results.add(new PsiElementResolveResult(field));
+                    }
+                }
+            }
+        }
+
         //todo: complete resolving for variables
         //final List<PsiPositionedElement> variables = LatteUtil.findVariablesInFileBeforeElement(getElement(), getElement().getContainingFile().getVirtualFile(), variableName);
         final List<PsiPositionedElement> variables = LatteUtil.findVariablesInFile(getElement().getProject(), getElement().getContainingFile().getVirtualFile(), variableName);
@@ -47,7 +57,6 @@ public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> impl
             variables = LatteUtil.findVariablesInFileBeforeElement(getElement(), getElement().getContainingFile().getVirtualFile(), variableName);
         }*/
 
-        List<ResolveResult> results = new ArrayList<ResolveResult>();
         for (PsiPositionedElement variable : variables) {
             results.add(new PsiElementResolveResult(variable.getElement()));
         }
@@ -71,6 +80,14 @@ public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> impl
     @Override
     public String getCanonicalText() {
         return LattePhpUtil.normalizePhpVariable(getElement().getText());
+    }
+
+    @Override
+    public PsiElement handleElementRename(@NotNull String newName) {
+        if (getElement() instanceof LattePhpVariable) {
+            ((LattePhpVariable) getElement()).setName(newName);
+        }
+        return getElement();
     }
 
 }

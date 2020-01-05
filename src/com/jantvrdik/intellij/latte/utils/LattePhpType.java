@@ -67,7 +67,6 @@ public class LattePhpType {
         return type != null && type.endsWith("[]");
     }
 
-    @Nullable
     public Collection<PhpClass> getPhpClasses(Project project) {
         List<PhpClass> output = new ArrayList<>();
         for (String type : types) {

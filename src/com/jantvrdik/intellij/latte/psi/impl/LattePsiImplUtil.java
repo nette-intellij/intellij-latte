@@ -340,18 +340,6 @@ public class LattePsiImplUtil {
 		return element.getVariableName();
 	}
 
-	public static PsiElement setName(LattePhpVariable element, String newName) {
-		ASTNode keyNode = element.getNode();
-		if (keyNode != null) {
-			LattePhpVariable variable = LatteElementFactory.createVariable(element.getProject(), newName);
-			if (variable != null) {
-				ASTNode newKeyNode = variable.getFirstChild().getNode();
-				element.getNode().replaceChild(keyNode, newKeyNode);
-			}
-		}
-		return element;
-	}
-
 	public static PsiElement setName(LattePhpMethod element, String newName) {
 		ASTNode keyNode = element.getFirstChild().getNode();
 		PsiElement method = LatteElementFactory.createMethod(element.getProject(), newName);
@@ -368,6 +356,33 @@ public class LattePsiImplUtil {
 			return element;
 		}
 		return replaceChildNode(element, property, keyNode);
+	}
+
+	public static PsiElement setName(LattePhpConstant element, String newName) {
+		ASTNode keyNode = element.getFirstChild().getNode();
+		PsiElement property = LatteElementFactory.createConstant(element.getProject(), newName);
+		if (property == null) {
+			return element;
+		}
+		return replaceChildNode(element, property, keyNode);
+	}
+
+	public static PsiElement setName(LattePhpStaticVariable element, String newName) {
+		ASTNode keyNode = element.getFirstChild().getNode();
+		PsiElement property = LatteElementFactory.createStaticVariable(element.getProject(), newName);
+		if (property == null) {
+			return element;
+		}
+		return replaceChildNode(element, property, keyNode);
+	}
+
+	public static PsiElement setName(LattePhpVariable element, String newName) {
+		ASTNode keyNode = element.getFirstChild().getNode();
+		LattePhpVariable variable = LatteElementFactory.createVariable(element.getProject(), newName);
+		if (variable == null) {
+			return element;
+		}
+		return replaceChildNode(element, variable, keyNode);
 	}
 
 	@NotNull
