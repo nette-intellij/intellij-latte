@@ -1,4 +1,4 @@
-<idea-plugin version="2">
+<idea-plugin>
 	<id>com.jantvrdik.intellij.latte</id>
 	<name>Latte</name>
 	<version>0.4.0</version>
@@ -33,9 +33,11 @@
 				added inspections for:
 				<ul>
 					<li>Class usages (Undefined class)</li>
+					<li>Checking not defined variables, more definitions with same variable name etc.</li>
 					<li>Checking constant, property and methods visibility (if is not public it make warning)</li>
 					<li>Checking not existing constants, properties and methods</li>
 					<li>Checking static methods and properties used non statically and vice versa</li>
+					<li>Checking valid content for templateType, varType and var macro</li>
 				</ul>
 			</li>
 			<li>Increased minimum compatibility with PhpStorm version to 2017.3 from PhpStorm 8 (pre-2016.2 IDE version)</li>
@@ -133,7 +135,7 @@
 		<fileTypeFactory implementation="com.jantvrdik.intellij.latte.LatteFileTypeFactory"/>
 		<lang.commenter language="Latte" implementationClass="com.jantvrdik.intellij.latte.commenter.LatteCommenter"/>
 		<lang.parserDefinition language="Latte" implementationClass="com.jantvrdik.intellij.latte.parser.LatteParserDefinition"/>
-		<lang.syntaxHighlighterFactory key="Latte" implementationClass="com.jantvrdik.intellij.latte.syntaxHighlighter.LatteSyntaxHighlighterFactory"/>
+		<lang.syntaxHighlighterFactory language="Latte" implementationClass="com.jantvrdik.intellij.latte.syntaxHighlighter.LatteSyntaxHighlighterFactory"/>
 		<lang.foldingBuilder language="Latte" implementationClass="com.jantvrdik.intellij.latte.folding.LatteFoldingBuilder"/>
 		<lang.fileViewProviderFactory language="Latte" implementationClass="com.jantvrdik.intellij.latte.psi.LatteFileViewProviderFactory"/>
 		<lang.formatter language="Latte" implementationClass="com.jantvrdik.intellij.latte.formatter.LatteFormattingModelBuilder"/>
