@@ -27,7 +27,7 @@ public class VariablesInspection extends LocalInspectionTool {
 	@NotNull
 	@Override
 	public String getShortName() {
-		return "VariablesProblems";
+		return "LatteVariablesProblems";
 	}
 
 	@Nullable

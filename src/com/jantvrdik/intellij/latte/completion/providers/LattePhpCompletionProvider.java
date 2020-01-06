@@ -1,7 +1,6 @@
 package com.jantvrdik.intellij.latte.completion.providers;
 
 import com.intellij.codeInsight.completion.CompletionParameters;
-import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.psi.PsiElement;
@@ -10,7 +9,8 @@ import com.jantvrdik.intellij.latte.completion.handlers.PhpVariableInsertHandler
 import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
 import com.jantvrdik.intellij.latte.utils.LattePhpType;
-import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
+import com.jantvrdik.intellij.latte.utils.LatteTypesUtil;
+import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import com.jetbrains.php.completion.PhpLookupElement;
 import com.jetbrains.php.completion.insert.PhpFieldInsertHandler;
 import com.jetbrains.php.completion.insert.PhpMethodInsertHandler;
@@ -22,10 +22,15 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
-public class LattePhpCompletionProvider extends CompletionProvider<CompletionParameters> {
+public class LattePhpCompletionProvider extends BaseLatteCompletionProvider {
+
+	private final LattePhpFunctionCompletionProvider functionCompletionProvider;
+	private final LattePhpClassCompletionProvider classCompletionProvider;
 
 	public LattePhpCompletionProvider() {
 		super();
+		functionCompletionProvider = new LattePhpFunctionCompletionProvider();
+		classCompletionProvider = new LattePhpClassCompletionProvider();
 	}
 
 	@Override
@@ -43,6 +48,19 @@ public class LattePhpCompletionProvider extends CompletionProvider<CompletionPar
 
 		} else if (element instanceof LattePhpProperty || (element instanceof LattePhpMethod && !((LattePhpMethod) element).isStatic())) {
 			attachPhpCompletions(result, (BaseLattePhpElement) element, false);
+
+		} else {
+			if (LatteUtil.matchParentMacroName(element, "varType") || LatteUtil.matchParentMacroName(element, "var")) {
+				attachVarTypes(result);
+			}
+			classCompletionProvider.addCompletions(parameters, context, result);
+			functionCompletionProvider.addCompletions(parameters, context, result);
+		}
+	}
+
+	private void attachVarTypes(@NotNull CompletionResultSet result) {
+		for (String nativeTypeHint : LatteTypesUtil.getNativeTypeHints()) {
+			result.addElement(LookupElementBuilder.create(nativeTypeHint));
 		}
 	}
 
@@ -58,7 +76,7 @@ public class LattePhpCompletionProvider extends CompletionProvider<CompletionPar
 			for (Method method : phpClass.getMethods()) {
 				PhpModifier modifier = method.getModifier();
 				if (modifier.isPublic() && canShowCompletionElement(isStatic, modifier)) {
-					PhpLookupElement lookupItem = LattePhpClassCompletionProvider.getPhpLookupElement(method, method.getName());
+					PhpLookupElement lookupItem = getPhpLookupElement(method, method.getName());
 					lookupItem.handler = PhpMethodInsertHandler.getInstance();
 					result.addElement(lookupItem);
 				}
@@ -69,19 +87,19 @@ public class LattePhpCompletionProvider extends CompletionProvider<CompletionPar
 				if (modifier.isPublic()) {
 					if (isStatic) {
 						if (field.isConstant()) {
-							PhpLookupElement lookupItem = LattePhpClassCompletionProvider.getPhpLookupElement(field, field.getName());
+							PhpLookupElement lookupItem = getPhpLookupElement(field, field.getName());
 							lookupItem.handler = PhpFieldInsertHandler.getInstance();
 							result.addElement(lookupItem);
 
 						} else if (modifier.isStatic()) {
-							PhpLookupElement lookupItem = LattePhpClassCompletionProvider.getPhpLookupElement(field, "$" + field.getName());
+							PhpLookupElement lookupItem = getPhpLookupElement(field, "$" + field.getName());
 							lookupItem.handler = PhpVariableInsertHandler.getInstance();
 							result.addElement(lookupItem);
 						}
 
 					} else {
 						if (!field.isConstant() && !modifier.isStatic()) {
-							PhpLookupElement lookupItem = LattePhpClassCompletionProvider.getPhpLookupElement(field, field.getName());
+							PhpLookupElement lookupItem = getPhpLookupElement(field, field.getName());
 							lookupItem.handler = PhpFieldInsertHandler.getInstance();
 							result.addElement(lookupItem);
 						}
@@ -90,7 +108,7 @@ public class LattePhpCompletionProvider extends CompletionProvider<CompletionPar
 			}
 
 			if (isStatic) {
-				for (String nativeConstant : LattePhpUtil.getNativeClassConstants()) {
+				for (String nativeConstant : LatteTypesUtil.getNativeClassConstants()) {
 					result.addElement(LookupElementBuilder.create(nativeConstant));
 				}
 			}

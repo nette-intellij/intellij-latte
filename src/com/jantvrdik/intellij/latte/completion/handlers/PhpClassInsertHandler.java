@@ -20,11 +20,18 @@ public class PhpClassInsertHandler extends PhpReferenceInsertHandler {
 	}
 
 	public void handleInsert(@NotNull InsertionContext context, @NotNull LookupElement lookupElement) {
-		super.handleInsert(context, lookupElement);
-
 		// for removing first `\` (because class completion is triggered if prev element is `\` and PHP completion adding `\` before)
 		PsiElement element = context.getFile().findElementAt(context.getStartOffset());
-		if (element != null && element.getNode().getElementType() == LatteTypes.T_PHP_VAR_TYPE) {
+
+		super.handleInsert(context, lookupElement);
+
+		element = context.getFile().findElementAt(context.getStartOffset());
+		String text = element != null ? element.getText() : null;
+		if (element == null || text == null || (text.startsWith("\\") && !text.substring(1).contains("\\"))) {
+			return;
+		}
+
+		if (element.getNode().getElementType() == LatteTypes.T_PHP_CLASS_NAME) {
 			Editor editor = context.getEditor();
 			CaretModel caretModel = editor.getCaretModel();
 			int offset = caretModel.getOffset();

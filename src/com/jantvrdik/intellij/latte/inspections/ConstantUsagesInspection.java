@@ -25,7 +25,7 @@ public class ConstantUsagesInspection extends LocalInspectionTool {
 	@NotNull
 	@Override
 	public String getShortName() {
-		return "ConstantUsages";
+		return "LatteConstantUsages";
 	}
 
 	@Nullable

@@ -142,7 +142,7 @@ phpProperty        ::= T_PHP_IDENTIFIER {
                         methods=[getName setName getNameIdentifier getPropertyName getPhpType getPropertyType isStatic]
                     }
 
-phpClass        ::= T_PHP_VAR_TYPE {
+phpClass        ::= T_PHP_CLASS_NAME {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpClassElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpClassElement"
                         methods=[getName setName getNameIdentifier getClassName getPhpType isTemplateType]
@@ -169,14 +169,14 @@ private
 phpArgument    ::=  phpSingleQuotedString | phpDoubleQuotedString | T_MACRO_ARGS_STRING | T_MACRO_ARGS_NUMBER | phpClass | phpDefinition
                     | phpStatic | phpFunctionCall | phpInBrackets | phpVariable | T_PHP_OBJECT_OPERATOR
                     | T_PHP_OPERATOR | T_PHP_DOUBLE_COLON | T_PHP_DOUBLE_ARROW | T_PHP_METHOD | T_PHP_IDENTIFIER | T_PHP_TYPE | T_PHP_KEYWORD
-                    | T_PHP_CLASS | T_PHP_AS | T_PHP_CAST | T_PHP_EXPRESSION | T_PHP_LEFT_BRACKET | T_PHP_RIGHT_BRACKET
-                    | T_PHP_LEFT_CURLY_BRACE | T_PHP_RIGHT_CURLY_BRACE
+                    | T_PHP_CLASS | T_PHP_AS | T_PHP_CAST | T_PHP_EXPRESSION | T_PHP_LEFT_BRACKET | T_PHP_RIGHT_BRACKET | T_PHP_NULL
+                    | T_PHP_MIXED | T_PHP_OR_INCLUSIVE | T_PHP_LEFT_CURLY_BRACE | T_PHP_RIGHT_CURLY_BRACE
 
 private
 phpFunctionCall    ::= (phpMethod | phpVariable) T_WHITESPACE? phpArgumentList T_WHITESPACE?
 
 private
-phpExpression    ::= T_MACRO_ARGS | phpArgument | T_PHP_LEFT_NORMAL_BRACE | T_PHP_RIGHT_NORMAL_BRACE
+phpExpression    ::= T_MACRO_ARGS | T_PHP_OR_INCLUSIVE | phpArgument | T_PHP_LEFT_NORMAL_BRACE | T_PHP_RIGHT_NORMAL_BRACE
 
 private
 phpDefinition    ::= phpMethodDefinition | phpConstantDefinition | phpPropertyDefinition

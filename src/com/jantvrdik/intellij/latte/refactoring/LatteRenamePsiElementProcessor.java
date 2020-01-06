@@ -12,11 +12,11 @@ class LatteRenamePsiElementProcessor extends RenamePsiElementProcessor {
 	@Override
 	public boolean canProcessElement(@NotNull PsiElement psiElement) {
 		return psiElement instanceof LattePhpMethod
+				|| psiElement instanceof LattePhpClass
 				|| psiElement instanceof LattePhpConstant
 				|| psiElement instanceof LattePhpStaticVariable
 				|| psiElement instanceof LattePhpProperty
 				|| psiElement instanceof Field
 				|| psiElement instanceof Method;
 	}
-
 }

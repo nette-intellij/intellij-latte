@@ -56,7 +56,7 @@ public class LatteSyntaxHighlighter extends SyntaxHighlighterBase {
 				|| token == LatteTypes.T_PHP_DOUBLE_QUOTE_RIGHT) {
 			return pack(MACRO_ARGS_STRING);
 
-		} else if (token == LatteTypes.T_PHP_KEYWORD || token == LatteTypes.T_PHP_AS) {
+		} else if (token == LatteTypes.T_PHP_KEYWORD || token == LatteTypes.T_PHP_AS || token == LatteTypes.T_PHP_NULL || token == LatteTypes.T_PHP_TYPE) {
 			return pack(PHP_KEYWORD);
 
 		} else if (token == LatteTypes.T_PHP_METHOD) {

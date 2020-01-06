@@ -60,7 +60,7 @@ public class LattePhpType {
     }
 
     private static boolean isClassOrInterfaceType(String type) {
-        return type != null && type.startsWith("\\");
+        return type != null && type.contains("\\");
     }
 
     private static boolean isArrayOf(String type) {

@@ -5,7 +5,13 @@
 	<vendor>Jan Tvrdík</vendor>
 
 	<description><![CDATA[
-		Provides support for <a href="https://github.com/nette/latte/">Latte</a> &ndash; a template engine for PHP.
+		<p>Provides support for <a href="https://github.com/nette/latte/">Latte</a> &ndash; a template engine for PHP.</p>
+
+		<h2>IMPORTANT notes</h2>
+
+		<ul>
+			<li><b>Refactoring for class names is supported only from PHP to Latte</b></li>
+		</ul>
 	]]></description>
 
 	<change-notes><![CDATA[
@@ -15,13 +21,14 @@
 			<li>added variable types</li>
 			<li>added highlighting and go to source support for latte variables</li>
 			<li>added support for define custom default variables per project</li>
-			<li>added completions for variables, methods, constants and properties</li>
+			<li>added completions for latte variables, PHP functions, methods, constants and properties</li>
 			<li>added varType macro</li>
 			<li>added templateType macro</li>
 			<li>added reference search for usages from PHP to Latte (for classes, methods, properties and constants)</li>
 			<li>added brace matcher for highlight braces</li>
 			<li>added go to source for class names, methods, constants and properties</li>
 			<li>added support for highlighting macro name and pair macro</li>
+			<li>added support for refactoring rename (methods, properties, constants and class names)</li>
 			<li>
 				added inspections for:
 				<ul>
@@ -145,8 +152,6 @@
 
 		<psi.referenceContributor implementation="com.jantvrdik.intellij.latte.reference.LatteReferenceContributor"/>
 
-		<gotoDeclarationHandler implementation="com.jantvrdik.intellij.latte.reference.handlers.GoToElementDeclarationHandler"/>
-
 		<localInspection language="Latte" shortName="ModifierNotAllowed" id="ModifierNotAllowed"
 						 displayName="Modifier not allowed"
 						 groupName="Latte" enabledByDefault="true" level="WARNING"
@@ -157,7 +162,7 @@
 						 groupName="Latte" enabledByDefault="true"
 						 implementationClass="com.jantvrdik.intellij.latte.inspections.DeprecatedMacroInspection"/>
 
-		<localInspection language="Latte" shortName="VariablesProblems" id="VariablesProblems"
+		<localInspection language="Latte" shortName="LatteVariablesProblems" id="LatteVariablesProblems"
 						 displayName="Variables problems"
 						 groupName="Latte" enabledByDefault="true"
 						 implementationClass="com.jantvrdik.intellij.latte.inspections.VariablesInspection"/>
@@ -167,7 +172,7 @@
 						 groupName="Latte" enabledByDefault="true"
 						 implementationClass="com.jantvrdik.intellij.latte.inspections.ClassUsagesInspection"/>
 
-		<localInspection language="Latte" shortName="MethodUsages" id="MethodUsages"
+		<localInspection language="Latte" shortName="LatteMethodUsages" id="LatteMethodUsages"
 						 displayName="Method usages"
 						 groupName="Latte" enabledByDefault="true"
 						 implementationClass="com.jantvrdik.intellij.latte.inspections.MethodUsagesInspection"/>
@@ -177,20 +182,30 @@
 						 groupName="Latte" enabledByDefault="true"
 						 implementationClass="com.jantvrdik.intellij.latte.inspections.StaticPropertyUsagesInspection"/>
 
-		<localInspection language="Latte" shortName="ConstantUsages" id="ConstantUsages"
+		<localInspection language="Latte" shortName="LatteConstantUsages" id="LatteConstantUsages"
 						 displayName="Constant usages"
 						 groupName="Latte" enabledByDefault="true"
 						 implementationClass="com.jantvrdik.intellij.latte.inspections.ConstantUsagesInspection"/>
 
-		<localInspection language="Latte" shortName="PropertyUsages" id="PropertyUsages"
+		<localInspection language="Latte" shortName="LattePropertyUsages" id="LattePropertyUsages"
 						 displayName="Property usages"
 						 groupName="Latte" enabledByDefault="true"
 						 implementationClass="com.jantvrdik.intellij.latte.inspections.PropertyUsagesInspection"/>
 
-		<localInspection language="Latte" shortName="TemplateType" id="TemplateType"
+		<localInspection language="Latte" shortName="LatteTemplateType" id="LatteTemplateType"
 						 displayName="Template type"
 						 groupName="Latte" enabledByDefault="true"
-						 implementationClass="com.jantvrdik.intellij.latte.inspections.TemplateTypeInspection"/>
+						 implementationClass="com.jantvrdik.intellij.latte.inspections.MacroTemplateTypeInspection"/>
+
+		<localInspection language="Latte" shortName="LatteVarType" id="LatteVarType"
+						 displayName="Var type"
+						 groupName="Latte" enabledByDefault="true"
+						 implementationClass="com.jantvrdik.intellij.latte.inspections.MacroVarTypeInspection"/>
+
+		<localInspection language="Latte" shortName="LatteMacroVar" id="LatteMacroVar"
+						 displayName="Var definition"
+						 groupName="Latte" enabledByDefault="true"
+						 implementationClass="com.jantvrdik.intellij.latte.inspections.MacroVarInspection"/>
 	</extensions>
 
 	<application-components>

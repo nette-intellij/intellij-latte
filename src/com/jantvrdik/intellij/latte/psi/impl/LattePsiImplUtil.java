@@ -72,8 +72,8 @@ public class LattePsiImplUtil {
 	}
 
 	public static String getClassName(@NotNull PsiElement element) {
-		PsiElement found = findFirstChildWithType(element, T_PHP_VAR_TYPE);
-		return found != null ? found.getText() : null;
+		PsiElement found = findFirstChildWithType(element, T_PHP_CLASS_NAME);
+		return found != null ? LattePhpUtil.normalizeClassName(found.getText()) : null;
 	}
 
 	@Nullable
@@ -104,16 +104,6 @@ public class LattePsiImplUtil {
 
 	private static LattePhpType detectVariableType(@NotNull PsiElement element, @NotNull String variableName)
 	{
-		LatteDefaultVariable defaultVariable = LatteConfiguration.INSTANCE.getVariable(element.getProject(), variableName);
-		if (defaultVariable != null) {
-			return defaultVariable.type;
-		}
-
-		LattePhpType templateType = detectVariableTypeFromTemplateType(element, variableName);
-		if (templateType != null) {
-			return templateType;
-		}
-
 		List<PsiPositionedElement> all = LatteUtil.findVariablesInFileBeforeElement(element, element.getContainingFile().getOriginalFile().getVirtualFile(), variableName);
 		List<PsiPositionedElement> definitions = all.stream().filter(
 				psiPositionedElement -> psiPositionedElement.getElement() instanceof LattePhpVariable
@@ -139,6 +129,17 @@ public class LattePsiImplUtil {
 				return new LattePhpType(types.toArray(new String[types.size()]), nullable);
 			}
 		}
+
+		LattePhpType templateType = detectVariableTypeFromTemplateType(element, variableName);
+		if (templateType != null) {
+			return templateType;
+		}
+
+		LatteDefaultVariable defaultVariable = LatteConfiguration.INSTANCE.getVariable(element.getProject(), variableName);
+		if (defaultVariable != null) {
+			return defaultVariable.type;
+		}
+
 		return new LattePhpType("mixed", false);
 	}
 
@@ -213,7 +214,7 @@ public class LattePsiImplUtil {
 
 	public static boolean isFunction(@NotNull PsiElement element) {
 		PsiElement prev = PsiTreeUtil.skipWhitespacesBackward(element);
-		return prev != null && prev.getNode().getElementType() != T_PHP_DOUBLE_COLON && prev.getNode().getElementType() != T_PHP_OBJECT_OPERATOR;
+		return prev == null || (prev.getNode().getElementType() != T_PHP_DOUBLE_COLON && prev.getNode().getElementType() != T_PHP_OBJECT_OPERATOR);
 	}
 
 	public static LattePhpType getReturnType(@NotNull LattePhpMethod element) {
@@ -265,23 +266,11 @@ public class LattePsiImplUtil {
 	}
 
 	public static boolean isTemplateType(@NotNull LattePhpClass element) {
-		PsiElement parent = element.getParent();
-		if (parent == null) {
-			return false;
-		}
-
-		PsiElement prevParent = PsiTreeUtil.prevLeaf(parent.getParent(), true);
-		return prevParent != null && prevParent.getText().equals("templateType");
+		return LatteUtil.matchParentMacroName(element, "templateType");
 	}
 
 	public static boolean isVarTypeDefinition(@NotNull LattePhpVariable element) {
-		PsiElement parent = element.getParent();
-		if (parent == null) {
-			return false;
-		}
-
-		PsiElement prevParent = PsiTreeUtil.prevLeaf(parent.getParent(), true);
-		return prevParent != null && prevParent.getText().equals("varType");
+		return LatteUtil.matchParentMacroName(element, "varType");
 	}
 
 	public static boolean isDefinition(@NotNull LattePhpVariable element) {
@@ -321,12 +310,7 @@ public class LattePsiImplUtil {
 			return prevElement != null && prevElement.getText().equals("n:for");
 		}
 
-		PsiElement prev = PsiTreeUtil.prevLeaf(parent, true);
-		if (prev == null) {
-			return false;
-		}
-
-		if (prev.getText().equals("for") || prev.getText().equals("var")) {
+		if (LatteUtil.matchParentMacroName(element, "for") || LatteUtil.matchParentMacroName(element, "var")) {
 			PsiElement nextElement = PsiTreeUtil.skipWhitespacesForward(element);
 			if (nextElement != null && nextElement.getText().equals("=")) {
 				return true;
@@ -385,6 +369,16 @@ public class LattePsiImplUtil {
 		return replaceChildNode(element, variable, keyNode);
 	}
 
+	public static PsiElement setName(LattePhpClass element, String newName) {
+		ASTNode keyNode = element.getFirstChild().getNode();
+		String namespace = element.getText().substring(0, element.getText().lastIndexOf("\\"));
+		PsiElement classType = LatteElementFactory.createClassType(element.getProject(), namespace + "\\" + newName);
+		if (classType == null) {
+			return element;
+		}
+		return replaceChildNode(element, classType, keyNode);
+	}
+
 	@NotNull
 	private static PsiElement replaceChildNode(@NotNull PsiElement psiElement, @NotNull PsiElement newElement, @Nullable ASTNode keyNode) {
 		ASTNode newKeyNode = newElement.getFirstChild().getNode();
@@ -435,7 +429,7 @@ public class LattePsiImplUtil {
 	}
 
 	public static PsiElement getNameIdentifier(LattePhpClass element) {
-		return findFirstChildWithType(element, T_PHP_VAR_TYPE);
+		return findFirstChildWithType(element, T_PHP_CLASS_NAME);
 	}
 
 	public static String getName(PsiElement element) {
@@ -446,6 +440,11 @@ public class LattePsiImplUtil {
 	public static String getName(LattePhpConstant element) {
 		PsiElement found = findFirstChildWithType(element, T_PHP_IDENTIFIER);
 		return found != null ? found.getText() : null;
+	}
+
+	public static String getName(LattePhpClass element) {
+		PsiElement found = findFirstChildWithType(element, T_PHP_METHOD);
+		return found != null ? LattePhpUtil.normalizeClassName(found.getText()) : null;
 	}
 
 	public static String getName(LattePhpProperty element) {

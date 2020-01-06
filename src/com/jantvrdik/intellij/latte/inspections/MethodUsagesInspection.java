@@ -9,6 +9,8 @@ import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LattePhpMethod;
 import com.jantvrdik.intellij.latte.utils.LattePhpType;
+import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
+import com.jetbrains.php.lang.psi.elements.Function;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +25,7 @@ public class MethodUsagesInspection extends BaseLocalInspectionTool {
 	@NotNull
 	@Override
 	public String getShortName() {
-		return "MethodUsages";
+		return "LatteMethodUsages";
 	}
 
 	@Nullable
@@ -37,41 +39,12 @@ public class MethodUsagesInspection extends BaseLocalInspectionTool {
 		file.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
 			@Override
 			public void visitElement(PsiElement element) {
-				if (element instanceof LattePhpMethod && !((LattePhpMethod) element).isFunction()) {
-					LattePhpType phpType = ((LattePhpMethod) element).getPhpType();
+				if (element instanceof LattePhpMethod) {
+					if (((LattePhpMethod) element).isFunction()) {
+						processFunction((LattePhpMethod) element, problems, manager, isOnTheFly);
 
-					boolean isFound = false;
-					Collection<PhpClass> phpClasses = phpType.getPhpClasses(element.getProject());
-					String methodName = ((LattePhpMethod) element).getMethodName();
-					if (phpClasses != null) {
-						for (PhpClass phpClass : phpClasses) {
-							for (Method method : phpClass.getMethods()) {
-								if (method.getName().equals(methodName)) {
-									if (method.getModifier().isPrivate()) {
-										addProblem(manager, problems, element, "Used private method '" + methodName + "'", isOnTheFly);
-
-									} else if (method.getModifier().isProtected()) {
-										addProblem(manager, problems, element, "Used protected method '" + methodName + "'", isOnTheFly);
-									}
-
-									String description;
-									boolean isStatic = ((LattePhpMethod) element).isStatic();
-									if (isStatic && !method.getModifier().isStatic()) {
-										description = "Method '" + methodName + "' is not static but called statically";
-										addProblem(manager, problems, element, description, isOnTheFly);
-
-									} else if (!isStatic && method.getModifier().isStatic()) {
-										description = "Method '" + methodName + "' is static but called non statically";
-										addProblem(manager, problems, element, description, isOnTheFly);
-									}
-									isFound = true;
-								}
-							}
-						}
-					}
-
-					if (!isFound) {
-						addProblem(manager, problems, element, "Method '" + methodName + "' not found", ProblemHighlightType.GENERIC_ERROR_OR_WARNING, isOnTheFly);
+					} else {
+						processMethod((LattePhpMethod) element, problems, manager, isOnTheFly);
 					}
 
 				} else {
@@ -81,5 +54,61 @@ public class MethodUsagesInspection extends BaseLocalInspectionTool {
 		});
 
 		return problems.toArray(new ProblemDescriptor[problems.size()]);
+	}
+
+	private void processFunction(
+			LattePhpMethod element,
+			@NotNull List<ProblemDescriptor> problems,
+			@NotNull final InspectionManager manager,
+			final boolean isOnTheFly
+	) {
+		String functionName = element.getMethodName();
+		Collection<Function> existing = LattePhpUtil.getFunctionByName(element.getProject(), functionName);
+		if (existing.size() == 0) {
+			addProblem(manager, problems, element, "Function '" + functionName + "' not found", ProblemHighlightType.GENERIC_ERROR_OR_WARNING, isOnTheFly);
+		}
+	}
+
+	private void processMethod(
+			LattePhpMethod element,
+			@NotNull List<ProblemDescriptor> problems,
+			@NotNull final InspectionManager manager,
+			final boolean isOnTheFly
+	) {
+		LattePhpType phpType = element.getPhpType();
+
+		boolean isFound = false;
+		Collection<PhpClass> phpClasses = phpType.getPhpClasses(element.getProject());
+		String methodName = element.getMethodName();
+		if (phpClasses != null) {
+			for (PhpClass phpClass : phpClasses) {
+				for (Method method : phpClass.getMethods()) {
+					if (method.getName().equals(methodName)) {
+						if (method.getModifier().isPrivate()) {
+							addProblem(manager, problems, element, "Used private method '" + methodName + "'", isOnTheFly);
+
+						} else if (method.getModifier().isProtected()) {
+							addProblem(manager, problems, element, "Used protected method '" + methodName + "'", isOnTheFly);
+						}
+
+						String description;
+						boolean isStatic = ((LattePhpMethod) element).isStatic();
+						if (isStatic && !method.getModifier().isStatic()) {
+							description = "Method '" + methodName + "' is not static but called statically";
+							addProblem(manager, problems, element, description, isOnTheFly);
+
+						} else if (!isStatic && method.getModifier().isStatic()) {
+							description = "Method '" + methodName + "' is static but called non statically";
+							addProblem(manager, problems, element, description, isOnTheFly);
+						}
+						isFound = true;
+					}
+				}
+			}
+		}
+
+		if (!isFound) {
+			addProblem(manager, problems, element, "Method '" + methodName + "' not found", ProblemHighlightType.GENERIC_ERROR_OR_WARNING, isOnTheFly);
+		}
 	}
 }

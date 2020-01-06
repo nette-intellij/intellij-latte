@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class LattePhpClassReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
@@ -31,13 +30,14 @@ public class LattePhpClassReference extends PsiReferenceBase<PsiElement> impleme
             return new ResolveResult[0];
         }
 
-        final Collection<BaseLattePhpElement> methods = LatteUtil.findClasses(getElement().getProject(), className);
-        if (methods.size() == 0) {
-            return new ResolveResult[0];
+        List<ResolveResult> results = new ArrayList<ResolveResult>();
+        for (PhpClass phpClass : ((LattePhpClass) getElement()).getPhpType().getPhpClasses(getElement().getProject())) {
+            if (LattePhpUtil.isReferenceFor(className, phpClass)) {
+                results.add(new PsiElementResolveResult(phpClass));
+            }
         }
 
-        List<ResolveResult> results = new ArrayList<ResolveResult>();
-        for (BaseLattePhpElement method : methods) {
+        for (BaseLattePhpElement method : LatteUtil.findClasses(getElement().getProject(), className)) {
             results.add(new PsiElementResolveResult(method));
         }
 
@@ -48,13 +48,21 @@ public class LattePhpClassReference extends PsiReferenceBase<PsiElement> impleme
     @Override
     public PsiElement resolve() {
         ResolveResult[] resolveResults = multiResolve(false);
-        return resolveResults.length == 1 ? resolveResults[0].getElement() : null;
+        return resolveResults.length > 0 ? resolveResults[0].getElement() : null;
     }
 
     @NotNull
     @Override
     public Object[] getVariants() {
         return new Object[0];
+    }
+
+    @Override
+    public PsiElement handleElementRename(@NotNull String newName) {
+        if (getElement() instanceof LattePhpClass) {
+            ((LattePhpClass) getElement()).setName(newName);
+        }
+        return getElement();
     }
 
     @Override

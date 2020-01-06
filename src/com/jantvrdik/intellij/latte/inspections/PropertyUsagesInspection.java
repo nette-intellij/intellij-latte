@@ -25,7 +25,7 @@ public class PropertyUsagesInspection extends BaseLocalInspectionTool {
 	@NotNull
 	@Override
 	public String getShortName() {
-		return "PropertyUsages";
+		return "LattePropertyUsages";
 	}
 
 	@Nullable

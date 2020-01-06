@@ -1,7 +1,6 @@
 package com.jantvrdik.intellij.latte.completion.providers;
 
 import com.intellij.codeInsight.completion.CompletionParameters;
-import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
@@ -25,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class LatteVariableCompletionProvider extends CompletionProvider<CompletionParameters> {
+public class LatteVariableCompletionProvider extends BaseLatteCompletionProvider {
 
 	public LatteVariableCompletionProvider() {
 		super();
@@ -61,7 +60,7 @@ public class LatteVariableCompletionProvider extends CompletionProvider<Completi
 			for (PhpClass phpClass : phpClasses) {
 				for (Field field : phpClass.getFields()) {
 					if (!field.isConstant() && field.getModifier().isPublic()) {
-						PhpLookupElement lookupItem = LattePhpClassCompletionProvider.getPhpLookupElement(field, "$" + field.getName());
+						PhpLookupElement lookupItem = getPhpLookupElement(field, "$" + field.getName());
 						lookupItem.handler = PhpVariableInsertHandler.getInstance();
 						lookupItem.icon = PhpIcons.PROPERTY_ICON;
 						lookupItem.bold = true;

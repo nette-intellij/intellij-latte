@@ -8,8 +8,10 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.*;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.util.Processor;
+import com.jantvrdik.intellij.latte.psi.LattePhpClass;
 import com.jantvrdik.intellij.latte.psi.LattePhpStaticVariable;
 import com.jantvrdik.intellij.latte.psi.LattePhpVariable;
+import com.jantvrdik.intellij.latte.reference.references.LattePhpClassReference;
 import com.jantvrdik.intellij.latte.reference.references.LattePhpStaticVariableReference;
 import com.jantvrdik.intellij.latte.reference.references.LattePhpVariableReference;
 import com.jantvrdik.intellij.latte.utils.LattePhpType;
@@ -27,7 +29,30 @@ public class LatteReferenceSearch extends QueryExecutorBase<PsiReference, Refere
     public void processQuery(ReferencesSearch.@NotNull SearchParameters searchParameters, @NotNull Processor<? super PsiReference> processor) {
         if (searchParameters.getElementToSearch() instanceof Field) {
             processField((Field) searchParameters.getElementToSearch(), searchParameters.getScopeDeterminedByUser(), processor);
+
+        } else if (searchParameters.getElementToSearch() instanceof PhpClass) {
+            processClass((PhpClass) searchParameters.getElementToSearch(), searchParameters.getScopeDeterminedByUser(), processor);
         }
+    }
+
+    private void processClass(@NotNull PhpClass phpClass, @NotNull SearchScope searchScope, @NotNull Processor<? super PsiReference> processor) {
+        ApplicationManager.getApplication().runReadAction(() -> {
+            String fieldName = phpClass.getFQN();
+
+            PsiSearchHelper.SERVICE.getInstance(phpClass.getProject())
+                    .processElementsWithWord(new TextOccurenceProcessor() {
+                        @Override
+                        public boolean execute(PsiElement psiElement, int i) {
+                            PsiElement currentClass = psiElement.getParent();
+                            if (currentClass instanceof LattePhpClass) {
+                                String value = ((LattePhpClass) currentClass).getClassName();
+                                processor.process(new LattePhpClassReference((LattePhpClass) currentClass, new TextRange(0, value.length())));
+
+                            }
+                            return true;
+                        }
+                    }, searchScope, fieldName.startsWith("\\") ? fieldName.substring(1) : fieldName, UsageSearchContext.IN_CODE, true);
+        });
     }
 
     private void processField(@NotNull Field field, @NotNull SearchScope searchScope, @NotNull Processor<? super PsiReference> processor) {

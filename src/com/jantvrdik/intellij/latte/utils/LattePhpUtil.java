@@ -3,7 +3,6 @@ package com.jantvrdik.intellij.latte.utils;
 import com.intellij.codeInsight.completion.PrefixMatcher;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiElementResolveResult;
 import com.intellij.psi.ResolveResult;
 import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
@@ -11,18 +10,13 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public class LattePhpUtil {
-
-    private static String[] nativeClassConstants = new String[]{"class"};
-
-    public static String[] getNativeClassConstants() {
-        return nativeClassConstants;
-    }
 
     public static Collection<PhpNamedElement> getAllClassNamesAndInterfaces(Project project, Collection<String> classNames) {
         Collection<PhpNamedElement> variants = new THashSet<PhpNamedElement>();
@@ -31,6 +25,16 @@ public class LattePhpUtil {
         for (String name : classNames) {
             variants.addAll(filterClasses(phpIndex.getClassesByName(name), null));
             variants.addAll(filterClasses(phpIndex.getInterfacesByName(name), null));
+        }
+        return variants;
+    }
+
+    public static Collection<Function> getAllFunctions(Project project, Collection<String> functionNames) {
+        Collection<Function> variants = new THashSet<Function>();
+        PhpIndex phpIndex = getPhpIndex(project);
+
+        for (String name : functionNames) {
+            variants.addAll(phpIndex.getFunctionsByName(name));
         }
         return variants;
     }
@@ -64,13 +68,19 @@ public class LattePhpUtil {
 
     public static boolean isReferenceFor(@NotNull PhpClass originalClass, @NotNull PhpClass targetClass)
     {
-        if (originalClass.getFQN().equals(targetClass.getFQN())) {
+        return isReferenceFor(originalClass.getFQN(), targetClass);
+    }
+
+    public static boolean isReferenceFor(@NotNull String originalClass, @NotNull PhpClass targetClass)
+    {
+        originalClass = normalizeClassName(originalClass);
+        if (originalClass.equals(targetClass.getFQN())) {
             return true;
         }
 
         ExtendsList extendsList = targetClass.getExtendsList();
         for (ClassReference reference : extendsList.getReferenceElements()) {
-            if (reference.getFQN().equals(originalClass.getFQN())) {
+            if (reference.getFQN() != null && reference.getFQN().equals(originalClass)) {
                 return true;
             }
         }
@@ -128,7 +138,15 @@ public class LattePhpUtil {
     }
 
     public static Collection<PhpClass> getClassesByFQN(Project project, String className) {
-        return getPhpIndex(project).getAnyByFQN(className);
+        return getPhpIndex(project).getAnyByFQN(normalizeClassName(className));
+    }
+
+    public static Collection<Function> getFunctionByName(Project project, String functionName) {
+        return getPhpIndex(project).getFunctionsByName(functionName);
+    }
+
+    public static Collection<String> getAllExistingFunctionNames(Project project, PrefixMatcher prefixMatcher) {
+        return getPhpIndex(project).getAllFunctionNames(prefixMatcher);
     }
 
 
@@ -153,5 +171,9 @@ public class LattePhpUtil {
             }
         }
         return result;
+    }
+
+    public static String normalizeClassName(@Nullable String className) {
+        return className == null ? "" : (className.startsWith("\\") ? className : ("\\" + className));
     }
 }

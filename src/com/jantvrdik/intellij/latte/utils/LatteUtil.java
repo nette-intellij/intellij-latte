@@ -74,7 +74,7 @@ public class LatteUtil {
         return result != null ? result : Collections.<PsiPositionedElement>emptyList();
     }
 
-    public static Collection<BaseLattePhpElement> findMethods(Project project, String key, @NotNull PhpClass phpClass) {
+    public static Collection<BaseLattePhpElement> findMethods(Project project, String key, @Nullable PhpClass phpClass) {
         List<BaseLattePhpElement> result = new ArrayList<BaseLattePhpElement>();
         Collection<VirtualFile> virtualFiles =
                 FileTypeIndex.getFiles(LatteFileType.INSTANCE, GlobalSearchScope.allScope(project));
@@ -89,6 +89,17 @@ public class LatteUtil {
                 attachResults(result, key, elements, phpClass);
             }
         }
+        return result;
+    }
+
+    public static Collection<BaseLattePhpElement> findFunctions(Project project, String key) {
+        List<BaseLattePhpElement> result = new ArrayList<BaseLattePhpElement>();
+        findMethods(project, key, null)
+            .forEach(method -> {
+                if (((LattePhpMethod) method).isFunction()) {
+                    result.add(method);
+                }
+            });
         return result;
     }
 
@@ -140,7 +151,7 @@ public class LatteUtil {
                     findLattePhpClasses(elements, element);
                 }
 
-                attachResults(result, key, elements);
+                attachResults(result, LattePhpUtil.normalizeClassName(key), elements);
             }
         }
         return result;
@@ -164,16 +175,24 @@ public class LatteUtil {
         return result;
     }
 
-    private static void attachResults(@NotNull List<BaseLattePhpElement> result, String key, List<PsiElement> elements, @NotNull PhpClass phpClass)
+    public static boolean matchParentMacroName(@NotNull PsiElement element, @NotNull String name) {
+        LatteMacroClassic macroClassic = PsiTreeUtil.getParentOfType(element, LatteMacroClassic.class);
+        if (macroClassic == null) {
+            return false;
+        }
+        return macroClassic.getOpenTag().getMacroName().equals(name);
+    }
+
+    private static void attachResults(@NotNull List<BaseLattePhpElement> result, String key, List<PsiElement> elements, @Nullable PhpClass phpClass)
     {
-        for (PsiElement constant : elements) {
-            if (!(constant instanceof BaseLattePhpElement) || !((BaseLattePhpElement) constant).getPhpType().hasClass(phpClass.getFQN())) {
+        for (PsiElement element : elements) {
+            if (!(element instanceof BaseLattePhpElement) || (phpClass != null && !((BaseLattePhpElement) element).getPhpType().hasClass(phpClass.getFQN()))) {
                 continue;
             }
 
-            String varName = ((BaseLattePhpElement) constant).getPhpElementName();
+            String varName = ((BaseLattePhpElement) element).getPhpElementName();
             if (key.equals(varName)) {
-                result.add((BaseLattePhpElement) constant);
+                result.add((BaseLattePhpElement) element);
             }
         }
     }
@@ -185,7 +204,7 @@ public class LatteUtil {
                 continue;
             }
 
-            String varName = ((BaseLattePhpElement) constant).getPhpElementName();
+            String varName = LattePhpUtil.normalizeClassName(((BaseLattePhpElement) constant).getPhpElementName());
             if (key.equals(varName)) {
                 result.add((BaseLattePhpElement) constant);
             }

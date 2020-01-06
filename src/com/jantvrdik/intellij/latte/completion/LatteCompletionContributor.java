@@ -10,7 +10,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.util.ProcessingContext;
 import com.jantvrdik.intellij.latte.LatteLanguage;
-import com.jantvrdik.intellij.latte.completion.providers.LattePhpClassCompletionProvider;
 import com.jantvrdik.intellij.latte.completion.providers.LattePhpCompletionProvider;
 import com.jantvrdik.intellij.latte.completion.providers.LatteVariableCompletionProvider;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
@@ -63,18 +62,10 @@ public class LatteCompletionContributor extends CompletionContributor {
 				new LatteVariableCompletionProvider()
 		);
 
-		extend(CompletionType.BASIC, PlatformPatterns.psiElement(), new LattePhpCompletionProvider());
-
 		extend(
 				CompletionType.BASIC,
-				PlatformPatterns.psiElement()
-						.andOr(
-								PlatformPatterns.or(
-										PlatformPatterns.psiElement().withElementType(LatteTypes.T_PHP_VAR_TYPE),
-										PlatformPatterns.psiElement().withElementType(LatteTypes.T_MACRO_ARGS)
-								)
-						),
-				new LattePhpClassCompletionProvider()
+				PlatformPatterns.psiElement().withLanguage(LatteLanguage.INSTANCE),
+				new LattePhpCompletionProvider()
 		);
 	}
 

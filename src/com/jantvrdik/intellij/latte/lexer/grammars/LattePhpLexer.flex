@@ -17,6 +17,7 @@ import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
 
 WHITE_SPACE=[ \t\r\n]+
 IDENTIFIER=[a-zA-Z_][a-zA-Z0-9_]*
+CLASS_NAME=\\?[a-zA-Z_][a-zA-Z0-9_]*\\[a-zA-Z_][a-zA-Z0-9_\\]* | \\[a-zA-Z_][a-zA-Z0-9_]*
 
 %%
 
@@ -26,8 +27,8 @@ IDENTIFIER=[a-zA-Z_][a-zA-Z0-9_]*
         return T_MACRO_ARGS_VAR;
     }
 
-    "\\" [a-zA-Z_][a-zA-Z0-9_\\]* {
-        return T_PHP_VAR_TYPE;
+    {CLASS_NAME} {
+        return T_PHP_CLASS_NAME;
     }
 
     "::" {
@@ -82,15 +83,27 @@ IDENTIFIER=[a-zA-Z_][a-zA-Z0-9_]*
         return T_PHP_EXPRESSION;
     }
 
+    "|" {
+        return T_PHP_OR_INCLUSIVE;
+    }
+
     "as" {
         return T_PHP_AS;
     }
 
-    ("class" | "false" | "true" | "null" | "break" | "continue" | "case" | "default" | "die" | "exit" | "do" | "while" | "foreach" | "for" | "function" | "echo" | "print" | "catch" | "finally" | "try" | "instanceof" | "if" | "else" | "elseif" | "endif" | "endforeach" | "endfor" | "endwhile" | "endswitch" | "isset" | "or" | "new" | "switch" | "use") {
+    ("class" | "false" | "true" | "break" | "continue" | "case" | "default" | "die" | "exit" | "do" | "while" | "foreach" | "for" | "function" | "echo" | "print" | "catch" | "finally" | "try" | "instanceof" | "if" | "else" | "elseif" | "endif" | "endforeach" | "endfor" | "endwhile" | "endswitch" | "isset" | "or" | "new" | "switch" | "use") {
         return T_PHP_KEYWORD;
     }
 
-    ("string" | "int" | "bool" | "object" | "float" | "array") {
+    "null" {
+        return T_PHP_NULL;
+    }
+
+    "mixed" {
+        return T_PHP_MIXED;
+    }
+
+    ("string" | "int" | "bool" | "object" | "float" | "array" | "callable" | "iterable" | "void") {
         return T_PHP_TYPE;
     }
 

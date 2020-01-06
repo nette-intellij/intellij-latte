@@ -61,6 +61,20 @@ public class LatteElementFactory {
 		return null;
 	}
 
+	public static PsiElement createClassType(Project project, String name) {
+		final LatteFile file = createFileWithPhpMacro(project, name);
+		PsiElement firstChild = file.getFirstChild().getFirstChild().getFirstChild();
+		if (firstChild != null) {
+			try {
+				return firstChild.getNextSibling().getNextSibling().getFirstChild().getLastChild();
+
+			} catch (NullPointerException e) {
+				return null;
+			}
+		}
+		return null;
+	}
+
 	public static PsiElement createStaticVariable(Project project, String name) {
 		final LatteFile file = createFileWithPhpMacro(project, "$x::$" + name);
 		PsiElement firstChild = file.getFirstChild().getFirstChild().getFirstChild();

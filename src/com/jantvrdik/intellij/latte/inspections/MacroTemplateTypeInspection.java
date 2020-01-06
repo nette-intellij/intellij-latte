@@ -17,12 +17,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TemplateTypeInspection extends LocalInspectionTool {
+public class MacroTemplateTypeInspection extends LocalInspectionTool {
 
 	@NotNull
 	@Override
 	public String getShortName() {
-		return "TemplateType";
+		return "LatteTemplateType";
 	}
 
 	@Nullable
