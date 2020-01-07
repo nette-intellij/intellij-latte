@@ -3,12 +3,15 @@ package com.jantvrdik.intellij.latte.utils;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.TokenSet;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Arrays;
 
 public class LatteTypesUtil {
 
     final private static String[] nativeClassConstants = new String[]{"class"};
 
-    final private static String[] nativeTypeHints = new String[]{"string", "int", "bool", "object", "float", "array", "mixed", "null"};
+    final private static String[] nativeTypeHints = new String[]{"string", "int", "bool", "object", "float", "array", "mixed", "null", "callable", "iterable"};
 
     final private static TokenSet whitespaceTokens = TokenSet.create(LatteTypes.T_WHITESPACE, TokenType.WHITE_SPACE);
 
@@ -26,6 +29,10 @@ public class LatteTypesUtil {
 
     public static String[] getNativeTypeHints() {
         return nativeTypeHints;
+    }
+
+    public static boolean isNativeTypeHint(@NotNull String value) {
+        return Arrays.asList(nativeTypeHints).contains(value);
     }
 
     public static TokenSet getTypeHintTokens() {

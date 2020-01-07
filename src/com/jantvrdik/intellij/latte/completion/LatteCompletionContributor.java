@@ -8,6 +8,7 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PlatformPatterns;
+import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.jantvrdik.intellij.latte.LatteLanguage;
 import com.jantvrdik.intellij.latte.completion.providers.LattePhpCompletionProvider;
@@ -15,6 +16,8 @@ import com.jantvrdik.intellij.latte.completion.providers.LatteVariableCompletion
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.config.LatteMacro;
 import com.jantvrdik.intellij.latte.psi.*;
+import com.jantvrdik.intellij.latte.utils.LatteMimeTypes;
+import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -56,6 +59,17 @@ public class LatteCompletionContributor extends CompletionContributor {
 			}
 		});
 
+		extend(CompletionType.BASIC, PlatformPatterns.psiElement().withLanguage(LatteLanguage.INSTANCE), new CompletionProvider<CompletionParameters>() {
+			@Override
+			protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
+				PsiElement element = parameters.getPosition().getParent();
+				if (!LatteUtil.matchParentMacroName(element, "contentType")) {
+					return;
+				}
+				attachContentTypes(result);
+			}
+		});
+
 		extend(
 				CompletionType.BASIC,
 				PlatformPatterns.psiElement(LatteTypes.T_MACRO_ARGS_VAR).withLanguage(LatteLanguage.INSTANCE),
@@ -76,6 +90,12 @@ public class LatteCompletionContributor extends CompletionContributor {
 		Map<String, LatteMacro> macros = LatteConfiguration.INSTANCE.getStandardMacros();
 		classicMacrosCompletions = getClassicMacroCompletions(macros);
 		attrMacrosCompletions = getAttrMacroCompletions(macros);
+	}
+
+	private void attachContentTypes(@NotNull CompletionResultSet result) {
+		for (String contentType : LatteMimeTypes.getDefaultMimeTypes()) {
+			result.addElement(LookupElementBuilder.create(contentType));
+		}
 	}
 
 	/**

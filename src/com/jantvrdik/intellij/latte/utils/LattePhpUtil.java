@@ -174,6 +174,13 @@ public class LattePhpUtil {
     }
 
     public static String normalizeClassName(@Nullable String className) {
-        return className == null ? "" : (className.startsWith("\\") ? className : ("\\" + className));
+        String normalized = className == null ? "" : (className.startsWith("\\") ? className : ("\\" + className));
+        if (normalized.contains("|null")) {
+            normalized = normalized.replace("|null", "");
+        }
+        if (normalized.contains("|NULL")) {
+            normalized = normalized.replace("|NULL", "");
+        }
+        return normalized;
     }
 }

@@ -18,6 +18,7 @@ import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
 WHITE_SPACE=[ \t\r\n]+
 IDENTIFIER=[a-zA-Z_][a-zA-Z0-9_]*
 CLASS_NAME=\\?[a-zA-Z_][a-zA-Z0-9_]*\\[a-zA-Z_][a-zA-Z0-9_\\]* | \\[a-zA-Z_][a-zA-Z0-9_]*
+CONTENT_TYPE=[a-zA-Z\-][a-zA-Z0-9\-]*\/[a-zA-Z\-][a-zA-Z0-9\-\.]*
 
 %%
 
@@ -29,6 +30,10 @@ CLASS_NAME=\\?[a-zA-Z_][a-zA-Z0-9_]*\\[a-zA-Z_][a-zA-Z0-9_\\]* | \\[a-zA-Z_][a-z
 
     {CLASS_NAME} {
         return T_PHP_CLASS_NAME;
+    }
+
+    {CONTENT_TYPE} {
+        return T_PHP_CONTENT_TYPE;
     }
 
     "::" {

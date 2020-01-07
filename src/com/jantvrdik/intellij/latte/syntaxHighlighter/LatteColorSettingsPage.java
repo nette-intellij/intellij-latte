@@ -25,6 +25,7 @@ public class LatteColorSettingsPage implements ColorSettingsPage {
 		new AttributesDescriptor("PHP method", LatteSyntaxHighlighter.PHP_METHOD),
 		new AttributesDescriptor("PHP keyword", LatteSyntaxHighlighter.PHP_KEYWORD),
 		new AttributesDescriptor("PHP identifier", LatteSyntaxHighlighter.PHP_IDENTIFIER),
+		new AttributesDescriptor("PHP content type", LatteSyntaxHighlighter.PHP_CONTENT_TYPE),
 	};
 
 	@Nullable

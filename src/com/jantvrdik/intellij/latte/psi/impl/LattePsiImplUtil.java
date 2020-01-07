@@ -115,12 +115,13 @@ public class LattePsiImplUtil {
 				continue;
 			}
 
-			if (isVarTypeDefinition((LattePhpVariable) positionedElement.getElement())) {
+			PsiElement current = positionedElement.getElement();
+			if (isVarTypeDefinition((LattePhpVariable) current) || isVarDefinition((LattePhpVariable) current)) {
 				String prevPhpType = findPrevPhpType(positionedElement.getElement());
 				boolean nullable = false;
 				List<String> types = new ArrayList<String>();
 				for (String part : prevPhpType.split(Pattern.quote("|"))) {
-					if (part.equals("null")) {
+					if (part.toLowerCase().equals("null")) {
 						nullable = true;
 						continue;
 					}
@@ -273,8 +274,12 @@ public class LattePsiImplUtil {
 		return LatteUtil.matchParentMacroName(element, "varType");
 	}
 
+	public static boolean isVarDefinition(@NotNull LattePhpVariable element) {
+		return LatteUtil.matchParentMacroName(element, "var");
+	}
+
 	public static boolean isDefinition(@NotNull LattePhpVariable element) {
-		if (isVarTypeDefinition(element)) {
+		if (isVarTypeDefinition(element) || LatteUtil.matchParentMacroName(element, "capture")) {
 			return true;
 		}
 
@@ -310,7 +315,7 @@ public class LattePsiImplUtil {
 			return prevElement != null && prevElement.getText().equals("n:for");
 		}
 
-		if (LatteUtil.matchParentMacroName(element, "for") || LatteUtil.matchParentMacroName(element, "var")) {
+		if (LatteUtil.matchParentMacroName(element, "for") || isVarDefinition(element)) {
 			PsiElement nextElement = PsiTreeUtil.skipWhitespacesForward(element);
 			if (nextElement != null && nextElement.getText().equals("=")) {
 				return true;
@@ -362,7 +367,7 @@ public class LattePsiImplUtil {
 
 	public static PsiElement setName(LattePhpVariable element, String newName) {
 		ASTNode keyNode = element.getFirstChild().getNode();
-		LattePhpVariable variable = LatteElementFactory.createVariable(element.getProject(), newName);
+		PsiElement variable = LatteElementFactory.createVariable(element.getProject(), newName);
 		if (variable == null) {
 			return element;
 		}

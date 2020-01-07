@@ -20,6 +20,7 @@ STRING_DQ = "\"" ("\\" [^] | [^\"\\])* "\""
 SYMBOL = [_[:letter:]][_0-9[:letter:]]*(-[_0-9[:letter:]]+)* //todo: unicode letters
 FUNCTION_CALL=[a-zA-Z_][a-zA-Z0-9_]* "("
 CLASS_NAME=\\?[a-zA-Z_][a-zA-Z0-9_]*\\[a-zA-Z_][a-zA-Z0-9_\\]* | \\[a-zA-Z_][a-zA-Z0-9_]*
+CONTENT_TYPE=[a-zA-Z\-][a-zA-Z0-9\-]*\/[a-zA-Z\-][a-zA-Z0-9\-\.]*
 
 %%
 
@@ -27,6 +28,10 @@ CLASS_NAME=\\?[a-zA-Z_][a-zA-Z0-9_]*\\[a-zA-Z_][a-zA-Z0-9_\\]* | \\[a-zA-Z_][a-z
 <YYINITIAL> {
 
 	({CLASS_NAME} | "$" | {FUNCTION_CALL}) .+ {
+        return T_PHP_CONTENT;
+    }
+
+    {CONTENT_TYPE} {
         return T_PHP_CONTENT;
     }
 

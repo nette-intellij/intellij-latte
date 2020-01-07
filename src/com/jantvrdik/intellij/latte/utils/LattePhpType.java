@@ -33,7 +33,11 @@ public class LattePhpType {
 
     public LattePhpType(String name, String[] types, boolean nullable) {
         this.name = name == null ? null : LattePhpUtil.normalizePhpVariable(name);
-        this.types = types;
+        List<String> normalizedTypes = new ArrayList<String>();
+        for (String type : types) {
+            normalizedTypes.add(LattePhpUtil.normalizeClassName(type));
+        }
+        this.types = normalizedTypes.toArray(new String[0]);
         this.nullable = nullable;
     }
 
@@ -48,7 +52,7 @@ public class LattePhpType {
     public boolean hasClass(String className) {
         for (String type : types) {
             String wholeType = LattePhpType.getWholeType(type);
-            if (wholeType.equals(className)) {
+            if (LattePhpUtil.normalizeClassName(wholeType).equals(LattePhpUtil.normalizeClassName(className))) {
                 return true;
             }
         }
@@ -60,7 +64,7 @@ public class LattePhpType {
     }
 
     private static boolean isClassOrInterfaceType(String type) {
-        return type != null && type.contains("\\");
+        return type != null && (type.contains("\\") || !LatteTypesUtil.isNativeTypeHint(type));
     }
 
     private static boolean isArrayOf(String type) {

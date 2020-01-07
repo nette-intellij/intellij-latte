@@ -10,7 +10,7 @@
 		<h2>IMPORTANT notes</h2>
 
 		<ul>
-			<li><b>Refactoring for class names is supported only from PHP to Latte</b></li>
+			<li><b>Refactoring for class names is now supported only from PHP to Latte</b></li>
 		</ul>
 	]]></description>
 
@@ -24,6 +24,8 @@
 			<li>added completions for latte variables, PHP functions, methods, constants and properties</li>
 			<li>added varType macro</li>
 			<li>added templateType macro</li>
+			<li>added support for define type in {var Bar\FooClass $class = ...}</li>
+			<li>added support for mime types and completion it in contentType macro</li>
 			<li>added reference search for usages from PHP to Latte (for classes, methods, properties and constants)</li>
 			<li>added brace matcher for highlight braces</li>
 			<li>added go to source for class names, methods, constants and properties</li>
