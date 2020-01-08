@@ -19,6 +19,6 @@ public class AddCustomNullableVariable extends AddCustomVariable {
 	@NotNull
 	@Override
 	public String getText() {
-		return "Add custom nullable variable " + defaultVariable.name;
+		return "Add custom nullable variable " + defaultVariable.getVarName();
 	}
 }

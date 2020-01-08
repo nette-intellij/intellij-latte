@@ -6,7 +6,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.config.LatteDefaultVariable;
+import com.jantvrdik.intellij.latte.settings.LatteVariableSettings;
 import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.utils.LattePhpType;
 import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
@@ -76,6 +76,11 @@ public class LattePsiImplUtil {
 		return found != null ? LattePhpUtil.normalizeClassName(found.getText()) : null;
 	}
 
+	public static String getModifierName(@NotNull LatteMacroModifier element) {
+		PsiElement found = findFirstChildWithType(element, T_MACRO_FILTERS);
+		return found != null ? LatteUtil.normalizeMacroModifier(found.getText()) : null;
+	}
+
 	@Nullable
 	public static LattePhpType detectVariableTypeFromTemplateType(@NotNull PsiElement element, @NotNull String variableName)
 	{
@@ -136,9 +141,9 @@ public class LattePsiImplUtil {
 			return templateType;
 		}
 
-		LatteDefaultVariable defaultVariable = LatteConfiguration.INSTANCE.getVariable(element.getProject(), variableName);
+		LatteVariableSettings defaultVariable = LatteConfiguration.INSTANCE.getVariable(element.getProject(), variableName);
 		if (defaultVariable != null) {
-			return defaultVariable.type;
+			return defaultVariable.toPhpType();
 		}
 
 		return new LattePhpType("mixed", false);
@@ -400,6 +405,10 @@ public class LattePsiImplUtil {
 		return psiElement;
 	}
 
+	public static PsiElement getNameIdentifier(LatteMacroModifier element) {
+		return findFirstChildWithType(element, T_MACRO_FILTERS);
+	}
+
 	public static PsiElement getNameIdentifier(LattePhpVariable element) {
 		return findFirstChildWithType(element, T_MACRO_ARGS_VAR);
 	}
@@ -440,6 +449,10 @@ public class LattePsiImplUtil {
 	public static String getName(PsiElement element) {
 		PsiElement found = findFirstChildWithType(element, T_PHP_METHOD);
 		return found != null ? found.getText() : null;
+	}
+
+	public static String getName(LatteMacroModifier element) {
+		return element.getModifierName();
 	}
 
 	public static String getName(LattePhpConstant element) {

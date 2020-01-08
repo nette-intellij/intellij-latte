@@ -13,11 +13,18 @@ public class LatteMacro {
 
 	public boolean deprecated = false;
 
+	public boolean allowedModifiers;
+
 	public String deprecatedMessage;
 
 	public LatteMacro(String name, Type type) {
+		this(name, type, true);
+	}
+
+	public LatteMacro(String name, Type type, boolean allowedModifiers) {
 		this.name = name;
 		this.type = type;
+		this.allowedModifiers = allowedModifiers;
 	}
 
 	public enum Type {

@@ -32,11 +32,7 @@ public class LattePhpConstantReference extends PsiReferenceBase<PsiElement> impl
             return new ResolveResult[0];
         }
 
-        final Collection<BaseLattePhpElement> methods = LatteUtil.findConstants(getElement().getProject(), key, phpClass);
-        if (methods.size() == 0) {
-            return new ResolveResult[0];
-        }
-
+        final Collection<LattePhpConstant> methods = LatteUtil.findConstants(getElement().getProject(), key, phpClass);
         List<ResolveResult> results = new ArrayList<ResolveResult>();
         for (BaseLattePhpElement method : methods) {
             results.add(new PsiElementResolveResult(method));

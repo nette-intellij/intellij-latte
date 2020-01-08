@@ -7,22 +7,16 @@ import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
-import com.intellij.psi.tree.TokenSet;
-import com.jantvrdik.intellij.latte.psi.LatteFile;
-import com.jantvrdik.intellij.latte.psi.LatteMacroContent;
-import com.jantvrdik.intellij.latte.psi.LatteMacroTag;
-import com.jantvrdik.intellij.latte.psi.LatteTypes;
+import com.jantvrdik.intellij.latte.config.LatteConfiguration;
+import com.jantvrdik.intellij.latte.config.LatteMacro;
+import com.jantvrdik.intellij.latte.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class ModifierNotAllowedInspection extends LocalInspectionTool {
-
-	private static Set<String> macros;
 
 
 	@NotNull
@@ -37,59 +31,51 @@ public class ModifierNotAllowedInspection extends LocalInspectionTool {
 		if (!(file instanceof LatteFile)) {
 			return null;
 		}
+
 		final List<ProblemDescriptor> problems = new ArrayList<ProblemDescriptor>();
 		file.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
 			@Override
 			public void visitElement(PsiElement element) {
 				if (element instanceof LatteMacroTag) {
-					boolean result = checkClassicMacro((LatteMacroTag) element);
-					if (result) {
-						ProblemDescriptor problem = manager.createProblemDescriptor(element, "Modifiers are not allowed here", true, ProblemHighlightType.GENERIC_ERROR_OR_WARNING, isOnTheFly);
-						problems.add(problem);
-					}
+					checkClassicMacro((LatteMacroTag) element, problems, manager, isOnTheFly);
+
 				} else {
 					super.visitElement(element);
 				}
 			}
 		});
-
-
 		return problems.toArray(new ProblemDescriptor[problems.size()]);
 	}
 
-	private static boolean checkClassicMacro(LatteMacroTag macro) {
-		String name = macro.getMacroName();
-		if (!macros.contains(name)) {
-			return false;
+	private static void checkClassicMacro(
+			LatteMacroTag macroTag,
+			@NotNull List<ProblemDescriptor> problems,
+			@NotNull final InspectionManager manager,
+			final boolean isOnTheFly
+	) {
+		String name = macroTag.getMacroName();
+		LatteMacro macro = LatteConfiguration.INSTANCE.getMacro(macroTag.getProject(), name);
+		if (macro == null || macro.allowedModifiers) {
+			return;
 		}
-		LatteMacroContent content = macro.getMacroContent();
-		if (content == null) {
-			return false;
-		}
-		return content.getNode().getChildren(TokenSet.create(LatteTypes.T_MACRO_ARGS_MODIFIERS)).length > 0;
-	}
 
-	static {
-		macros = new HashSet<String>();
-		macros.add("includeblock");
-		macros.add("extends");
-		macros.add("ifset");
-		macros.add("if");
-		macros.add("elseif");
-		macros.add("else");
-		macros.add("use");
-		macros.add("breakIf");
-		macros.add("continueIf");
-		macros.add("dump");
-		macros.add("debugbreak");
-		macros.add("var");
-		macros.add("contentType");
-		macros.add("status");
-		macros.add("ifCurrent");
-		macros.add("form");
-		macros.add("formContainer");
-		macros.add("label");
-		macros.add("input");
-		macros.add("inputError");
+		LatteMacroContent content = macroTag.getMacroContent();
+		if (content == null) {
+			return;
+		}
+
+		content.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
+			@Override
+			public void visitElement(PsiElement element) {
+				if (element instanceof LatteMacroModifier) {
+					String description = "Modifiers are not allowed here";
+					ProblemDescriptor problem = manager.createProblemDescriptor(element, description, true, ProblemHighlightType.GENERIC_ERROR, isOnTheFly);
+					problems.add(problem);
+
+				} else {
+					super.visitElement(element);
+				}
+			}
+		});
 	}
 }

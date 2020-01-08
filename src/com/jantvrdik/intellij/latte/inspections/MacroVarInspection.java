@@ -58,7 +58,7 @@ public class MacroVarInspection extends LocalInspectionTool {
 
 										} else {
 											super.visitElement(element);
-											if (type != LatteTypes.PHP_CONTENT) {
+											if (type != LatteTypes.PHP_CONTENT && !element.getText().equals("|")) {
 												if (!result.hasValidVariable) {
 													result.beforeVarCount++;
 												}

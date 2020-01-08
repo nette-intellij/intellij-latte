@@ -10,7 +10,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.jantvrdik.intellij.latte.completion.handlers.PhpVariableInsertHandler;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.config.LatteDefaultVariable;
+import com.jantvrdik.intellij.latte.settings.LatteVariableSettings;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LattePhpVariable;
 import com.jantvrdik.intellij.latte.utils.LattePhpType;
@@ -95,20 +95,20 @@ public class LatteVariableCompletionProvider extends BaseLatteCompletionProvider
 			foundVariables.add(variableName);
 		}
 
-		List<LatteDefaultVariable> defaultVariables = LatteConfiguration.INSTANCE.getVariables(psiElement.getProject());
+		List<LatteVariableSettings> defaultVariables = LatteConfiguration.INSTANCE.getVariables(psiElement.getProject());
 		if (defaultVariables == null) {
 			return lookupElements;
 		}
 
-		for (LatteDefaultVariable variable : defaultVariables) {
-			String variableName = variable.name;
+		for (LatteVariableSettings variable : defaultVariables) {
+			String variableName = variable.getVarName();
 			if (foundVariables.stream().anyMatch(variableName::equals)) {
 				continue;
 			}
 
 			LookupElementBuilder builder = LookupElementBuilder.create("$" + variableName);
 			builder = builder.withInsertHandler(PhpVariableInsertHandler.getInstance());
-			builder = builder.withTypeText(variable.type.toReadableString());
+			builder = builder.withTypeText(variable.toPhpType().toReadableString());
 			builder = builder.withIcon(PhpIcons.VARIABLE_READ_ACCESS);
 			builder = builder.withBoldness(false);
 			lookupElements.add(builder);

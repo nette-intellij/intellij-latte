@@ -9,12 +9,15 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
 import com.jantvrdik.intellij.latte.LatteLanguage;
 import com.jantvrdik.intellij.latte.completion.providers.LattePhpCompletionProvider;
 import com.jantvrdik.intellij.latte.completion.providers.LatteVariableCompletionProvider;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.config.LatteMacro;
+import com.jantvrdik.intellij.latte.config.LatteModifier;
+import com.jantvrdik.intellij.latte.icons.LatteIcons;
 import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.utils.LatteMimeTypes;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
@@ -33,11 +36,15 @@ public class LatteCompletionContributor extends CompletionContributor {
 	/** cached lookup elements for standard attribute macros */
 	private List<LookupElement> attrMacrosCompletions;
 
+	/** cached lookup elements for standard attribute macros */
+	private List<LookupElement> classicModifiersCompletions;
+
 	/** insert handler for attribute macros */
 	private InsertHandler<LookupElement> attrMacroInsertHandler = new AttrMacroInsertHandler<LookupElement>();
 
 	public LatteCompletionContributor() {
 		initStandardMacrosCompletions();
+		initStandardModifiersCompletions();
 
 		extend(CompletionType.BASIC, PlatformPatterns.psiElement(LatteTypes.T_MACRO_NAME).withLanguage(LatteLanguage.INSTANCE), new CompletionProvider<CompletionParameters>() {
 			@Override
@@ -70,6 +77,29 @@ public class LatteCompletionContributor extends CompletionContributor {
 			}
 		});
 
+		extend(CompletionType.BASIC, PlatformPatterns.psiElement(LatteTypes.T_MACRO_FILTERS).withLanguage(LatteLanguage.INSTANCE), new CompletionProvider<CompletionParameters>() {
+			@Override
+			protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
+				PsiElement element = parameters.getPosition().getParent();
+				if (!(element instanceof LatteMacroModifier)) {
+					return;
+				}
+				LatteMacroClassic macroClassic = PsiTreeUtil.getParentOfType(element, LatteMacroClassic.class);
+				if (macroClassic == null) {
+					return;
+				}
+
+				LatteMacro macro = LatteConfiguration.INSTANCE.getMacro(element.getProject(), macroClassic.getOpenTag().getMacroName());
+				if (macro == null || !macro.allowedModifiers) {
+					return;
+				}
+
+				Map<String, LatteModifier> customModifiers = LatteConfiguration.INSTANCE.getCustomModifiers(element.getProject());
+				result.addAllElements(classicModifiersCompletions);
+				result.addAllElements(getClassicModifierCompletions(customModifiers));
+			}
+		});
+
 		extend(
 				CompletionType.BASIC,
 				PlatformPatterns.psiElement(LatteTypes.T_MACRO_ARGS_VAR).withLanguage(LatteLanguage.INSTANCE),
@@ -92,6 +122,14 @@ public class LatteCompletionContributor extends CompletionContributor {
 		attrMacrosCompletions = getAttrMacroCompletions(macros);
 	}
 
+	/**
+	 * Prepares lists of lookup elements for both classic and attribute standard macros.
+	 */
+	private void initStandardModifiersCompletions() {
+		Map<String, LatteModifier> modifiers = LatteConfiguration.INSTANCE.getStandardModifiers();
+		classicModifiersCompletions = getClassicModifierCompletions(modifiers);
+	}
+
 	private void attachContentTypes(@NotNull CompletionResultSet result) {
 		for (String contentType : LatteMimeTypes.getDefaultMimeTypes()) {
 			result.addElement(LookupElementBuilder.create(contentType));
@@ -105,10 +143,42 @@ public class LatteCompletionContributor extends CompletionContributor {
 		List<LookupElement> lookupElements = new ArrayList<LookupElement>(macros.size());
 		for (LatteMacro macro : macros.values()) {
 			if (macro.type != LatteMacro.Type.ATTR_ONLY) {
-				lookupElements.add(LookupElementBuilder.create(macro.name));
+				lookupElements.add(createBuilderForMacro(macro));
 			}
 		}
 		return lookupElements;
+	}
+
+	/**
+	 * Builds list of lookup elements for code completion of classic macros.
+	 */
+	private List<LookupElement> getClassicModifierCompletions(Map<String, LatteModifier> modifiers) {
+		List<LookupElement> lookupElements = new ArrayList<LookupElement>(modifiers.size());
+		for (LatteModifier modifier : modifiers.values()) {
+			if (modifier.help.length() > 0) {
+				lookupElements.add(createBuilderWithHelp("|" + modifier.name, modifier.help, false));
+			} else {
+				lookupElements.add(createBuilderWithHelp("|" + modifier.name, modifier.description, true));
+			}
+		}
+		return lookupElements;
+	}
+
+	private LookupElementBuilder createBuilderWithHelp(String name, String help, boolean grayed) {
+		LookupElementBuilder builder = LookupElementBuilder.create(name);
+		builder = builder.withIcon(LatteIcons.MODIFIER);
+		return builder.withTypeText(help, grayed);
+	}
+
+	private LookupElementBuilder createBuilderForMacro(LatteMacro macro) {
+		LookupElementBuilder builder = LookupElementBuilder.create(macro.name);
+		builder = builder.withIcon(LatteIcons.MACRO);
+		return builder.withTypeText(macro.type.toString(), true);
+	}
+
+	private LookupElementBuilder createBuilderForTag(String name) {
+		LookupElementBuilder builder = LookupElementBuilder.create(name);
+		return builder.withIcon(LatteIcons.N_TAG);
 	}
 
 	/**
@@ -118,10 +188,10 @@ public class LatteCompletionContributor extends CompletionContributor {
 		List<LookupElement> lookupElements = new ArrayList<LookupElement>(macros.size());
 		for (LatteMacro macro : macros.values()) {
 			if (macro.type != LatteMacro.Type.UNPAIRED) {
-				lookupElements.add(LookupElementBuilder.create("n:" + macro.name).withInsertHandler(attrMacroInsertHandler));
+				lookupElements.add(createBuilderForTag("n:" + macro.name).withInsertHandler(attrMacroInsertHandler));
 				if (macro.type == LatteMacro.Type.PAIR || macro.type == LatteMacro.Type.AUTO_EMPTY) {
-					lookupElements.add(LookupElementBuilder.create("n:tag-" + macro.name).withInsertHandler(attrMacroInsertHandler));
-					lookupElements.add(LookupElementBuilder.create("n:inner-" + macro.name).withInsertHandler(attrMacroInsertHandler));
+					lookupElements.add(createBuilderForTag("n:tag-" + macro.name).withInsertHandler(attrMacroInsertHandler));
+					lookupElements.add(createBuilderForTag("n:inner-" + macro.name).withInsertHandler(attrMacroInsertHandler));
 				}
 			}
 		}

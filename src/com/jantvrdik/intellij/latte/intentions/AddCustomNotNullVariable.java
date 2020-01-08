@@ -19,6 +19,6 @@ public class AddCustomNotNullVariable extends AddCustomVariable {
 	@NotNull
 	@Override
 	public String getText() {
-		return "Add custom not null variable " + defaultVariable.name;
+		return "Add custom not null variable " + defaultVariable.getVarName();
 	}
 }

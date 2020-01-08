@@ -37,7 +37,7 @@ public class LattePhpClassReference extends PsiReferenceBase<PsiElement> impleme
             }
         }
 
-        for (BaseLattePhpElement method : LatteUtil.findClasses(getElement().getProject(), className)) {
+        for (LattePhpClass method : LatteUtil.findClasses(getElement().getProject(), className)) {
             results.add(new PsiElementResolveResult(method));
         }
 

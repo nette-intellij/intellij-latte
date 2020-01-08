@@ -1,5 +1,6 @@
 package com.jantvrdik.intellij.latte.psi;
 
+import com.intellij.extapi.psi.ASTDelegatePsiElement;
 import com.intellij.extapi.psi.PsiFileBase;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.psi.FileViewProvider;
@@ -29,5 +30,10 @@ public class LatteFile extends PsiFileBase {
 	@Override
 	public Icon getIcon(int flags) {
 		return super.getIcon(flags);
+	}
+
+	@Override
+	public void subtreeChanged() {
+		super.subtreeChanged();
 	}
 }

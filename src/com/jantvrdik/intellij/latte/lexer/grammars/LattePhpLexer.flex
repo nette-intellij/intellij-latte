@@ -88,6 +88,10 @@ CONTENT_TYPE=[a-zA-Z\-][a-zA-Z0-9\-]*\/[a-zA-Z\-][a-zA-Z0-9\-\.]*
         return T_PHP_EXPRESSION;
     }
 
+	"|" {IDENTIFIER} {
+        return T_MACRO_FILTERS;
+    }
+
     "|" {
         return T_PHP_OR_INCLUSIVE;
     }

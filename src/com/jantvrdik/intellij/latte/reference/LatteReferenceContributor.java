@@ -153,5 +153,26 @@ public class LatteReferenceContributor extends PsiReferenceContributor {
                         return new PsiReference[]{new LatteMacroTagReference(constantElement, new TextRange(1, value.length() + length))};
                     }
                 });
+
+        registrar.registerReferenceProvider(
+                PlatformPatterns.or(
+                        PlatformPatterns.psiElement(LatteTypes.MACRO_MODIFIER)
+                ),
+                new PsiReferenceProvider() {
+                    @NotNull
+                    @Override
+                    public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
+                        if (!(element instanceof LatteMacroModifier)) {
+                            return PsiReference.EMPTY_ARRAY;
+                        }
+
+                        LatteMacroModifier constantElement = (LatteMacroModifier) element;
+                        String value = constantElement.getModifierName();
+                        if (value.length() == 0) {
+                            return PsiReference.EMPTY_ARRAY;
+                        }
+                        return new PsiReference[]{new LatteMacroModifierReference(constantElement, new TextRange(0, value.length() + 1))};
+                    }
+                });
     }
 }

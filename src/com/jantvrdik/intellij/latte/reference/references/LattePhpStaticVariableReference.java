@@ -32,11 +32,7 @@ public class LattePhpStaticVariableReference extends PsiReferenceBase<PsiElement
             return new ResolveResult[0];
         }
 
-        final Collection<BaseLattePhpElement> methods = LatteUtil.findStaticVariables(getElement().getProject(), variableName, phpClass);
-        if (methods.size() == 0) {
-            return new ResolveResult[0];
-        }
-
+        final Collection<LattePhpStaticVariable> methods = LatteUtil.findStaticVariables(getElement().getProject(), variableName, phpClass);
         List<ResolveResult> results = new ArrayList<ResolveResult>();
         for (BaseLattePhpElement method : methods) {
             results.add(new PsiElementResolveResult(method));

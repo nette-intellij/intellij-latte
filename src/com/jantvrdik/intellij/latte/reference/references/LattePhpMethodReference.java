@@ -40,7 +40,7 @@ public class LattePhpMethodReference extends PsiReferenceBase<PsiElement> implem
     @NotNull
     public ResolveResult[] multiResolveMethod() {
         List<ResolveResult> results = new ArrayList<ResolveResult>();
-        final Collection<BaseLattePhpElement> methods = LatteUtil.findMethods(getElement().getProject(), methodName, phpClass);
+        final Collection<LattePhpMethod> methods = LatteUtil.findMethods(getElement().getProject(), methodName, phpClass);
         for (BaseLattePhpElement method : methods) {
             results.add(new PsiElementResolveResult(method));
         }

@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.config.LatteDefaultVariable;
+import com.jantvrdik.intellij.latte.settings.LatteVariableSettings;
 import com.jantvrdik.intellij.latte.intentions.AddCustomNotNullVariable;
 import com.jantvrdik.intellij.latte.intentions.AddCustomNullableVariable;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
@@ -69,7 +69,7 @@ public class VariablesInspection extends LocalInspectionTool {
 								.collect(Collectors.toList());
 
 						if (varDefinitions.size() > 0 && !((LattePhpVariable) element).isVarTypeDefinition()) {
-							LatteDefaultVariable defaultVariable = LatteConfiguration.INSTANCE.getVariable(element.getProject(), variableName);
+							LatteVariableSettings defaultVariable = LatteConfiguration.INSTANCE.getVariable(element.getProject(), variableName);
 							if (defaultVariable != null) {
 								ProblemDescriptor descriptor = manager.createProblemDescriptor(
 										element,
@@ -92,7 +92,7 @@ public class VariablesInspection extends LocalInspectionTool {
 						}
 
 					} else if (beforeElement.size() == 0) {
-						LatteDefaultVariable defaultVariable = LatteConfiguration.INSTANCE.getVariable(element.getProject(), variableName);
+						LatteVariableSettings defaultVariable = LatteConfiguration.INSTANCE.getVariable(element.getProject(), variableName);
 						if (defaultVariable == null && LattePsiImplUtil.detectVariableTypeFromTemplateType(element, variableName) == null) {
 							type = ProblemHighlightType.GENERIC_ERROR_OR_WARNING;
 							description = "Undefined variable '" + variableName + "'";

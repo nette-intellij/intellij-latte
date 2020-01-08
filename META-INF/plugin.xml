@@ -21,16 +21,19 @@
 			<li>added variable types</li>
 			<li>added highlighting and go to source support for latte variables</li>
 			<li>added support for define custom default variables per project</li>
-			<li>added completions for latte variables, PHP functions, methods, constants and properties</li>
+			<li>added code-completions for latte variables, PHP functions, methods, constants and properties</li>
 			<li>added varType macro</li>
 			<li>added templateType macro</li>
 			<li>added support for define type in {var Bar\FooClass $class = ...}</li>
-			<li>added support for mime types and completion it in contentType macro</li>
+			<li>added support for mime types and code-completion it in contentType macro</li>
 			<li>added reference search for usages from PHP to Latte (for classes, methods, properties and constants)</li>
 			<li>added brace matcher for highlight braces</li>
 			<li>added go to source for class names, methods, constants and properties</li>
 			<li>added support for highlighting macro name and pair macro</li>
 			<li>added support for refactoring rename (methods, properties, constants and class names)</li>
+			<li>added code-completion for latte filters</li>
+			<li>added support for adding custom latte filters</li>
+			<li>added UI for setting custom variables, filters and macros</li>
 			<li>
 				added inspections for:
 				<ul>
@@ -40,6 +43,7 @@
 					<li>Checking not existing constants, properties and methods</li>
 					<li>Checking static methods and properties used non statically and vice versa</li>
 					<li>Checking valid content for templateType, varType and var macro</li>
+					<li>Checking existing latte filters</li>
 				</ul>
 			</li>
 			<li>Increased minimum compatibility with PhpStorm version to 2017.3 from PhpStorm 8 (pre-2016.2 IDE version)</li>
@@ -134,6 +138,9 @@
 	<depends>com.jetbrains.php</depends>
 
 	<extensions defaultExtensionNs="com.intellij">
+
+		<projectService serviceImplementation="com.jantvrdik.intellij.latte.settings.LatteSettings"/>
+
 		<fileTypeFactory implementation="com.jantvrdik.intellij.latte.LatteFileTypeFactory"/>
 		<lang.commenter language="Latte" implementationClass="com.jantvrdik.intellij.latte.commenter.LatteCommenter"/>
 		<lang.parserDefinition language="Latte" implementationClass="com.jantvrdik.intellij.latte.parser.LatteParserDefinition"/>
@@ -153,13 +160,47 @@
 		<lang.findUsagesProvider language="Latte" implementationClass="com.jantvrdik.intellij.latte.reference.LatteFindUsagesProvider"/>
 		<lang.braceMatcher language="Latte" implementationClass="com.jantvrdik.intellij.latte.reference.LatteBraceMatcher"/>
 		<renamePsiElementProcessor implementation="com.jantvrdik.intellij.latte.refactoring.LatteRenamePsiElementProcessor"/>
+		<lang.documentationProvider language="Latte" implementationClass="com.jantvrdik.intellij.latte.documentation.LatteDocumentationProvider"/>
 
 		<psi.referenceContributor implementation="com.jantvrdik.intellij.latte.reference.LatteReferenceContributor"/>
+
+		<projectConfigurable instance="com.jantvrdik.intellij.latte.ui.LatteSettingsForm"
+							 displayName="Latte"
+							 parentId="reference.webide.settings.project.settings.php"
+							 id="Latte.LatteSettingsForm"
+							 nonDefaultProject="true"
+		/>
+
+		<projectConfigurable instance="com.jantvrdik.intellij.latte.ui.LatteCustomMacroSettingsForm"
+							 displayName="Macros"
+							 parentId="Latte.LatteSettingsForm"
+							 id="Latte.LatteCustomMacroSettingsForm"
+							 nonDefaultProject="true"
+		/>
+
+		<projectConfigurable instance="com.jantvrdik.intellij.latte.ui.LatteCustomModifierSettingsForm"
+							 displayName="Filters"
+							 parentId="Latte.LatteSettingsForm"
+							 id="Latte.LatteCustomModifierSettingsForm"
+							 nonDefaultProject="true"
+		/>
+
+		<projectConfigurable instance="com.jantvrdik.intellij.latte.ui.LatteVariableSettingsForm"
+							 displayName="Variables"
+							 parentId="Latte.LatteSettingsForm"
+							 id="Latte.LatteVariableSettingsForm"
+							 nonDefaultProject="true"
+		/>
 
 		<localInspection language="Latte" shortName="ModifierNotAllowed" id="ModifierNotAllowed"
 						 displayName="Modifier not allowed"
 						 groupName="Latte" enabledByDefault="true" level="WARNING"
 						 implementationClass="com.jantvrdik.intellij.latte.inspections.ModifierNotAllowedInspection"/>
+
+		<localInspection language="Latte" shortName="LatteModifierDefinition" id="LatteModifierDefinition"
+						 displayName="Modifier definition"
+						 groupName="Latte" enabledByDefault="true" level="WARNING"
+						 implementationClass="com.jantvrdik.intellij.latte.inspections.ModifierDefinitionInspection"/>
 
 		<localInspection language="Latte" shortName="DeprecatedMacro" id="DeprecatedMacro"
 						 displayName="Deprecated macro"

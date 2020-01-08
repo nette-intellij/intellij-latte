@@ -32,11 +32,7 @@ public class LattePhpPropertyReference extends PsiReferenceBase<PsiElement> impl
             return new ResolveResult[0];
         }
 
-        final Collection<BaseLattePhpElement> methods = LatteUtil.findProperties(getElement().getProject(), key, phpClass);
-        if (methods.size() == 0) {
-            return new ResolveResult[0];
-        }
-
+        final Collection<LattePhpProperty> methods = LatteUtil.findProperties(getElement().getProject(), key, phpClass);
         List<ResolveResult> results = new ArrayList<ResolveResult>();
         for (BaseLattePhpElement method : methods) {
             results.add(new PsiElementResolveResult(method));
