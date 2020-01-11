@@ -16,8 +16,7 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 	/**
 	 * Looks for a classic macro a returns true if it finds the macro a and it is pair or unpaired (based on pair parameter).
 	 */
-	public static boolean checkPairMacro(PsiBuilder builder, int level, Parser parser) {
-		boolean pair = parser == LatteParser.TRUE_parser_;
+	public static boolean checkPairMacro(PsiBuilder builder, int level, boolean pair) {
 		if (builder.getTokenType() != T_MACRO_OPEN_TAG_OPEN) return false;
 
 		PsiBuilder.Marker marker = builder.mark();
@@ -32,8 +31,13 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 			// hard coded rule for macro _ because of dg's poor design decision
 			// macro _ is pair only if it has empty arguments, otherwise it is unpaired
 			// see https://github.com/nette/nette/blob/v2.1.2/Nette/Latte/Macros/CoreMacros.php#L193
+			boolean emptyArgs = true;
 			builder.advanceLexer();
-			result = ((builder.getTokenType() == T_MACRO_TAG_CLOSE) == pair);
+			while (emptyArgs && nextTokenIsFast(builder, T_MACRO_ARGS, T_MACRO_ARGS_NUMBER, T_MACRO_ARGS_STRING, T_MACRO_ARGS_VAR)) {
+				emptyArgs = (builder.getTokenText().trim().length() == 0);
+				builder.advanceLexer();
+			}
+			result = (emptyArgs == pair);
 
 		// all other macros which respect rules
 		} else {

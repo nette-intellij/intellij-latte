@@ -155,28 +155,5 @@ public class LatteTopLexerAdapterTest {
 			Pair.create(T_TEXT, "A"),
 			Pair.create(T_MACRO_COMMENT, "{* ' *}"),
 		});
-
-		//incomplete
-
-		lexer.start("{foo");
-		assertTokens(lexer, new Pair[] {
-			Pair.create(T_MACRO_CLASSIC, "{foo"),
-		});
-
-		lexer.start("{foo'}");
-		assertTokens(lexer, new Pair[] {
-			Pair.create(T_MACRO_CLASSIC, "{foo'}"),
-		});
-
-		lexer.start("{foo");
-		assertTokens(lexer, new Pair[] {
-			Pair.create(T_MACRO_CLASSIC, "{foo"),
-		});
-
-		lexer.start("{foo 'aa'}a");
-		assertTokens(lexer, new Pair[] {
-			Pair.create(T_MACRO_CLASSIC, "{foo 'aa'}"),
-			Pair.create(T_TEXT, "a"),
-		});
 	}
 }

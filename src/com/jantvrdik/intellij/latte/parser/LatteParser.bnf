@@ -60,31 +60,17 @@ emptyMacroTag    ::= T_MACRO_OPEN_TAG_OPEN classicMacroContent T_MACRO_TAG_CLOSE
 private
 classicMacroContent     ::= macroName macroContent?
 
-macroContent ::= macroArgs?
+macroContent ::= macroArgs? (T_MACRO_MODIFIERS macroArgs)*
 
 private
 macroName        ::= T_MACRO_NAME
                    | T_MACRO_NOESCAPE? T_MACRO_SHORTNAME?
 
 private
-macroArgs        ::= (T_MACRO_ARGS_STRING | T_MACRO_ARGS_NUMBER | T_MACRO_ARGS_SYMBOL
-                      | T_MACRO_ARGS_OBJECT_OPERATOR | T_MACRO_ARGS_PAAMAYIM_NEKUDOTAYIM
-                      | T_MACRO_ARGS_LEFT_BRACKET | T_MACRO_ARGS_RIGHT_BRACKET
-                      | T_MACRO_ARGS_LEFT_CURLY_BRACKET | T_MACRO_ARGS_RIGHT_CURLY_BRACKET
-                      | T_MACRO_ARGS_LEFT_SQUARE_BRACKET | T_MACRO_ARGS_RIGHT_SQUARE_BRACKET
-                      | T_MACRO_ARGS_VAR | T_MACRO_ARGS_COMMA | T_MACRO_ARGS_IDENTIFIER
-                      | T_MACRO_ARGS_QUESTION_MARK | T_MACRO_ARGS_COLON | T_MACRO_ARGS_COALESCE
-                      | T_MACRO_ARGS_BINARY_OPERATOR | T_MACRO_ARGS_DOUBLE_ARROW
-                      | T_MACRO_ARGS_INC | T_MACRO_ARGS_DEC | T_MACRO_ARGS_SHUTUP
-                      | T_MACRO_ARGS_NOT | T_MACRO_ARGS_INSTANCEOF | T_MACRO_ARGS_NEW | T_MACRO_ARGS_ARRAY
-                      | T_MACRO_ARGS_OTHER | T_MACRO_ARGS_DOLLAR | T_MACRO_ARGS_NEG | T_MACRO_ARGS_ELLIPSIS
-                      | T_MACRO_ARGS_CLONE | T_MACRO_ARGS_ISSET | T_MACRO_ARGS_UNSET | T_MACRO_ARGS_LIST
-                      | T_MACRO_ARGS_DOUBLE_QUOTE_LEFT | T_MACRO_ARGS_DOUBLE_QUOTE_RIGHT
-                      | T_MACRO_ARGS_SINGLE_QUOTE_LEFT | T_MACRO_ARGS_SINGLE_QUOTE_RIGHT | T_MACRO_ARGS_EMPTY
-                      | T_MACRO_ARGS_MODIFIER)+
+macroArgs        ::= (T_MACRO_ARGS | T_MACRO_ARGS_VAR | T_MACRO_ARGS_STRING | T_MACRO_ARGS_NUMBER)+
 
 // autoClosedBlock
-autoClosedBlock  ::= &("{block" macroArgs? "}") macroOpenTag structureToken*
+autoClosedBlock  ::= &("{block" macroArgs? T_MACRO_MODIFIERS? "}") macroOpenTag structureToken*
 
 
 

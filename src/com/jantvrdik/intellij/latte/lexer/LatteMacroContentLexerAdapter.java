@@ -10,7 +10,7 @@ public class LatteMacroContentLexerAdapter extends MergingLexerAdapter {
 	public LatteMacroContentLexerAdapter() {
 		super(
 				new FlexAdapter(new LatteMacroContentLexer(null)),
-				TokenSet.create(LatteTypes.T_MACRO_ARGS_STRING, LatteTypes.T_MACRO_ARGS_OTHER)
+				TokenSet.create(LatteTypes.T_MACRO_ARGS)
 		);
 	}
 }

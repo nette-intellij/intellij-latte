@@ -32,7 +32,7 @@ import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
 
 WHITE_SPACE=[ \t\r\n]+
 MACRO_COMMENT = "{*" ~"*}"
-MACRO_CLASSIC = "{" [^ \t\r\n'\"{}] ({MACRO_STRING} | "{" {MACRO_STRING}* "}")*  ("'" ("\\" [^] | [^'\\])* | "\"" ("\\" [^] | [^\"\\])*)? "}"?
+MACRO_CLASSIC = "{" [^ \t\r\n'\"{}] ({MACRO_STRING} | "{" {MACRO_STRING}* "}")* "}"
 MACRO_STRING = {MACRO_STRING_SQ} | {MACRO_STRING_DQ} | {MACRO_STRING_UQ}
 MACRO_STRING_SQ = "'" ("\\" [^] | [^'\\])* "'"
 MACRO_STRING_DQ = "\"" ("\\" [^] | [^\"\\])* "\""
