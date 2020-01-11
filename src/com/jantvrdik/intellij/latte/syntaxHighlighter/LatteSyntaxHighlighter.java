@@ -22,7 +22,7 @@ public class LatteSyntaxHighlighter extends SyntaxHighlighterBase {
 	public static final TextAttributesKey MACRO_MODIFIERS = createTextAttributesKey("LATTE_MACRO_MODIFIERS", DefaultLanguageHighlighterColors.DOC_COMMENT);
 	public static final TextAttributesKey MACRO_COMMENT = createTextAttributesKey("LATTE_MACRO_COMMENT", DefaultLanguageHighlighterColors.BLOCK_COMMENT);
 	public static final TextAttributesKey PHP_KEYWORD = createTextAttributesKey("LATTE_PHP_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD);
-	public static final TextAttributesKey PHP_CLASS_NAME = createTextAttributesKey("LATTE_PHP_CLASS_NAME", DefaultLanguageHighlighterColors.CLASS_NAME);
+	public static final TextAttributesKey PHP_CLASS_NAME = createTextAttributesKey("LATTE_PHP_CLASS_NAME", DefaultLanguageHighlighterColors.CLASS_REFERENCE);
 	public static final TextAttributesKey PHP_METHOD = createTextAttributesKey("LATTE_PHP_METHOD", DefaultLanguageHighlighterColors.INSTANCE_METHOD);
 	public static final TextAttributesKey PHP_IDENTIFIER = createTextAttributesKey("LATTE_PHP_IDENTIFIER", DefaultLanguageHighlighterColors.INSTANCE_FIELD);
 	public static final TextAttributesKey PHP_CONTENT_TYPE = createTextAttributesKey("LATTE_PHP_CONTENT_TYPE", DefaultLanguageHighlighterColors.PREDEFINED_SYMBOL);
@@ -89,7 +89,7 @@ public class LatteSyntaxHighlighter extends SyntaxHighlighterBase {
 			return pack(MACRO_COMMENT);
 
 		} else {
-			return EMPTY;
+			return EMPTY; // todo: after plugin will be for minimum 192.4147 replace with TextAttributesKey.EMPTY_ARRAY
 		}
 	}
 }

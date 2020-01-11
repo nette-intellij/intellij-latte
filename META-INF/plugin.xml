@@ -144,9 +144,11 @@
 
 	<extensions defaultExtensionNs="com.intellij">
 
+		<fileType name="Latte" implementationClass="com.jantvrdik.intellij.latte.LatteFileType" fieldName="INSTANCE"
+				  language="Latte" extensions="latte" />
+
 		<projectService serviceImplementation="com.jantvrdik.intellij.latte.settings.LatteSettings"/>
 
-		<fileTypeFactory implementation="com.jantvrdik.intellij.latte.LatteFileTypeFactory"/>
 		<lang.commenter language="Latte" implementationClass="com.jantvrdik.intellij.latte.commenter.LatteCommenter"/>
 		<lang.parserDefinition language="Latte" implementationClass="com.jantvrdik.intellij.latte.parser.LatteParserDefinition"/>
 		<lang.syntaxHighlighterFactory language="Latte" implementationClass="com.jantvrdik.intellij.latte.syntaxHighlighter.LatteSyntaxHighlighterFactory"/>
