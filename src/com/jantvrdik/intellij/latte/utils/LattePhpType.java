@@ -2,42 +2,59 @@ package com.jantvrdik.intellij.latte.utils;
 
 import com.intellij.openapi.project.Project;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class LattePhpType {
 
-    private final String[] types;
+    private final List<TypePart> types = new ArrayList<TypePart>();
     private final String name;
     private final boolean nullable;
+    private boolean hasClass = false;
 
-    public LattePhpType(String type, boolean nullable) {
-        this(null, new String[]{type}, nullable);
+    public LattePhpType(String type) {
+        this(null, type, false);
     }
 
-    public LattePhpType(String[] types, boolean nullable) {
-        this(null, types, nullable);
+    public LattePhpType(String type, boolean nullable) {
+        this(null, type, nullable);
     }
 
     public LattePhpType(String name, String type) {
-        this(name, new String[]{type}, false);
+        this(name, type, false);
     }
 
-    public LattePhpType(String name, String type, boolean nullable) {
-        this(name, new String[]{type}, nullable);
-    }
+    public LattePhpType(String name, String typeString, boolean nullable) {
+        if (typeString == null || typeString.length() == 0) {
+            types.add(new TypePart("mixed"));
 
-    public LattePhpType(String name, String[] types, boolean nullable) {
-        this.name = name == null ? null : LattePhpUtil.normalizePhpVariable(name);
-        List<String> normalizedTypes = new ArrayList<String>();
-        for (String type : types) {
-            normalizedTypes.add(LattePhpUtil.normalizeClassName(type));
+        } else {
+            String[] parts = typeString.split("\\|");
+            for (String part : parts) {
+                part = part.trim();
+                if (part.length() == 0) {
+                    continue;
+                }
+
+                String lower = part.toLowerCase();
+                if (lower.equals("null")) {
+                    nullable = true;
+                    continue;
+                }
+
+                TypePart typePart = new TypePart(part);
+                if (typePart.isClass) {
+                    this.hasClass = true;
+                }
+                types.add(typePart);
+            }
         }
-        this.types = normalizedTypes.toArray(new String[0]);
+        this.name = name == null ? null : LattePhpUtil.normalizePhpVariable(name);
         this.nullable = nullable;
     }
 
@@ -45,75 +62,104 @@ public class LattePhpType {
         return name;
     }
 
-    private static String getWholeType(String type) {
-        return LattePhpType.isArrayOf(type) ? "array" : type;
+    public boolean containsClasses() {
+        return hasClass;
     }
 
-    public boolean hasClass(String className) {
-        for (String type : types) {
-            String wholeType = LattePhpType.getWholeType(type);
-            if (LattePhpUtil.normalizeClassName(wholeType).equals(LattePhpUtil.normalizeClassName(className))) {
+    public boolean hasUndefinedClass(@NotNull Project project) {
+        if (!containsClasses()) {
+            return false;
+        }
+
+        for (String className : findClasses()) {
+            if (LattePhpUtil.getClassesByFQN(project, className).size() == 0) {
                 return true;
             }
         }
         return false;
     }
 
+    public boolean hasClass(String className) {
+        if (!containsClasses()) {
+            return false;
+        }
+        String normalizedName = LattePhpUtil.normalizeClassName(className);
+        return types.stream().anyMatch(typePart -> typePart.isClass && typePart.getPart().equals(normalizedName));
+    }
+
     public boolean isNullable() {
         return nullable;
     }
 
-    private static boolean isClassOrInterfaceType(String type) {
-        return type != null && (type.contains("\\") || !LatteTypesUtil.isNativeTypeHint(type));
-    }
-
-    private static boolean isArrayOf(String type) {
-        return type != null && type.endsWith("[]");
-    }
-
     public Collection<PhpClass> getPhpClasses(Project project) {
         List<PhpClass> output = new ArrayList<>();
-        for (String type : types) {
-            String wholeType = LattePhpType.getWholeType(type);
-            if (!LattePhpType.isClassOrInterfaceType(wholeType)) {
-                continue;
-            }
+        for (String wholeType : findClasses()) {
             output.addAll(LattePhpUtil.getClassesByFQN(project, wholeType));
         }
         return output;
     }
 
-    @Nullable
-    public PhpClass getFirstPhpClass(Project project) {
-        Collection<PhpClass> phpClasses = getPhpClasses(project);
-        if (phpClasses == null) {
-            return null;
+    String[] findClasses() {
+        if (!containsClasses()) {
+            return new String[0];
         }
-        return phpClasses.stream().findFirst().isPresent() ? phpClasses.stream().findFirst().get() : null;
+        return types.stream()
+                .filter(typePart -> typePart.isClass)
+                .map(TypePart::getPart)
+                .toArray(String[]::new);
     }
 
-    public static LattePhpType fromString(String s) {
-        String wholeString = s.substring(13, s.length() - 1);
-        String[] splited = wholeString.split(",");
-
-        String name = splited[0].equals("null") ? null : splited[0];
-        return new LattePhpType(name, splited[1].split(Pattern.quote("|")), splited[2].equals("@Nullable"));
+    @Nullable
+    public PhpClass getFirstPhpClass(Project project) {
+        for (String wholeType : findClasses()) {
+            List<PhpClass> classes = new ArrayList<>(LattePhpUtil.getClassesByFQN(project, wholeType));
+            if (classes.size() > 0) {
+                return classes.get(0);
+            }
+        }
+        return null;
     }
 
     @Override
     public String toString() {
-        return "LattePhpType(" + name + "," + String.join("|", types) + "," + (nullable ? "@Nullable" : "@NotNull") + ")";
+        return toReadableString();
     }
 
     public String toReadableString() {
-        String out = String.join("|", types);
+        String out =  types.stream()
+                .map(TypePart::getPart)
+                .collect(Collectors.joining("|"));
         if (nullable) {
             out += "|null";
         }
         return out;
     }
 
-    public static String toStringList(LattePhpType lattePhpType) {
-        return lattePhpType.toString();
+    static class TypePart {
+        String part;
+        boolean isClass = false;
+        boolean isNative = false;
+        boolean isArrayOf = false;
+
+        TypePart (@NotNull String part) {
+            if (part.endsWith("[]")) {
+                part = "array";
+                this.isArrayOf = true; //todo: add support for types in array
+
+            } else if (LatteTypesUtil.isNativeTypeHint(part)) {
+                part = part.toLowerCase();
+                this.isNative = true;
+
+            } else {
+                part = LattePhpUtil.normalizeClassName(part);
+                this.isClass = true;
+            }
+            this.part = part;
+        }
+
+        String getPart() {
+            return part;
+        }
     }
+
 }

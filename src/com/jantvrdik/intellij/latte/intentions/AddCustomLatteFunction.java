@@ -7,23 +7,27 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.IncorrectOperationException;
 import com.jantvrdik.intellij.latte.LatteLanguage;
-import com.jantvrdik.intellij.latte.settings.LatteVariableSettings;
+import com.jantvrdik.intellij.latte.settings.LatteCustomFunctionSettings;
 import com.jantvrdik.intellij.latte.settings.LatteSettings;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Base class for intentions which will register a custom variable.
  */
-abstract public class AddCustomVariable extends BaseIntentionAction {
+public class AddCustomLatteFunction extends BaseIntentionAction {
 
 	/** custom macro which will be registered on invocation */
-	protected final LatteVariableSettings defaultVariable;
+	protected final LatteCustomFunctionSettings defaultFunction;
 
-	public AddCustomVariable(String variableName) {
-		this.defaultVariable = new LatteVariableSettings(variableName, "mixed");
+	@NotNull
+	@Override
+	public String getText() {
+		return "Add custom latte function " + defaultFunction.getFunctionName() + "()";
 	}
 
-	protected abstract boolean isNullable();
+	public AddCustomLatteFunction(String functionName) {
+		this.defaultFunction = new LatteCustomFunctionSettings(functionName);
+	}
 
 	@NotNull
 	@Override
@@ -38,7 +42,7 @@ abstract public class AddCustomVariable extends BaseIntentionAction {
 
 	@Override
 	public void invoke(@NotNull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
-		LatteSettings.getInstance(project).variableSettings.add(defaultVariable);
+		LatteSettings.getInstance(project).customFunctionSettings.add(defaultFunction);
 		DaemonCodeAnalyzer.getInstance(project).restart(); // force re-analyzing
 	}
 }

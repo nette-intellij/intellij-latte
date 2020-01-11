@@ -18,7 +18,8 @@ public class LatteLexerTest {
 			Pair.create(T_TEXT, "<e>"),
 			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
 			Pair.create(T_MACRO_NAME, "if"),
-			Pair.create(T_MACRO_ARGS, " XYZ"),
+			Pair.create(T_WHITESPACE, " "),
+			Pair.create(T_PHP_IDENTIFIER, "XYZ"),
 			Pair.create(T_MACRO_TAG_CLOSE, "}"),
 			Pair.create(T_TEXT, "B"),
 			Pair.create(T_MACRO_CLOSE_TAG_OPEN, "{/"),
@@ -26,16 +27,18 @@ public class LatteLexerTest {
 			Pair.create(T_MACRO_TAG_CLOSE, "}"),
 		});
 
-		lexer.start("{if XYZ}B{/if}");
+		lexer.start("{if XYZ}B{/if}<e>");
 		assertTokens(lexer, new Pair[] {
 			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
 			Pair.create(T_MACRO_NAME, "if"),
-			Pair.create(T_MACRO_ARGS, " XYZ"),
+			Pair.create(T_WHITESPACE, " "),
+			Pair.create(T_PHP_IDENTIFIER, "XYZ"),
 			Pair.create(T_MACRO_TAG_CLOSE, "}"),
 			Pair.create(T_TEXT, "B"),
 			Pair.create(T_MACRO_CLOSE_TAG_OPEN, "{/"),
 			Pair.create(T_MACRO_NAME, "if"),
 			Pair.create(T_MACRO_TAG_CLOSE, "}"),
+			Pair.create(T_TEXT, "<e>"),
 		});
 	}
 }

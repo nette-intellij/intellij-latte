@@ -13,6 +13,10 @@ public class LatteTypesUtil {
 
     final private static String[] nativeTypeHints = new String[]{"string", "int", "bool", "object", "float", "array", "mixed", "null", "callable", "iterable"};
 
+    final private static String[] excludedCompletion = new String[]{"__construct", "__callstatic", "__call", "__get", "__isset", "__clone", "__set", "__unset"};
+
+    final private static String[] macroWithoutSpaceAfterName = new String[]{"l", "r", "spaceless", "sep", "else", "first", "last"};
+
     final private static TokenSet whitespaceTokens = TokenSet.create(LatteTypes.T_WHITESPACE, TokenType.WHITE_SPACE);
 
     final private static TokenSet typeHintTokens = TokenSet.create(LatteTypes.T_PHP_TYPE, LatteTypes.PHP_CLASS, LatteTypes.T_PHP_NULL, LatteTypes.T_PHP_MIXED);
@@ -32,7 +36,16 @@ public class LatteTypesUtil {
     }
 
     public static boolean isNativeTypeHint(@NotNull String value) {
-        return Arrays.asList(nativeTypeHints).contains(value);
+        value = value.toLowerCase();
+        return Arrays.asList(nativeTypeHints).contains(value.startsWith("\\") ? value.substring(1) : value);
+    }
+
+    public static boolean isExcludedCompletion(@NotNull String value) {
+        return Arrays.asList(excludedCompletion).contains(value.toLowerCase());
+    }
+
+    public static boolean isMacroWithSpaceAfterName(@NotNull String macroName) {
+        return !Arrays.asList(macroWithoutSpaceAfterName).contains(macroName.toLowerCase());
     }
 
     public static TokenSet getTypeHintTokens() {

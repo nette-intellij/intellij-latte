@@ -1,30 +1,30 @@
 package com.jantvrdik.intellij.latte.completion.providers;
 
 import com.intellij.codeInsight.completion.CompletionParameters;
-import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.completion.PrefixMatcher;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
+import com.jantvrdik.intellij.latte.completion.handlers.MacroCustomFunctionInsertHandler;
+import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.psi.LattePhpContent;
+import com.jantvrdik.intellij.latte.settings.LatteCustomFunctionSettings;
 import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
+import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.completion.PhpLookupElement;
 import com.jetbrains.php.completion.insert.PhpFunctionInsertHandler;
 import com.jetbrains.php.lang.psi.elements.Function;
-import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Complete class names
  */
-public class LattePhpFunctionCompletionProvider extends CompletionProvider<CompletionParameters> {
+public class LattePhpFunctionCompletionProvider extends BaseLatteCompletionProvider {
 
 	public LattePhpFunctionCompletionProvider() {
 		super();
@@ -54,24 +54,26 @@ public class LattePhpFunctionCompletionProvider extends CompletionProvider<Compl
 
 		// Add variants
 		for (Function item : variants) {
-			PhpLookupElement lookupItem = LattePhpFunctionCompletionProvider.getPhpLookupElement(item, null);
+			PhpLookupElement lookupItem = getPhpLookupElement(item, null);
 			lookupItem.handler = PhpFunctionInsertHandler.getInstance();
 			results.addElement(lookupItem);
 		}
+
+		List<LatteCustomFunctionSettings> customFunctions = LatteConfiguration.INSTANCE.getFunctions(project);
+		for (LatteCustomFunctionSettings item : customFunctions) {
+			LookupElementBuilder builder = createBuilderWithHelp(item);
+			results.addElement(builder);
+		}
 	}
 
-	static PhpLookupElement getPhpLookupElement(@NotNull PhpNamedElement phpNamedElement, @Nullable String searchedWord) {
-		PhpLookupElement lookupItem = new PhpLookupElement(phpNamedElement) {
-			@Override
-			public Set<String> getAllLookupStrings() {
-				Set<String> original = super.getAllLookupStrings();
-				Set<String> strings = new HashSet<String>(original.size() + 1);
-				strings.addAll(original);
-				strings.add(searchedWord == null ? this.getNamedElement().getFQN() : searchedWord);
-				return strings;
-			}
-		};
-		return lookupItem;
+	private LookupElementBuilder createBuilderWithHelp(LatteCustomFunctionSettings settings) {
+		LookupElementBuilder builder = LookupElementBuilder.create(settings.getFunctionName());
+		builder = builder.withIcon(PhpIcons.FUNCTION_ICON);
+		builder = builder.withInsertHandler(MacroCustomFunctionInsertHandler.getInstance());
+		if (settings.getFunctionHelp().trim().length() > 0) {
+			builder = builder.withTailText(settings.getFunctionHelp());
+		}
+		return builder.withTypeText(settings.getFunctionReturnType());
 	}
 
 }

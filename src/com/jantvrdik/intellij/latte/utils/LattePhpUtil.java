@@ -138,7 +138,7 @@ public class LattePhpUtil {
     }
 
     public static Collection<PhpClass> getClassesByFQN(Project project, String className) {
-        return getPhpIndex(project).getAnyByFQN(normalizeClassName(className));
+        return getPhpIndex(project).getAnyByFQN(className);
     }
 
     public static Collection<Function> getFunctionByName(Project project, String functionName) {

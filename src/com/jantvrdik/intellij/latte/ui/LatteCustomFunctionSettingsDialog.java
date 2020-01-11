@@ -2,7 +2,7 @@ package com.jantvrdik.intellij.latte.ui;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.table.TableView;
-import com.jantvrdik.intellij.latte.settings.LatteVariableSettings;
+import com.jantvrdik.intellij.latte.settings.LatteCustomFunctionSettings;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -14,16 +14,18 @@ import java.awt.event.WindowEvent;
 /**
  * @author Daniel Espendiller <daniel@espendiller.net>
  */
-public class LatteVariableSettingsDialog extends JDialog {
+public class LatteCustomFunctionSettingsDialog extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
-    private JTextField textVarName;
-    private JTextField textVarType;
-    private LatteVariableSettings latteVariableSettings;
-    private TableView<LatteVariableSettings> tableView;
+    private JTextField textName;
+    private JTextField textHelp;
+    private JTextField textReturnType;
+    private JTextArea textDescription;
+    private LatteCustomFunctionSettings latteCustomFunctionSettings;
+    private TableView<LatteCustomFunctionSettings> tableView;
 
-    public LatteVariableSettingsDialog(Project project, TableView<LatteVariableSettings> tableView) {
+    public LatteCustomFunctionSettingsDialog(Project project, TableView<LatteCustomFunctionSettings> tableView) {
         this.tableView = tableView;
 
         setContentPane(contentPane);
@@ -34,8 +36,10 @@ public class LatteVariableSettingsDialog extends JDialog {
 
         buttonCancel.addActionListener(e -> onCancel());
 
-        this.textVarName.getDocument().addDocumentListener(new ChangeDocumentListener());
-        this.textVarType.getDocument().addDocumentListener(new ChangeDocumentListener());
+        this.textName.getDocument().addDocumentListener(new ChangeDocumentListener());
+        this.textReturnType.getDocument().addDocumentListener(new ChangeDocumentListener());
+        this.textHelp.getDocument().addDocumentListener(new ChangeDocumentListener());
+        this.textDescription.getDocument().addDocumentListener(new ChangeDocumentListener());
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
@@ -47,21 +51,25 @@ public class LatteVariableSettingsDialog extends JDialog {
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    public LatteVariableSettingsDialog(Project project, TableView<LatteVariableSettings> tableView, LatteVariableSettings latteVariableSettings) {
+    public LatteCustomFunctionSettingsDialog(Project project, TableView<LatteCustomFunctionSettings> tableView, LatteCustomFunctionSettings latteCustomFunctionSettings) {
         this(project, tableView);
 
-        this.textVarName.setText(latteVariableSettings.getVarName());
-        this.textVarType.setText(latteVariableSettings.getVarType());
-        this.latteVariableSettings = latteVariableSettings;
-
+        this.textName.setText(latteCustomFunctionSettings.getFunctionName());
+        this.textReturnType.setText(latteCustomFunctionSettings.getFunctionReturnType());
+        this.textHelp.setText(latteCustomFunctionSettings.getFunctionHelp());
+        this.textDescription.setText(latteCustomFunctionSettings.getFunctionDescription());
+        this.latteCustomFunctionSettings = latteCustomFunctionSettings;
     }
 
     private void onOK() {
-        LatteVariableSettings settings = new LatteVariableSettings(this.textVarName.getText(), this.textVarType.getText());
+        LatteCustomFunctionSettings settings = new LatteCustomFunctionSettings(
+                this.textName.getText(),
+                this.textReturnType.getText(),
+                this.textHelp.getText(),
+                this.textDescription.getText()
+        );
 
-        // re-add old item to not use public setter wor twigpaths
-        // update ?
-        if(this.latteVariableSettings != null) {
+        if (this.latteCustomFunctionSettings != null) {
             int row = this.tableView.getSelectedRows()[0];
             this.tableView.getListTableModel().removeRow(row);
             this.tableView.getListTableModel().insertRow(row, settings);
@@ -77,8 +85,7 @@ public class LatteVariableSettingsDialog extends JDialog {
 
     private void setOkState() {
         this.buttonOK.setEnabled(
-            this.textVarName.getText().length() > 0 &&
-            this.textVarType.getText().length() > 0
+            this.textName.getText().length() > 0 && this.textReturnType.getText().length() > 0
         );
     }
 

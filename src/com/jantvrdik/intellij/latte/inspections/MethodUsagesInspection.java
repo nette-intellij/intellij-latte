@@ -1,13 +1,18 @@
 package com.jantvrdik.intellij.latte.inspections;
 
+import com.intellij.codeInsight.intention.IntentionManager;
 import com.intellij.codeInspection.InspectionManager;
+import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
+import com.jantvrdik.intellij.latte.config.LatteConfiguration;
+import com.jantvrdik.intellij.latte.intentions.AddCustomLatteFunction;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LattePhpMethod;
+import com.jantvrdik.intellij.latte.settings.LatteCustomFunctionSettings;
 import com.jantvrdik.intellij.latte.utils.LattePhpType;
 import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
 import com.jetbrains.php.lang.psi.elements.Function;
@@ -62,10 +67,19 @@ public class MethodUsagesInspection extends BaseLocalInspectionTool {
 			@NotNull final InspectionManager manager,
 			final boolean isOnTheFly
 	) {
-		String functionName = element.getMethodName();
-		Collection<Function> existing = LattePhpUtil.getFunctionByName(element.getProject(), functionName);
+		String name = element.getMethodName();
+		LatteCustomFunctionSettings customFunction = LatteConfiguration.INSTANCE.getFunction(element.getProject(), name);
+		if (customFunction != null) {
+			return;
+		}
+
+		Collection<Function> existing = LattePhpUtil.getFunctionByName(element.getProject(), name);
 		if (existing.size() == 0) {
-			addProblem(manager, problems, element, "Function '" + functionName + "' not found", ProblemHighlightType.GENERIC_ERROR_OR_WARNING, isOnTheFly);
+			LocalQuickFix addFunctionFix = IntentionManager.getInstance().convertToFix(new AddCustomLatteFunction(name));
+			ProblemHighlightType type = ProblemHighlightType.GENERIC_ERROR_OR_WARNING;
+			String description = "Function '" + name + "' not found";
+			ProblemDescriptor problem = manager.createProblemDescriptor(element, description, true, type, isOnTheFly, addFunctionFix);
+			problems.add(problem);
 		}
 	}
 

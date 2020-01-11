@@ -7,15 +7,13 @@ public class LatteVariableSettings {
 
 	private String varName;
 	private String varType;
-	private boolean nullable;
 
 	public LatteVariableSettings() {
 	}
 
-	public LatteVariableSettings(String varName, String varType, boolean nullable) {
+	public LatteVariableSettings(String varName, String varType) {
 		this.varName = varName;
 		this.varType = varType;
-		this.nullable = nullable;
 	}
 
 	public void setVarName(String varName) {
@@ -26,13 +24,8 @@ public class LatteVariableSettings {
 		this.varType = varType;
 	}
 
-	public LatteVariableSettings setNullable(boolean nullable) {
-		this.nullable = nullable;
-		return this;
-	}
-
 	public LattePhpType toPhpType() {
-		return new LattePhpType(varName, varType, nullable);
+		return new LattePhpType(varName, varType);
 	}
 
 	@Attribute("VarName")
@@ -43,11 +36,6 @@ public class LatteVariableSettings {
 	@Attribute("VarType")
 	public String getVarType() {
 		return varType;
-	}
-
-	@Attribute("IsNullable")
-	public boolean isNullable() {
-		return nullable;
 	}
 
 }

@@ -3,19 +3,28 @@ package com.jantvrdik.intellij.latte.settings;
 public class DefaultSettings {
 
 	public static LatteVariableSettings[] defaultVariables = new LatteVariableSettings[]{
-			new LatteVariableSettings("control", "\\Nette\\Application\\UI\\Control", false),
-			new LatteVariableSettings("basePath", "string", false),
-			new LatteVariableSettings("baseUrl", "string", false),
-			new LatteVariableSettings("baseUri", "string", false),
-			new LatteVariableSettings("flashes", "mixed[]", false),
-			new LatteVariableSettings("presenter", "\\Nette\\Application\\UI\\Presenter", false),
-			new LatteVariableSettings("iterator", "\\Latte\\Runtime\\CachingIterator", false),
-			new LatteVariableSettings("form", "\\Nette\\Application\\UI\\Form", false),
-			new LatteVariableSettings("user", "\\Nette\\Security\\User", false),
+			new LatteVariableSettings("control", "\\Nette\\Application\\UI\\Control"),
+			new LatteVariableSettings("basePath", "string"),
+			new LatteVariableSettings("baseUrl", "string"),
+			new LatteVariableSettings("baseUri", "string"),
+			new LatteVariableSettings("flashes", "mixed[]"),
+			new LatteVariableSettings("presenter", "\\Nette\\Application\\UI\\Presenter"),
+			new LatteVariableSettings("iterator", "\\Latte\\Runtime\\CachingIterator"),
+			new LatteVariableSettings("form", "\\Nette\\Application\\UI\\Form"),
+			new LatteVariableSettings("user", "\\Nette\\Security\\User"),
+	};
+
+	public static LatteCustomFunctionSettings[] defaultCustomFunctions = new LatteCustomFunctionSettings[]{
+			new LatteCustomFunctionSettings("isLinkCurrent", "bool", "(string $destination = null, $args = [])"),
+			new LatteCustomFunctionSettings("isModuleCurrent", "bool", "(string $moduleName)"),
 	};
 
 	public static LatteVariableSettings[] getDefaultVariables() {
 		return defaultVariables;
+	}
+
+	public static LatteCustomFunctionSettings[] getDefaultCustomFunctions() {
+		return defaultCustomFunctions;
 	}
 }
 

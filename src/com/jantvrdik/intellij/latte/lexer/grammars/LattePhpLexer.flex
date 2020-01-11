@@ -14,11 +14,17 @@ import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
 
 %state SINGLE_QUOTED
 %state DOUBLE_QUOTED
+%state MACRO_FILTERS
 
 WHITE_SPACE=[ \t\r\n]+
 IDENTIFIER=[a-zA-Z_][a-zA-Z0-9_]*
 CLASS_NAME=\\?[a-zA-Z_][a-zA-Z0-9_]*\\[a-zA-Z_][a-zA-Z0-9_\\]* | \\[a-zA-Z_][a-zA-Z0-9_]*
 CONTENT_TYPE=[a-zA-Z\-][a-zA-Z0-9\-]*\/[a-zA-Z\-][a-zA-Z0-9\-\.]*
+TYPES=("string" | "int" | "bool" | "object" | "float" | "array" | "callable" | "iterable" | "void")
+KEYWORD=(class | "false" | "true" | "break" | "continue" | "case" | "default" | "die" | "exit" | "do" | "while" | "foreach" | "for" | "function" | "echo" | "print" | "catch" | "finally" | "try" | "instanceof" | "if" | "else" | "elseif" | "endif" | "endforeach" | "endfor" | "endwhile" | "endswitch" | "isset" | "or" | "new" | "switch" | "use")
+NULL="null"
+MIXED="mixed"
+AS="as"
 
 %%
 
@@ -88,32 +94,37 @@ CONTENT_TYPE=[a-zA-Z\-][a-zA-Z0-9\-]*\/[a-zA-Z\-][a-zA-Z0-9\-\.]*
         return T_PHP_EXPRESSION;
     }
 
-	"|" {IDENTIFIER} {
-        return T_MACRO_FILTERS;
+    "=" {
+        return T_PHP_DEFINITION_OPERATOR;
+    }
+
+    {AS} {
+        return T_PHP_AS;
+    }
+
+    {KEYWORD} {
+        return T_PHP_KEYWORD;
+    }
+
+    {NULL} {
+        return T_PHP_NULL;
+    }
+
+    {MIXED} {
+        return T_PHP_MIXED;
+    }
+
+    {TYPES} {
+        return T_PHP_TYPE;
+    }
+
+    "|" / ({IDENTIFIER} | {CLASS_NAME}) {
+        yybegin(MACRO_FILTERS);
+        return T_PHP_OR_INCLUSIVE;
     }
 
     "|" {
         return T_PHP_OR_INCLUSIVE;
-    }
-
-    "as" {
-        return T_PHP_AS;
-    }
-
-    ("class" | "false" | "true" | "break" | "continue" | "case" | "default" | "die" | "exit" | "do" | "while" | "foreach" | "for" | "function" | "echo" | "print" | "catch" | "finally" | "try" | "instanceof" | "if" | "else" | "elseif" | "endif" | "endforeach" | "endfor" | "endwhile" | "endswitch" | "isset" | "or" | "new" | "switch" | "use") {
-        return T_PHP_KEYWORD;
-    }
-
-    "null" {
-        return T_PHP_NULL;
-    }
-
-    "mixed" {
-        return T_PHP_MIXED;
-    }
-
-    ("string" | "int" | "bool" | "object" | "float" | "array" | "callable" | "iterable" | "void") {
-        return T_PHP_TYPE;
     }
 
     {IDENTIFIER} / ("(") {
@@ -146,6 +157,48 @@ CONTENT_TYPE=[a-zA-Z\-][a-zA-Z0-9\-]*\/[a-zA-Z\-][a-zA-Z0-9\-\.]*
         return T_MACRO_ARGS;
     }
 
+}
+
+<MACRO_FILTERS> {
+	{CLASS_NAME} {
+        pushState(YYINITIAL);
+        return T_PHP_CLASS_NAME;
+    }
+
+	{AS} {
+        pushState(YYINITIAL);
+        return T_PHP_AS;
+    }
+
+	{KEYWORD} {
+        pushState(YYINITIAL);
+        return T_PHP_KEYWORD;
+    }
+
+    {NULL} {
+        pushState(YYINITIAL);
+        return T_PHP_NULL;
+    }
+
+    {MIXED} {
+        pushState(YYINITIAL);
+        return T_PHP_MIXED;
+    }
+
+    {TYPES} {
+        pushState(YYINITIAL);
+        return T_PHP_TYPE;
+    }
+
+    {IDENTIFIER} {
+        pushState(YYINITIAL);
+        return T_MACRO_FILTERS;
+    }
+
+    "|" {
+        pushState(YYINITIAL);
+        return T_PHP_OR_INCLUSIVE;
+    }
 }
 
 <SINGLE_QUOTED> {

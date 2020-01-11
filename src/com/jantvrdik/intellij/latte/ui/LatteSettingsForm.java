@@ -3,7 +3,9 @@ package com.jantvrdik.intellij.latte.ui;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
+import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.settings.LatteSettings;
+import com.jantvrdik.intellij.latte.utils.LatteIdeHelper;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,11 +30,9 @@ public class LatteSettingsForm implements Configurable {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				super.mouseClicked(e);
-				//todo: add url to docs
-				//IdeHelper.openUrl(Symfony2ProjectComponent.HELP_URL + "extension/signature_type.html");
+				LatteIdeHelper.openUrl(LatteConfiguration.LATTE_HELP_URL + "en/");
 			}
 		});
-
 	}
 
 	@Nls

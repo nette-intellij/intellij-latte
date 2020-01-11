@@ -2,7 +2,6 @@ package com.jantvrdik.intellij.latte.syntaxHighlighter;
 
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
-import com.intellij.openapi.editor.HighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.tree.IElementType;
@@ -20,12 +19,15 @@ public class LatteSyntaxHighlighter extends SyntaxHighlighterBase {
 	public static final TextAttributesKey MACRO_ARGS_VAR = createTextAttributesKey("LATTE_MACRO_ARGS_VAR", DefaultLanguageHighlighterColors.INSTANCE_FIELD);
 	public static final TextAttributesKey MACRO_ARGS_STRING = createTextAttributesKey("LATTE_MACRO_ARGS_STRING", DefaultLanguageHighlighterColors.STRING);
 	public static final TextAttributesKey MACRO_ARGS_NUMBER = createTextAttributesKey("LATTE_MACRO_ARGS_NUMBER", DefaultLanguageHighlighterColors.NUMBER);
-	public static final TextAttributesKey MACRO_MODIFIERS = createTextAttributesKey("LATTE_MACRO_MODIFIERS", HighlighterColors.TEXT);
+	public static final TextAttributesKey MACRO_MODIFIERS = createTextAttributesKey("LATTE_MACRO_MODIFIERS", DefaultLanguageHighlighterColors.DOC_COMMENT);
 	public static final TextAttributesKey MACRO_COMMENT = createTextAttributesKey("LATTE_MACRO_COMMENT", DefaultLanguageHighlighterColors.BLOCK_COMMENT);
 	public static final TextAttributesKey PHP_KEYWORD = createTextAttributesKey("LATTE_PHP_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD);
+	public static final TextAttributesKey PHP_CLASS_NAME = createTextAttributesKey("LATTE_PHP_CLASS_NAME", DefaultLanguageHighlighterColors.CLASS_NAME);
 	public static final TextAttributesKey PHP_METHOD = createTextAttributesKey("LATTE_PHP_METHOD", DefaultLanguageHighlighterColors.INSTANCE_METHOD);
 	public static final TextAttributesKey PHP_IDENTIFIER = createTextAttributesKey("LATTE_PHP_IDENTIFIER", DefaultLanguageHighlighterColors.INSTANCE_FIELD);
 	public static final TextAttributesKey PHP_CONTENT_TYPE = createTextAttributesKey("LATTE_PHP_CONTENT_TYPE", DefaultLanguageHighlighterColors.PREDEFINED_SYMBOL);
+	public static final TextAttributesKey PHP_TYPE = createTextAttributesKey("LATTE_PHP_TYPE", DefaultLanguageHighlighterColors.KEYWORD);
+	public static final TextAttributesKey PHP_NULL = createTextAttributesKey("LATTE_PHP_NULL", DefaultLanguageHighlighterColors.KEYWORD);
 
 	@NotNull
 	@Override
@@ -59,14 +61,26 @@ public class LatteSyntaxHighlighter extends SyntaxHighlighterBase {
 				|| token == LatteTypes.T_PHP_DOUBLE_QUOTE_RIGHT) {
 			return pack(MACRO_ARGS_STRING);
 
-		} else if (token == LatteTypes.T_PHP_KEYWORD || token == LatteTypes.T_PHP_AS || token == LatteTypes.T_PHP_NULL || token == LatteTypes.T_PHP_TYPE) {
+		} else if (token == LatteTypes.T_PHP_KEYWORD || token == LatteTypes.T_PHP_AS) {
 			return pack(PHP_KEYWORD);
+
+		} else if (token == LatteTypes.T_PHP_CLASS_NAME) {
+			return pack(PHP_CLASS_NAME);
 
 		} else if (token == LatteTypes.T_PHP_METHOD) {
 			return pack(PHP_METHOD);
 
+		} else if (token == LatteTypes.T_PHP_TYPE) {
+			return pack(PHP_TYPE);
+
+		} else if (token == LatteTypes.T_PHP_NULL) {
+			return pack(PHP_NULL);
+
 		} else if (token == LatteTypes.T_PHP_IDENTIFIER) {
 			return pack(PHP_IDENTIFIER);
+
+		} else if (token == LatteTypes.T_MACRO_FILTERS) {
+			return pack(MACRO_MODIFIERS);
 
 		} else if (token == LatteTypes.T_MACRO_ARGS_NUMBER) {
 			return pack(MACRO_ARGS_NUMBER);

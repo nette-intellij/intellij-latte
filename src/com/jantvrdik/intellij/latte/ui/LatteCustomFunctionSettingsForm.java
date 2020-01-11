@@ -10,8 +10,8 @@ import com.intellij.util.ui.ElementProducer;
 import com.intellij.util.ui.ListTableModel;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.settings.DefaultSettings;
+import com.jantvrdik.intellij.latte.settings.LatteCustomFunctionSettings;
 import com.jantvrdik.intellij.latte.settings.LatteSettings;
-import com.jantvrdik.intellij.latte.settings.LatteVariableSettings;
 import com.jantvrdik.intellij.latte.utils.LatteIdeHelper;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
@@ -22,37 +22,38 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
-public class LatteVariableSettingsForm implements Configurable {
+public class LatteCustomFunctionSettingsForm implements Configurable {
 	private JPanel panel1;
 	private JPanel panelConfigTableView;
-	private JCheckBox enableCustomSignatureTypesCheckBox;
+	private JCheckBox enableCustomFunctionsCheckBox;
 	private JButton buttonHelp;
 	private JButton resetToDefaultsButton;
 
-	private TableView<LatteVariableSettings> tableView;
+	private TableView<LatteCustomFunctionSettings> tableView;
 	private Project project;
 	private boolean changed = false;
-	private ListTableModel<LatteVariableSettings> modelList;
+	private ListTableModel<LatteCustomFunctionSettings> modelList;
 
-	public LatteVariableSettingsForm(Project project) {
+	public LatteCustomFunctionSettingsForm(Project project) {
 		this.project = project;
 
-		this.tableView = new TableView<LatteVariableSettings>();
-		this.modelList = new ListTableModel<LatteVariableSettings>(
-				new VarNameColumn(),
-				new VarTypeColumn()
+		this.tableView = new TableView<LatteCustomFunctionSettings>();
+		this.modelList = new ListTableModel<LatteCustomFunctionSettings>(
+				new NameColumn(),
+				new ReturnTypeColumn(),
+				new HelpColumn()
 		);
 
 		this.attachItems();
 
 		this.tableView.setModelAndUpdateColumns(this.modelList);
-		this.tableView.getModel().addTableModelListener(e -> LatteVariableSettingsForm.this.changed = true);
+		this.tableView.getModel().addTableModelListener(e -> LatteCustomFunctionSettingsForm.this.changed = true);
 
 		buttonHelp.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				super.mouseClicked(e);
-				LatteIdeHelper.openUrl(LatteConfiguration.LATTE_HELP_URL + "en/guide");
+				LatteIdeHelper.openUrl(LatteConfiguration.FORUM_URL + "en/32885-latte-version-2-6-0-released");
 			}
 		});
 
@@ -64,31 +65,25 @@ public class LatteVariableSettingsForm implements Configurable {
 			}
 		});
 
-		enableCustomSignatureTypesCheckBox.setSelected(getSettings().enableDefaultVariables);
+		enableCustomFunctionsCheckBox.setSelected(getSettings().enableDefaultVariables);
 
-		enableCustomSignatureTypesCheckBox.addMouseListener(new MouseAdapter() {
+		enableCustomFunctionsCheckBox.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				super.mouseClicked(e);
-				LatteVariableSettingsForm.this.changed = true;
+				LatteCustomFunctionSettingsForm.this.changed = true;
 			}
 		});
 	}
 
 	private void attachItems() {
 
-		if(this.getSettings().variableSettings == null) {
+		if(this.getSettings().customMacroSettings == null) {
 			return;
 		}
 
-		for (LatteVariableSettings methodParameterSetting : this.getSettings().variableSettings) {
-			this.modelList.addRow(methodParameterSetting);
-		}
-	}
-
-	private void attachDefaultVariables() {
-		for (LatteVariableSettings variableSettings : DefaultSettings.getDefaultVariables()) {
-			this.modelList.addRow(variableSettings);
+		for (LatteCustomFunctionSettings customMacroSettings : this.getSettings().customFunctionSettings) {
+			this.modelList.addRow(customMacroSettings);
 		}
 	}
 
@@ -107,9 +102,9 @@ public class LatteVariableSettingsForm implements Configurable {
 	@Nullable
 	@Override
 	public JComponent createComponent() {
-		ToolbarDecorator tablePanel = ToolbarDecorator.createDecorator(this.tableView, new ElementProducer<LatteVariableSettings>() {
+		ToolbarDecorator tablePanel = ToolbarDecorator.createDecorator(this.tableView, new ElementProducer<LatteCustomFunctionSettings>() {
 			@Override
-			public LatteVariableSettings createElement() {
+			public LatteCustomFunctionSettings createElement() {
 				//IdeFocusManager.getInstance(TwigSettingsForm.this.project).requestFocus(TwigNamespaceDialog.getWindows(), true);
 				return null;
 			}
@@ -121,11 +116,11 @@ public class LatteVariableSettingsForm implements Configurable {
 		});
 
 		tablePanel.setEditAction(anActionButton ->
-				LatteVariableSettingsForm.this.openVariablePathDialog(LatteVariableSettingsForm.this.tableView.getSelectedObject())
+				LatteCustomFunctionSettingsForm.this.openFunctionDialog(LatteCustomFunctionSettingsForm.this.tableView.getSelectedObject())
 		);
 
 		tablePanel.setAddAction(anActionButton ->
-				LatteVariableSettingsForm.this.openVariablePathDialog(null)
+				LatteCustomFunctionSettingsForm.this.openFunctionDialog(null)
 		);
 
 		tablePanel.disableUpAction();
@@ -136,6 +131,12 @@ public class LatteVariableSettingsForm implements Configurable {
 		return this.panel1;
 	}
 
+	private void attachDefaultVariables() {
+		for (LatteCustomFunctionSettings customFunctionSettings : DefaultSettings.getDefaultCustomFunctions()) {
+			this.modelList.addRow(customFunctionSettings);
+		}
+	}
+
 	@Override
 	public boolean isModified() {
 		return this.changed;
@@ -143,8 +144,8 @@ public class LatteVariableSettingsForm implements Configurable {
 
 	@Override
 	public void apply() throws ConfigurationException {
-		getSettings().variableSettings = new ArrayList<>(this.tableView.getListTableModel().getItems());
-		getSettings().enableDefaultVariables = enableCustomSignatureTypesCheckBox.isSelected();
+		getSettings().customFunctionSettings = new ArrayList<>(this.tableView.getListTableModel().getItems());
+		getSettings().enableCustomFunctions = enableCustomFunctionsCheckBox.isSelected();
 
 		this.changed = false;
 	}
@@ -178,43 +179,56 @@ public class LatteVariableSettingsForm implements Configurable {
 
 	}
 
-	private static class VarNameColumn extends ColumnInfo<LatteVariableSettings, String> {
+	private class NameColumn extends ColumnInfo<LatteCustomFunctionSettings, String> {
 
-		public VarNameColumn() {
+		public NameColumn() {
 			super("Name");
 		}
 
 		@Nullable
 		@Override
-		public String valueOf(LatteVariableSettings methodParameterSetting) {
-			return methodParameterSetting.getVarName();
+		public String valueOf(LatteCustomFunctionSettings functionSettings) {
+			return functionSettings.getFunctionName();
 		}
 	}
 
-	private class VarTypeColumn extends PhpTypeColumn<LatteVariableSettings> {
+	private class ReturnTypeColumn extends PhpTypeColumn<LatteCustomFunctionSettings> {
 
-		public VarTypeColumn() {
-			super("Type", project);
+		public ReturnTypeColumn() {
+			super("ReturnType", project);
 		}
 
 		@Nullable
 		@Override
-		public String valueOf(LatteVariableSettings latteVariableSettings) {
-			return latteVariableSettings.getVarType();
+		public String valueOf(LatteCustomFunctionSettings functionSettings) {
+			return functionSettings.getFunctionReturnType();
 		}
 	}
+	private class HelpColumn extends ColumnInfo<LatteCustomFunctionSettings, String> {
 
-	private void openVariablePathDialog(@Nullable LatteVariableSettings variableSettings) {
-		LatteVariableSettingsDialog latteVariableDialog;
-		if(variableSettings == null) {
-			latteVariableDialog = new LatteVariableSettingsDialog(project, this.tableView);
+
+		public HelpColumn() {
+			super("Help");
+		}
+		@Nullable
+		@Override
+		public String valueOf(LatteCustomFunctionSettings functionSettings) {
+			return functionSettings.getFunctionHelp();
+		}
+
+	}
+
+	private void openFunctionDialog(@Nullable LatteCustomFunctionSettings customMacroSettings) {
+		LatteCustomFunctionSettingsDialog latteVariableDialog;
+		if(customMacroSettings == null) {
+			latteVariableDialog = new LatteCustomFunctionSettingsDialog(project, this.tableView);
 		} else {
-			latteVariableDialog = new LatteVariableSettingsDialog(project, this.tableView, variableSettings);
+			latteVariableDialog = new LatteCustomFunctionSettingsDialog(project, this.tableView, customMacroSettings);
 		}
 
 		Dimension dim = new Dimension();
-		dim.setSize(500, 160);
-		latteVariableDialog.setTitle("LatteVariableSettings");
+		dim.setSize(500, 130);
+		latteVariableDialog.setTitle("LatteCustomFunctionSettings");
 		latteVariableDialog.setMinimumSize(dim);
 		latteVariableDialog.pack();
 		latteVariableDialog.setLocationRelativeTo(this.panel1);

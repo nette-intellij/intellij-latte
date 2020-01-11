@@ -14,9 +14,6 @@ import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
 
 
 WHITE_SPACE=[ \t\r\n]+
-STRING = {STRING_SQ} | {STRING_DQ}
-STRING_SQ = "'" ("\\" [^] | [^'\\])* "'"
-STRING_DQ = "\"" ("\\" [^] | [^\"\\])* "\""
 SYMBOL = [_[:letter:]][_0-9[:letter:]]*(-[_0-9[:letter:]]+)* //todo: unicode letters
 FUNCTION_CALL=[a-zA-Z_][a-zA-Z0-9_]* "("
 CLASS_NAME=\\?[a-zA-Z_][a-zA-Z0-9_]*\\[a-zA-Z_][a-zA-Z0-9_\\]* | \\[a-zA-Z_][a-zA-Z0-9_]*
@@ -27,7 +24,7 @@ CONTENT_TYPE=[a-zA-Z\-][a-zA-Z0-9\-]*\/[a-zA-Z\-][a-zA-Z0-9\-\.]*
 
 <YYINITIAL> {
 
-	({CLASS_NAME} | "$" | {FUNCTION_CALL}) .+ {
+	({CLASS_NAME} | "$" | {FUNCTION_CALL} | "\"" | "'" | "{" | "(" | "[") .+ {
         return T_PHP_CONTENT;
     }
 
@@ -35,7 +32,7 @@ CONTENT_TYPE=[a-zA-Z\-][a-zA-Z0-9\-]*\/[a-zA-Z\-][a-zA-Z0-9\-\.]*
         return T_PHP_CONTENT;
     }
 
-	({STRING} | [0-9]+ | {SYMBOL} | {CLASS_NAME}) {
+	([0-9]+ | {SYMBOL} | {CLASS_NAME}) {
 		return T_PHP_CONTENT;
 	}
 

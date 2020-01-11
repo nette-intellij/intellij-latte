@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,7 +43,6 @@ public class LatteTypedHandler extends TypedHandlerDelegate {
 				return Result.STOP;
 			}
 		}
-
 		return super.beforeCharTyped(charTyped, project, editor, file, fileType);
 	}
 

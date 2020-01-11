@@ -1,11 +1,14 @@
 <idea-plugin>
 	<id>com.jantvrdik.intellij.latte</id>
 	<name>Latte</name>
-	<version>0.4.0</version>
+	<version>1.0.0</version>
 	<vendor>Jan Tvrdík</vendor>
 
 	<description><![CDATA[
-		<p>Provides support for <a href="https://github.com/nette/latte/">Latte</a> &ndash; a template engine for PHP.</p>
+		<p>
+			Provides support for <a href="https://github.com/nette/latte/">Latte</a> &ndash; a template engine for PHP.
+			It's a must have plugin for Nette developers.
+		</p>
 
 		<h2>IMPORTANT notes</h2>
 
@@ -15,7 +18,7 @@
 	]]></description>
 
 	<change-notes><![CDATA[
-		<p>0.4.0</p>
+		<p>1.0.0</p>
 		<ul>
 			<li>added support for PHP content</li>
 			<li>added variable types</li>
@@ -31,19 +34,21 @@
 			<li>added go to source for class names, methods, constants and properties</li>
 			<li>added support for highlighting macro name and pair macro</li>
 			<li>added support for refactoring rename (methods, properties, constants and class names)</li>
-			<li>added code-completion for latte filters</li>
-			<li>added support for adding custom latte filters</li>
-			<li>added UI for setting custom variables, filters and macros</li>
+			<li>added code-completion for latte filters and custom function</li>
+			<li>added support for adding custom latte filters and functions</li>
+			<li>added UI for setting custom variables, filters, custom function and macros</li>
+			<li>added help buttons in settings to go to documentation</li>
+			<li>added completion pair macro if use code-completion for pair macro name and click enter</li>
 			<li>
 				added inspections for:
 				<ul>
-					<li>Class usages (Undefined class)</li>
-					<li>Checking not defined variables, more definitions with same variable name etc.</li>
-					<li>Checking constant, property and methods visibility (if is not public it make warning)</li>
-					<li>Checking not existing constants, properties and methods</li>
-					<li>Checking static methods and properties used non statically and vice versa</li>
-					<li>Checking valid content for templateType, varType and var macro</li>
-					<li>Checking existing latte filters</li>
+					<li>class usages (Undefined class)</li>
+					<li>checking not defined variables, more definitions with same variable name etc.</li>
+					<li>checking constant, property and methods visibility (if is not public it make warning)</li>
+					<li>checking not existing constants, properties and methods</li>
+					<li>checking static methods and properties used non statically and vice versa</li>
+					<li>checking valid content for templateType, varType and var macro</li>
+					<li>checking existing latte filters</li>
 				</ul>
 			</li>
 			<li>Increased minimum compatibility with PhpStorm version to 2017.3 from PhpStorm 8 (pre-2016.2 IDE version)</li>
@@ -182,6 +187,13 @@
 							 displayName="Filters"
 							 parentId="Latte.LatteSettingsForm"
 							 id="Latte.LatteCustomModifierSettingsForm"
+							 nonDefaultProject="true"
+		/>
+
+		<projectConfigurable instance="com.jantvrdik.intellij.latte.ui.LatteCustomFunctionSettingsForm"
+							 displayName="Functions"
+							 parentId="Latte.LatteSettingsForm"
+							 id="Latte.LatteCustomFunctionSettingsForm"
 							 nonDefaultProject="true"
 		/>
 

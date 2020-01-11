@@ -1,10 +1,7 @@
 package com.jantvrdik.intellij.latte.config;
 
 import com.intellij.openapi.project.Project;
-import com.jantvrdik.intellij.latte.settings.LatteCustomMacroSettings;
-import com.jantvrdik.intellij.latte.settings.LatteCustomModifierSettings;
-import com.jantvrdik.intellij.latte.settings.LatteVariableSettings;
-import com.jantvrdik.intellij.latte.settings.LatteSettings;
+import com.jantvrdik.intellij.latte.settings.*;
 import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,6 +11,9 @@ import java.util.*;
 import static com.jantvrdik.intellij.latte.config.LatteMacro.Type.*;
 
 public class LatteConfiguration {
+
+	public static String LATTE_HELP_URL = "https://latte.nette.org/";
+	public static String FORUM_URL = "https://forum.nette.org/";
 
 	/** globally available class instance */
 	public static final LatteConfiguration INSTANCE = new LatteConfiguration();
@@ -47,17 +47,19 @@ public class LatteConfiguration {
 		addStandardMacroWithoutModifiers("elseifset", UNPAIRED);
 		addStandardMacro("ifcontent", PAIR);
 
-		addStandardMacro("switch", PAIR);
-		addStandardMacro("case", UNPAIRED);
+		addStandardMacroWithoutModifiers("switch", PAIR);
+		addStandardMacroWithoutModifiers("case", UNPAIRED);
 
-		addStandardMacro("foreach", PAIR);
-		addStandardMacro("for", PAIR);
-		addStandardMacro("while", PAIR);
+		addStandardMacroWithoutModifiers("foreach", PAIR);
+		addStandardMacroWithoutModifiers("for", PAIR);
+		addStandardMacroWithoutModifiers("while", PAIR);
 		addStandardMacroWithoutModifiers("continueIf", UNPAIRED);
 		addStandardMacroWithoutModifiers("breakIf", UNPAIRED);
 		addStandardMacro("first", PAIR);
 		addStandardMacro("last", PAIR);
 		addStandardMacro("sep", PAIR);
+
+		addStandardMacroWithoutModifiers("spaceless", PAIR);
 
 		addStandardMacroWithoutModifiers("var", UNPAIRED);
 		addStandardMacroWithoutModifiers("varType", UNPAIRED);
@@ -116,18 +118,18 @@ public class LatteConfiguration {
 	}
 
 	private void initStandardModifiers() {
-		addStandardModifier("truncate", "shortens the length preserving whole words", "truncate (length, append = '…')");
-		addStandardModifier("substr", "returns part of the string", "substr (offset [, length])");
-		addStandardModifier("trim", "strips whitespace or other characters from the beginning and end of the string", "trim (charset = mezery)");
+		addStandardModifier("truncate", "shortens the length preserving whole words", ":(length, append = '…')");
+		addStandardModifier("substr", "returns part of the string", ":(offset [, length])");
+		addStandardModifier("trim", "strips whitespace or other characters from the beginning and end of the string", ":(charset = mezery)");
 		addStandardModifier("striptags", "removes HTML tags");
 		addStandardModifier("strip", "removes whitespace");
-		addStandardModifier("indent", "indents the text from left with number of tabs", "indent (level = 1, char = \"\\t\")");
-		addStandardModifier("replace", "replaces all occurrences of the search string with the replacement", "replace (search, replace = '')");
-		addStandardModifier("replaceRE", "replaces all occurrences according to regular expression", "replaceRE (pattern, replace = '')");
-		addStandardModifier("padLeft", "completes the string to given length from left", "padLeft (length, pad = ' ')");
-		addStandardModifier("padRight", "completes the string to given length from right", "padRight (length, pad = ' ')");
-		addStandardModifier("repeat", "repeats the string", "repeat (count)");
-		addStandardModifier("implode", "joins an array to a string", "implode (glue = '')");
+		addStandardModifier("indent", "indents the text from left with number of tabs", ":(level = 1, char = \"\\t\")");
+		addStandardModifier("replace", "replaces all occurrences of the search string with the replacement", ":(search, replace = '')");
+		addStandardModifier("replaceRE", "replaces all occurrences according to regular expression", ":(pattern, replace = '')");
+		addStandardModifier("padLeft", "completes the string to given length from left", ":(length, pad = ' ')");
+		addStandardModifier("padRight", "completes the string to given length from right", ":(length, pad = ' ')");
+		addStandardModifier("repeat", "repeats the string", ":(count)");
+		addStandardModifier("implode", "joins an array to a string", ":(glue = '')");
 		addStandardModifier("webalize", "adjusts the UTF-8 string to the shape used in the URL");
 		addStandardModifier("breaklines", "inserts HTML line breaks before all newlines");
 		addStandardModifier("reverse", "reverse an UTF-8 string or array");
@@ -138,10 +140,10 @@ public class LatteConfiguration {
 		addStandardModifier("firstUpper", "makes the first letter upper case");
 		addStandardModifier("capitalize", "lower case, the first letter of each word upper case");
 
-		addStandardModifier("date", "formats date", "date (format)");
-		addStandardModifier("number", "format number", "number (decimals = 0, decPoint = '.')");
-		addStandardModifier("bytes", "formats size in bytes", "bytes (precision = 2)");
-		addStandardModifier("dataStream", "Data URI protocol conversion", "dataStream (mimetype = detect)");
+		addStandardModifier("date", "formats date", ":(format)");
+		addStandardModifier("number", "format number", ":(decimals = 0, decPoint = '.')");
+		addStandardModifier("bytes", "formats size in bytes", ":(precision = 2)");
+		addStandardModifier("dataStream", "Data URI protocol conversion", ":(mimetype = detect)");
 
 		addStandardModifier("noescape", "prints a variable without escaping");
 		addStandardModifier("escapeurl", "escapes parameter in URL");
@@ -183,6 +185,21 @@ public class LatteConfiguration {
 		return null;
 	}
 
+	@Nullable
+	public LatteCustomFunctionSettings getFunction(Project project, String name) {
+		LatteSettings settings = getSettings(project);
+		if (!settings.enableCustomModifiers) {
+			return null;
+		}
+
+		for (LatteCustomFunctionSettings functionSettings : settings.customFunctionSettings) {
+			if (functionSettings.getFunctionName().equals(name)) {
+				return functionSettings;
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * @return variable with given name
 	 */
@@ -207,16 +224,22 @@ public class LatteConfiguration {
 		return LatteSettings.getInstance(project);
 	}
 
-	/**
-	 * @return variable with given name
-	 */
-	@Nullable
+	@NotNull
 	public List<LatteVariableSettings> getVariables(Project project) {
 		LatteSettings settings = getSettings(project);
 		if (!settings.enableDefaultVariables || settings.variableSettings == null) {
-			return null;
+			return Collections.emptyList();
 		}
 		return new ArrayList<LatteVariableSettings>(settings.variableSettings);
+	}
+
+	@NotNull
+	public List<LatteCustomFunctionSettings> getFunctions(Project project) {
+		LatteSettings settings = getSettings(project);
+		if (!settings.enableCustomFunctions) {
+			return Collections.emptyList();
+		}
+		return new ArrayList<LatteCustomFunctionSettings>(settings.customFunctionSettings);
 	}
 
 	/**

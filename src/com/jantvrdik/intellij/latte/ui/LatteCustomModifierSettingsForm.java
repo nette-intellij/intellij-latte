@@ -8,8 +8,10 @@ import com.intellij.ui.table.TableView;
 import com.intellij.util.ui.ColumnInfo;
 import com.intellij.util.ui.ElementProducer;
 import com.intellij.util.ui.ListTableModel;
+import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.settings.LatteCustomModifierSettings;
 import com.jantvrdik.intellij.latte.settings.LatteSettings;
+import com.jantvrdik.intellij.latte.utils.LatteIdeHelper;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,8 +51,7 @@ public class LatteCustomModifierSettingsForm implements Configurable {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				super.mouseClicked(e);
-				//todo: add url to docs
-				//IdeHelper.openUrl(Symfony2ProjectComponent.HELP_URL + "extension/signature_type.html");
+				LatteIdeHelper.openUrl(LatteConfiguration.LATTE_HELP_URL + "en/filters");
 			}
 		});
 

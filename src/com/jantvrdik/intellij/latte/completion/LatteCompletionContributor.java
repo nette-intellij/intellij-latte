@@ -12,6 +12,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
 import com.jantvrdik.intellij.latte.LatteLanguage;
+import com.jantvrdik.intellij.latte.completion.handlers.PhpMacroInsertHandler;
 import com.jantvrdik.intellij.latte.completion.providers.LattePhpCompletionProvider;
 import com.jantvrdik.intellij.latte.completion.providers.LatteVariableCompletionProvider;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
@@ -155,24 +156,26 @@ public class LatteCompletionContributor extends CompletionContributor {
 	private List<LookupElement> getClassicModifierCompletions(Map<String, LatteModifier> modifiers) {
 		List<LookupElement> lookupElements = new ArrayList<LookupElement>(modifiers.size());
 		for (LatteModifier modifier : modifiers.values()) {
-			if (modifier.help.length() > 0) {
-				lookupElements.add(createBuilderWithHelp("|" + modifier.name, modifier.help, false));
-			} else {
-				lookupElements.add(createBuilderWithHelp("|" + modifier.name, modifier.description, true));
-			}
+			lookupElements.add(createBuilderWithHelp(modifier));
 		}
 		return lookupElements;
 	}
 
-	private LookupElementBuilder createBuilderWithHelp(String name, String help, boolean grayed) {
-		LookupElementBuilder builder = LookupElementBuilder.create(name);
-		builder = builder.withIcon(LatteIcons.MODIFIER);
-		return builder.withTypeText(help, grayed);
+	private LookupElementBuilder createBuilderWithHelp(LatteModifier modifier) {
+		LookupElementBuilder builder = LookupElementBuilder.create(modifier.name);
+		if (modifier.description.trim().length() > 0) {
+			builder = builder.withTypeText(modifier.description, true);
+		}
+		if (modifier.help.trim().length() > 0) {
+			builder = builder.withTailText(modifier.help);
+		}
+		return builder.withIcon(LatteIcons.MODIFIER);
 	}
 
 	private LookupElementBuilder createBuilderForMacro(LatteMacro macro) {
 		LookupElementBuilder builder = LookupElementBuilder.create(macro.name);
 		builder = builder.withIcon(LatteIcons.MACRO);
+		builder = builder.withInsertHandler(PhpMacroInsertHandler.getInstance());
 		return builder.withTypeText(macro.type.toString(), true);
 	}
 

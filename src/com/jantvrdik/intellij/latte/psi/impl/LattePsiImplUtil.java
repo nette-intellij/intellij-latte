@@ -6,6 +6,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
+import com.jantvrdik.intellij.latte.settings.LatteCustomFunctionSettings;
 import com.jantvrdik.intellij.latte.settings.LatteVariableSettings;
 import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.utils.LattePhpType;
@@ -18,10 +19,8 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
@@ -123,16 +122,7 @@ public class LattePsiImplUtil {
 			PsiElement current = positionedElement.getElement();
 			if (isVarTypeDefinition((LattePhpVariable) current) || isVarDefinition((LattePhpVariable) current)) {
 				String prevPhpType = findPrevPhpType(positionedElement.getElement());
-				boolean nullable = false;
-				List<String> types = new ArrayList<String>();
-				for (String part : prevPhpType.split(Pattern.quote("|"))) {
-					if (part.toLowerCase().equals("null")) {
-						nullable = true;
-						continue;
-					}
-					types.add(part);
-				}
-				return new LattePhpType(types.toArray(new String[types.size()]), nullable);
+				return new LattePhpType(prevPhpType.length() == 0 ? "mixed" : prevPhpType);
 			}
 		}
 
@@ -224,7 +214,20 @@ public class LattePsiImplUtil {
 	}
 
 	public static LattePhpType getReturnType(@NotNull LattePhpMethod element) {
-		return getMethodType(element.getProject(), element.getPhpType(), element.getMethodName());
+		LattePhpType type = element.getPhpType();
+		PhpClass first = type.getFirstPhpClass(element.getProject());
+		String name = element.getMethodName();
+		if (first == null) {
+			LatteCustomFunctionSettings customFunction = LatteConfiguration.INSTANCE.getFunction(element.getProject(), name);
+			return customFunction == null ? null : new LattePhpType(customFunction.getFunctionReturnType());
+		}
+
+		for (Method phpMethod : first.getMethods()) {
+			if (phpMethod.getName().equals(name)) {
+				return new LattePhpType(phpMethod.getType().toString(), phpMethod.getType().isNullable());
+			}
+		}
+		return null;
 	}
 
 	public static LattePhpType getPropertyType(@NotNull LattePhpStaticVariable element) {
@@ -248,20 +251,6 @@ public class LattePsiImplUtil {
 		for (Field field : first.getFields()) {
 			if (field.getName().equals(LattePhpUtil.normalizePhpVariable(elementName))) {
 				return new LattePhpType(field.getType().toString(), field.getType().isNullable());
-			}
-		}
-		return null;
-	}
-
-	private static LattePhpType getMethodType(@NotNull Project project, @NotNull LattePhpType type, @NotNull String elementName) {
-		PhpClass first = type.getFirstPhpClass(project);
-		if (first == null) {
-			return null;
-		}
-
-		for (Method phpMethod : first.getMethods()) {
-			if (phpMethod.getName().equals(elementName)) {
-				return new LattePhpType(phpMethod.getType().toString(), phpMethod.getType().isNullable());
 			}
 		}
 		return null;
@@ -308,11 +297,11 @@ public class LattePsiImplUtil {
 		LatteNetteAttrValue parentAttr = PsiTreeUtil.getParentOfType(element, LatteNetteAttrValue.class);
 		if (parentAttr != null) {
 			PsiElement nextElement = PsiTreeUtil.skipWhitespacesForward(element);
-			if (nextElement == null || !nextElement.getText().equals("=")) {
+			if (nextElement == null || nextElement.getNode().getElementType() != LatteTypes.T_PHP_DEFINITION_OPERATOR) {
 				return false;
 			}
 			PsiElement prevElement = PsiTreeUtil.skipWhitespacesBackward(parentAttr);
-			if (prevElement == null || !prevElement.getText().equals("=")) {
+			if (prevElement == null || prevElement.getNode().getElementType() != LatteTypes.T_PHP_DEFINITION_OPERATOR) {
 				return false;
 			}
 
@@ -322,7 +311,7 @@ public class LattePsiImplUtil {
 
 		if (LatteUtil.matchParentMacroName(element, "for") || isVarDefinition(element)) {
 			PsiElement nextElement = PsiTreeUtil.skipWhitespacesForward(element);
-			if (nextElement != null && nextElement.getText().equals("=")) {
+			if (nextElement != null && nextElement.getNode().getElementType() == LatteTypes.T_PHP_DEFINITION_OPERATOR) {
 				return true;
 			}
 		}

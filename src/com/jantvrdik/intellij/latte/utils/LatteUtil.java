@@ -1,5 +1,6 @@
 package com.jantvrdik.intellij.latte.utils;
 
+import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiElement;
 import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
@@ -93,7 +94,7 @@ public class LatteUtil {
     }
 
     public static Collection<LattePhpClass> findClasses(Project project, String key) {
-        return findElementsInAllFiles(project, LattePhpUtil.normalizeClassName(key), LattePhpClass.class, null);
+        return findElementsInAllFiles(project, key, LattePhpClass.class, null);
     }
 
     public static Collection<LattePhpStaticVariable> findStaticVariables(Project project, String key, @NotNull PhpClass phpClass) {
@@ -133,6 +134,12 @@ public class LatteUtil {
             return false;
         }
         return macroClassic.getOpenTag().getMacroName().equals(name);
+    }
+
+    public static boolean isStringAtCaret(@NotNull Editor editor, @NotNull String string) {
+        int startOffset = editor.getCaretModel().getOffset();
+        String fileText = editor.getDocument().getText();
+        return fileText.length() >= startOffset + string.length() && fileText.substring(startOffset, startOffset + string.length()).equals(string);
     }
 
     private static <T extends BaseLattePhpElement>  Collection<T> findElementsInAllFiles(Project project, String key, Class<T> className, @Nullable PhpClass phpClass) {

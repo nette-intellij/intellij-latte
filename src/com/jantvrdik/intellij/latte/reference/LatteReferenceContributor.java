@@ -171,7 +171,7 @@ public class LatteReferenceContributor extends PsiReferenceContributor {
                         if (value.length() == 0) {
                             return PsiReference.EMPTY_ARRAY;
                         }
-                        return new PsiReference[]{new LatteMacroModifierReference(constantElement, new TextRange(0, value.length() + 1))};
+                        return new PsiReference[]{new LatteMacroModifierReference(constantElement, new TextRange(0, value.length()))};
                     }
                 });
     }

@@ -6,6 +6,7 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializerUtil;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -22,11 +23,15 @@ public class LatteSettings implements PersistentStateComponent<LatteSettings> {
 
 	public boolean wasFirstInitialized = false;
 
+	public boolean wasFirstInitializedFunctions = false;
+
 	public boolean enableDefaultVariables = true;
 
 	public boolean enableCustomMacros = true;
 
 	public boolean enableCustomModifiers = true;
+
+	public boolean enableCustomFunctions = true;
 
 	public boolean codeCompletionEnabled = true;
 
@@ -35,6 +40,8 @@ public class LatteSettings implements PersistentStateComponent<LatteSettings> {
 	public List<LatteCustomMacroSettings> customMacroSettings = new ArrayList<>();
 
 	public List<LatteCustomModifierSettings> customModifierSettings = new ArrayList<>();
+
+	public List<LatteCustomFunctionSettings> customFunctionSettings = new ArrayList<>();
 
 	public static LatteSettings getInstance(Project project) {
 		return ServiceManager.getService(project, LatteSettings.class);
@@ -50,11 +57,19 @@ public class LatteSettings implements PersistentStateComponent<LatteSettings> {
 			variableSettings.addAll(Arrays.asList(DefaultSettings.getDefaultVariables()));
 			wasFirstInitialized = true;
 		}
+
+		if (!wasFirstInitializedFunctions) { //todo: remove this in future version (only for now if someone have variables but not functions)
+			if (customFunctionSettings == null) {
+				customFunctionSettings = new ArrayList<>();
+			}
+			customFunctionSettings.addAll(Arrays.asList(DefaultSettings.getDefaultCustomFunctions()));
+			wasFirstInitializedFunctions = true;
+		}
 		return this;
 	}
 
 	@Override
-	public void loadState(LatteSettings settings) {
+	public void loadState(@NotNull LatteSettings settings) {
 		XmlSerializerUtil.copyBean(settings, this);
 	}
 }
