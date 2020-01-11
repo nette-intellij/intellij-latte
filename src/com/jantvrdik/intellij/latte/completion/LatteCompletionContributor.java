@@ -32,6 +32,9 @@ public class LatteCompletionContributor extends CompletionContributor {
 	/** cached lookup elements for standard classic macros */
 	private List<LookupElement> classicMacrosCompletions;
 
+	/** cached lookup elements for standard classic macros */
+	private List<LookupElement> classicPrefixedMacrosCompletions;
+
 	/** cached lookup elements for standard attribute macros */
 	private List<LookupElement> attrMacrosCompletions;
 
@@ -45,10 +48,9 @@ public class LatteCompletionContributor extends CompletionContributor {
 		extend(CompletionType.BASIC, PlatformPatterns.psiElement(LatteTypes.T_MACRO_NAME).withLanguage(LatteLanguage.INSTANCE), new CompletionProvider<CompletionParameters>() {
 			@Override
 			protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
+				PsiElement parent = parameters.getPosition().getParent();
 				Project project = parameters.getOriginalFile().getProject();
-				Map<String, LatteMacro> customMacros = LatteConfiguration.INSTANCE.getCustomMacros(project);
-				result.addAllElements(classicMacrosCompletions);
-				result.addAllElements(getClassicMacroCompletions(customMacros));
+				attachClassicMacrosCompletion(project, result, parent instanceof LatteMacroCloseTag);
 			}
 		});
 
@@ -114,7 +116,8 @@ public class LatteCompletionContributor extends CompletionContributor {
 	 */
 	private void initStandardMacrosCompletions() {
 		Map<String, LatteMacro> macros = LatteConfiguration.INSTANCE.getStandardMacros();
-		classicMacrosCompletions = getClassicMacroCompletions(macros);
+		classicMacrosCompletions = getClassicMacroCompletions(macros, false);
+		classicPrefixedMacrosCompletions = getClassicMacroCompletions(macros, true);
 		attrMacrosCompletions = getAttrMacroCompletions(macros);
 	}
 
@@ -132,14 +135,20 @@ public class LatteCompletionContributor extends CompletionContributor {
 		}
 	}
 
+	private void attachClassicMacrosCompletion(@NotNull Project project, @NotNull CompletionResultSet result, boolean prefix) {
+		result.addAllElements(prefix ? classicPrefixedMacrosCompletions : classicMacrosCompletions);
+		Map<String, LatteMacro> customMacros = LatteConfiguration.INSTANCE.getCustomMacros(project);
+		result.addAllElements(getClassicMacroCompletions(customMacros, prefix));
+	}
+
 	/**
 	 * Builds list of lookup elements for code completion of classic macros.
 	 */
-	private List<LookupElement> getClassicMacroCompletions(Map<String, LatteMacro> macros) {
+	private List<LookupElement> getClassicMacroCompletions(Map<String, LatteMacro> macros, boolean prefix) {
 		List<LookupElement> lookupElements = new ArrayList<LookupElement>(macros.size());
 		for (LatteMacro macro : macros.values()) {
-			if (macro.type != LatteMacro.Type.ATTR_ONLY) {
-				lookupElements.add(createBuilderForMacro(macro));
+			if (macro.type != LatteMacro.Type.ATTR_ONLY && (!prefix || macro.type == LatteMacro.Type.PAIR)) {
+				lookupElements.add(createBuilderForMacro(macro, prefix));
 			}
 		}
 		return lookupElements;
@@ -167,8 +176,8 @@ public class LatteCompletionContributor extends CompletionContributor {
 		return builder.withIcon(LatteIcons.MODIFIER);
 	}
 
-	private LookupElementBuilder createBuilderForMacro(LatteMacro macro) {
-		LookupElementBuilder builder = LookupElementBuilder.create(macro.name);
+	private LookupElementBuilder createBuilderForMacro(LatteMacro macro, boolean prefix) {
+		LookupElementBuilder builder = LookupElementBuilder.create((prefix ? "/" : "") + macro.name);
 		builder = builder.withIcon(LatteIcons.MACRO);
 		builder = builder.withInsertHandler(MacroInsertHandler.getInstance());
 		return builder.withTypeText(macro.type.toString(), true);

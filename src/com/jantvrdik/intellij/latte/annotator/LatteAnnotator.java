@@ -4,8 +4,6 @@ import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiErrorElement;
-import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.config.LatteMacro;
 import com.jantvrdik.intellij.latte.intentions.*;
@@ -78,9 +76,17 @@ public class LatteAnnotator implements Annotator {
 			}
 
 			if (!isOk) {
-				Annotation annotation = holder.createErrorAnnotation(openTag, "Unknown macro {" + openTagName + "}");
-				annotation.registerFix(new AddCustomPairMacro(openTagName));
-				annotation.registerFix(new AddCustomUnpairedMacro(openTagName));
+				if (macro != null) {
+					holder.createErrorAnnotation(openTag, "Can not use n:" + openTagName + " attribute as normal macro");
+					if (closeTag != null) {
+						holder.createErrorAnnotation(closeTag, "Macro n:" + openTagName + " can not be used as pair macro");
+					}
+
+				} else {
+					Annotation annotation = holder.createErrorAnnotation(openTag, "Unknown macro {" + openTagName + "}");
+					annotation.registerFix(new AddCustomPairMacro(openTagName));
+					annotation.registerFix(new AddCustomUnpairedMacro(openTagName));
+				}
 			}
 		}
 
@@ -89,11 +95,12 @@ public class LatteAnnotator implements Annotator {
 			holder.createErrorAnnotation(closeTag, "Unexpected {/" + closeTagName + "}, expected {/" + openTagName + "}");
 		}
 
-		if (macro != null
-				&& element instanceof LattePairMacro
-				&& (macro.type == LatteMacro.Type.PAIR || macro.type == LatteMacro.Type.AUTO_EMPTY)
+		if (
+				macro != null
 				&& closeTag == null
-				&& !openTagName.equals("block")) {
+				&& ((element instanceof LattePairMacro && macro.type == LatteMacro.Type.AUTO_EMPTY) || macro.type == LatteMacro.Type.PAIR)
+				&& !openTagName.equals("block"))
+		{
 			holder.createErrorAnnotation(openTag, "Unclosed macro " + openTagName);
 		}
 	}

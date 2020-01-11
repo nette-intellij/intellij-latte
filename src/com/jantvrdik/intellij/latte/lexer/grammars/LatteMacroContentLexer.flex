@@ -24,7 +24,7 @@ CONTENT_TYPE=[a-zA-Z\-][a-zA-Z0-9\-]*\/[a-zA-Z\-][a-zA-Z0-9\-\.]*
 
 <YYINITIAL> {
 
-	({CLASS_NAME} | "$" | {FUNCTION_CALL} | "\"" | "'" | "{" | "(" | "[") .+ {
+	({CLASS_NAME} | "$" | {FUNCTION_CALL} | "\"" | "'" | "{" | "(" | "[" | {SYMBOL}) .+ {
         return T_PHP_CONTENT;
     }
 
