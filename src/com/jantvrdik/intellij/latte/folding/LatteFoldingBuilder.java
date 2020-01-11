@@ -24,7 +24,7 @@ public class LatteFoldingBuilder extends FoldingBuilderEx {
 		List<FoldingDescriptor> descriptors = new ArrayList<FoldingDescriptor>();
 
 		if (!quick) {
-			Collection<LatteMacroClassic> nodes = PsiTreeUtil.findChildrenOfAnyType(root, LatteMacroClassic.class);
+			Collection<PsiElement> nodes = PsiTreeUtil.findChildrenOfAnyType(root, LatteMacroClassic.class, LatteAutoClosedBlock.class);
 			for (PsiElement node : nodes) {
 				int start = node.getFirstChild().getTextRange().getEndOffset();
 				int end = node.getLastChild().getTextRange().getEndOffset();
