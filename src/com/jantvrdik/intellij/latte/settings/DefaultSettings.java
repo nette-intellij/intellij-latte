@@ -1,5 +1,11 @@
 package com.jantvrdik.intellij.latte.settings;
 
+import com.jantvrdik.intellij.latte.config.LatteMacro;
+import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
+import com.jantvrdik.intellij.latte.utils.LatteUtil;
+
+import java.util.Arrays;
+
 public class DefaultSettings {
 
 	public static LatteVariableSettings[] defaultVariables = new LatteVariableSettings[]{
@@ -14,6 +20,24 @@ public class DefaultSettings {
 			new LatteVariableSettings("user", "\\Nette\\Security\\User"),
 	};
 
+	public static LatteCustomMacroSettings[] defaultMacros = new LatteCustomMacroSettings[]{
+			new LatteCustomMacroSettings("href", LatteMacro.Type.ATTR_ONLY),
+			new LatteCustomMacroSettings("link", LatteMacro.Type.UNPAIRED),
+			new LatteCustomMacroSettings("plink", LatteMacro.Type.UNPAIRED),
+			new LatteCustomMacroSettings("control", LatteMacro.Type.UNPAIRED),
+			new LatteCustomMacroSettings("snippet", LatteMacro.Type.PAIR),
+			new LatteCustomMacroSettings("snippetArea", LatteMacro.Type.PAIR),
+			new LatteCustomMacroSettings("form", LatteMacro.Type.PAIR, false, true),
+			new LatteCustomMacroSettings("formContainer", LatteMacro.Type.PAIR, false, true),
+			new LatteCustomMacroSettings("label", LatteMacro.Type.AUTO_EMPTY, false, true),
+			new LatteCustomMacroSettings("input", LatteMacro.Type.UNPAIRED, false, true),
+			new LatteCustomMacroSettings("name", LatteMacro.Type.ATTR_ONLY),
+			new LatteCustomMacroSettings("inputError", LatteMacro.Type.UNPAIRED, false, true),
+			new LatteCustomMacroSettings("_", LatteMacro.Type.PAIR),
+			new LatteCustomMacroSettings("dump", LatteMacro.Type.UNPAIRED, false, true),
+			new LatteCustomMacroSettings("cache", LatteMacro.Type.PAIR),
+	};
+
 	public static LatteCustomFunctionSettings[] defaultCustomFunctions = new LatteCustomFunctionSettings[]{
 			new LatteCustomFunctionSettings("isLinkCurrent", "bool", "(string $destination = null, $args = [])"),
 			new LatteCustomFunctionSettings("isModuleCurrent", "bool", "(string $moduleName)"),
@@ -23,8 +47,27 @@ public class DefaultSettings {
 		return defaultVariables;
 	}
 
+	public static boolean isDefaultVariable(String variableName) {
+		final String normalizedName = LattePhpUtil.normalizePhpVariable(variableName);
+		return Arrays.stream(defaultVariables).anyMatch(variable -> variable.getVarName().equals(normalizedName));
+	}
+
+	public static LatteCustomMacroSettings[] getDefaultMacros() {
+		return defaultMacros;
+	}
+
+	public static boolean isDefaultMacro(String macroName) {
+		final String normalizedName = LatteUtil.normalizeNAttrNameModifier(macroName);
+		return Arrays.stream(defaultMacros).anyMatch(macro -> macro.getMacroName().equals(normalizedName));
+	}
+
 	public static LatteCustomFunctionSettings[] getDefaultCustomFunctions() {
 		return defaultCustomFunctions;
+	}
+
+	public static boolean isDefaultFunction(String macroName) {
+		final String normalizedName = LatteUtil.normalizeNAttrNameModifier(macroName);
+		return Arrays.stream(defaultCustomFunctions).anyMatch(function -> function.getFunctionName().equals(normalizedName));
 	}
 }
 

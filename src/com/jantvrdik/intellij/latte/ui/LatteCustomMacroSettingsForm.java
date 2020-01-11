@@ -9,6 +9,7 @@ import com.intellij.util.ui.ColumnInfo;
 import com.intellij.util.ui.ElementProducer;
 import com.intellij.util.ui.ListTableModel;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
+import com.jantvrdik.intellij.latte.settings.DefaultSettings;
 import com.jantvrdik.intellij.latte.settings.LatteCustomMacroSettings;
 import com.jantvrdik.intellij.latte.settings.LatteSettings;
 import com.jantvrdik.intellij.latte.utils.LatteIdeHelper;
@@ -26,6 +27,7 @@ public class LatteCustomMacroSettingsForm implements Configurable {
 	private JPanel panelConfigTableView;
 	private JCheckBox enableCustomMacrosCheckBox;
 	private JButton buttonHelp;
+	private JButton resetToDefaultsButton;
 
 	private TableView<LatteCustomMacroSettings> tableView;
 	private Project project;
@@ -40,7 +42,8 @@ public class LatteCustomMacroSettingsForm implements Configurable {
 				new MacroNameColumn(),
 				new TypeColumn(),
 				new AllowedModifiersColumn(),
-				new HasParametersColumn()
+				new HasParametersColumn(),
+				new SourceColumn()
 		);
 
 		this.attachItems();
@@ -53,6 +56,14 @@ public class LatteCustomMacroSettingsForm implements Configurable {
 			public void mouseClicked(MouseEvent e) {
 				super.mouseClicked(e);
 				LatteIdeHelper.openUrl(LatteConfiguration.LATTE_HELP_URL + "en/tags");
+			}
+		});
+
+		resetToDefaultsButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				super.mouseClicked(e);
+				resetToDefaults();
 			}
 		});
 
@@ -122,6 +133,12 @@ public class LatteCustomMacroSettingsForm implements Configurable {
 		return this.panel1;
 	}
 
+	private void attachDefaultVariables() {
+		for (LatteCustomMacroSettings customMacroSettings : DefaultSettings.getDefaultMacros()) {
+			this.modelList.addRow(customMacroSettings);
+		}
+	}
+
 	@Override
 	public boolean isModified() {
 		return this.changed;
@@ -152,6 +169,11 @@ public class LatteCustomMacroSettingsForm implements Configurable {
 		this.resetList();
 		this.attachItems();
 		this.changed = false;
+	}
+
+	public void resetToDefaults() {
+		this.resetList();
+		this.attachDefaultVariables();
 	}
 
 	@Override
@@ -207,6 +229,19 @@ public class LatteCustomMacroSettingsForm implements Configurable {
 		@Override
 		public String valueOf(LatteCustomMacroSettings customMacroSettings) {
 			return customMacroSettings.hasParameters() ? "yes" : "no";
+		}
+	}
+
+	private static class SourceColumn extends SourceTypeColumn<LatteCustomMacroSettings> {
+
+		public SourceColumn() {
+			super("Source");
+		}
+
+		@Nullable
+		@Override
+		public Type valueOf(LatteCustomMacroSettings customMacroSettings) {
+			return DefaultSettings.isDefaultMacro(customMacroSettings.getMacroName()) ? Type.NETTE : Type.CUSTOM;
 		}
 	}
 

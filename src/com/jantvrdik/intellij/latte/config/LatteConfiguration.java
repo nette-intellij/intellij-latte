@@ -36,9 +36,6 @@ public class LatteConfiguration {
 		// Built-in
 		addStandardMacro("syntax", PAIR);
 
-		// CacheMacro
-		addStandardMacro("cache", PAIR);
-
 		// CoreMacros
 		addStandardMacroWithoutModifiers("if", PAIR);
 		addStandardMacroWithoutModifiers("ifset", PAIR);
@@ -68,12 +65,10 @@ public class LatteConfiguration {
 
 		addStandardMacro("assign", UNPAIRED);
 		addStandardMacro("default", UNPAIRED);
-		addStandardMacroWithoutModifiers("dump", UNPAIRED);
 		addStandardMacroWithoutModifiers("debugbreak", UNPAIRED);
 		addStandardMacroWithoutModifiers("l", UNPAIRED, false);
 		addStandardMacroWithoutModifiers("r", UNPAIRED, false);
 
-		addStandardMacro("_", PAIR);
 		addStandardMacro("=", UNPAIRED);
 		addStandardMacro("?", UNPAIRED);
 		addStandardMacro("php", UNPAIRED);
@@ -86,14 +81,6 @@ public class LatteConfiguration {
 		addStandardMacro("attr", ATTR_ONLY);
 		addStandardMacroWithoutParameters("nonce", ATTR_ONLY);
 
-		// FormMacros
-		addStandardMacroWithoutModifiers("form", PAIR);
-		addStandardMacroWithoutModifiers("formContainer", PAIR);
-		addStandardMacroWithoutModifiers("label", AUTO_EMPTY);
-		addStandardMacroWithoutModifiers("input", UNPAIRED);
-		addStandardMacro("name", ATTR_ONLY);
-		addStandardMacroWithoutModifiers("inputError", UNPAIRED);
-
 		// BlockMacros
 		LatteMacro includeBlock = addStandardMacroWithoutModifiers("includeblock", UNPAIRED);
 		includeBlock.deprecated = true;
@@ -103,20 +90,12 @@ public class LatteConfiguration {
 		addStandardMacro("layout", UNPAIRED);
 		addStandardMacro("block", PAIR);
 		addStandardMacro("define", PAIR);
-		addStandardMacro("snippet", PAIR);
-		addStandardMacro("snippetArea", PAIR);
-		// addStandardMacro("ifset", PAIR);
 
-		addStandardMacro("widget", UNPAIRED);
-		addStandardMacro("control", UNPAIRED);
-		addStandardMacro("href", ATTR_ONLY);
-
-		addStandardMacro("plink", UNPAIRED);
-		addStandardMacro("link", UNPAIRED);
-		addStandardMacroWithoutModifiers("ifCurrent", PAIR);
+		LatteMacro ifCurrent = addStandardMacroWithoutModifiers("ifCurrent", PAIR);
+		ifCurrent.deprecated = true;
+		ifCurrent.deprecatedMessage = "Macro ifCurrent is deprecated in Latte 2.6. Use custom function isLinkCurrent() instead.";
 
 		addStandardMacroWithoutModifiers("contentType", UNPAIRED);
-		addStandardMacroWithoutModifiers("status", UNPAIRED);
 	}
 
 	private void initStandardModifiers() {

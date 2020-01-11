@@ -44,7 +44,8 @@ public class MacroInsertHandler implements InsertHandler<LookupElement> {
 				macro = LatteConfiguration.INSTANCE.getMacro(element.getProject(), macroName);
 			}
 
-			if (macro != null && macro.type == LatteMacro.Type.PAIR) {
+			boolean isCloseTag = parent instanceof LatteMacroCloseTag;
+			if (!isCloseTag && macro != null && macro.type == LatteMacro.Type.PAIR) {
 				resolvePairMacro = true;
 			}
 
@@ -55,7 +56,7 @@ public class MacroInsertHandler implements InsertHandler<LookupElement> {
 
 				int spaceInserted = 0;
 				int offset = caretModel.getOffset();
-				boolean isCloseTag = parent instanceof LatteMacroCloseTag;
+
 				if (macro != null && !isCloseTag && macro.hasParameters && !LatteUtil.isStringAtCaret(editor, " ")) {
 					EditorModificationUtil.insertStringAtCaret(editor, " ");
 					spaceInserted = 1;
@@ -65,7 +66,7 @@ public class MacroInsertHandler implements InsertHandler<LookupElement> {
 					int lastBraceOffset = text.indexOf("}", offset);
 					int endOfLineOffset = text.indexOf("\n", offset);
 
-					if (lastBraceOffset == -1 || lastBraceOffset > endOfLineOffset) {
+					if (endOfLineOffset != -1 && (lastBraceOffset == -1 || lastBraceOffset > endOfLineOffset)) {
 						caretModel.moveToOffset(endOfLineOffset + spaceInserted);
 						EditorModificationUtil.insertStringAtCaret(editor, "}");
 						lastBraceOffset = endOfLineOffset;

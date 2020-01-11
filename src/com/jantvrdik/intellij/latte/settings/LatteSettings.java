@@ -58,11 +58,17 @@ public class LatteSettings implements PersistentStateComponent<LatteSettings> {
 			wasFirstInitialized = true;
 		}
 
-		if (!wasFirstInitializedFunctions) { //todo: remove this in future version (only for now if someone have variables but not functions)
+		if (!wasFirstInitializedFunctions) {
 			if (customFunctionSettings == null) {
 				customFunctionSettings = new ArrayList<>();
 			}
 			customFunctionSettings.addAll(Arrays.asList(DefaultSettings.getDefaultCustomFunctions()));
+
+			if (customMacroSettings == null) {
+				customMacroSettings = new ArrayList<>();
+			}
+			customMacroSettings.addAll(Arrays.asList(DefaultSettings.getDefaultMacros()));
+
 			wasFirstInitializedFunctions = true;
 		}
 		return this;
