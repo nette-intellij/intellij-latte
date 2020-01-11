@@ -248,4 +248,8 @@ public class LatteUtil {
     public static String normalizeMacroModifier(String name) {
         return name.startsWith("|") ? name.substring(1) : name;
     }
+
+    public static String normalizeNAttrNameModifier(String name) {
+        return name.startsWith("n:") ? name.substring(2) : name;
+    }
 }

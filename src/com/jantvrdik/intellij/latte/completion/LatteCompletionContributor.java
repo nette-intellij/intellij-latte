@@ -3,16 +3,14 @@ package com.jantvrdik.intellij.latte.completion;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.openapi.editor.CaretModel;
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
 import com.jantvrdik.intellij.latte.LatteLanguage;
-import com.jantvrdik.intellij.latte.completion.handlers.PhpMacroInsertHandler;
+import com.jantvrdik.intellij.latte.completion.handlers.AttrMacroInsertHandler;
+import com.jantvrdik.intellij.latte.completion.handlers.MacroInsertHandler;
 import com.jantvrdik.intellij.latte.completion.providers.LattePhpCompletionProvider;
 import com.jantvrdik.intellij.latte.completion.providers.LatteVariableCompletionProvider;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
@@ -39,9 +37,6 @@ public class LatteCompletionContributor extends CompletionContributor {
 
 	/** cached lookup elements for standard attribute macros */
 	private List<LookupElement> classicModifiersCompletions;
-
-	/** insert handler for attribute macros */
-	private InsertHandler<LookupElement> attrMacroInsertHandler = new AttrMacroInsertHandler<LookupElement>();
 
 	public LatteCompletionContributor() {
 		initStandardMacrosCompletions();
@@ -175,12 +170,13 @@ public class LatteCompletionContributor extends CompletionContributor {
 	private LookupElementBuilder createBuilderForMacro(LatteMacro macro) {
 		LookupElementBuilder builder = LookupElementBuilder.create(macro.name);
 		builder = builder.withIcon(LatteIcons.MACRO);
-		builder = builder.withInsertHandler(PhpMacroInsertHandler.getInstance());
+		builder = builder.withInsertHandler(MacroInsertHandler.getInstance());
 		return builder.withTypeText(macro.type.toString(), true);
 	}
 
 	private LookupElementBuilder createBuilderForTag(String name) {
 		LookupElementBuilder builder = LookupElementBuilder.create(name);
+		builder = builder.withInsertHandler(AttrMacroInsertHandler.getInstance());
 		return builder.withIcon(LatteIcons.N_TAG);
 	}
 
@@ -191,29 +187,13 @@ public class LatteCompletionContributor extends CompletionContributor {
 		List<LookupElement> lookupElements = new ArrayList<LookupElement>(macros.size());
 		for (LatteMacro macro : macros.values()) {
 			if (macro.type != LatteMacro.Type.UNPAIRED) {
-				lookupElements.add(createBuilderForTag("n:" + macro.name).withInsertHandler(attrMacroInsertHandler));
+				lookupElements.add(createBuilderForTag("n:" + macro.name));
 				if (macro.type == LatteMacro.Type.PAIR || macro.type == LatteMacro.Type.AUTO_EMPTY) {
-					lookupElements.add(createBuilderForTag("n:tag-" + macro.name).withInsertHandler(attrMacroInsertHandler));
-					lookupElements.add(createBuilderForTag("n:inner-" + macro.name).withInsertHandler(attrMacroInsertHandler));
+					lookupElements.add(createBuilderForTag("n:tag-" + macro.name));
+					lookupElements.add(createBuilderForTag("n:inner-" + macro.name));
 				}
 			}
 		}
 		return lookupElements;
-	}
-
-	/**
-	 * Inserts ="" after attribute macro and moves caret inside those quotes.
-	 */
-	private static class AttrMacroInsertHandler<T extends LookupElement> implements InsertHandler<T> {
-		@Override
-		public void handleInsert(InsertionContext context, LookupElement item) {
-			Editor editor = context.getEditor();
-			Document document = editor.getDocument();
-			CaretModel caretModel = editor.getCaretModel();
-			int offset = caretModel.getOffset();
-
-			document.insertString(offset, "=\"\"");
-			caretModel.moveToOffset(offset + 2);
-		}
 	}
 }

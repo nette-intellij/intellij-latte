@@ -14,6 +14,7 @@ import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAtt
 public class LatteSyntaxHighlighter extends SyntaxHighlighterBase {
 
 	public static final TextAttributesKey HTML_NATTR_NAME = createTextAttributesKey("LATTE_HTML_NATTR_NAME", DefaultLanguageHighlighterColors.KEYWORD);
+	public static final TextAttributesKey HTML_NATTR_VALUE = createTextAttributesKey("LATTE_HTML_NATTR_VALUE", DefaultLanguageHighlighterColors.STRING);
 	public static final TextAttributesKey MACRO_DELIMITERS = createTextAttributesKey("LATTE_MACRO_DELIMITERS", DefaultLanguageHighlighterColors.BRACKETS);
 	public static final TextAttributesKey MACRO_NAME = createTextAttributesKey("LATTE_MACRO_NAME", DefaultLanguageHighlighterColors.KEYWORD);
 	public static final TextAttributesKey MACRO_ARGS_VAR = createTextAttributesKey("LATTE_MACRO_ARGS_VAR", DefaultLanguageHighlighterColors.INSTANCE_FIELD);
@@ -26,6 +27,7 @@ public class LatteSyntaxHighlighter extends SyntaxHighlighterBase {
 	public static final TextAttributesKey PHP_METHOD = createTextAttributesKey("LATTE_PHP_METHOD", DefaultLanguageHighlighterColors.INSTANCE_METHOD);
 	public static final TextAttributesKey PHP_IDENTIFIER = createTextAttributesKey("LATTE_PHP_IDENTIFIER", DefaultLanguageHighlighterColors.INSTANCE_FIELD);
 	public static final TextAttributesKey PHP_CONTENT_TYPE = createTextAttributesKey("LATTE_PHP_CONTENT_TYPE", DefaultLanguageHighlighterColors.PREDEFINED_SYMBOL);
+	public static final TextAttributesKey PHP_CAST = createTextAttributesKey("LATTE_PHP_CAST", DefaultLanguageHighlighterColors.LABEL);
 	public static final TextAttributesKey PHP_TYPE = createTextAttributesKey("LATTE_PHP_TYPE", DefaultLanguageHighlighterColors.KEYWORD);
 	public static final TextAttributesKey PHP_NULL = createTextAttributesKey("LATTE_PHP_NULL", DefaultLanguageHighlighterColors.KEYWORD);
 
@@ -73,11 +75,17 @@ public class LatteSyntaxHighlighter extends SyntaxHighlighterBase {
 		} else if (token == LatteTypes.T_PHP_TYPE) {
 			return pack(PHP_TYPE);
 
+		} else if (token == LatteTypes.T_PHP_CAST) {
+			return pack(PHP_CAST);
+
 		} else if (token == LatteTypes.T_PHP_NULL) {
 			return pack(PHP_NULL);
 
 		} else if (token == LatteTypes.T_PHP_IDENTIFIER) {
 			return pack(PHP_IDENTIFIER);
+
+		} else if (token == LatteTypes.T_HTML_TAG_ATTR_DQ || token == LatteTypes.T_HTML_TAG_ATTR_SQ || token == LatteTypes.T_HTML_TAG_ATTR_EQUAL_SIGN) {
+			return pack(HTML_NATTR_VALUE);
 
 		} else if (token == LatteTypes.T_MACRO_FILTERS) {
 			return pack(MACRO_MODIFIERS);

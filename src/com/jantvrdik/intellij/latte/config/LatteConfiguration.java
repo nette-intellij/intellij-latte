@@ -42,7 +42,7 @@ public class LatteConfiguration {
 		// CoreMacros
 		addStandardMacroWithoutModifiers("if", PAIR);
 		addStandardMacroWithoutModifiers("ifset", PAIR);
-		addStandardMacroWithoutModifiers("else", UNPAIRED);
+		addStandardMacroWithoutModifiers("else", UNPAIRED, false);
 		addStandardMacroWithoutModifiers("elseif", UNPAIRED);
 		addStandardMacroWithoutModifiers("elseifset", UNPAIRED);
 		addStandardMacro("ifcontent", PAIR);
@@ -55,11 +55,12 @@ public class LatteConfiguration {
 		addStandardMacroWithoutModifiers("while", PAIR);
 		addStandardMacroWithoutModifiers("continueIf", UNPAIRED);
 		addStandardMacroWithoutModifiers("breakIf", UNPAIRED);
-		addStandardMacro("first", PAIR);
-		addStandardMacro("last", PAIR);
-		addStandardMacro("sep", PAIR);
 
-		addStandardMacroWithoutModifiers("spaceless", PAIR);
+		addStandardMacroWithoutParameters("first", PAIR);
+		addStandardMacroWithoutParameters("last", PAIR);
+		addStandardMacroWithoutParameters("sep", PAIR);
+
+		addStandardMacroWithoutModifiers("spaceless", PAIR, false);
 
 		addStandardMacroWithoutModifiers("var", UNPAIRED);
 		addStandardMacroWithoutModifiers("varType", UNPAIRED);
@@ -69,8 +70,8 @@ public class LatteConfiguration {
 		addStandardMacro("default", UNPAIRED);
 		addStandardMacroWithoutModifiers("dump", UNPAIRED);
 		addStandardMacroWithoutModifiers("debugbreak", UNPAIRED);
-		addStandardMacroWithoutModifiers("l", UNPAIRED);
-		addStandardMacroWithoutModifiers("r", UNPAIRED);
+		addStandardMacroWithoutModifiers("l", UNPAIRED, false);
+		addStandardMacroWithoutModifiers("r", UNPAIRED, false);
 
 		addStandardMacro("_", PAIR);
 		addStandardMacro("=", UNPAIRED);
@@ -83,6 +84,7 @@ public class LatteConfiguration {
 
 		addStandardMacro("class", ATTR_ONLY);
 		addStandardMacro("attr", ATTR_ONLY);
+		addStandardMacroWithoutParameters("nonce", ATTR_ONLY);
 
 		// FormMacros
 		addStandardMacroWithoutModifiers("form", PAIR);
@@ -272,7 +274,7 @@ public class LatteConfiguration {
 		for (LatteCustomMacroSettings customMacro : settings.customMacroSettings) {
 			projectMacros.put(
 					customMacro.getMacroName(),
-					new LatteMacro(customMacro.getMacroName(), customMacro.getType(), customMacro.isAllowedModifiers())
+					new LatteMacro(customMacro.getMacroName(), customMacro.getType(), customMacro.isAllowedModifiers(), customMacro.hasParameters())
 			);
 		}
 		return Collections.unmodifiableMap(projectMacros);
@@ -306,12 +308,24 @@ public class LatteConfiguration {
 		addStandardMacro(name, type, true);
 	}
 
+	private void addStandardMacroWithoutParameters(String name, LatteMacro.Type type) {
+		addStandardMacro(name, type, true, false);
+	}
+
 	private LatteMacro addStandardMacroWithoutModifiers(String name, LatteMacro.Type type) {
 		return addStandardMacro(name, type, false);
 	}
 
+	private void addStandardMacroWithoutModifiers(String name, LatteMacro.Type type, boolean hasParameters) {
+		addStandardMacro(name, type, false, hasParameters);
+	}
+
 	private LatteMacro addStandardMacro(String name, LatteMacro.Type type, boolean allowedModifiers) {
-		LatteMacro macro = new LatteMacro(name, type, allowedModifiers);
+		return addStandardMacro(name, type, allowedModifiers, true);
+	}
+
+	private LatteMacro addStandardMacro(String name, LatteMacro.Type type, boolean allowedModifiers, boolean hasParameters) {
+		LatteMacro macro = new LatteMacro(name, type, allowedModifiers, hasParameters);
 		addStandardMacro(macro);
 		return macro;
 	}

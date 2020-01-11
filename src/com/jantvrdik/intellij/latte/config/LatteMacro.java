@@ -15,15 +15,18 @@ public class LatteMacro {
 
 	public boolean allowedModifiers;
 
+	public boolean hasParameters;
+
 	public String deprecatedMessage;
 
 	public LatteMacro(String name, Type type) {
-		this(name, type, true);
+		this(name, type, true, true);
 	}
 
-	public LatteMacro(String name, Type type, boolean allowedModifiers) {
+	public LatteMacro(String name, Type type, boolean allowedModifiers, boolean hasParameters) {
 		this.name = name;
 		this.type = type;
+		this.hasParameters = hasParameters;
 		this.allowedModifiers = allowedModifiers;
 	}
 

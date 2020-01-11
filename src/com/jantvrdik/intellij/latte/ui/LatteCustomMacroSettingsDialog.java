@@ -22,6 +22,7 @@ public class LatteCustomMacroSettingsDialog extends JDialog {
     private JTextField textVarName;
     private JComboBox<String> macroType;
     private JCheckBox checkBoxAllowedModifiers;
+    private JCheckBox checkBosHasParameters;
     private LatteCustomMacroSettings latteCustomMacroSettings;
     private TableView<LatteCustomMacroSettings> tableView;
 
@@ -81,6 +82,7 @@ public class LatteCustomMacroSettingsDialog extends JDialog {
         }
 
         settings.setAllowedModifiers(this.checkBoxAllowedModifiers.isSelected());
+        settings.setHasParameters(this.checkBosHasParameters.isSelected());
         dispose();
     }
 

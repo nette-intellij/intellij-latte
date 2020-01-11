@@ -14,15 +14,14 @@ import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.config.LatteMacro;
 import com.jantvrdik.intellij.latte.psi.LatteMacroTag;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
-import com.jantvrdik.intellij.latte.utils.LatteTypesUtil;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import org.jetbrains.annotations.NotNull;
 
-public class PhpMacroInsertHandler implements InsertHandler<LookupElement> {
+public class MacroInsertHandler implements InsertHandler<LookupElement> {
 
-	private static final PhpMacroInsertHandler instance = new PhpMacroInsertHandler();
+	private static final MacroInsertHandler instance = new MacroInsertHandler();
 
-	public PhpMacroInsertHandler() {
+	public MacroInsertHandler() {
 		super();
 	}
 
@@ -34,15 +33,17 @@ public class PhpMacroInsertHandler implements InsertHandler<LookupElement> {
 			boolean resolvePairMacro = false;
 			boolean lastError = parent.getLastChild().getNode().getElementType() == TokenType.ERROR_ELEMENT;
 			String macroName = null;
+			LatteMacro macro = null;
 			if (lastError && element.getNode().getElementType() == LatteTypes.T_MACRO_NAME) {
 				macroName = element.getText();
-				LatteMacro macro = LatteConfiguration.INSTANCE.getMacro(element.getProject(), macroName);
+				macro = LatteConfiguration.INSTANCE.getMacro(element.getProject(), macroName);
 				if (macro != null && macro.type == LatteMacro.Type.PAIR) {
 					resolvePairMacro = true;
 				}
 
 			} else if (parent instanceof LatteMacroTag) {
 				macroName = ((LatteMacroTag) parent).getMacroName();
+				macro = LatteConfiguration.INSTANCE.getMacro(element.getProject(), macroName);
 			}
 
 			if (macroName != null) {
@@ -52,7 +53,7 @@ public class PhpMacroInsertHandler implements InsertHandler<LookupElement> {
 
 				int spaceInserted = 0;
 				int offset = caretModel.getOffset();
-				if (LatteTypesUtil.isMacroWithSpaceAfterName(macroName) && !LatteUtil.isStringAtCaret(editor, " ")) {
+				if (macro != null && macro.hasParameters && !LatteUtil.isStringAtCaret(editor, " ")) {
 					EditorModificationUtil.insertStringAtCaret(editor, " ");
 					spaceInserted = 1;
 				}
@@ -82,7 +83,7 @@ public class PhpMacroInsertHandler implements InsertHandler<LookupElement> {
 		}
 	}
 
-	public static PhpMacroInsertHandler getInstance() {
+	public static MacroInsertHandler getInstance() {
 		return instance;
 	}
 }

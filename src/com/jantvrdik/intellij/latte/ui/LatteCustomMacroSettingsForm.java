@@ -39,7 +39,8 @@ public class LatteCustomMacroSettingsForm implements Configurable {
 		this.modelList = new ListTableModel<LatteCustomMacroSettings>(
 				new MacroNameColumn(),
 				new TypeColumn(),
-				new AllowedModifiersColumn()
+				new AllowedModifiersColumn(),
+				new HasParametersColumn()
 		);
 
 		this.attachItems();
@@ -193,6 +194,19 @@ public class LatteCustomMacroSettingsForm implements Configurable {
 		@Override
 		public String valueOf(LatteCustomMacroSettings customMacroSettings) {
 			return customMacroSettings.isAllowedModifiers() ? "yes" : "no";
+		}
+	}
+
+	private static class HasParametersColumn extends ColumnInfo<LatteCustomMacroSettings, String> {
+
+		public HasParametersColumn() {
+			super("Has parameters");
+		}
+
+		@Nullable
+		@Override
+		public String valueOf(LatteCustomMacroSettings customMacroSettings) {
+			return customMacroSettings.hasParameters() ? "yes" : "no";
 		}
 	}
 
