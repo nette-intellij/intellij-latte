@@ -66,7 +66,10 @@ public class MacroInsertHandler implements InsertHandler<LookupElement> {
 					int lastBraceOffset = text.indexOf("}", offset);
 					int endOfLineOffset = text.indexOf("\n", offset);
 
-					if (endOfLineOffset != -1 && (lastBraceOffset == -1 || lastBraceOffset > endOfLineOffset)) {
+					if (endOfLineOffset == -1) {
+						endOfLineOffset = text.length();
+					}
+					if (lastBraceOffset == -1 || lastBraceOffset > endOfLineOffset) {
 						caretModel.moveToOffset(endOfLineOffset + spaceInserted);
 						EditorModificationUtil.insertStringAtCaret(editor, "}");
 						lastBraceOffset = endOfLineOffset;

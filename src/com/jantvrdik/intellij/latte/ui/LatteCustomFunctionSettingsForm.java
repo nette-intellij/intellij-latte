@@ -41,7 +41,8 @@ public class LatteCustomFunctionSettingsForm implements Configurable {
 		this.modelList = new ListTableModel<LatteCustomFunctionSettings>(
 				new NameColumn(),
 				new ReturnTypeColumn(),
-				new HelpColumn()
+				new HelpColumn(),
+				new SourceColumn()
 		);
 
 		this.attachItems();
@@ -179,7 +180,7 @@ public class LatteCustomFunctionSettingsForm implements Configurable {
 
 	}
 
-	private class NameColumn extends ColumnInfo<LatteCustomFunctionSettings, String> {
+	private static class NameColumn extends ColumnInfo<LatteCustomFunctionSettings, String> {
 
 		public NameColumn() {
 			super("Name");
@@ -204,16 +205,30 @@ public class LatteCustomFunctionSettingsForm implements Configurable {
 			return functionSettings.getFunctionReturnType();
 		}
 	}
-	private class HelpColumn extends ColumnInfo<LatteCustomFunctionSettings, String> {
-
+	private static class HelpColumn extends ColumnInfo<LatteCustomFunctionSettings, String> {
 
 		public HelpColumn() {
 			super("Help");
 		}
+
 		@Nullable
 		@Override
 		public String valueOf(LatteCustomFunctionSettings functionSettings) {
 			return functionSettings.getFunctionHelp();
+		}
+
+	}
+
+	private static class SourceColumn extends SourceTypeColumn<LatteCustomFunctionSettings> {
+
+		public SourceColumn() {
+			super("Source");
+		}
+
+		@Nullable
+		@Override
+		public Type valueOf(LatteCustomFunctionSettings functionSettings) {
+			return DefaultSettings.isDefaultFunction(functionSettings.getFunctionName()) ? Type.NETTE : Type.CUSTOM;
 		}
 
 	}

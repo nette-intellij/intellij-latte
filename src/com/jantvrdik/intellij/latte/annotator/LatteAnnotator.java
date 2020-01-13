@@ -99,8 +99,9 @@ public class LatteAnnotator implements Annotator {
 				macro != null
 				&& closeTag == null
 				&& ((element instanceof LattePairMacro && macro.type == LatteMacro.Type.AUTO_EMPTY) || macro.type == LatteMacro.Type.PAIR)
-				&& !openTagName.equals("block"))
-		{
+				&& !openTagName.equals("block")
+				&& !openTagName.equals("_")
+		) {
 			holder.createErrorAnnotation(openTag, "Unclosed macro " + openTagName);
 		}
 	}

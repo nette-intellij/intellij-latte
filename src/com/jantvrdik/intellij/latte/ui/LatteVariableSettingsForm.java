@@ -40,7 +40,8 @@ public class LatteVariableSettingsForm implements Configurable {
 		this.tableView = new TableView<LatteVariableSettings>();
 		this.modelList = new ListTableModel<LatteVariableSettings>(
 				new VarNameColumn(),
-				new VarTypeColumn()
+				new VarTypeColumn(),
+				new SourceColumn()
 		);
 
 		this.attachItems();
@@ -201,6 +202,19 @@ public class LatteVariableSettingsForm implements Configurable {
 		@Override
 		public String valueOf(LatteVariableSettings latteVariableSettings) {
 			return latteVariableSettings.getVarType();
+		}
+	}
+
+	private static class SourceColumn extends SourceTypeColumn<LatteVariableSettings> {
+
+		public SourceColumn() {
+			super("Source");
+		}
+
+		@Nullable
+		@Override
+		public Type valueOf(LatteVariableSettings methodParameterSetting) {
+			return DefaultSettings.isDefaultVariable(methodParameterSetting.getVarName()) ? Type.NETTE : Type.CUSTOM;
 		}
 	}
 
