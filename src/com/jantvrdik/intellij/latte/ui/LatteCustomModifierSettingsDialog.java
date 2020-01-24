@@ -54,7 +54,7 @@ public class LatteCustomModifierSettingsDialog extends JDialog {
 
         this.textName.setText(latteCustomModifierSettings.getModifierName());
         this.textHelp.setText(latteCustomModifierSettings.getModifierHelp());
-        this.textDescription.setText(latteCustomModifierSettings.getModifierHelp());
+        this.textDescription.setText(latteCustomModifierSettings.getModifierDescription());
         this.latteCustomModifierSettings = latteCustomModifierSettings;
     }
 

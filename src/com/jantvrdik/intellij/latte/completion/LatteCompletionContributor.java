@@ -168,7 +168,7 @@ public class LatteCompletionContributor extends CompletionContributor {
 	private LookupElementBuilder createBuilderWithHelp(LatteModifier modifier) {
 		LookupElementBuilder builder = LookupElementBuilder.create(modifier.name);
 		if (modifier.description.trim().length() > 0) {
-			builder = builder.withTypeText(modifier.description, true);
+			builder = builder.withTypeText(modifier.description);
 		}
 		if (modifier.help.trim().length() > 0) {
 			builder = builder.withTailText(modifier.help);
