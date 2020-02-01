@@ -17,12 +17,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DeprecatedMacroInspection extends LocalInspectionTool {
+public class DeprecatedTagInspection extends LocalInspectionTool {
 
 	@NotNull
 	@Override
 	public String getShortName() {
-		return "DeprecatedMacro";
+		return "DeprecatedTag";
 	}
 
 	@Nullable
@@ -39,7 +39,7 @@ public class DeprecatedMacroInspection extends LocalInspectionTool {
 					String macroName = ((LatteMacroTag) element).getMacroName();
 					LatteMacro macro = LatteConfiguration.INSTANCE.getMacro(element.getProject(), macroName);
 					if (macro != null && macro.deprecated) {
-						String description = macro.deprecatedMessage != null ? macro.deprecatedMessage : "Macro " + macroName + " is deprecated";
+						String description = macro.deprecatedMessage != null ? macro.deprecatedMessage : "Tag {" + macroName + "} is deprecated";
 						ProblemDescriptor problem = manager.createProblemDescriptor(element, description, true, ProblemHighlightType.LIKE_DEPRECATED, isOnTheFly);
 						problems.add(problem);
 

@@ -179,7 +179,7 @@
 		/>
 
 		<projectConfigurable instance="com.jantvrdik.intellij.latte.ui.LatteCustomMacroSettingsForm"
-							 displayName="Macros"
+							 displayName="Tags"
 							 parentId="Latte.LatteSettingsForm"
 							 id="Latte.LatteCustomMacroSettingsForm"
 							 nonDefaultProject="true"
@@ -216,10 +216,10 @@
 						 groupName="Latte" enabledByDefault="true" level="WARNING"
 						 implementationClass="com.jantvrdik.intellij.latte.inspections.ModifierDefinitionInspection"/>
 
-		<localInspection language="Latte" shortName="DeprecatedMacro" id="DeprecatedMacro"
-						 displayName="Deprecated macro"
+		<localInspection language="Latte" shortName="DeprecatedTag" id="DeprecatedTag"
+						 displayName="Deprecated tag"
 						 groupName="Latte" enabledByDefault="true"
-						 implementationClass="com.jantvrdik.intellij.latte.inspections.DeprecatedMacroInspection"/>
+						 implementationClass="com.jantvrdik.intellij.latte.inspections.DeprecatedTagInspection"/>
 
 		<localInspection language="Latte" shortName="LatteVariablesProblems" id="LatteVariablesProblems"
 						 displayName="Variables problems"
@@ -261,7 +261,7 @@
 						 groupName="Latte" enabledByDefault="true"
 						 implementationClass="com.jantvrdik.intellij.latte.inspections.MacroVarTypeInspection"/>
 
-		<localInspection language="Latte" shortName="LatteMacroVar" id="LatteMacroVar"
+		<localInspection language="Latte" shortName="LatteTagVar" id="LatteTagVar"
 						 displayName="Var definition"
 						 groupName="Latte" enabledByDefault="true"
 						 implementationClass="com.jantvrdik.intellij.latte.inspections.MacroVarInspection"/>

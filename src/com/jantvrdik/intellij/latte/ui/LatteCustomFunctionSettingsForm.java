@@ -21,6 +21,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.List;
 
 public class LatteCustomFunctionSettingsForm implements Configurable {
 	private JPanel panel1;
@@ -132,12 +133,6 @@ public class LatteCustomFunctionSettingsForm implements Configurable {
 		return this.panel1;
 	}
 
-	private void attachDefaultVariables() {
-		for (LatteCustomFunctionSettings customFunctionSettings : DefaultSettings.getDefaultCustomFunctions()) {
-			this.modelList.addRow(customFunctionSettings);
-		}
-	}
-
 	@Override
 	public boolean isModified() {
 		return this.changed;
@@ -171,8 +166,29 @@ public class LatteCustomFunctionSettingsForm implements Configurable {
 	}
 
 	public void resetToDefaults() {
+		java.util.List<String> foundMacros = new ArrayList<String>();
+		List<LatteCustomFunctionSettings> newSettings = new ArrayList<LatteCustomFunctionSettings>();
+		for (LatteCustomFunctionSettings functionSettings : this.modelList.getItems()) {
+			LatteCustomFunctionSettings defaultFunction = DefaultSettings.getDefaultFunction(functionSettings.getFunctionName());
+			if (defaultFunction != null) {
+				newSettings.add(defaultFunction);
+				foundMacros.add(functionSettings.getFunctionName());
+			} else {
+				newSettings.add(functionSettings);
+			}
+		}
+
+		for (LatteCustomFunctionSettings customFunctionSettings : DefaultSettings.getDefaultCustomFunctions()) {
+			if (!foundMacros.contains(customFunctionSettings.getFunctionName())) {
+				newSettings.add(customFunctionSettings);
+			}
+		}
+
 		this.resetList();
-		this.attachDefaultVariables();
+
+		for (LatteCustomFunctionSettings customFunctionSettings : newSettings) {
+			this.modelList.addRow(customFunctionSettings);
+		}
 	}
 
 	@Override

@@ -21,6 +21,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.List;
 
 public class LatteCustomMacroSettingsForm implements Configurable {
 	private JPanel panel1;
@@ -133,12 +134,6 @@ public class LatteCustomMacroSettingsForm implements Configurable {
 		return this.panel1;
 	}
 
-	private void attachDefaultVariables() {
-		for (LatteCustomMacroSettings customMacroSettings : DefaultSettings.getDefaultMacros()) {
-			this.modelList.addRow(customMacroSettings);
-		}
-	}
-
 	@Override
 	public boolean isModified() {
 		return this.changed;
@@ -161,7 +156,6 @@ public class LatteCustomMacroSettingsForm implements Configurable {
 		while(this.modelList.getRowCount() > 0) {
 			this.modelList.removeRow(0);
 		}
-
 	}
 
 	@Override
@@ -172,8 +166,29 @@ public class LatteCustomMacroSettingsForm implements Configurable {
 	}
 
 	public void resetToDefaults() {
+		List<String> foundMacros = new ArrayList<String>();
+		List<LatteCustomMacroSettings> newSettings = new ArrayList<LatteCustomMacroSettings>();
+		for (LatteCustomMacroSettings macroSettings : this.modelList.getItems()) {
+			LatteCustomMacroSettings defaultMacro = DefaultSettings.getDefaultMacro(macroSettings.getMacroName());
+			if (defaultMacro != null) {
+				newSettings.add(defaultMacro);
+				foundMacros.add(macroSettings.getMacroName());
+			} else {
+				newSettings.add(macroSettings);
+			}
+		}
+
+		for (LatteCustomMacroSettings customMacroSettings : DefaultSettings.getDefaultMacros()) {
+			if (!foundMacros.contains(customMacroSettings.getMacroName())) {
+				newSettings.add(customMacroSettings);
+			}
+		}
+
 		this.resetList();
-		this.attachDefaultVariables();
+
+		for (LatteCustomMacroSettings customMacroSettings : newSettings) {
+			this.modelList.addRow(customMacroSettings);
+		}
 	}
 
 	@Override
@@ -255,7 +270,7 @@ public class LatteCustomMacroSettingsForm implements Configurable {
 
 		Dimension dim = new Dimension();
 		dim.setSize(500, 130);
-		latteVariableDialog.setTitle("LatteCustomMacroSettings");
+		latteVariableDialog.setTitle("LatteCustomTagSettings");
 		latteVariableDialog.setMinimumSize(dim);
 		latteVariableDialog.pack();
 		latteVariableDialog.setLocationRelativeTo(this.panel1);

@@ -21,6 +21,6 @@ public class AddCustomUnpairedMacro extends AddCustomMacro {
 	@NotNull
 	@Override
 	public String getText() {
-		return "Add custom unpaired macro {" + macro.getMacroName() + "}";
+		return "Add custom unpaired tag {" + macro.getMacroName() + "}";
 	}
 }

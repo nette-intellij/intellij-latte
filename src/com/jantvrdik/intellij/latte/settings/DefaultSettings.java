@@ -3,6 +3,7 @@ package com.jantvrdik.intellij.latte.settings;
 import com.jantvrdik.intellij.latte.config.LatteMacro;
 import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
@@ -52,6 +53,14 @@ public class DefaultSettings {
 		return Arrays.stream(defaultVariables).anyMatch(variable -> variable.getVarName().equals(normalizedName));
 	}
 
+	@Nullable
+	public static LatteVariableSettings getDefaultVariable(String variableName) {
+		final String normalizedName = LattePhpUtil.normalizePhpVariable(variableName);
+		return Arrays.stream(defaultVariables).filter(variable -> variable.getVarName().equals(normalizedName))
+				.findFirst()
+				.orElse(null);
+	}
+
 	public static LatteCustomMacroSettings[] getDefaultMacros() {
 		return defaultMacros;
 	}
@@ -61,6 +70,14 @@ public class DefaultSettings {
 		return Arrays.stream(defaultMacros).anyMatch(macro -> macro.getMacroName().equals(normalizedName));
 	}
 
+	@Nullable
+	public static LatteCustomMacroSettings getDefaultMacro(String macroName) {
+		final String normalizedName = LatteUtil.normalizeNAttrNameModifier(macroName);
+		return Arrays.stream(defaultMacros).filter(macro -> macro.getMacroName().equals(normalizedName))
+				.findFirst()
+				.orElse(null);
+	}
+
 	public static LatteCustomFunctionSettings[] getDefaultCustomFunctions() {
 		return defaultCustomFunctions;
 	}
@@ -68,6 +85,14 @@ public class DefaultSettings {
 	public static boolean isDefaultFunction(String macroName) {
 		final String normalizedName = LatteUtil.normalizeNAttrNameModifier(macroName);
 		return Arrays.stream(defaultCustomFunctions).anyMatch(function -> function.getFunctionName().equals(normalizedName));
+	}
+
+	@Nullable
+	public static LatteCustomFunctionSettings getDefaultFunction(String macroName) {
+		final String normalizedName = LatteUtil.normalizeNAttrNameModifier(macroName);
+		return Arrays.stream(defaultCustomFunctions).filter(function -> function.getFunctionName().equals(normalizedName))
+				.findFirst()
+				.orElse(null);
 	}
 }
 

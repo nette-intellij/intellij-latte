@@ -22,7 +22,7 @@ public class MacroVarInspection extends LocalInspectionTool {
 	@NotNull
 	@Override
 	public String getShortName() {
-		return "LatteMacroVar";
+		return "LatteTagVar";
 	}
 
 	@Nullable
@@ -42,7 +42,7 @@ public class MacroVarInspection extends LocalInspectionTool {
 						List<LattePhpContent> phpContent = new ArrayList<>(macroContent.getPhpContentList());
 
 						if (phpContent.size() == 0) {
-							addError("Macro 'var' must have php content.", problems, element, manager, isOnTheFly);
+							addError("Tag {var} must have php content.", problems, element, manager, isOnTheFly);
 
 						} else {
 							Result result = new Result();
@@ -69,11 +69,11 @@ public class MacroVarInspection extends LocalInspectionTool {
 							}
 
 							if (!result.hasValidVariable) {
-								addError("Macro 'var' must contains valid variable.", problems, element, manager, isOnTheFly);
+								addError("Tag {var} must contains valid variable.", problems, element, manager, isOnTheFly);
 							}
 
 							if (result.beforeVarCount > 0) {
-								addError("Invalid content in 'var' macro.", problems, element, manager, isOnTheFly);
+								addError("Invalid content in {var} tag.", problems, element, manager, isOnTheFly);
 							}
 						}
 					}

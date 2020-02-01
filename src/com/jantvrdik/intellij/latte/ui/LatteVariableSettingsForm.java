@@ -21,6 +21,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.List;
 
 public class LatteVariableSettingsForm implements Configurable {
 	private JPanel panel1;
@@ -84,12 +85,6 @@ public class LatteVariableSettingsForm implements Configurable {
 
 		for (LatteVariableSettings methodParameterSetting : this.getSettings().variableSettings) {
 			this.modelList.addRow(methodParameterSetting);
-		}
-	}
-
-	private void attachDefaultVariables() {
-		for (LatteVariableSettings variableSettings : DefaultSettings.getDefaultVariables()) {
-			this.modelList.addRow(variableSettings);
 		}
 	}
 
@@ -170,8 +165,29 @@ public class LatteVariableSettingsForm implements Configurable {
 	}
 
 	public void resetToDefaults() {
+		java.util.List<String> foundVariables = new ArrayList<String>();
+		List<LatteVariableSettings> newSettings = new ArrayList<LatteVariableSettings>();
+		for (LatteVariableSettings functionSettings : this.modelList.getItems()) {
+			LatteVariableSettings defaultFunction = DefaultSettings.getDefaultVariable(functionSettings.getVarName());
+			if (defaultFunction != null) {
+				newSettings.add(defaultFunction);
+				foundVariables.add(functionSettings.getVarName());
+			} else {
+				newSettings.add(functionSettings);
+			}
+		}
+
+		for (LatteVariableSettings customVariable : DefaultSettings.getDefaultVariables()) {
+			if (!foundVariables.contains(customVariable.getVarName())) {
+				newSettings.add(customVariable);
+			}
+		}
+
 		this.resetList();
-		this.attachDefaultVariables();
+
+		for (LatteVariableSettings customVariable : newSettings) {
+			this.modelList.addRow(customVariable);
+		}
 	}
 
 	@Override

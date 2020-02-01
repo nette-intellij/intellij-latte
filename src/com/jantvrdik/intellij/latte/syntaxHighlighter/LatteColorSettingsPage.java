@@ -14,12 +14,12 @@ import java.util.Map;
 
 public class LatteColorSettingsPage implements ColorSettingsPage {
 	private static final AttributesDescriptor[] DESCRIPTORS = new AttributesDescriptor[] {
-		new AttributesDescriptor("Macro name", LatteSyntaxHighlighter.MACRO_NAME),
-		new AttributesDescriptor("Macro filters", LatteSyntaxHighlighter.MACRO_MODIFIERS),
-		new AttributesDescriptor("Macro delimiters", LatteSyntaxHighlighter.MACRO_DELIMITERS),
-		new AttributesDescriptor("Macro comment", LatteSyntaxHighlighter.MACRO_COMMENT),
-		new AttributesDescriptor("Attribute macro name", LatteSyntaxHighlighter.HTML_NATTR_NAME),
-		new AttributesDescriptor("Attribute macro value", LatteSyntaxHighlighter.HTML_NATTR_VALUE),
+		new AttributesDescriptor("Tag name", LatteSyntaxHighlighter.MACRO_NAME),
+		new AttributesDescriptor("Tag filters", LatteSyntaxHighlighter.MACRO_MODIFIERS),
+		new AttributesDescriptor("Tag delimiters", LatteSyntaxHighlighter.MACRO_DELIMITERS),
+		new AttributesDescriptor("Tag comment", LatteSyntaxHighlighter.MACRO_COMMENT),
+		new AttributesDescriptor("Attribute n:tag name", LatteSyntaxHighlighter.HTML_NATTR_NAME),
+		new AttributesDescriptor("Attribute n:tag value", LatteSyntaxHighlighter.HTML_NATTR_VALUE),
 		new AttributesDescriptor("PHP variable", LatteSyntaxHighlighter.MACRO_ARGS_VAR),
 		new AttributesDescriptor("PHP string", LatteSyntaxHighlighter.MACRO_ARGS_STRING),
 		new AttributesDescriptor("PHP number", LatteSyntaxHighlighter.MACRO_ARGS_NUMBER),

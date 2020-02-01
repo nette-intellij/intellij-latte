@@ -40,7 +40,7 @@ public class MacroVarTypeInspection extends LocalInspectionTool {
 						List<LattePhpContent> phpContent = new ArrayList<>(macroContent.getPhpContentList());
 
 						if (phpContent.size() == 0) {
-							addError("Macro 'varType' must have php content.", problems, element, manager, isOnTheFly);
+							addError("Tag {varType} must have php content.", problems, element, manager, isOnTheFly);
 
 						} else {
 							Result result = new Result();
@@ -70,18 +70,18 @@ public class MacroVarTypeInspection extends LocalInspectionTool {
 							}
 
 							if (!result.hasTypeFirst) {
-								addError("First value in 'varType' macro must be type hint.", problems, element, manager, isOnTheFly);
+								addError("First value in {varType} tag must be type hint.", problems, element, manager, isOnTheFly);
 							}
 
 							if (result.variableCount == 0) {
-								addError("Last value in 'varType' macro must be variable.", problems, element, manager, isOnTheFly);
+								addError("Last value in {varType} tag must be variable.", problems, element, manager, isOnTheFly);
 
 							} else if (result.variableCount > 1) {
-								addError("Only one variable can be defined in 'varType' macro.", problems, element, manager, isOnTheFly);
+								addError("Only one variable can be defined in {varType} tag.", problems, element, manager, isOnTheFly);
 							}
 
 							if (result.otherCount > 0) {
-								addError("Invalid content in 'varType' macro.", problems, element, manager, isOnTheFly);
+								addError("Invalid content in {varType} tag.", problems, element, manager, isOnTheFly);
 							}
 						}
 

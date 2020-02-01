@@ -85,7 +85,7 @@ public class LatteConfiguration {
 		// BlockMacros
 		LatteMacro includeBlock = addStandardMacroWithoutModifiers("includeblock", UNPAIRED);
 		includeBlock.deprecated = true;
-		includeBlock.deprecatedMessage = "Macro includeblock is deprecated in Latte 2.4. Use import macro instead.";
+		includeBlock.deprecatedMessage = "Tag {includeblock} is deprecated in Latte 2.4. Use {import} tag instead.";
 		addStandardMacro("import", UNPAIRED);
 		addStandardMacroWithoutModifiers("extends", UNPAIRED);
 		addStandardMacro("layout", UNPAIRED);
@@ -94,7 +94,7 @@ public class LatteConfiguration {
 
 		LatteMacro ifCurrent = addStandardMacroWithoutModifiers("ifCurrent", PAIR);
 		ifCurrent.deprecated = true;
-		ifCurrent.deprecatedMessage = "Macro ifCurrent is deprecated in Latte 2.6. Use custom function isLinkCurrent() instead.";
+		ifCurrent.deprecatedMessage = "Tag {ifCurrent} is deprecated in Latte 2.6. Use custom function isLinkCurrent() instead.";
 
 		addStandardMacroWithoutModifiers("contentType", UNPAIRED);
 	}

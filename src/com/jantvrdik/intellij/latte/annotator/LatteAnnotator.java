@@ -50,12 +50,12 @@ public class LatteAnnotator implements Annotator {
 
 		LatteMacro macro = LatteConfiguration.INSTANCE.getMacro(element.getProject(), macroName);
 		if (macro == null || macro.type == LatteMacro.Type.UNPAIRED) {
-			Annotation annotation = holder.createErrorAnnotation(attrName, "Unknown attribute macro " + attrName.getText());
+			Annotation annotation = holder.createErrorAnnotation(attrName, "Unknown attribute tag " + attrName.getText());
 			annotation.registerFix(new AddCustomPairMacro(macroName));
 			if (!prefixed) annotation.registerFix(new AddCustomAttrOnlyMacro(macroName));
 
 		} else if (prefixed && macro.type != LatteMacro.Type.PAIR && macro.type != LatteMacro.Type.AUTO_EMPTY) {
-			holder.createErrorAnnotation(attrName, "Attribute macro n:" + macroName + " can not be used with prefix.");
+			holder.createErrorAnnotation(attrName, "Attribute tag n:" + macroName + " can not be used with prefix.");
 		}
 	}
 
@@ -77,13 +77,13 @@ public class LatteAnnotator implements Annotator {
 
 			if (!isOk) {
 				if (macro != null) {
-					holder.createErrorAnnotation(openTag, "Can not use n:" + openTagName + " attribute as normal macro");
+					holder.createErrorAnnotation(openTag, "Can not use n:" + openTagName + " attribute as normal tag");
 					if (closeTag != null) {
-						holder.createErrorAnnotation(closeTag, "Macro n:" + openTagName + " can not be used as pair macro");
+						holder.createErrorAnnotation(closeTag, "Tag n:" + openTagName + " can not be used as pair tag");
 					}
 
 				} else {
-					Annotation annotation = holder.createErrorAnnotation(openTag, "Unknown macro {" + openTagName + "}");
+					Annotation annotation = holder.createErrorAnnotation(openTag, "Unknown tag {" + openTagName + "}");
 					annotation.registerFix(new AddCustomPairMacro(openTagName));
 					annotation.registerFix(new AddCustomUnpairedMacro(openTagName));
 				}
@@ -102,7 +102,7 @@ public class LatteAnnotator implements Annotator {
 				&& !openTagName.equals("block")
 				&& !openTagName.equals("_")
 		) {
-			holder.createErrorAnnotation(openTag, "Unclosed macro " + openTagName);
+			holder.createErrorAnnotation(openTag, "Unclosed tag " + openTagName);
 		}
 	}
 }

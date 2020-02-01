@@ -42,7 +42,7 @@ public class MacroTemplateTypeInspection extends LocalInspectionTool {
 					if (allMacros.size() > 1) {
 						ProblemDescriptor problem = manager.createProblemDescriptor(
 								element,
-								"Macro template type can be used only once per file.",
+								"Tag {templateType} can be used only once per file.",
 								true,
 								ProblemHighlightType.GENERIC_ERROR,
 								isOnTheFly
@@ -55,7 +55,7 @@ public class MacroTemplateTypeInspection extends LocalInspectionTool {
 						if (currentClasses.size() == 0) {
 							ProblemDescriptor problem = manager.createProblemDescriptor(
 									element,
-									"Invalid class name in macro templateType.",
+									"Invalid class name in tag {templateType}.",
 									true,
 									ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
 									isOnTheFly

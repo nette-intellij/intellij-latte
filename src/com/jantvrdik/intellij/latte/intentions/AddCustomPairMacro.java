@@ -21,6 +21,6 @@ public class AddCustomPairMacro extends AddCustomMacro {
 	@NotNull
 	@Override
 	public String getText() {
-		return "Add custom pair macro {" + macro.getMacroName() + "}...{/" + macro.getMacroName() + "} and n:" + macro.getMacroName();
+		return "Add custom pair tag {" + macro.getMacroName() + "}...{/" + macro.getMacroName() + "} and n:" + macro.getMacroName();
 	}
 }
