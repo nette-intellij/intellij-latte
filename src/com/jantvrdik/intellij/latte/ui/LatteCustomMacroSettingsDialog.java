@@ -57,12 +57,19 @@ public class LatteCustomMacroSettingsDialog extends JDialog {
         this.textVarName.setText(latteCustomMacroSettings.getMacroName());
         this.macroType.getModel().setSelectedItem(latteCustomMacroSettings.getMacroType());
         this.latteCustomMacroSettings = latteCustomMacroSettings;
+        this.checkBoxAllowedModifiers.setSelected(latteCustomMacroSettings.isAllowedModifiers());
+        this.checkBosHasParameters.setSelected(latteCustomMacroSettings.hasParameters());
 
         attachComboBoxValues();
     }
 
     private void attachComboBoxValues() {
-        for(LatteMacro.Type type: LatteMacro.Type.values()) {
+        LatteMacro.Type[] values = LatteMacro.Type.values();
+        if (macroType.getItemCount() == values.length) {
+            return;
+        }
+
+        for(LatteMacro.Type type: values) {
             macroType.addItem(type.toString());
         }
     }

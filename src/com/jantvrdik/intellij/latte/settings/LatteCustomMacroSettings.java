@@ -56,6 +56,10 @@ public class LatteCustomMacroSettings {
 	}
 
 	@Attribute("HasParameters")
+	public boolean isHasParameters() {
+		return hasParameters();
+	}
+
 	public boolean hasParameters() {
 		return hasParameters;
 	}

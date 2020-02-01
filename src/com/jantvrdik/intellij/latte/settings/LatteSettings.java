@@ -23,8 +23,6 @@ public class LatteSettings implements PersistentStateComponent<LatteSettings> {
 
 	public boolean wasFirstInitialized = false;
 
-	public boolean wasFirstInitializedFunctions = false;
-
 	public boolean enableDefaultVariables = true;
 
 	public boolean enableCustomMacros = true;
@@ -55,10 +53,7 @@ public class LatteSettings implements PersistentStateComponent<LatteSettings> {
 				variableSettings = new ArrayList<>();
 			}
 			variableSettings.addAll(Arrays.asList(DefaultSettings.getDefaultVariables()));
-			wasFirstInitialized = true;
-		}
 
-		if (!wasFirstInitializedFunctions) {
 			if (customFunctionSettings == null) {
 				customFunctionSettings = new ArrayList<>();
 			}
@@ -69,7 +64,7 @@ public class LatteSettings implements PersistentStateComponent<LatteSettings> {
 			}
 			customMacroSettings.addAll(Arrays.asList(DefaultSettings.getDefaultMacros()));
 
-			wasFirstInitializedFunctions = true;
+			wasFirstInitialized = true;
 		}
 		return this;
 	}

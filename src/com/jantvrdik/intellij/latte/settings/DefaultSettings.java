@@ -9,38 +9,38 @@ import java.util.Arrays;
 public class DefaultSettings {
 
 	public static LatteVariableSettings[] defaultVariables = new LatteVariableSettings[]{
-			new LatteVariableSettings("control", "\\Nette\\Application\\UI\\Control"),
-			new LatteVariableSettings("basePath", "string"),
-			new LatteVariableSettings("baseUrl", "string"),
-			new LatteVariableSettings("baseUri", "string"),
-			new LatteVariableSettings("flashes", "mixed[]"),
-			new LatteVariableSettings("presenter", "\\Nette\\Application\\UI\\Presenter"),
-			new LatteVariableSettings("iterator", "\\Latte\\Runtime\\CachingIterator"),
-			new LatteVariableSettings("form", "\\Nette\\Application\\UI\\Form"),
-			new LatteVariableSettings("user", "\\Nette\\Security\\User"),
+		new LatteVariableSettings("control", "\\Nette\\Application\\UI\\Control"),
+		new LatteVariableSettings("basePath", "string"),
+		new LatteVariableSettings("baseUrl", "string"),
+		new LatteVariableSettings("baseUri", "string"),
+		new LatteVariableSettings("flashes", "mixed[]"),
+		new LatteVariableSettings("presenter", "\\Nette\\Application\\UI\\Presenter"),
+		new LatteVariableSettings("iterator", "\\Latte\\Runtime\\CachingIterator"),
+		new LatteVariableSettings("form", "\\Nette\\Application\\UI\\Form"),
+		new LatteVariableSettings("user", "\\Nette\\Security\\User"),
 	};
 
 	public static LatteCustomMacroSettings[] defaultMacros = new LatteCustomMacroSettings[]{
-			new LatteCustomMacroSettings("href", LatteMacro.Type.ATTR_ONLY),
-			new LatteCustomMacroSettings("link", LatteMacro.Type.UNPAIRED),
-			new LatteCustomMacroSettings("plink", LatteMacro.Type.UNPAIRED),
-			new LatteCustomMacroSettings("control", LatteMacro.Type.UNPAIRED),
-			new LatteCustomMacroSettings("snippet", LatteMacro.Type.PAIR),
-			new LatteCustomMacroSettings("snippetArea", LatteMacro.Type.PAIR),
-			new LatteCustomMacroSettings("form", LatteMacro.Type.PAIR, false, true),
-			new LatteCustomMacroSettings("formContainer", LatteMacro.Type.PAIR, false, true),
-			new LatteCustomMacroSettings("label", LatteMacro.Type.AUTO_EMPTY, false, true),
-			new LatteCustomMacroSettings("input", LatteMacro.Type.UNPAIRED, false, true),
-			new LatteCustomMacroSettings("name", LatteMacro.Type.ATTR_ONLY),
-			new LatteCustomMacroSettings("inputError", LatteMacro.Type.UNPAIRED, false, true),
-			new LatteCustomMacroSettings("_", LatteMacro.Type.PAIR),
-			new LatteCustomMacroSettings("dump", LatteMacro.Type.UNPAIRED, false, true),
-			new LatteCustomMacroSettings("cache", LatteMacro.Type.PAIR),
+		new LatteCustomMacroSettings("href", LatteMacro.Type.ATTR_ONLY),
+		new LatteCustomMacroSettings("link", LatteMacro.Type.UNPAIRED),
+		new LatteCustomMacroSettings("plink", LatteMacro.Type.UNPAIRED),
+		new LatteCustomMacroSettings("control", LatteMacro.Type.UNPAIRED),
+		new LatteCustomMacroSettings("snippet", LatteMacro.Type.PAIR),
+		new LatteCustomMacroSettings("snippetArea", LatteMacro.Type.PAIR),
+		new LatteCustomMacroSettings("form", LatteMacro.Type.PAIR, false, true),
+		new LatteCustomMacroSettings("formContainer", LatteMacro.Type.PAIR, false, true),
+		new LatteCustomMacroSettings("label", LatteMacro.Type.AUTO_EMPTY, false, true),
+		new LatteCustomMacroSettings("input", LatteMacro.Type.UNPAIRED, false, true),
+		new LatteCustomMacroSettings("name", LatteMacro.Type.ATTR_ONLY),
+		new LatteCustomMacroSettings("inputError", LatteMacro.Type.UNPAIRED, false, true),
+		new LatteCustomMacroSettings("_", LatteMacro.Type.PAIR),
+		new LatteCustomMacroSettings("dump", LatteMacro.Type.UNPAIRED, false, true),
+		new LatteCustomMacroSettings("cache", LatteMacro.Type.PAIR),
 	};
 
 	public static LatteCustomFunctionSettings[] defaultCustomFunctions = new LatteCustomFunctionSettings[]{
-			new LatteCustomFunctionSettings("isLinkCurrent", "bool", "(string $destination = null, $args = [])"),
-			new LatteCustomFunctionSettings("isModuleCurrent", "bool", "(string $moduleName)"),
+		new LatteCustomFunctionSettings("isLinkCurrent", "bool", "(string $destination = null, $args = [])"),
+		new LatteCustomFunctionSettings("isModuleCurrent", "bool", "(string $moduleName)"),
 	};
 
 	public static LatteVariableSettings[] getDefaultVariables() {
