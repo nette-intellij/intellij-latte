@@ -25,7 +25,7 @@
             </constraints>
             <properties>
               <selected value="false"/>
-              <text value="Enable Custom Filters"/>
+              <text value="Enable Custom Functions"/>
             </properties>
           </component>
           <component id="1691f" class="javax.swing.JButton" binding="buttonHelp">

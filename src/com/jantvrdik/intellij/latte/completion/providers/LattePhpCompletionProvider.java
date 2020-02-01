@@ -75,12 +75,13 @@ public class LattePhpCompletionProvider extends BaseLatteCompletionProvider {
 			return;
 		}
 
+		boolean isMagicPrefixed = result.getPrefixMatcher().getPrefix().startsWith("__");
 		for (PhpClass phpClass : phpClasses) {
 			for (Method method : phpClass.getMethods()) {
 				PhpModifier modifier = method.getModifier();
 				if (modifier.isPublic() && canShowCompletionElement(isStatic, modifier)) {
 					String name = method.getName();
-					if (LatteTypesUtil.isExcludedCompletion(name)) {
+					if (!isMagicPrefixed && LatteTypesUtil.isExcludedCompletion(name)) {
 						continue;
 					}
 					PhpLookupElement lookupItem = getPhpLookupElement(method, name);

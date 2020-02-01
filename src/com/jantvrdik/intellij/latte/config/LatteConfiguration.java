@@ -123,7 +123,7 @@ public class LatteConfiguration {
 		addStandardModifier("capitalize", "lower case, the first letter of each word upper case");
 
 		addStandardModifier("date", "formats date", ":(format)");
-		addStandardModifier("number", "format number", ":(decimals = 0, decPoint = '.')");
+		addStandardModifier("number", "format number", ":(decimals = 0, decPoint = '.', thousandsSep = ',')");
 		addStandardModifier("bytes", "formats size in bytes", ":(precision = 2)");
 		addStandardModifier("dataStream", "Data URI protocol conversion", ":(mimetype = detect)");
 
@@ -274,7 +274,7 @@ public class LatteConfiguration {
 		for (LatteCustomModifierSettings customModifier : settings.customModifierSettings) {
 			projectModifiers.put(
 					customModifier.getModifierName(),
-					new LatteModifier(customModifier.getModifierName(), customModifier.getModifierHelp(), customModifier.getModifierDescription())
+					new LatteModifier(customModifier.getModifierName(), customModifier.getModifierDescription(), customModifier.getModifierHelp())
 			);
 		}
 		return Collections.unmodifiableMap(projectModifiers);
