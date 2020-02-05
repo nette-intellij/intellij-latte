@@ -15,18 +15,17 @@
 	tokenTypeClass="com.jantvrdik.intellij.latte.psi.LatteTokenType"
 }
 
-root             ::= (structureToken)*
+root             ::= (structureToken)* autoClosedBlock?
 
 // macro
 private
-macro            ::= macroComment
-					| (
-					      <<checkPairMacro true>> (<<checkEmptyMacro>> emptyMacro | pairMacro)
-						| <<checkPairMacro false>> unpairedMacro
-					)
+//macro            ::= macroComment | macroClassic
+macro            ::= macroComment | (
+                                          <<checkPairMacro true>> (<<checkEmptyMacro>> emptyMacro | pairMacro)
+                                        | <<checkPairMacro false>> unpairedMacro
+                                    )
 
 macroComment     ::= T_MACRO_COMMENT
-
 fake
 macroClassic     ::= macroTag macroTag?{
                      	methods = [
@@ -35,19 +34,17 @@ macroClassic     ::= macroTag macroTag?{
                      	]
                      }
 
-pairMacro        ::= macroOpenTag structureToken* macroCloseTag? { //incomplete pair macro is handled in a annotator
-					extends=macroClassic
-				    }
-
+pairMacro        ::= macroOpenTag structureToken* macroCloseTag { //incomplete pair macro is handled in a annotator
+                            extends=macroClassic
+                        }
 
 emptyMacro       ::= emptyMacroTag {
-					extends=macroClassic
-                    }
-
+                            extends=macroClassic
+                        }
 
 unpairedMacro    ::= macroOpenTag {
-					extends=macroClassic
-					}
+                            extends=macroClassic
+                        }
 
 fake
 macroTag         ::= classicMacroContent {
@@ -58,15 +55,23 @@ macroTag         ::= classicMacroContent {
                      }
 
 macroOpenTag     ::= T_MACRO_OPEN_TAG_OPEN classicMacroContent T_MACRO_TAG_CLOSE {
-						pin=1
-                     	extends = macroTag
+                        pin=1
+                        mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LatteMacroTagElementImpl"
+                        implements="com.jantvrdik.intellij.latte.psi.elements.LatteMacroTagElement"
+                        methods=[getName setName getNameIdentifier getMacroName]
+                        extends = macroTag
                      }
+
 macroCloseTag    ::= T_MACRO_CLOSE_TAG_OPEN classicMacroContent T_MACRO_TAG_CLOSE {
-						pin=1
+                        pin=1
+                        mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LatteMacroTagElementImpl"
+                        implements="com.jantvrdik.intellij.latte.psi.elements.LatteMacroTagElement"
+                        methods=[getName setName getNameIdentifier getMacroName]
                      	extends = macroTag
                      }
+
 emptyMacroTag    ::= T_MACRO_OPEN_TAG_OPEN classicMacroContent T_MACRO_TAG_CLOSE_EMPTY {
-						pin=1
+                        pin=1
                      	extends = macroTag
                      }
 
@@ -74,31 +79,19 @@ emptyMacroTag    ::= T_MACRO_OPEN_TAG_OPEN classicMacroContent T_MACRO_TAG_CLOSE
 private
 classicMacroContent     ::= macroName macroContent?
 
-macroContent ::= (T_MACRO_ARGS_NUMBER | T_MACRO_ARGS_SYMBOL
-			   | T_MACRO_ARGS_OBJECT_OPERATOR | T_MACRO_ARGS_PAAMAYIM_NEKUDOTAYIM
-			   | T_MACRO_ARGS_LEFT_BRACKET | T_MACRO_ARGS_RIGHT_BRACKET
-			   | T_MACRO_ARGS_LEFT_CURLY_BRACKET | T_MACRO_ARGS_RIGHT_CURLY_BRACKET
-			   | T_MACRO_ARGS_LEFT_SQUARE_BRACKET | T_MACRO_ARGS_RIGHT_SQUARE_BRACKET
-			   | T_MACRO_ARGS_VAR | T_MACRO_ARGS_COMMA | T_MACRO_ARGS_IDENTIFIER
-			   | T_MACRO_ARGS_QUESTION_MARK | T_MACRO_ARGS_COLON | T_MACRO_ARGS_COALESCE
-			   | T_MACRO_ARGS_BINARY_OPERATOR | T_MACRO_ARGS_DOUBLE_ARROW
-			   | T_MACRO_ARGS_INC | T_MACRO_ARGS_DEC | T_MACRO_ARGS_SHUTUP
-			   | T_MACRO_ARGS_NOT | T_MACRO_ARGS_INSTANCEOF | T_MACRO_ARGS_NEW | T_MACRO_ARGS_ARRAY
-			   | T_MACRO_ARGS_OTHER | T_MACRO_ARGS_DOLLAR | T_MACRO_ARGS_NEG | T_MACRO_ARGS_ELLIPSIS
-			   | T_MACRO_ARGS_CLONE | T_MACRO_ARGS_ISSET | T_MACRO_ARGS_UNSET | T_MACRO_ARGS_LIST
-			   | T_MACRO_ARGS_EMPTY | T_MACRO_ARGS_MODIFIERS | macroString)+
-
-macroString ::= singleQuotedString | doubleQuotedString
+macroContent ::= macroArgs? (T_MACRO_MODIFIERS macroArgs)* {
+                        methods=[getFirstPhpContent]
+                    }
 
 private
 macroName        ::= T_MACRO_NAME
                    | T_MACRO_NOESCAPE? T_MACRO_SHORTNAME?
 
 private
-singleQuotedString ::= T_MACRO_ARGS_SINGLE_QUOTE_LEFT T_MACRO_ARGS_STRING? T_MACRO_ARGS_SINGLE_QUOTE_RIGHT {pin=1}
+macroArgs        ::= phpContent
 
-private
-doubleQuotedString ::= T_MACRO_ARGS_DOUBLE_QUOTE_LEFT ( T_MACRO_ARGS_STRING | T_MACRO_ARGS_VAR)* T_MACRO_ARGS_DOUBLE_QUOTE_RIGHT {pin=1}
+// autoClosedBlock
+autoClosedBlock  ::= &("{block" macroArgs? T_MACRO_MODIFIERS? "}") macroOpenTag structureToken*
 
 
 
@@ -116,10 +109,106 @@ netteAttrValue   ::= T_HTML_TAG_ATTR_SQ macroContent? T_HTML_TAG_ATTR_SQ
 
 outerHtml ::= T_TEXT;
 
+// PHP tokens
+phpContent       ::= (phpForeach | phpFor | phpExpression)+
+
+phpVariable        ::= T_MACRO_ARGS_VAR {
+                        mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpVariableElementImpl"
+                        implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpVariableElement"
+                        methods=[getName setName getNameIdentifier getVariableName isDefinition getPhpType isVarTypeDefinition]
+                    }
+
+phpStaticVariable  ::= T_MACRO_ARGS_VAR {
+                        mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpStaticVariableElementImpl"
+                        implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpStaticVariableElement"
+                        methods=[getName setName getNameIdentifier getVariableName getPhpType getPropertyType]
+                    }
+
+phpMethod        ::= T_PHP_METHOD {
+                        mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpMethodElementImpl"
+                        implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpMethodElement"
+                        methods=[getName setName getNameIdentifier getMethodName getPhpType getReturnType isStatic isFunction]
+                    }
+
+phpConstant        ::= T_PHP_IDENTIFIER {
+                        mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpConstantElementImpl"
+                        implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpConstantElement"
+                        methods=[getName setName getNameIdentifier getConstantName getPhpType getConstantType]
+                    }
+
+phpProperty        ::= T_PHP_IDENTIFIER {
+                        mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpPropertyElementImpl"
+                        implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpPropertyElement"
+                        methods=[getName setName getNameIdentifier getPropertyName getPhpType getPropertyType isStatic]
+                    }
+
+phpClass        ::= T_PHP_CLASS_NAME {
+                        mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpClassElementImpl"
+                        implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpClassElement"
+                        methods=[getName setName getNameIdentifier getClassName getPhpType isTemplateType]
+                    }
+
+macroModifier    ::= T_MACRO_FILTERS {
+                        mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LatteMacroModifierElementImpl"
+                        implements="com.jantvrdik.intellij.latte.psi.elements.LatteMacroModifierElement"
+                        methods=[getName setName getNameIdentifier getModifierName]
+                    }
+
+phpForeach       ::= T_WHITESPACE? phpExpression T_WHITESPACE? T_PHP_AS T_WHITESPACE? (phpVariable | phpArrayOfVariables) (T_WHITESPACE? T_PHP_DOUBLE_ARROW T_WHITESPACE? (phpVariable | phpArrayOfVariables))?
+
+phpFor          ::= T_WHITESPACE? phpExpression* T_WHITESPACE? ";" T_WHITESPACE? phpExpression* T_WHITESPACE? ";" T_WHITESPACE? phpExpression* T_WHITESPACE?
+
+phpArrayOfVariables        ::= T_WHITESPACE? T_PHP_LEFT_BRACKET T_WHITESPACE? phpVariable ( T_WHITESPACE? "," T_WHITESPACE? phpVariable )* ","? T_WHITESPACE? T_PHP_RIGHT_BRACKET T_WHITESPACE?
+
+private
+phpMethodDefinition       ::= T_WHITESPACE? (T_PHP_DOUBLE_COLON | T_PHP_OBJECT_OPERATOR) T_WHITESPACE? phpMethod T_WHITESPACE? phpArgumentList T_WHITESPACE?
+
+private
+phpArgumentList       ::= (T_PHP_LEFT_NORMAL_BRACE T_WHITESPACE? T_PHP_RIGHT_NORMAL_BRACE) | (T_PHP_LEFT_NORMAL_BRACE phpMethodArgs T_PHP_RIGHT_NORMAL_BRACE)
+
+private
+phpInBrackets       ::= T_PHP_LEFT_NORMAL_BRACE T_WHITESPACE? phpArgument+ T_WHITESPACE? T_PHP_RIGHT_NORMAL_BRACE
+
+phpMethodArgs       ::= T_WHITESPACE? phpArgument+ ( T_WHITESPACE? "," T_WHITESPACE? phpArgument+ )* T_WHITESPACE?
+
+private
+phpArgument    ::=  phpSingleQuotedString | phpDoubleQuotedString | T_MACRO_ARGS_STRING | T_MACRO_ARGS_NUMBER | phpClass | phpDefinition
+                    | phpStatic | phpFunctionCall | phpInBrackets | phpVariable | T_PHP_CONTENT_TYPE | T_PHP_OBJECT_OPERATOR
+                    | T_PHP_OPERATOR | T_PHP_DOUBLE_COLON | T_PHP_DOUBLE_ARROW | T_PHP_METHOD | T_PHP_TYPE | T_PHP_KEYWORD
+                    | T_PHP_CLASS | T_PHP_AS | T_PHP_CAST | T_PHP_EXPRESSION | T_PHP_LEFT_BRACKET | T_PHP_RIGHT_BRACKET | T_PHP_NULL
+                    | T_PHP_MIXED | T_PHP_LEFT_CURLY_BRACE | T_PHP_RIGHT_CURLY_BRACE | macroModifier | T_PHP_IDENTIFIER | T_PHP_OR_INCLUSIVE
+                    | T_PHP_DEFINITION_OPERATOR
+
+private
+phpFunctionCall    ::= (phpMethod | phpVariable) T_WHITESPACE? phpArgumentList T_WHITESPACE?
+
+private
+phpExpression    ::= T_MACRO_ARGS | T_PHP_OR_INCLUSIVE | phpArgument | T_PHP_LEFT_NORMAL_BRACE | T_PHP_RIGHT_NORMAL_BRACE
+
+private
+phpDefinition    ::= phpMethodDefinition | phpConstantDefinition | phpPropertyDefinition
+
+private
+phpStatic ::= T_WHITESPACE? T_PHP_DOUBLE_COLON T_WHITESPACE? phpStaticVariable
+
+private
+phpConstantDefinition ::= T_WHITESPACE? T_PHP_DOUBLE_COLON T_WHITESPACE? phpConstant
+
+private
+phpPropertyDefinition ::= T_WHITESPACE? T_PHP_OBJECT_OPERATOR T_WHITESPACE? phpProperty
+
+private
+phpSingleQuotedString ::= T_PHP_SINGLE_QUOTE_LEFT T_MACRO_ARGS_STRING? T_PHP_SINGLE_QUOTE_RIGHT {pin=1}
+
+private
+phpDoubleQuotedString ::= T_PHP_DOUBLE_QUOTE_LEFT (T_MACRO_ARGS_STRING | phpVariable)* T_PHP_DOUBLE_QUOTE_RIGHT {pin=1}
+
+
 // tokens sets
 private
 structureToken   ::= outerHtml | macro | netteAttr
+                        | (pairMacro | unpairedMacro) // this two (pair | unpaired) are here only for error resolve in annotator
 
 
 private
-topLevelTokens   ::= T_MACRO_CLASSIC T_MACRO_CONTENT topLevelTokens
+topLevelTokens   ::= T_MACRO_CLASSIC T_MACRO_CONTENT T_PHP_CONTENT topLevelTokens

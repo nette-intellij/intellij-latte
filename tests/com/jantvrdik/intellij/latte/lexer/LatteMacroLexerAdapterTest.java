@@ -157,28 +157,5 @@ public class LatteMacroLexerAdapterTest {
 			Pair.create(T_MACRO_CONTENT, " 'function() { $a = $b|c() }' |mod"),
 			Pair.create(T_MACRO_TAG_CLOSE, "}"),
 		});
-
-
-		//incomplete
-		lexer.start("{$var");
-		assertTokens(lexer, new Pair[] {
-			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
-			Pair.create(T_MACRO_CONTENT, "$var"),
-		});
-		//incomplete
-		lexer.start("{foo '}");
-		assertTokens(lexer, new Pair[] {
-			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
-			Pair.create(T_MACRO_NAME, "foo"),
-			Pair.create(T_MACRO_CONTENT, " '}"),
-		});
-
-		lexer.start("{foo 'aa'}");
-		assertTokens(lexer, new Pair[] {
-			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
-			Pair.create(T_MACRO_NAME, "foo"),
-			Pair.create(T_MACRO_CONTENT, " 'aa'"),
-			Pair.create(T_MACRO_TAG_CLOSE, "}"),
-		});
 	}
 }

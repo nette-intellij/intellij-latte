@@ -36,7 +36,7 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 			builder.advanceLexer();
 			result = ((builder.getTokenType() == T_MACRO_TAG_CLOSE) == pair);
 
-		// all other macros which respect rules
+			// all other macros which respect rules
 		} else {
 			result = (macro != null ? (macro.type == (pair ? LatteMacro.Type.PAIR : LatteMacro.Type.UNPAIRED)) : !pair);
 		}
@@ -66,6 +66,25 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 		return result;
 	}
 
+	private static boolean isClosingTagExpected(PsiBuilder builder, String macroName)
+	{
+		IElementType type = builder.getTokenType();
+		Builder.Marker marker = builder.mark();
+		if (type == T_MACRO_CLOSE_TAG_OPEN || isEmptyPair(builder)) {
+			return false;
+		}
+		marker.rollbackTo();
+		LatteMacro macro = LatteConfiguration.INSTANCE.getMacro(builder.getProject(), macroName);
+
+		if (macro != null && macro.type == LatteMacro.Type.AUTO_EMPTY) {
+			return isAutoEmptyPair(macroName, builder);
+		}
+		if (macroName.equals("_")) {
+			builder.advanceLexer();
+			return builder.getTokenType() == T_MACRO_TAG_CLOSE;
+		}
+		return macro != null && macro.type == LatteMacro.Type.PAIR;
+	}
 
 	@NotNull
 	private static String getMacroName(PsiBuilder builder) {
@@ -131,26 +150,5 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 		}
 		return false;
 	}
-
-	private static boolean isClosingTagExpected(PsiBuilder builder, String macroName)
-	{
-		IElementType type = builder.getTokenType();
-		Builder.Marker marker = builder.mark();
-		if (type == T_MACRO_CLOSE_TAG_OPEN || isEmptyPair(builder)) {
-			return false;
-		}
-		marker.rollbackTo();
-		LatteMacro macro = LatteConfiguration.INSTANCE.getMacro(builder.getProject(), macroName);
-
-		if (macro != null && macro.type == LatteMacro.Type.AUTO_EMPTY) {
-			return isAutoEmptyPair(macroName, builder);
-		}
-		if (macroName.equals("_")) {
-			builder.advanceLexer();
-			return builder.getTokenType() == T_MACRO_TAG_CLOSE;
-		}
-		return macro != null && macro.type == LatteMacro.Type.PAIR;
-	}
-
 
 }

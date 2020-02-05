@@ -3,6 +3,7 @@ package com.jantvrdik.intellij.latte.editor;
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
 import com.intellij.psi.PsiElement;
+import com.jantvrdik.intellij.latte.psi.LatteAutoClosedBlock;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LatteMacroClassic;
 import org.jetbrains.annotations.NotNull;
@@ -23,8 +24,11 @@ public class LatteStructureViewTreeElement extends PsiTreeElementBase<PsiElement
 	@Override
 	public Collection<StructureViewTreeElement> getChildrenBase() {
 		Collection<StructureViewTreeElement> elements = new ArrayList<StructureViewTreeElement>();
+		if (getElement() == null) {
+			return elements;
+		}
 		for (PsiElement el : getElement().getChildren()) {
-			if (el instanceof LatteMacroClassic) {
+			if (el instanceof LatteMacroClassic || el instanceof LatteAutoClosedBlock) {
 				elements.add(new LatteStructureViewTreeElement(el));
 			}
 		}

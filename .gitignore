@@ -5,4 +5,9 @@
 /gen
 /out
 
+/src/com/jantvrdik/intellij/latte/lexer/LatteMacroContentLexer.java
+/src/com/jantvrdik/intellij/latte/lexer/LatteMacroLexer.java
+/src/com/jantvrdik/intellij/latte/lexer/LatteTopLexer.java
+/src/com/jantvrdik/intellij/latte/parser/_LatteLexer.flex
+
 !latte-plugin.iml

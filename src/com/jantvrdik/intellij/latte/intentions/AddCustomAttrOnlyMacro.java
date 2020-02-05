@@ -21,6 +21,6 @@ public class AddCustomAttrOnlyMacro extends AddCustomMacro {
 	@NotNull
 	@Override
 	public String getText() {
-		return "Add custom unpaired attribute macro n:" + macro.name;
+		return "Add custom unpaired attribute tag n:" + macro.getMacroName();
 	}
 }

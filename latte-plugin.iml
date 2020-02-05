@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="PLUGIN_MODULE" version="4">
-  <component name="DevKit.ModuleBuildProperties" url="file://$MODULE_DIR$/META-INF/plugin.xml" />
+  <component name="DevKit.ModuleBuildProperties" url="file://$MODULE_DIR$/resources/META-INF/plugin.xml" />
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
@@ -42,8 +42,11 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" scope="PROVIDED" name="css-openapi" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="javascript-openapi" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="php-openapi" level="project" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="php-openapi" level="project" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="php-openapi-src" level="project" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="com.github.adedayo.intellij.sdk:java-psi-api:142.1" level="project" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="php" level="project" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="css-openapi" level="project" />
+    <orderEntry type="library" exported="" scope="PROVIDED" name="javascript-openapi" level="project" />
   </component>
 </module>

@@ -7,8 +7,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.IncorrectOperationException;
 import com.jantvrdik.intellij.latte.LatteLanguage;
-import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.config.LatteMacro;
+import com.jantvrdik.intellij.latte.settings.LatteCustomMacroSettings;
+import com.jantvrdik.intellij.latte.settings.LatteSettings;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -17,10 +18,10 @@ import org.jetbrains.annotations.NotNull;
 abstract public class AddCustomMacro extends BaseIntentionAction {
 
 	/** custom macro which will be registered on invocation */
-	protected final LatteMacro macro;
+	protected final LatteCustomMacroSettings macro;
 
 	public AddCustomMacro(String macroName) {
-		this.macro = new LatteMacro(macroName, getMacroType());
+		this.macro = new LatteCustomMacroSettings(macroName, getMacroType());
 	}
 
 	@NotNull
@@ -39,7 +40,7 @@ abstract public class AddCustomMacro extends BaseIntentionAction {
 
 	@Override
 	public void invoke(@NotNull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
-		LatteConfiguration.INSTANCE.addCustomMacro(project, macro);
+		LatteSettings.getInstance(project).customMacroSettings.add(macro);
 		DaemonCodeAnalyzer.getInstance(project).restart(); // force re-analyzing
 	}
 }
