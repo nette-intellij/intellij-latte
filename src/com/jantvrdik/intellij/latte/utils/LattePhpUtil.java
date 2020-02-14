@@ -8,6 +8,7 @@ import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,8 +44,7 @@ public class LattePhpUtil {
         return name.startsWith("$") ? name.substring(1) : name;
     }
 
-    public static boolean isReferenceTo(@NotNull PhpClass originalClass, @NotNull ResolveResult[] results, @NotNull PsiElement element, @NotNull String name)
-    {
+    public static boolean isReferenceTo(@NotNull PhpClass originalClass, @NotNull ResolveResult[] results, @NotNull PsiElement element, @NotNull String name) {
         for (ResolveResult result : results) {
             if (!(result.getElement() instanceof BaseLattePhpElement)) {
                 continue;
@@ -66,13 +66,20 @@ public class LattePhpUtil {
         return false;
     }
 
-    public static boolean isReferenceFor(@NotNull PhpClass originalClass, @NotNull PhpClass targetClass)
-    {
+    public static boolean isNullable(@NotNull PhpType type) {
+        try {
+            return type.isNullable();
+
+        } catch (NoSuchMethodError e) {
+            return false;
+        }
+    }
+
+    public static boolean isReferenceFor(@NotNull PhpClass originalClass, @NotNull PhpClass targetClass) {
         return isReferenceFor(originalClass.getFQN(), targetClass);
     }
 
-    public static boolean isReferenceFor(@NotNull String originalClass, @NotNull PhpClass targetClass)
-    {
+    public static boolean isReferenceFor(@NotNull String originalClass, @NotNull PhpClass targetClass) {
         originalClass = normalizeClassName(originalClass);
         if (originalClass.equals(targetClass.getFQN())) {
             return true;
@@ -87,8 +94,7 @@ public class LattePhpUtil {
         return false;
     }
 
-    public static List<Field> getFieldsForPhpElement(@NotNull BaseLattePhpElement psiElement)
-    {
+    public static List<Field> getFieldsForPhpElement(@NotNull BaseLattePhpElement psiElement) {
         List<Field> out = new ArrayList<Field>();
         LattePhpType phpType = psiElement.getPhpType();
         String name = psiElement.getPhpElementName();
@@ -120,8 +126,7 @@ public class LattePhpUtil {
         return fields;
     }
 
-    public static List<Method> getMethodsForPhpElement(@NotNull LattePhpMethod psiElement)
-    {
+    public static List<Method> getMethodsForPhpElement(@NotNull LattePhpMethod psiElement) {
         List<Method> out = new ArrayList<Method>();
         Collection<PhpClass> phpClasses = psiElement.getPhpType().getPhpClasses(psiElement.getProject());
         if (phpClasses != null && phpClasses.size() > 0) {

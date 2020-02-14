@@ -99,7 +99,7 @@ public class LattePsiImplUtil {
 		for (PhpClass phpClass : classes) {
 			for (Field field : phpClass.getFields()) {
 				if (!field.isConstant() && field.getModifier().isPublic() && variableName.equals(field.getName())) {
-					return new LattePhpType(field.getName(), field.getType().toString(), field.getType().isNullable());
+					return new LattePhpType(field.getName(), field.getType().toString(), LattePhpUtil.isNullable(field.getType()));
 				}
 			}
 		}
@@ -224,7 +224,7 @@ public class LattePsiImplUtil {
 
 		for (Method phpMethod : first.getMethods()) {
 			if (phpMethod.getName().equals(name)) {
-				return new LattePhpType(phpMethod.getType().toString(), phpMethod.getType().isNullable());
+				return new LattePhpType(phpMethod.getType().toString(), LattePhpUtil.isNullable(phpMethod.getType()));
 			}
 		}
 		return null;
@@ -250,7 +250,7 @@ public class LattePsiImplUtil {
 
 		for (Field field : first.getFields()) {
 			if (field.getName().equals(LattePhpUtil.normalizePhpVariable(elementName))) {
-				return new LattePhpType(field.getType().toString(), field.getType().isNullable());
+				return new LattePhpType(field.getType().toString(), LattePhpUtil.isNullable(field.getType()));
 			}
 		}
 		return null;

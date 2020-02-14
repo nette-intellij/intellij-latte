@@ -62,7 +62,11 @@ public class LatteVariableCompletionProvider extends BaseLatteCompletionProvider
 					if (!field.isConstant() && field.getModifier().isPublic()) {
 						PhpLookupElement lookupItem = getPhpLookupElement(field, "$" + field.getName());
 						lookupItem.handler = PhpVariableInsertHandler.getInstance();
-						lookupItem.icon = PhpIcons.PROPERTY_ICON;
+						try {
+							lookupItem.icon = PhpIcons.PROPERTY_ICON;
+						} catch (IllegalAccessError e) {
+							// ignored
+						}
 						lookupItem.bold = true;
 						result.addElement(lookupItem);
 					}

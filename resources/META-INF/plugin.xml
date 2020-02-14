@@ -18,6 +18,10 @@
 	]]></description>
 
 	<change-notes><![CDATA[
+		<p>1.0.1</p>
+		<ul>
+			<li>Fixed compatibility issues</li>
+		</ul>
 		<p>1.0.0</p>
 		<ul>
 			<li>added support for PHP content</li>
