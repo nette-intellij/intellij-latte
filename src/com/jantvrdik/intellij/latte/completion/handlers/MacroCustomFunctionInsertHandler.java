@@ -10,7 +10,6 @@ import com.intellij.psi.PsiElement;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import com.jetbrains.php.completion.insert.PhpInsertHandlerUtil;
-import com.jetbrains.php.completion.insert.PhpReturnKeywordInsertHandler;
 import com.jetbrains.php.lang.psi.elements.impl.PhpUseImpl;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,20 +38,14 @@ public class MacroCustomFunctionInsertHandler implements InsertHandler<LookupEle
 			if (notInUse) {
 				if (!LatteUtil.isStringAtCaret(editor, "(")) {
 					this.insertParenthesesCodeStyleAware(editor);
-					possiblyInsertTrailingSemicolon(context);
 				} else if (LatteUtil.isStringAtCaret(editor, "()")) {
 					editor.getCaretModel().moveCaretRelatively(2, 0, false, false, true);
-					possiblyInsertTrailingSemicolon(context);
 				} else {
 					editor.getCaretModel().moveCaretRelatively(1, 0, false, false, true);
 					showParameterInfo(editor);
 				}
 			}
 		}
-	}
-
-	private static void possiblyInsertTrailingSemicolon(@NotNull InsertionContext context) {
-		PhpReturnKeywordInsertHandler.insertSemicolonAtCaret(context, true);
 	}
 
 	private void insertParenthesesCodeStyleAware(@NotNull Editor editor) {

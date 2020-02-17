@@ -5,6 +5,8 @@
 /gen
 /out
 
+.DS_Store
+
 /src/com/jantvrdik/intellij/latte/lexer/LatteMacroContentLexer.java
 /src/com/jantvrdik/intellij/latte/lexer/LatteMacroLexer.java
 /src/com/jantvrdik/intellij/latte/lexer/LatteTopLexer.java

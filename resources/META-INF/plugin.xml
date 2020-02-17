@@ -1,7 +1,7 @@
 <idea-plugin>
 	<id>com.jantvrdik.intellij.latte</id>
 	<name>Latte</name>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<vendor>Jan Tvrdík</vendor>
 
 	<description><![CDATA[
@@ -18,6 +18,11 @@
 	]]></description>
 
 	<change-notes><![CDATA[
+		<p>1.0.1</p>
+		<ul>
+			<li>Fixed compatibility issues</li>
+			<li>Fixed structure view (added n:tags and images)</li>
+		</ul>
 		<p>1.0.0</p>
 		<ul>
 			<li>added support for PHP content</li>
