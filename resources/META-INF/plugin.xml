@@ -21,6 +21,7 @@
 		<p>1.0.1</p>
 		<ul>
 			<li>Fixed compatibility issues</li>
+			<li>Fixed structure view (added n:tags and images)</li>
 		</ul>
 		<p>1.0.0</p>
 		<ul>
