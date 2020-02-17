@@ -67,12 +67,7 @@ public class LattePhpUtil {
     }
 
     public static boolean isNullable(@NotNull PhpType type) {
-        try {
-            return type.isNullable();
-
-        } catch (NoSuchMethodError e) {
-            return false;
-        }
+        return false;
     }
 
     public static boolean isReferenceFor(@NotNull PhpClass originalClass, @NotNull PhpClass targetClass) {
