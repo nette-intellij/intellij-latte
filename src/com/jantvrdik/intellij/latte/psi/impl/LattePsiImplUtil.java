@@ -151,10 +151,9 @@ public class LattePsiImplUtil {
 		if (
 			prevElement != null && nextElement != null
 				&& prevElement.getNode().getElementType().equals(LatteTypes.T_PHP_OR_INCLUSIVE)
-				&& nextElement.getNode().getElementType().equals(LatteTypes.T_PHP_RIGHT_NORMAL_BRACE)
 		) {
-			PsiElement prevVariable = prevElement.getPrevSibling();
-			if (prevVariable instanceof LattePhpVariable) {
+			LattePhpVariable prevVariable = PsiTreeUtil.getPrevSiblingOfType(prevElement, LattePhpVariable.class);
+			if (prevVariable != null) {
 				PsiElement beforeVariable = prevVariable.getPrevSibling();
 				if (beforeVariable != null && beforeVariable.getNode().getElementType().equals(LatteTypes.T_PHP_LEFT_NORMAL_BRACE)) {
 					return true;
@@ -360,28 +359,20 @@ public class LattePsiImplUtil {
 		return LatteUtil.matchParentMacroName(element, "var") || LatteUtil.matchParentMacroName(element, "default");
 	}
 
-	public static boolean isDefinition(@NotNull LattePhpVariable element) {
-		if (isVarTypeDefinition(element) || LatteUtil.matchParentMacroName(element, "capture") || LatteUtil.matchParentMacroName(element, "default")) {
-			return true;
-		}
-
+	public static boolean isDefinitionInForeach(@NotNull PsiElement element) {
 		PsiElement parent = element.getParent();
-		if (parent == null) {
-			return false;
-		}
-
-		if (parent.getNode().getElementType() == PHP_ARRAY_OF_VARIABLES) {
-			PsiElement parentPrevElement = PsiTreeUtil.skipWhitespacesBackward(parent);
-			IElementType type = parentPrevElement != null ? parentPrevElement.getNode().getElementType() : null;
-			return type == T_PHP_AS || type == T_PHP_DOUBLE_ARROW;
-		}
-
-		if (parent.getNode().getElementType() == PHP_FOREACH) {
+		if (parent != null && parent.getNode().getElementType() == PHP_FOREACH) {
 			PsiElement prevElement = PsiTreeUtil.skipWhitespacesBackward(element);
 			IElementType type = prevElement != null ? prevElement.getNode().getElementType() : null;
 			return type == T_PHP_AS || type == T_PHP_DOUBLE_ARROW;
-		}
 
+		} else if (parent != null && parent.getNode().getElementType() == PHP_ARRAY_OF_VARIABLES) {
+			return isDefinitionInForeach(parent);
+		}
+		return false;
+	}
+
+	public static boolean isDefinitionInFor(@NotNull LattePhpVariable element) {
 		LatteNetteAttrValue parentAttr = PsiTreeUtil.getParentOfType(element, LatteNetteAttrValue.class);
 		if (parentAttr != null) {
 			PsiElement nextElement = PsiTreeUtil.skipWhitespacesForward(element);
@@ -396,15 +387,41 @@ public class LattePsiImplUtil {
 			prevElement = PsiTreeUtil.skipWhitespacesBackward(prevElement);
 			return prevElement != null && prevElement.getText().equals("n:for");
 		}
+		return LatteUtil.matchParentMacroName(element, "for") && isNextDefinitionOperator(element);
+	}
 
-		if (LatteUtil.matchParentMacroName(element, "for") || isVarDefinition(element)) {
-			PsiElement nextElement = PsiTreeUtil.skipWhitespacesForward(element);
-			if (nextElement != null && nextElement.getNode().getElementType() == LatteTypes.T_PHP_DEFINITION_OPERATOR) {
+	private static boolean isNextDefinitionOperator(@NotNull PsiElement element) {
+		PsiElement nextElement = PsiTreeUtil.skipWhitespacesForward(element);
+		return nextElement != null && nextElement.getNode().getElementType() == LatteTypes.T_PHP_DEFINITION_OPERATOR;
+	}
+
+	public static boolean isDefinition(@NotNull LattePhpVariable element) {
+		if (isVarTypeDefinition(element) || LatteUtil.matchParentMacroName(element, "capture")) {
+			return true;
+		}
+
+		if (isVarDefinition(element)) {
+			if (isNextDefinitionOperator(element)) {
 				return true;
 			}
 		}
 
-		return false;
+		PsiElement parent = element.getParent();
+		if (parent == null) {
+			return false;
+		}
+
+		if (parent.getNode().getElementType() == PHP_ARRAY_OF_VARIABLES) {
+			if (isNextDefinitionOperator(parent)) {
+				return true;
+			}
+		}
+
+		if (isDefinitionInForeach(element)) {
+			return true;
+		}
+
+		return isDefinitionInFor(element);
 	}
 
 	public static String getName(LattePhpVariable element) {

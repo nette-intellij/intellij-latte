@@ -45,6 +45,7 @@ public class VariablesInspection extends LocalInspectionTool {
 					String variableName = ((LattePhpVariable) element).getVariableName();
 					VirtualFile file = element.getContainingFile().getVirtualFile();
 					List<PsiPositionedElement> all = LatteUtil.findVariablesInFile(element.getProject(), file, variableName);
+					List<PsiPositionedElement> afterElement = LatteUtil.findVariablesInFileAfterElement(element, file, variableName);
 					List<PsiPositionedElement> definitions = all.stream()
 							.filter(variableElement -> variableElement.getElement() instanceof LattePhpVariable && ((LattePhpVariable) variableElement.getElement()).isDefinition())
 							.collect(Collectors.toList());
@@ -53,22 +54,32 @@ public class VariablesInspection extends LocalInspectionTool {
 					List<PsiPositionedElement> beforeElement = definitions.stream()
 							.filter(variableElement -> variableElement.getPosition() <= offset)
 							.collect(Collectors.toList());
-					List<PsiPositionedElement> varDefinitions = definitions.stream()
+					int varDefinitions = (int) definitions.stream()
 							.filter(variableElement -> variableElement.getElement() instanceof LattePhpVariable && !((LattePhpVariable) variableElement.getElement()).isVarTypeDefinition())
-							.collect(Collectors.toList());
+							.count();
+					int cyclesDefinitions = (int) definitions.stream()
+							.filter(
+									variableElement -> variableElement.getElement() instanceof LattePhpVariable
+											&& !((LattePhpVariable) variableElement.getElement()).isVarTypeDefinition()
+											&& (
+												((LattePhpVariable) variableElement.getElement()).isDefinitionInFor()
+												|| ((LattePhpVariable) variableElement.getElement()).isDefinitionInForeach()
+											)
+							).count();
+					int normalVarDefinitions =  varDefinitions - cyclesDefinitions;
 
 					ProblemHighlightType type = null;
 					String description = null;
 					boolean isUndefined = false;
 					if (((LattePhpVariable) element).isDefinition()) {
-						List<PsiPositionedElement> usages = all.stream()
+						List<PsiPositionedElement> usages = afterElement.stream()
 								.filter(
 										variableElement -> variableElement.getElement() instanceof LattePhpVariable
 										&& !((LattePhpVariable) variableElement.getElement()).isDefinition()
 								)
 								.collect(Collectors.toList());
 
-						if (varDefinitions.size() > 0 && !((LattePhpVariable) element).isVarTypeDefinition()) {
+						if (varDefinitions > 0 && !((LattePhpVariable) element).isVarTypeDefinition()) {
 							LatteVariableSettings defaultVariable = LatteConfiguration.INSTANCE.getVariable(element.getProject(), variableName);
 							if (defaultVariable != null) {
 								ProblemDescriptor descriptor = manager.createProblemDescriptor(
@@ -82,9 +93,13 @@ public class VariablesInspection extends LocalInspectionTool {
 							}
 						}
 
-						if (varDefinitions.size() > 1) {
+						if (normalVarDefinitions > 1) {
 							type = ProblemHighlightType.GENERIC_ERROR_OR_WARNING;
 							description = "Multiple definitions for variable '" + variableName + "'";
+
+						} else if (normalVarDefinitions == 1 && cyclesDefinitions > 0) {
+							type = ProblemHighlightType.GENERIC_ERROR_OR_WARNING;
+							description = "Multiple definitions for variable '" + variableName + "'. Defined in for/foreach and normally.";
 
 						} else if (usages.size() == 0) {
 							type = ProblemHighlightType.LIKE_UNUSED_SYMBOL;
