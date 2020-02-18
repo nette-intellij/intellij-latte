@@ -27,6 +27,7 @@
 			<li>fixed resolving methods if a type is more classes FooClass|BarClass</li>
 			<li>fixed completion for unpaired macro after if missing end }</li>
 			<li>fixed filters on variables (issue #47)</li>
+			<li>fixed wrong indent for elseifset (issue #42)</li>
 			<li>increased minimum compatibility to 2018.3</li>
 		</ul>
 		<p>1.0.1</p>
