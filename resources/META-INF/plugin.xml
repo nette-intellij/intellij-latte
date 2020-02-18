@@ -20,12 +20,13 @@
 	<change-notes><![CDATA[
 		<p>1.0.2</p>
 		<ul>
-			<li>added code style settings (settings for use tabs or spaces)</li>
+			<li>added code style settings (settings for use tabs or spaces) (issue #46)</li>
 			<li>added support for define variable in tag {default $foo}</li>
 			<li>added class namespaces completion</li>
 			<li>implemented some performance improvements</li>
 			<li>fixed resolving methods if a type is more classes FooClass|BarClass</li>
 			<li>fixed completion for unpaired macro after if missing end }</li>
+			<li>fixed filters on variables (issue #47)</li>
 			<li>increased minimum compatibility to 2018.3</li>
 		</ul>
 		<p>1.0.1</p>

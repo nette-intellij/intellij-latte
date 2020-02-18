@@ -67,7 +67,7 @@ public class ModifierNotAllowedInspection extends LocalInspectionTool {
 		content.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
 			@Override
 			public void visitElement(PsiElement element) {
-				if (element instanceof LatteMacroModifier) {
+				if (element instanceof LatteMacroModifier && !((LatteMacroModifier) element).isVariableModifier()) {
 					String description = "Modifiers are not allowed here";
 					ProblemDescriptor problem = manager.createProblemDescriptor(element, description, true, ProblemHighlightType.GENERIC_ERROR, isOnTheFly);
 					problems.add(problem);

@@ -153,7 +153,7 @@ phpClass        ::= T_PHP_CLASS_NAME {
 macroModifier    ::= T_MACRO_FILTERS {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LatteMacroModifierElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LatteMacroModifierElement"
-                        methods=[getName setName getNameIdentifier getTextElement getModifierName]
+                        methods=[getName setName getNameIdentifier getTextElement getModifierName isVariableModifier]
                     }
 
 phpForeach       ::= T_WHITESPACE? phpExpression T_WHITESPACE? T_PHP_AS T_WHITESPACE? (phpVariable | phpArrayOfVariables) (T_WHITESPACE? T_PHP_DOUBLE_ARROW T_WHITESPACE? (phpVariable | phpArrayOfVariables))?

@@ -145,6 +145,25 @@ public class LattePsiImplUtil {
 		return found != null ? LatteUtil.normalizeMacroModifier(found.getText()) : null;
 	}
 
+	public static boolean isVariableModifier(@NotNull LatteMacroModifier element) {
+		PsiElement prevElement = PsiTreeUtil.skipWhitespacesBackward(element);
+		PsiElement nextElement = PsiTreeUtil.skipWhitespacesForward(element);
+		if (
+			prevElement != null && nextElement != null
+				&& prevElement.getNode().getElementType().equals(LatteTypes.T_PHP_OR_INCLUSIVE)
+				&& nextElement.getNode().getElementType().equals(LatteTypes.T_PHP_RIGHT_NORMAL_BRACE)
+		) {
+			PsiElement prevVariable = prevElement.getPrevSibling();
+			if (prevVariable instanceof LattePhpVariable) {
+				PsiElement beforeVariable = prevVariable.getPrevSibling();
+				if (beforeVariable != null && beforeVariable.getNode().getElementType().equals(LatteTypes.T_PHP_LEFT_NORMAL_BRACE)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	@Nullable
 	public static LattePhpType detectVariableTypeFromTemplateType(@NotNull PsiElement element, @NotNull String variableName)
 	{
