@@ -21,7 +21,7 @@
 		<p>1.0.2</p>
 		<ul>
 			<li>added code style settings (settings for use tabs or spaces) (issue #46, #30)</li>
-			<li>added support for define variable in tag {default $foo}</li>
+			<li>added support for define variable in tag {default $foo = 123}</li>
 			<li>added class namespaces completion</li>
 			<li>added support for define variables by {php [$foo, $bar] = $arr}</li>
 			<li>implemented some performance improvements</li>
@@ -30,6 +30,7 @@
 			<li>fixed filters on variables (issue #47)</li>
 			<li>fixed wrong indent for elseifset (issue #42)</li>
 			<li>fixed multiple variable definitions in for/foreach cycles</li>
+			<li>fixed auto-complete (disabled in strings, more improvements)</li>
 			<li>increased minimum compatibility to 2018.3</li>
 		</ul>
 		<p>1.0.1</p>

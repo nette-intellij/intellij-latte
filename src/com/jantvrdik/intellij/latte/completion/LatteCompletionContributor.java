@@ -86,9 +86,11 @@ public class LatteCompletionContributor extends CompletionContributor {
 					return;
 				}
 
-				LatteMacro macro = LatteConfiguration.INSTANCE.getMacro(element.getProject(), macroClassic.getOpenTag().getMacroName());
-				if (macro == null || !macro.allowedModifiers) {
-					return;
+				if (!((LatteMacroModifier) element).isVariableModifier()) {
+					LatteMacro macro = LatteConfiguration.INSTANCE.getMacro(element.getProject(), macroClassic.getOpenTag().getMacroName());
+					if (macro == null || !macro.allowedModifiers) {
+						return;
+					}
 				}
 
 				Map<String, LatteModifier> customModifiers = LatteConfiguration.INSTANCE.getCustomModifiers(element.getProject());

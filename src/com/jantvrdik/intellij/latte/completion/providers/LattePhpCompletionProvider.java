@@ -53,16 +53,16 @@ public class LattePhpCompletionProvider extends BaseLatteCompletionProvider {
 		} else if (element instanceof LattePhpProperty || (element instanceof LattePhpMethod && !((LattePhpMethod) element).isStatic())) {
 			attachPhpCompletions(result, (BaseLattePhpElement) element, false);
 
-		} else {
+		} else if (!(element instanceof LatteMacroModifier) && !(element instanceof LattePhpString)) {
+			classCompletionProvider.addCompletions(parameters, context, result);
+			namespaceCompletionProvider.addCompletions(parameters, context, result);
+
 			if (LatteUtil.matchParentMacroName(element, "varType") || LatteUtil.matchParentMacroName(element, "var")) {
 				attachVarTypes(result);
-			}
 
-			if (!(element instanceof LatteMacroModifier)) {
-				classCompletionProvider.addCompletions(parameters, context, result);
+			} else {
 				variableCompletionProvider.addCompletions(parameters, context, result);
 				functionCompletionProvider.addCompletions(parameters, context, result);
-				namespaceCompletionProvider.addCompletions(parameters, context, result);
 			}
 		}
 	}

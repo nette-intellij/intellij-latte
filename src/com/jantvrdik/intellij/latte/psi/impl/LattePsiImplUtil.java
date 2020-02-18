@@ -146,21 +146,8 @@ public class LattePsiImplUtil {
 	}
 
 	public static boolean isVariableModifier(@NotNull LatteMacroModifier element) {
-		PsiElement prevElement = PsiTreeUtil.skipWhitespacesBackward(element);
-		PsiElement nextElement = PsiTreeUtil.skipWhitespacesForward(element);
-		if (
-			prevElement != null && nextElement != null
-				&& prevElement.getNode().getElementType().equals(LatteTypes.T_PHP_OR_INCLUSIVE)
-		) {
-			LattePhpVariable prevVariable = PsiTreeUtil.getPrevSiblingOfType(prevElement, LattePhpVariable.class);
-			if (prevVariable != null) {
-				PsiElement beforeVariable = prevVariable.getPrevSibling();
-				if (beforeVariable != null && beforeVariable.getNode().getElementType().equals(LatteTypes.T_PHP_LEFT_NORMAL_BRACE)) {
-					return true;
-				}
-			}
-		}
-		return false;
+		LattePhpInBrackets variableModifier = PsiTreeUtil.getParentOfType(element, LattePhpInBrackets.class);
+		return variableModifier != null;
 	}
 
 	@Nullable
