@@ -26,12 +26,14 @@ public class LattePhpCompletionProvider extends BaseLatteCompletionProvider {
 
 	private final LattePhpFunctionCompletionProvider functionCompletionProvider;
 	private final LattePhpClassCompletionProvider classCompletionProvider;
+	private final LattePhpNamespaceCompletionProvider namespaceCompletionProvider;
 	private final LatteVariableCompletionProvider variableCompletionProvider;
 
 	public LattePhpCompletionProvider() {
 		super();
 		functionCompletionProvider = new LattePhpFunctionCompletionProvider();
 		classCompletionProvider = new LattePhpClassCompletionProvider();
+		namespaceCompletionProvider = new LattePhpNamespaceCompletionProvider();
 		variableCompletionProvider = new LatteVariableCompletionProvider();
 	}
 
@@ -60,6 +62,7 @@ public class LattePhpCompletionProvider extends BaseLatteCompletionProvider {
 				classCompletionProvider.addCompletions(parameters, context, result);
 				variableCompletionProvider.addCompletions(parameters, context, result);
 				functionCompletionProvider.addCompletions(parameters, context, result);
+				namespaceCompletionProvider.addCompletions(parameters, context, result);
 			}
 		}
 	}
