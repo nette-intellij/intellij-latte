@@ -26,11 +26,13 @@ public class LattePhpCompletionProvider extends BaseLatteCompletionProvider {
 
 	private final LattePhpFunctionCompletionProvider functionCompletionProvider;
 	private final LattePhpClassCompletionProvider classCompletionProvider;
+	private final LatteVariableCompletionProvider variableCompletionProvider;
 
 	public LattePhpCompletionProvider() {
 		super();
 		functionCompletionProvider = new LattePhpFunctionCompletionProvider();
 		classCompletionProvider = new LattePhpClassCompletionProvider();
+		variableCompletionProvider = new LatteVariableCompletionProvider();
 	}
 
 	@Override
@@ -56,6 +58,7 @@ public class LattePhpCompletionProvider extends BaseLatteCompletionProvider {
 
 			if (!(element instanceof LatteMacroModifier)) {
 				classCompletionProvider.addCompletions(parameters, context, result);
+				variableCompletionProvider.addCompletions(parameters, context, result);
 				functionCompletionProvider.addCompletions(parameters, context, result);
 			}
 		}

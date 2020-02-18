@@ -37,7 +37,7 @@ public class LatteVariableCompletionProvider extends BaseLatteCompletionProvider
 			@NotNull CompletionResultSet result
 	) {
 		PsiElement element = parameters.getPosition().getParent();
-		if (!(element instanceof LattePhpVariable) || ((LattePhpVariable) element).isDefinition()) {
+		if ((element instanceof LattePhpVariable) && ((LattePhpVariable) element).isDefinition()) {
 			return;
 		}
 
