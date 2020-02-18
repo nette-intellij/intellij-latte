@@ -18,12 +18,12 @@ import java.util.List;
 
 public class LattePhpMethodReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
     private String methodName;
-    private PhpClass phpClass;
+    private Collection<PhpClass> phpClasses;
 
     public LattePhpMethodReference(@NotNull LattePhpMethod element, TextRange textRange) {
         super(element, textRange);
         methodName = element.getMethodName();
-        phpClass = element.getPhpType().getFirstPhpClass(element.getProject());
+        phpClasses = element.getPhpType().getPhpClasses(element.getProject());
     }
 
     @NotNull
@@ -31,7 +31,7 @@ public class LattePhpMethodReference extends PsiReferenceBase<PsiElement> implem
     public ResolveResult[] multiResolve(boolean b) {
         if (((LattePhpMethod) getElement()).isFunction()) {
             return multiResolveFunction();
-        } else if (phpClass == null) {
+        } else if (phpClasses.size() == 0) {
             return new ResolveResult[0];
         }
         return multiResolveMethod();
@@ -40,7 +40,7 @@ public class LattePhpMethodReference extends PsiReferenceBase<PsiElement> implem
     @NotNull
     public ResolveResult[] multiResolveMethod() {
         List<ResolveResult> results = new ArrayList<ResolveResult>();
-        final Collection<LattePhpMethod> methods = LatteUtil.findMethods(getElement().getProject(), methodName, phpClass);
+        final Collection<LattePhpMethod> methods = LatteUtil.findMethods(getElement().getProject(), methodName, phpClasses);
         for (BaseLattePhpElement method : methods) {
             results.add(new PsiElementResolveResult(method));
         }
@@ -100,10 +100,12 @@ public class LattePhpMethodReference extends PsiReferenceBase<PsiElement> implem
     @Override
     public boolean isReferenceTo(@NotNull PsiElement element) {
         if (element instanceof LattePhpMethod) {
-            PhpClass originalClass = ((LattePhpMethod) element).getPhpType().getFirstPhpClass(element.getProject());
-            if (originalClass != null) {
-                if (LattePhpUtil.isReferenceTo(originalClass, multiResolve(false), element, ((LattePhpMethod) element).getMethodName())) {
-                    return true;
+            Collection<PhpClass> originalClasses = ((LattePhpMethod) element).getPhpType().getPhpClasses(element.getProject());
+            if (originalClasses.size() > 0) {
+                for (PhpClass originalClass : originalClasses) {
+                    if (LattePhpUtil.isReferenceTo(originalClass, multiResolve(false), element, ((LattePhpMethod) element).getMethodName())) {
+                        return true;
+                    }
                 }
             }
         }

@@ -17,22 +17,22 @@ import java.util.List;
 
 public class LattePhpStaticVariableReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
     private String variableName;
-    private PhpClass phpClass;
+    private Collection<PhpClass> phpClasses;
 
     public LattePhpStaticVariableReference(@NotNull LattePhpStaticVariable element, TextRange textRange) {
         super(element, textRange);
         variableName = element.getVariableName();
-        phpClass = element.getPhpType().getFirstPhpClass(element.getProject());
+        phpClasses = element.getPhpType().getPhpClasses(element.getProject());
     }
 
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean b) {
-        if (phpClass == null) {
+        if (phpClasses.size() == 0) {
             return new ResolveResult[0];
         }
 
-        final Collection<LattePhpStaticVariable> methods = LatteUtil.findStaticVariables(getElement().getProject(), variableName, phpClass);
+        final Collection<LattePhpStaticVariable> methods = LatteUtil.findStaticVariables(getElement().getProject(), variableName, phpClasses);
         List<ResolveResult> results = new ArrayList<ResolveResult>();
         for (BaseLattePhpElement method : methods) {
             results.add(new PsiElementResolveResult(method));

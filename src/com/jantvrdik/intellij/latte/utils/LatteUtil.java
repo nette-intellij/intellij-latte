@@ -75,8 +75,8 @@ public class LatteUtil {
         return result != null ? result : Collections.<PsiPositionedElement>emptyList();
     }
 
-    public static Collection<LattePhpMethod> findMethods(Project project, String key, @Nullable PhpClass phpClass) {
-        return findElementsInAllFiles(project, key, LattePhpMethod.class, phpClass);
+    public static Collection<LattePhpMethod> findMethods(Project project, String key, @Nullable Collection<PhpClass> phpClasses) {
+        return findElementsInAllFiles(project, key, LattePhpMethod.class, phpClasses);
     }
 
     public static Collection<BaseLattePhpElement> findFunctions(Project project, String key) {
@@ -85,11 +85,11 @@ public class LatteUtil {
                 .collect(Collectors.toList());
     }
 
-    public static Collection<LattePhpProperty> findProperties(Project project, String key, @NotNull PhpClass phpClass) {
+    public static Collection<LattePhpProperty> findProperties(Project project, String key, @NotNull Collection<PhpClass> phpClass) {
         return findElementsInAllFiles(project, key, LattePhpProperty.class, phpClass);
     }
 
-    public static Collection<LattePhpConstant> findConstants(Project project, String key, @NotNull PhpClass phpClass) {
+    public static Collection<LattePhpConstant> findConstants(Project project, String key, @NotNull Collection<PhpClass> phpClass) {
         return findElementsInAllFiles(project, key, LattePhpConstant.class, phpClass);
     }
 
@@ -97,7 +97,7 @@ public class LatteUtil {
         return findElementsInAllFiles(project, key, LattePhpClass.class, null);
     }
 
-    public static Collection<LattePhpStaticVariable> findStaticVariables(Project project, String key, @NotNull PhpClass phpClass) {
+    public static Collection<LattePhpStaticVariable> findStaticVariables(Project project, String key, @NotNull Collection<PhpClass> phpClass) {
         return findElementsInAllFiles(project, key, LattePhpStaticVariable.class, phpClass);
     }
 
@@ -142,7 +142,7 @@ public class LatteUtil {
         return fileText.length() >= startOffset + string.length() && fileText.substring(startOffset, startOffset + string.length()).equals(string);
     }
 
-    private static <T extends BaseLattePhpElement> Collection<T> findElementsInAllFiles(Project project, String key, Class<T> className, @Nullable PhpClass phpClass) {
+    private static <T extends BaseLattePhpElement> Collection<T> findElementsInAllFiles(Project project, String key, Class<T> className, @Nullable Collection<PhpClass> phpClass) {
         List<T> result = new ArrayList<T>();
         Collection<VirtualFile> virtualFiles =
                 FileTypeIndex.getFiles(LatteFileType.INSTANCE, GlobalSearchScope.allScope(project));
@@ -160,10 +160,14 @@ public class LatteUtil {
         return result;
     }
 
-    private static <T extends BaseLattePhpElement> void attachResults(@NotNull List<T> result, String key, List<PsiElement> elements, @Nullable PhpClass phpClass)
+    private static <T extends BaseLattePhpElement> void attachResults(@NotNull List<T> result, String key, List<PsiElement> elements, @Nullable Collection<PhpClass> phpClasses)
     {
         for (PsiElement element : elements) {
-            if (!(element instanceof BaseLattePhpElement) || (phpClass != null && !((BaseLattePhpElement) element).getPhpType().hasClass(phpClass.getFQN()))) {
+            if (!(element instanceof BaseLattePhpElement)) {
+                continue;
+            }
+
+            if ((phpClasses != null && phpClasses.size() > 0 && !((BaseLattePhpElement) element).getPhpType().hasClass(phpClasses))) {
                 continue;
             }
 
