@@ -28,16 +28,45 @@ import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
 public class LattePsiImplUtil {
 	@NotNull
 	public static String getMacroName(LatteMacroTag element) {
+		ASTNode nameNode = getMacroNameNode(element);
+		if (nameNode != null) {
+			return nameNode.getText();
+		}
+		return createMacroName(element);
+	}
+
+	public static boolean matchMacroName(LatteMacroTag element, @NotNull String name) {
+		ASTNode nameNode = getMacroNameNode(element);
+		if (nameNode == null) {
+			return createMacroName(element).equals(name);
+		}
+		return matchPsiElement(nameNode, name);
+	}
+
+	public static int getMacroNameLength(LatteMacroTag element) {
+		ASTNode nameNode = getMacroNameNode(element);
+		if (nameNode != null) {
+			return nameNode.getTextLength();
+		}
+		return createMacroName(element).length();
+	}
+
+	private static boolean matchPsiElement(ASTNode element, @NotNull String text) {
+		return element.getTextLength() == text.length() && element.getText().equals(text);
+	}
+
+	@Nullable
+	private static ASTNode getMacroNameNode(LatteMacroTag element) {
 		ASTNode elementNode = element.getNode();
 		ASTNode nameNode = elementNode.findChildByType(T_MACRO_NAME);
 		if (nameNode != null) {
-			return nameNode.getText();
+			return nameNode;
 		}
+		return elementNode.findChildByType(T_MACRO_SHORTNAME);
+	}
 
-		nameNode = elementNode.findChildByType(T_MACRO_SHORTNAME);
-		if (nameNode != null) {
-			return nameNode.getText();
-		}
+	@NotNull
+	private static String createMacroName(LatteMacroTag element) {
 		LatteMacroContent content = element.getMacroContent();
 		if (content == null || element instanceof LatteMacroCloseTag) {
 			return "";
@@ -51,32 +80,68 @@ public class LattePsiImplUtil {
 		return phpContents.stream().findFirst().isPresent() ? phpContents.stream().findFirst().get() : null;
 	}
 
-	public static String getVariableName(@NotNull PsiElement element) {
-		PsiElement found = findFirstChildWithType(element, T_MACRO_ARGS_VAR);
+	public static String getVariableName(@NotNull LattePhpVariable element) {
+		PsiElement found = getTextElement(element);
 		return found != null ? LattePhpUtil.normalizePhpVariable(found.getText()) : null;
 	}
 
-	public static String getConstantName(@NotNull PsiElement element) {
-		return getPropertyName(element);
+	public static String getVariableName(@NotNull LattePhpStaticVariable element) {
+		PsiElement found = getTextElement(element);
+		return found != null ? LattePhpUtil.normalizePhpVariable(found.getText()) : null;
 	}
 
-	public static String getMethodName(@NotNull PsiElement element) {
+	@Nullable
+	public static PsiElement getTextElement(@NotNull LattePhpStaticVariable element) {
+		return findFirstChildWithType(element, T_MACRO_ARGS_VAR);
+	}
+
+	@Nullable
+	public static PsiElement getTextElement(@NotNull LattePhpVariable element) {
+		return findFirstChildWithType(element, T_MACRO_ARGS_VAR);
+	}
+
+	public static String getConstantName(@NotNull LattePhpConstant element) {
+		PsiElement found = getTextElement(element);
+		return found != null ? found.getText() : null;
+	}
+
+	public static String getMethodName(@NotNull LattePhpMethod element) {
 		PsiElement found = findFirstChildWithType(element, T_PHP_METHOD);
 		return found != null ? found.getText() : null;
 	}
 
-	public static String getPropertyName(@NotNull PsiElement element) {
-		PsiElement found = findFirstChildWithType(element, T_PHP_IDENTIFIER);
+	public static String getPropertyName(@NotNull LattePhpProperty element) {
+		PsiElement found = getTextElement(element);
 		return found != null ? found.getText() : null;
 	}
 
-	public static String getClassName(@NotNull PsiElement element) {
-		PsiElement found = findFirstChildWithType(element, T_PHP_CLASS_NAME);
+	@Nullable
+	public static PsiElement getTextElement(@NotNull LattePhpMethod element) {
+		return findFirstChildWithType(element, T_PHP_METHOD);
+	}
+
+	@Nullable
+	public static PsiElement getTextElement(@NotNull LattePhpClass element) {
+		return findFirstChildWithType(element, T_PHP_CLASS_NAME);
+	}
+
+	@Nullable
+	public static PsiElement getTextElement(@NotNull LatteMacroModifier element) {
+		return findFirstChildWithType(element, T_MACRO_FILTERS);
+	}
+
+	@Nullable
+	public static PsiElement getTextElement(@NotNull PsiElement element) {
+		return findFirstChildWithType(element, T_PHP_IDENTIFIER);
+	}
+
+	public static String getClassName(@NotNull LattePhpClass element) {
+		PsiElement found = getTextElement(element);
 		return found != null ? LattePhpUtil.normalizeClassName(found.getText()) : null;
 	}
 
 	public static String getModifierName(@NotNull LatteMacroModifier element) {
-		PsiElement found = findFirstChildWithType(element, T_MACRO_FILTERS);
+		PsiElement found = getTextElement(element);
 		return found != null ? LatteUtil.normalizeMacroModifier(found.getText()) : null;
 	}
 
@@ -470,5 +535,10 @@ public class LattePsiImplUtil {
 		} else {
 			return null;
 		}
+	}
+
+	@Nullable
+	private static ASTNode findFirstChildNodeWithType(PsiElement element, @NotNull IElementType type) {
+		return element.getNode().findChildByType(type);
 	}
 }

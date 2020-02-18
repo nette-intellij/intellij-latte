@@ -20,13 +20,14 @@
 	<change-notes><![CDATA[
 		<p>1.0.2</p>
 		<ul>
-			<li>Added code style settings</li>
+			<li>added code style settings</li>
+			<li>implemented some performance improvements</li>
 			<li>Increased minimum compatibility to 2018.3</li>
 		</ul>
 		<p>1.0.1</p>
 		<ul>
-			<li>Fixed compatibility issues</li>
-			<li>Fixed structure view (added n:tags and images)</li>
+			<li>fixed compatibility issues</li>
+			<li>fixed structure view (added n:tags and images)</li>
 		</ul>
 		<p>1.0.0</p>
 		<ul>

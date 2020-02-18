@@ -50,6 +50,8 @@ fake
 macroTag         ::= classicMacroContent {
                      	methods = [
                      		getMacroName
+                     		matchMacroName
+                     		getMacroNameLength
                      		macroContent="macroContent"
                      	]
                      }
@@ -58,7 +60,7 @@ macroOpenTag     ::= T_MACRO_OPEN_TAG_OPEN classicMacroContent T_MACRO_TAG_CLOSE
                         pin=1
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LatteMacroTagElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LatteMacroTagElement"
-                        methods=[getName setName getNameIdentifier getMacroName]
+                        methods=[getName setName getNameIdentifier getMacroName matchMacroName getMacroNameLength]
                         extends = macroTag
                      }
 
@@ -66,7 +68,7 @@ macroCloseTag    ::= T_MACRO_CLOSE_TAG_OPEN classicMacroContent T_MACRO_TAG_CLOS
                         pin=1
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LatteMacroTagElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LatteMacroTagElement"
-                        methods=[getName setName getNameIdentifier getMacroName]
+                        methods=[getName setName getNameIdentifier getMacroName matchMacroName getMacroNameLength]
                      	extends = macroTag
                      }
 
@@ -115,43 +117,43 @@ phpContent       ::= (phpForeach | phpFor | phpExpression)+
 phpVariable        ::= T_MACRO_ARGS_VAR {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpVariableElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpVariableElement"
-                        methods=[getName setName getNameIdentifier getVariableName isDefinition getPhpType isVarTypeDefinition]
+                        methods=[getName setName getNameIdentifier getTextElement getVariableName isDefinition getPhpType isVarTypeDefinition]
                     }
 
 phpStaticVariable  ::= T_MACRO_ARGS_VAR {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpStaticVariableElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpStaticVariableElement"
-                        methods=[getName setName getNameIdentifier getVariableName getPhpType getPropertyType]
+                        methods=[getName setName getNameIdentifier getTextElement getVariableName getPhpType getPropertyType]
                     }
 
 phpMethod        ::= T_PHP_METHOD {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpMethodElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpMethodElement"
-                        methods=[getName setName getNameIdentifier getMethodName getPhpType getReturnType isStatic isFunction]
+                        methods=[getName setName getNameIdentifier getTextElement getMethodName getPhpType getReturnType isStatic isFunction]
                     }
 
 phpConstant        ::= T_PHP_IDENTIFIER {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpConstantElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpConstantElement"
-                        methods=[getName setName getNameIdentifier getConstantName getPhpType getConstantType]
+                        methods=[getName setName getNameIdentifier getTextElement getConstantName getPhpType getConstantType]
                     }
 
 phpProperty        ::= T_PHP_IDENTIFIER {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpPropertyElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpPropertyElement"
-                        methods=[getName setName getNameIdentifier getPropertyName getPhpType getPropertyType isStatic]
+                        methods=[getName setName getNameIdentifier getTextElement getPropertyName getPhpType getPropertyType isStatic]
                     }
 
 phpClass        ::= T_PHP_CLASS_NAME {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpClassElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpClassElement"
-                        methods=[getName setName getNameIdentifier getClassName getPhpType isTemplateType]
+                        methods=[getName setName getNameIdentifier getTextElement getClassName getPhpType isTemplateType]
                     }
 
 macroModifier    ::= T_MACRO_FILTERS {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LatteMacroModifierElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LatteMacroModifierElement"
-                        methods=[getName setName getNameIdentifier getModifierName]
+                        methods=[getName setName getNameIdentifier getTextElement getModifierName]
                     }
 
 phpForeach       ::= T_WHITESPACE? phpExpression T_WHITESPACE? T_PHP_AS T_WHITESPACE? (phpVariable | phpArrayOfVariables) (T_WHITESPACE? T_PHP_DOUBLE_ARROW T_WHITESPACE? (phpVariable | phpArrayOfVariables))?

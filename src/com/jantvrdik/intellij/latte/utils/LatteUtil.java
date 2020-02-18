@@ -142,7 +142,7 @@ public class LatteUtil {
         return fileText.length() >= startOffset + string.length() && fileText.substring(startOffset, startOffset + string.length()).equals(string);
     }
 
-    private static <T extends BaseLattePhpElement>  Collection<T> findElementsInAllFiles(Project project, String key, Class<T> className, @Nullable PhpClass phpClass) {
+    private static <T extends BaseLattePhpElement> Collection<T> findElementsInAllFiles(Project project, String key, Class<T> className, @Nullable PhpClass phpClass) {
         List<T> result = new ArrayList<T>();
         Collection<VirtualFile> virtualFiles =
                 FileTypeIndex.getFiles(LatteFileType.INSTANCE, GlobalSearchScope.allScope(project));
@@ -224,7 +224,7 @@ public class LatteUtil {
         file.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
             @Override
             public void visitElement(PsiElement element) {
-                if (element instanceof LatteMacroTag && ((LatteMacroTag) element).getMacroName().equals("templateType")) {
+                if (element instanceof LatteMacroTag && ((LatteMacroTag) element).matchMacroName("templateType")) {
                     classes.add((LatteMacroTag) element);
                 } else {
                     super.visitElement(element);

@@ -36,7 +36,7 @@ public class MacroTemplateTypeInspection extends LocalInspectionTool {
 		file.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
 			@Override
 			public void visitElement(PsiElement element) {
-				if (element instanceof LatteMacroTag && ((LatteMacroTag) element).getMacroName().equals("templateType")) {
+				if (element instanceof LatteMacroTag && ((LatteMacroTag) element).matchMacroName("templateType")) {
 					List<LatteMacroTag> allMacros = new ArrayList<LatteMacroTag>();
 					LatteUtil.findLatteMacroTemplateType(allMacros, (LatteFile) file);
 					if (allMacros.size() > 1) {

@@ -34,7 +34,7 @@ public class MacroVarTypeInspection extends LocalInspectionTool {
 		file.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
 			@Override
 			public void visitElement(PsiElement element) {
-				if (element instanceof LatteMacroTag && ((LatteMacroTag) element).getMacroName().equals("varType")) {
+				if (element instanceof LatteMacroTag && ((LatteMacroTag) element).matchMacroName("varType")) {
 					LatteMacroContent macroContent = PsiTreeUtil.findChildOfType(element, LatteMacroContent.class);
 					if (macroContent != null) {
 						List<LattePhpContent> phpContent = new ArrayList<>(macroContent.getPhpContentList());
