@@ -338,11 +338,11 @@ public class LattePsiImplUtil {
 	}
 
 	public static boolean isVarDefinition(@NotNull LattePhpVariable element) {
-		return LatteUtil.matchParentMacroName(element, "var");
+		return LatteUtil.matchParentMacroName(element, "var") || LatteUtil.matchParentMacroName(element, "default");
 	}
 
 	public static boolean isDefinition(@NotNull LattePhpVariable element) {
-		if (isVarTypeDefinition(element) || LatteUtil.matchParentMacroName(element, "capture")) {
+		if (isVarTypeDefinition(element) || LatteUtil.matchParentMacroName(element, "capture") || LatteUtil.matchParentMacroName(element, "default")) {
 			return true;
 		}
 
