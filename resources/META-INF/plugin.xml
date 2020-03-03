@@ -1,7 +1,7 @@
 <idea-plugin>
 	<id>com.jantvrdik.intellij.latte</id>
 	<name>Latte</name>
-	<version>1.0.1</version>
+	<version>1.0.2</version>
 	<vendor>Jan Tvrdík</vendor>
 
 	<description><![CDATA[
@@ -18,10 +18,25 @@
 	]]></description>
 
 	<change-notes><![CDATA[
+		<p>1.0.2</p>
+		<ul>
+			<li>added code style settings (settings for use tabs or spaces) (issue #46, #30)</li>
+			<li>added support for define variable in tag {default $foo = 123}</li>
+			<li>added class namespaces completion</li>
+			<li>added support for define variables by {php [$foo, $bar] = $arr}</li>
+			<li>implemented some performance improvements</li>
+			<li>fixed resolving methods if a type is more classes FooClass|BarClass</li>
+			<li>fixed completion for unpaired macro after if missing end }</li>
+			<li>fixed filters on variables (issue #47)</li>
+			<li>fixed wrong indent for elseifset (issue #42)</li>
+			<li>fixed multiple variable definitions in for/foreach cycles</li>
+			<li>fixed auto-complete (disabled in strings, more improvements)</li>
+			<li>increased minimum compatibility to 2018.3</li>
+		</ul>
 		<p>1.0.1</p>
 		<ul>
-			<li>Fixed compatibility issues</li>
-			<li>Fixed structure view (added n:tags and images)</li>
+			<li>fixed compatibility issues</li>
+			<li>fixed structure view (added n:tags and images)</li>
 		</ul>
 		<p>1.0.0</p>
 		<ul>
@@ -141,7 +156,7 @@
 	</change-notes>
 
 	<!-- http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges -->
-	<idea-version since-build="173.2099.1"/>
+	<idea-version since-build="183.3283.2"/>
 
 	<!-- http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products -->
 	<depends>com.intellij.modules.lang</depends>
@@ -173,6 +188,9 @@
 		<lang.braceMatcher language="Latte" implementationClass="com.jantvrdik.intellij.latte.reference.LatteBraceMatcher"/>
 		<renamePsiElementProcessor implementation="com.jantvrdik.intellij.latte.refactoring.LatteRenamePsiElementProcessor"/>
 		<lang.documentationProvider language="Latte" implementationClass="com.jantvrdik.intellij.latte.documentation.LatteDocumentationProvider"/>
+
+ 		<codeStyleSettingsProvider implementation="com.jantvrdik.intellij.latte.codeStyle.LatteCodeStyleSettingsProvider"/>
+		<langCodeStyleSettingsProvider implementation="com.jantvrdik.intellij.latte.codeStyle.LatteLanguageCodeStyleSettingsProvider"/>
 
 		<psi.referenceContributor implementation="com.jantvrdik.intellij.latte.reference.LatteReferenceContributor"/>
 

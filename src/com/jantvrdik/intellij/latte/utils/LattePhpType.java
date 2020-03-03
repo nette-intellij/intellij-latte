@@ -3,7 +3,6 @@ package com.jantvrdik.intellij.latte.utils;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -87,6 +86,18 @@ public class LattePhpType {
         return types.stream().anyMatch(typePart -> typePart.isClass && typePart.getPart().equals(normalizedName));
     }
 
+    public boolean hasClass(Collection<PhpClass> phpClasses) {
+        if (!containsClasses()) {
+            return false;
+        }
+        for (PhpClass phpClass : phpClasses) {
+            if (hasClass(phpClass.getFQN())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean isNullable() {
         return nullable;
     }
@@ -107,17 +118,6 @@ public class LattePhpType {
                 .filter(typePart -> typePart.isClass)
                 .map(TypePart::getPart)
                 .toArray(String[]::new);
-    }
-
-    @Nullable
-    public PhpClass getFirstPhpClass(Project project) {
-        for (String wholeType : findClasses()) {
-            List<PhpClass> classes = new ArrayList<>(LattePhpUtil.getClassesByFQN(project, wholeType));
-            if (classes.size() > 0) {
-                return classes.get(0);
-            }
-        }
-        return null;
     }
 
     @Override

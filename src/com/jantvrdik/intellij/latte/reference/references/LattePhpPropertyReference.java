@@ -17,22 +17,22 @@ import java.util.List;
 
 public class LattePhpPropertyReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
     private String key;
-    private PhpClass phpClass;
+    private Collection<PhpClass> phpClasses;
 
     public LattePhpPropertyReference(@NotNull LattePhpProperty element, TextRange textRange) {
         super(element, textRange);
         key = element.getPropertyName();
-        phpClass = element.getPhpType().getFirstPhpClass(element.getProject());
+        phpClasses = element.getPhpType().getPhpClasses(element.getProject());
     }
 
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean b) {
-        if (phpClass == null) {
+        if (phpClasses.size() == 0) {
             return new ResolveResult[0];
         }
 
-        final Collection<LattePhpProperty> methods = LatteUtil.findProperties(getElement().getProject(), key, phpClass);
+        final Collection<LattePhpProperty> methods = LatteUtil.findProperties(getElement().getProject(), key, phpClasses);
         List<ResolveResult> results = new ArrayList<ResolveResult>();
         for (BaseLattePhpElement method : methods) {
             results.add(new PsiElementResolveResult(method));
@@ -65,10 +65,12 @@ public class LattePhpPropertyReference extends PsiReferenceBase<PsiElement> impl
     @Override
     public boolean isReferenceTo(@NotNull PsiElement element) {
         if (element instanceof LattePhpProperty) {
-            PhpClass originalClass = ((LattePhpProperty) element).getPhpType().getFirstPhpClass(element.getProject());
-            if (originalClass != null) {
-                if (LattePhpUtil.isReferenceTo(originalClass, multiResolve(false), element, ((LattePhpProperty) element).getPropertyName())) {
-                    return true;
+            Collection<PhpClass> originalClasses = ((LattePhpProperty) element).getPhpType().getPhpClasses(element.getProject());
+            if (originalClasses.size() > 0) {
+                for (PhpClass originalClass : originalClasses) {
+                    if (LattePhpUtil.isReferenceTo(originalClass, multiResolve(false), element, ((LattePhpProperty) element).getPropertyName())) {
+                        return true;
+                    }
                 }
             }
         }

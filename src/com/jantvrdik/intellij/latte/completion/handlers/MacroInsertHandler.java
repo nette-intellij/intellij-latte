@@ -62,28 +62,26 @@ public class MacroInsertHandler implements InsertHandler<LookupElement> {
 					spaceInserted = 1;
 				}
 
-				if (isCloseTag || resolvePairMacro) {
-					int lastBraceOffset = text.indexOf("}", offset);
-					int endOfLineOffset = text.indexOf("\n", offset);
+				int lastBraceOffset = text.indexOf("}", offset);
+				int endOfLineOffset = text.indexOf("\n", offset);
 
-					if (endOfLineOffset == -1) {
-						endOfLineOffset = text.length();
-					}
-					if (lastBraceOffset == -1 || lastBraceOffset > endOfLineOffset) {
-						caretModel.moveToOffset(endOfLineOffset + spaceInserted);
-						EditorModificationUtil.insertStringAtCaret(editor, "}");
-						lastBraceOffset = endOfLineOffset;
-						endOfLineOffset++;
-					}
+				if (endOfLineOffset == -1) {
+					endOfLineOffset = text.length();
+				}
+				if (lastBraceOffset == -1 || lastBraceOffset > endOfLineOffset) {
+					caretModel.moveToOffset(endOfLineOffset + spaceInserted);
+					EditorModificationUtil.insertStringAtCaret(editor, "}");
+					lastBraceOffset = endOfLineOffset;
+					endOfLineOffset++;
+				}
 
-					if (resolvePairMacro) {
-						String endTag = "{/" + macroName + "}";
+				if (resolvePairMacro) {
+					String endTag = "{/" + macroName + "}";
 
-						int endTagOffset = text.indexOf(endTag, offset);
-						if (endTagOffset == -1 || endTagOffset > endOfLineOffset) {
-							caretModel.moveToOffset(lastBraceOffset + spaceInserted + 1);
-							EditorModificationUtil.insertStringAtCaret(editor, endTag);
-						}
+					int endTagOffset = text.indexOf(endTag, offset);
+					if (endTagOffset == -1 || endTagOffset > endOfLineOffset) {
+						caretModel.moveToOffset(lastBraceOffset + spaceInserted + 1);
+						EditorModificationUtil.insertStringAtCaret(editor, endTag);
 					}
 				}
 

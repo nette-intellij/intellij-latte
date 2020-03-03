@@ -20,11 +20,11 @@ public class LatteReferenceContributor extends PsiReferenceContributor {
                             return PsiReference.EMPTY_ARRAY;
                         }
 
-                        LattePhpVariable variableElement = (LattePhpVariable) element;
-                        String value = variableElement.getVariableName();
-                        if (value != null) {
+                        PsiElement value = ((LattePhpVariable) element).getTextElement();
+                        if (value != null && value.getTextLength() > 0) {
                             return new PsiReference[]{
-                                    new LattePhpVariableReference((LattePhpVariable) element, new TextRange(0, value.length() + 1))};
+                                    new LattePhpVariableReference((LattePhpVariable) element, new TextRange(0, value.getTextLength()))
+                            };
                         }
 
                         return PsiReference.EMPTY_ARRAY;
@@ -41,10 +41,11 @@ public class LatteReferenceContributor extends PsiReferenceContributor {
                             return PsiReference.EMPTY_ARRAY;
                         }
 
-                        LattePhpMethod methodElement = (LattePhpMethod) element;
-                        String value = methodElement.getMethodName();
-                        if (value != null) {
-                            return new PsiReference[]{new LattePhpMethodReference(methodElement, new TextRange(0, value.length()))};
+                        PsiElement value = ((LattePhpMethod) element).getTextElement();
+                        if (value != null && value.getTextLength() > 0) {
+                            return new PsiReference[]{
+                                    new LattePhpMethodReference((LattePhpMethod) element, new TextRange(0, value.getTextLength()))
+                            };
                         }
 
                         return PsiReference.EMPTY_ARRAY;
@@ -61,10 +62,11 @@ public class LatteReferenceContributor extends PsiReferenceContributor {
                             return PsiReference.EMPTY_ARRAY;
                         }
 
-                        LattePhpProperty propertyElement = (LattePhpProperty) element;
-                        String value = propertyElement.getPropertyName();
-                        if (value != null) {
-                            return new PsiReference[]{new LattePhpPropertyReference(propertyElement, new TextRange(0, value.length()))};
+                        PsiElement value = ((LattePhpProperty) element).getTextElement();
+                        if (value != null && value.getTextLength() > 0) {
+                            return new PsiReference[]{
+                                    new LattePhpPropertyReference((LattePhpProperty) element, new TextRange(0, value.getTextLength()))
+                            };
                         }
 
                         return PsiReference.EMPTY_ARRAY;
@@ -81,10 +83,11 @@ public class LatteReferenceContributor extends PsiReferenceContributor {
                             return PsiReference.EMPTY_ARRAY;
                         }
 
-                        LattePhpConstant constantElement = (LattePhpConstant) element;
-                        String value = constantElement.getConstantName();
-                        if (value != null) {
-                            return new PsiReference[]{new LattePhpConstantReference(constantElement, new TextRange(0, value.length()))};
+                        PsiElement value = ((LattePhpConstant) element).getTextElement();
+                        if (value != null && value.getTextLength() > 0) {
+                            return new PsiReference[]{
+                                    new LattePhpConstantReference((LattePhpConstant) element, new TextRange(0, value.getTextLength()))
+                            };
                         }
 
                         return PsiReference.EMPTY_ARRAY;
@@ -101,10 +104,11 @@ public class LatteReferenceContributor extends PsiReferenceContributor {
                             return PsiReference.EMPTY_ARRAY;
                         }
 
-                        LattePhpStaticVariable constantElement = (LattePhpStaticVariable) element;
-                        String value = constantElement.getVariableName();
-                        if (value != null) {
-                            return new PsiReference[]{new LattePhpStaticVariableReference(constantElement, new TextRange(0, value.length() + 1))};
+                        PsiElement value = ((LattePhpStaticVariable) element).getTextElement();
+                        if (value != null && value.getTextLength() > 0) {
+                            return new PsiReference[]{
+                                    new LattePhpStaticVariableReference((LattePhpStaticVariable) element, new TextRange(0, value.getTextLength()))
+                            };
                         }
 
                         return PsiReference.EMPTY_ARRAY;
@@ -121,10 +125,9 @@ public class LatteReferenceContributor extends PsiReferenceContributor {
                             return PsiReference.EMPTY_ARRAY;
                         }
 
-                        LattePhpClass constantElement = (LattePhpClass) element;
-                        String value = constantElement.getClassName();
-                        if (value != null) {
-                            return new PsiReference[]{new LattePhpClassReference(constantElement, new TextRange(0, value.length()))};
+                        PsiElement value = ((LattePhpClass) element).getTextElement();
+                        if (value != null && value.getTextLength() > 0) {
+                            return new PsiReference[]{new LattePhpClassReference((LattePhpClass) element, new TextRange(0, value.getTextLength()))};
                         }
 
                         return PsiReference.EMPTY_ARRAY;
@@ -144,13 +147,12 @@ public class LatteReferenceContributor extends PsiReferenceContributor {
                             return PsiReference.EMPTY_ARRAY;
                         }
 
-                        LatteMacroTag constantElement = (LatteMacroTag) element;
-                        String value = constantElement.getMacroName();
-                        if (value.length() == 0) {
+                        int valueLength = ((LatteMacroTag) element).getMacroNameLength();
+                        if (valueLength == 0) {
                             return PsiReference.EMPTY_ARRAY;
                         }
                         int length = element instanceof LatteMacroCloseTag ? 2 : 1;
-                        return new PsiReference[]{new LatteMacroTagReference(constantElement, new TextRange(1, value.length() + length))};
+                        return new PsiReference[]{new LatteMacroTagReference((LatteMacroTag) element, new TextRange(1, valueLength + length))};
                     }
                 });
 
@@ -167,11 +169,11 @@ public class LatteReferenceContributor extends PsiReferenceContributor {
                         }
 
                         LatteMacroModifier constantElement = (LatteMacroModifier) element;
-                        String value = constantElement.getModifierName();
-                        if (value.length() == 0) {
-                            return PsiReference.EMPTY_ARRAY;
+                        PsiElement textElement = ((LatteMacroModifier) element).getTextElement();
+                        if (textElement != null && textElement.getTextLength() > 0) {
+                            return new PsiReference[]{new LatteMacroModifierReference(constantElement, new TextRange(0, textElement.getTextLength()))};
                         }
-                        return new PsiReference[]{new LatteMacroModifierReference(constantElement, new TextRange(0, value.length()))};
+                        return PsiReference.EMPTY_ARRAY;
                     }
                 });
     }

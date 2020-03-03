@@ -54,13 +54,15 @@ public class LattePhpUtil {
                 continue;
             }
 
-            PhpClass phpClass = ((BaseLattePhpElement) result.getElement()).getPhpType().getFirstPhpClass(element.getProject());
-            if (phpClass == null) {
+            Collection<PhpClass> phpClasses = ((BaseLattePhpElement) result.getElement()).getPhpType().getPhpClasses(element.getProject());
+            if (phpClasses.size() == 0) {
                 continue;
             }
 
-            if (isReferenceFor(originalClass, phpClass)) {
-                return true;
+            for (PhpClass phpClass : phpClasses) {
+                if (isReferenceFor(originalClass, phpClass)) {
+                    return true;
+                }
             }
         }
         return false;

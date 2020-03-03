@@ -17,22 +17,22 @@ import java.util.List;
 
 public class LattePhpConstantReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
     private String key;
-    private PhpClass phpClass;
+    private Collection<PhpClass> phpClasses;
 
     public LattePhpConstantReference(@NotNull LattePhpConstant element, TextRange textRange) {
         super(element, textRange);
         key = element.getConstantName();
-        phpClass = element.getPhpType().getFirstPhpClass(element.getProject());
+        phpClasses = element.getPhpType().getPhpClasses(element.getProject());
     }
 
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean b) {
-        if (phpClass == null) {
+        if (phpClasses.size() == 0) {
             return new ResolveResult[0];
         }
 
-        final Collection<LattePhpConstant> methods = LatteUtil.findConstants(getElement().getProject(), key, phpClass);
+        final Collection<LattePhpConstant> methods = LatteUtil.findConstants(getElement().getProject(), key, phpClasses);
         List<ResolveResult> results = new ArrayList<ResolveResult>();
         for (BaseLattePhpElement method : methods) {
             results.add(new PsiElementResolveResult(method));
@@ -65,10 +65,12 @@ public class LattePhpConstantReference extends PsiReferenceBase<PsiElement> impl
     @Override
     public boolean isReferenceTo(@NotNull PsiElement element) {
         if (element instanceof LattePhpConstant) {
-            PhpClass originalClass = ((LattePhpConstant) element).getPhpType().getFirstPhpClass(element.getProject());
-            if (originalClass != null) {
-                if (LattePhpUtil.isReferenceTo(originalClass, multiResolve(false), element, ((LattePhpConstant) element).getConstantName())) {
-                    return true;
+            Collection<PhpClass> originalClasses = ((LattePhpConstant) element).getPhpType().getPhpClasses(element.getProject());
+            if (originalClasses.size() > 0) {
+                for (PhpClass originalClass : originalClasses) {
+                    if (LattePhpUtil.isReferenceTo(originalClass, multiResolve(false), element, ((LattePhpConstant) element).getConstantName())) {
+                        return true;
+                    }
                 }
             }
         }

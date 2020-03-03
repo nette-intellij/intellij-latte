@@ -51,7 +51,7 @@ public class LatteBlock extends TemplateLanguageBlock {
 		}
 		PsiElement el = astNode.getPsi();
 		LatteMacroTag openTag = ((LatteMacroClassic) el).getOpenTag();
-		if (openTag.getMacroName().equals("else") || openTag.getMacroName().equals("elseif")) {
+		if (openTag.matchMacroName("else") || openTag.matchMacroName("elseif") || openTag.matchMacroName("elseifset")) {
 			return Indent.getNoneIndent();
 		}
 		return Indent.getNormalIndent();

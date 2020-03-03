@@ -12,7 +12,6 @@ import com.jantvrdik.intellij.latte.LatteLanguage;
 import com.jantvrdik.intellij.latte.completion.handlers.AttrMacroInsertHandler;
 import com.jantvrdik.intellij.latte.completion.handlers.MacroInsertHandler;
 import com.jantvrdik.intellij.latte.completion.providers.LattePhpCompletionProvider;
-import com.jantvrdik.intellij.latte.completion.providers.LatteVariableCompletionProvider;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.config.LatteMacro;
 import com.jantvrdik.intellij.latte.config.LatteModifier;
@@ -87,9 +86,11 @@ public class LatteCompletionContributor extends CompletionContributor {
 					return;
 				}
 
-				LatteMacro macro = LatteConfiguration.INSTANCE.getMacro(element.getProject(), macroClassic.getOpenTag().getMacroName());
-				if (macro == null || !macro.allowedModifiers) {
-					return;
+				if (!((LatteMacroModifier) element).isVariableModifier()) {
+					LatteMacro macro = LatteConfiguration.INSTANCE.getMacro(element.getProject(), macroClassic.getOpenTag().getMacroName());
+					if (macro == null || !macro.allowedModifiers) {
+						return;
+					}
 				}
 
 				Map<String, LatteModifier> customModifiers = LatteConfiguration.INSTANCE.getCustomModifiers(element.getProject());
@@ -97,12 +98,6 @@ public class LatteCompletionContributor extends CompletionContributor {
 				result.addAllElements(getClassicModifierCompletions(customModifiers));
 			}
 		});
-
-		extend(
-				CompletionType.BASIC,
-				PlatformPatterns.psiElement(LatteTypes.T_MACRO_ARGS_VAR).withLanguage(LatteLanguage.INSTANCE),
-				new LatteVariableCompletionProvider()
-		);
 
 		extend(
 				CompletionType.BASIC,
