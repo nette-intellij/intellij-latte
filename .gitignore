@@ -1,15 +1,10 @@
-/.idea/misc.xml
-/.idea/tasks.xml
-/.idea/vcs.xml
-/.idea/workspace.xml
-/gen
-/out
-
 .DS_Store
+*.iml
 
-/src/com/jantvrdik/intellij/latte/lexer/LatteMacroContentLexer.java
-/src/com/jantvrdik/intellij/latte/lexer/LatteMacroLexer.java
-/src/com/jantvrdik/intellij/latte/lexer/LatteTopLexer.java
-/src/com/jantvrdik/intellij/latte/parser/_LatteLexer.flex
+/src/main/gen
+/src/main/java/src/com/jantvrdik/intellij/latte/parser/_LatteLexer.flex
 
-!latte-plugin.iml
+/.idea
+/.gradle
+/build
+/out

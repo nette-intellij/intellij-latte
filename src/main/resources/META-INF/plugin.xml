@@ -1,7 +1,6 @@
 <idea-plugin>
 	<id>com.jantvrdik.intellij.latte</id>
 	<name>Latte</name>
-	<version>1.0.2</version>
 	<vendor>Jan Tvrdík</vendor>
 
 	<description><![CDATA[
