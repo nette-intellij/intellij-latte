@@ -13,7 +13,7 @@ Settings → Plugins → Browse repositories → Find "Latte" → Install Plugin
 Building
 ------------
 
-Plugin uses Gradle to build, but before build you need to install **Grammar-Kit** plugin to Intellij Idea, right click in file explorer to **LatteParser.bnf** located in *com.jantvrdik.intellij.latte*, click to **Generate Parser Code**, then select PSI root to *src/main/gen/com/jantvrdik/intellij/latte/psi* and generated parser as *src/main/gen/com/jantvrdik/intellij/latte/parser/LatteParser.class*
+Plugin uses Gradle to build, but before build you need to install **Grammar-Kit** plugin to Intellij Idea, right click in file explorer to **LatteParser.bnf** located in **com.jantvrdik.intellij.latte**, click to **Generate Parser Code**, then select PSI root to **src/main/gen/com/jantvrdik/intellij/latte/psi** and generated parser as **src/main/gen/com/jantvrdik/intellij/latte/parser/LatteParser.class**
 
 After generating parser files, you need to generate a .flex file from the same .bnf file, right click to file and choose option **Generate JFlex Lexer** and generate **_LatteLexer.flex** in the same folder.
 
