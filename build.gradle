@@ -74,7 +74,6 @@ task generateLatteLexer(type: GenerateLexer) {
 
 task generateLatteMacroContentLexer(type: GenerateLexer) {
     source = "src/main/java/com/jantvrdik/intellij/latte/lexer/grammars/LatteMacroContentLexer.flex"
-    source = "src/main/java/com/jantvrdik/intellij/latte/lexer/grammars/LatteMacroContentLexer.flex"
     targetDir = "src/main/gen/com/jantvrdik/intellij/latte/lexer/"
     targetClass = "LatteMacroContentLexer"
     purgeOldFiles = true
