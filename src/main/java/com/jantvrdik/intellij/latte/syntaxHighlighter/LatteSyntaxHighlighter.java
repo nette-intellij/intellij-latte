@@ -2,6 +2,7 @@ package com.jantvrdik.intellij.latte.syntaxHighlighter;
 
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
+import com.intellij.openapi.editor.HighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.tree.IElementType;
@@ -30,6 +31,10 @@ public class LatteSyntaxHighlighter extends SyntaxHighlighterBase {
 	public static final TextAttributesKey PHP_CAST = createTextAttributesKey("LATTE_PHP_CAST", DefaultLanguageHighlighterColors.LABEL);
 	public static final TextAttributesKey PHP_TYPE = createTextAttributesKey("LATTE_PHP_TYPE", DefaultLanguageHighlighterColors.KEYWORD);
 	public static final TextAttributesKey PHP_NULL = createTextAttributesKey("LATTE_PHP_NULL", DefaultLanguageHighlighterColors.KEYWORD);
+	public static final TextAttributesKey PHP_ASSIGNMENT_OPERATOR = createTextAttributesKey("LATTE_PHP_ASSIGNMENT_OPERATOR", HighlighterColors.TEXT);
+	public static final TextAttributesKey PHP_LOGIC_OPERATOR = createTextAttributesKey("LATTE_PHP_LOGIC_OPERATOR", HighlighterColors.TEXT);
+	public static final TextAttributesKey PHP_OPERATOR = createTextAttributesKey("LATTE_PHP_OPERATOR", HighlighterColors.TEXT);
+	public static final TextAttributesKey PHP_CONCATENATION = createTextAttributesKey("LATTE_PHP_CONCATENATION", DefaultLanguageHighlighterColors.DOT);
 
 	@NotNull
 	@Override
@@ -71,6 +76,24 @@ public class LatteSyntaxHighlighter extends SyntaxHighlighterBase {
 
 		} else if (token == LatteTypes.T_PHP_METHOD) {
 			return pack(PHP_METHOD);
+
+		} else if (token == LatteTypes.T_PHP_DEFINITION_OPERATOR || token == LatteTypes.T_PHP_ASSIGNMENT_OPERATOR) {
+			return pack(PHP_ASSIGNMENT_OPERATOR);
+
+		} else if (token == LatteTypes.T_PHP_LOGIC_OPERATOR) {
+			return pack(PHP_LOGIC_OPERATOR);
+
+		} else if (
+				token == LatteTypes.T_PHP_RELATIONAL_OPERATOR
+				|| token == LatteTypes.T_PHP_BITWISE_OPERATOR
+				|| token == LatteTypes.T_PHP_OR_INCLUSIVE
+				|| token == LatteTypes.T_PHP_SHIFT_OPERATOR
+				|| token == LatteTypes.T_PHP_MULTIPLICATIVE_OPERATORS
+		) {
+			return pack(PHP_OPERATOR);
+
+		} else if (token == LatteTypes.T_PHP_CONCATENATION) {
+			return pack(PHP_CONCATENATION);
 
 		} else if (token == LatteTypes.T_PHP_TYPE) {
 			return pack(PHP_TYPE);

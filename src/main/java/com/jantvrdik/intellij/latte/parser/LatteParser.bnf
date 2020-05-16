@@ -177,16 +177,20 @@ phpString    ::=  phpSingleQuotedString | phpDoubleQuotedString | T_MACRO_ARGS_S
 private
 phpArgument    ::=  phpString | T_MACRO_ARGS_NUMBER | phpArrayOfVariables | phpClass | phpDefinition
                     | phpStatic | phpFunctionCall | phpInBrackets | phpVariable | T_PHP_CONTENT_TYPE | T_PHP_OBJECT_OPERATOR
-                    | T_PHP_OPERATOR | T_PHP_DOUBLE_COLON | T_PHP_DOUBLE_ARROW | T_PHP_METHOD | T_PHP_TYPE | T_PHP_KEYWORD
-                    | T_PHP_CLASS | T_PHP_AS | T_PHP_CAST | T_PHP_EXPRESSION | T_PHP_LEFT_BRACKET | T_PHP_RIGHT_BRACKET | T_PHP_NULL
-                    | T_PHP_MIXED | T_PHP_LEFT_CURLY_BRACE | T_PHP_RIGHT_CURLY_BRACE | macroModifier | T_PHP_IDENTIFIER | T_PHP_OR_INCLUSIVE
-                    | T_PHP_DEFINITION_OPERATOR
+                    | T_PHP_RELATIONAL_OPERATOR | T_PHP_ASSIGNMENT_OPERATOR | T_PHP_LOGIC_OPERATOR | T_PHP_OPERATOR
+                    | T_PHP_ADDITIVE_OPERATOR | T_PHP_BITWISE_OPERATOR | T_PHP_SHIFT_OPERATOR
+                    | T_PHP_DOUBLE_COLON | T_PHP_DOUBLE_ARROW | T_PHP_METHOD | T_PHP_TYPE | T_PHP_KEYWORD
+                    | T_PHP_CLASS | T_PHP_AS | T_PHP_CAST
+                    | T_PHP_CONCATENATION | T_PHP_MULTIPLICATIVE_OPERATORS | T_PHP_UNARY_OPERATOR
+                    | T_PHP_EXPRESSION | T_PHP_LEFT_BRACKET | T_PHP_RIGHT_BRACKET | T_PHP_NULL
+                    | T_PHP_MIXED | T_PHP_LEFT_CURLY_BRACE | T_PHP_RIGHT_CURLY_BRACE | macroModifier | T_PHP_IDENTIFIER
+                    | T_PHP_MACRO_SEPARATOR | T_PHP_OR_INCLUSIVE | T_PHP_DEFINITION_OPERATOR
 
 private
 phpFunctionCall    ::= (phpMethod | phpVariable) T_WHITESPACE? phpArgumentList T_WHITESPACE?
 
 private
-phpExpression    ::= T_MACRO_ARGS | T_PHP_OR_INCLUSIVE | phpArgument | T_PHP_LEFT_NORMAL_BRACE | T_PHP_RIGHT_NORMAL_BRACE
+phpExpression    ::= T_MACRO_ARGS | T_PHP_OR_INCLUSIVE | T_PHP_MACRO_SEPARATOR | phpArgument | T_PHP_LEFT_NORMAL_BRACE | T_PHP_RIGHT_NORMAL_BRACE
 
 private
 phpDefinition    ::= phpMethodDefinition | phpConstantDefinition | phpPropertyDefinition

@@ -22,6 +22,22 @@ Now you can build plugin using gradle, and it will automatically generate anothe
 $ gradlew build
 ```
 
+To build `.jar` file to local install to IDE run gradle task `buildPlugin`. `.jar` file with plugin will be located in `build/libs`
+
+
+Run IDE for testing
+-------------------
+
+Create file `local.properties` in project and insert next content with path to IDE directory:
+
+For your current OS see `default IDE paths`: https://www.jetbrains.com/help/idea/tuning-the-ide.html#default-dirs
+
+```
+runIdeDirectory = /Users/<user id>/Library/Application Support/JetBrains/Toolbox/apps/PhpStorm/ch-0/201.7223.96/PhpStorm 2019.3 EAP.app/Contents
+```
+
+And run gradle task `:runIde` ideally by run configurations in IDEA (it supports debugging).
+
 
 Supported Features
 ------------------

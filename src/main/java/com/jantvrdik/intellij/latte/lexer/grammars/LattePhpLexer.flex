@@ -78,19 +78,55 @@ AS="as"
         return T_PHP_RIGHT_BRACKET;
     }
 
-    ("<=>" | "<>" | "<=" | ">=" | "<" | ">" | "==" | "===" | "\!=" | "\==") {
+    ("<>" | "==" | "===" | "\!==" | "\!=" | "\==") {
         return T_PHP_OPERATOR;
+    }
+
+    ("<=>" | "<=" | ">=" | "<" | ">") {
+        return T_PHP_RELATIONAL_OPERATOR;
     }
 
     ("(bool)" | "(boolean)" | "(array)" | "(real)" | "(double)" | "(float)" | "(int)" | "(integer)" | "(object)" | "(string)" | "(unset)") {
         return T_PHP_CAST;
     }
 
-    ("||" | "&&" | "**=" | "**" | ".=" | "^=" | "-=" | "+=" | "%=" | "*=" | "|=" | "&=" | "??" | "--" | "/=" | "..." | "++" | "<<<" | "<<=" | ">>=" | "<<" | ">>") {
+    ("<<" | ">>") {
+        return T_PHP_SHIFT_OPERATOR;
+    }
+
+    ("--" | "++") {
+        return T_PHP_UNARY_OPERATOR;
+    }
+
+    ("**=" | "??" | "..." | "<<<" | "<<=" | ">>=") {
         return T_PHP_EXPRESSION;
     }
 
-    ("+" | "-" | "?" | ":" | "&" | "." | "*" | "/") {
+    ("||" | "&&") {
+        return T_PHP_LOGIC_OPERATOR;
+    }
+
+    (".=" | "^=" | "-=" | "+=" | "%=" | "*=" | "|=" | "&=" | "/=") {
+        return T_PHP_ASSIGNMENT_OPERATOR;
+    }
+
+    ("+" | "-") {
+        return T_PHP_ADDITIVE_OPERATOR;
+    }
+
+    ("&" | "^") {
+        return T_PHP_BITWISE_OPERATOR;
+    }
+
+    "." {
+        return T_PHP_CONCATENATION;
+    }
+
+    ("**" | "/" | "*" | "%") {
+        return T_PHP_MULTIPLICATIVE_OPERATORS;
+    }
+
+    ("?" | ":") {
         return T_PHP_EXPRESSION;
     }
 
@@ -120,7 +156,7 @@ AS="as"
 
     "|" / ({IDENTIFIER} | {CLASS_NAME}) {
         yybegin(MACRO_FILTERS);
-        return T_PHP_OR_INCLUSIVE;
+        return T_PHP_MACRO_SEPARATOR;
     }
 
     "|" {
@@ -197,7 +233,7 @@ AS="as"
 
     "|" {
         pushState(YYINITIAL);
-        return T_PHP_OR_INCLUSIVE;
+        return T_PHP_MACRO_SEPARATOR;
     }
 }
 

@@ -39,7 +39,7 @@ public class LatteReferenceSearch extends QueryExecutorBase<PsiReference, Refere
         ApplicationManager.getApplication().runReadAction(() -> {
             String fieldName = phpClass.getFQN();
 
-            PsiSearchHelper.SERVICE.getInstance(phpClass.getProject())
+            PsiSearchHelper.getInstance(phpClass.getProject())
                     .processElementsWithWord(new TextOccurenceProcessor() {
                         @Override
                         public boolean execute(PsiElement psiElement, int i) {
@@ -62,7 +62,7 @@ public class LatteReferenceSearch extends QueryExecutorBase<PsiReference, Refere
             }
             String fieldName = field.getName();
 
-            PsiSearchHelper.SERVICE.getInstance(field.getProject())
+            PsiSearchHelper.getInstance(field.getProject())
                     .processElementsWithWord(new TextOccurenceProcessor() {
                         @Override
                         public boolean execute(PsiElement psiElement, int i) {

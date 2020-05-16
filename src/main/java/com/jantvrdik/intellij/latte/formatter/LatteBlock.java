@@ -1,31 +1,37 @@
 package com.jantvrdik.intellij.latte.formatter;
 
-import com.intellij.formatting.Alignment;
-import com.intellij.formatting.Block;
-import com.intellij.formatting.Indent;
-import com.intellij.formatting.Spacing;
-import com.intellij.formatting.Wrap;
+import com.intellij.formatting.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.psi.formatter.xml.XmlFormattingPolicy;
 import com.intellij.psi.tree.IElementType;
-import com.intellij.webcore.template.formatter.AbstractTemplateLanguageFormattingModelBuilder;
-import com.intellij.webcore.template.formatter.TemplateLanguageBlock;
+import com.intellij.xml.template.formatter.AbstractXmlTemplateFormattingModelBuilder;
+import com.intellij.xml.template.formatter.TemplateLanguageBlock;
 import com.jantvrdik.intellij.latte.psi.LatteMacroClassic;
-import com.jantvrdik.intellij.latte.psi.LatteMacroOpenTag;
 import com.jantvrdik.intellij.latte.psi.LatteMacroTag;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class LatteBlock extends TemplateLanguageBlock {
+	private SpacingBuilder spacingBuilder;
 
 	private boolean isPair;
 
-	public LatteBlock(AbstractTemplateLanguageFormattingModelBuilder abstractTemplateLanguageFormattingModelBuilder, @NotNull ASTNode astNode, @Nullable Wrap wrap, @Nullable Alignment alignment, CodeStyleSettings codeStyleSettings, XmlFormattingPolicy xmlFormattingPolicy, Indent indent) {
+	public LatteBlock(
+			AbstractXmlTemplateFormattingModelBuilder abstractTemplateLanguageFormattingModelBuilder,
+			@NotNull ASTNode astNode,
+			@Nullable Wrap wrap,
+			@Nullable Alignment alignment,
+			CodeStyleSettings codeStyleSettings,
+			XmlFormattingPolicy xmlFormattingPolicy,
+			Indent indent,
+			SpacingBuilder spacingBuilder
+	) {
 		super(abstractTemplateLanguageFormattingModelBuilder, astNode, wrap, alignment, codeStyleSettings, xmlFormattingPolicy, indent);
+		this.spacingBuilder = spacingBuilder;
 		if (getNode().getFirstChildNode() == null) {
 			isPair = false;
 		} else {
@@ -65,7 +71,7 @@ public class LatteBlock extends TemplateLanguageBlock {
 	@Nullable
 	@Override
 	public Spacing getSpacing(@Nullable Block child1, @NotNull Block child2) {
-		return null;
+		return spacingBuilder.getSpacing(this, child1, child2);
 	}
 
 	private boolean isOpening(ASTNode node) {

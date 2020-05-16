@@ -16,144 +16,6 @@
 		</ul>
 	]]></description>
 
-	<change-notes><![CDATA[
-		<p>1.0.2</p>
-		<ul>
-			<li>added code style settings (settings for use tabs or spaces) (issue #46, #30)</li>
-			<li>added support for define variable in tag {default $foo = 123}</li>
-			<li>added class namespaces completion</li>
-			<li>added support for define variables by {php [$foo, $bar] = $arr}</li>
-			<li>implemented some performance improvements</li>
-			<li>fixed resolving methods if a type is more classes FooClass|BarClass</li>
-			<li>fixed completion for unpaired macro after if missing end }</li>
-			<li>fixed filters on variables (issue #47)</li>
-			<li>fixed wrong indent for elseifset (issue #42)</li>
-			<li>fixed multiple variable definitions in for/foreach cycles</li>
-			<li>fixed auto-complete (disabled in strings, more improvements)</li>
-			<li>increased minimum compatibility to 2018.3</li>
-		</ul>
-		<p>1.0.1</p>
-		<ul>
-			<li>fixed compatibility issues</li>
-			<li>fixed structure view (added n:tags and images)</li>
-		</ul>
-		<p>1.0.0</p>
-		<ul>
-			<li>added support for PHP content</li>
-			<li>added variable types</li>
-			<li>added highlighting and go to source support for latte variables</li>
-			<li>added support for define custom default variables per project</li>
-			<li>added code-completions for latte variables, PHP functions, methods, constants and properties</li>
-			<li>added varType macro</li>
-			<li>added templateType macro</li>
-			<li>added support for define type in {var Bar\FooClass $class = ...}</li>
-			<li>added support for mime types and code-completion it in contentType macro</li>
-			<li>added reference search for usages from PHP to Latte (for classes, methods, properties and constants)</li>
-			<li>added brace matcher for highlight braces</li>
-			<li>added go to source for class names, methods, constants and properties</li>
-			<li>added support for highlighting macro name and pair macro</li>
-			<li>added support for refactoring rename (methods, properties, constants and class names)</li>
-			<li>added code-completion for latte filters and custom function</li>
-			<li>added support for adding custom latte filters and functions</li>
-			<li>added UI for setting custom variables, filters, custom function and macros</li>
-			<li>added help buttons in settings to go to documentation</li>
-			<li>added completion pair macro if use code-completion for pair macro name and click enter</li>
-			<li>
-				added inspections for:
-				<ul>
-					<li>class usages (Undefined class)</li>
-					<li>checking not defined variables, more definitions with same variable name etc.</li>
-					<li>checking constant, property and methods visibility (if is not public it make warning)</li>
-					<li>checking not existing constants, properties and methods</li>
-					<li>checking static methods and properties used non statically and vice versa</li>
-					<li>checking valid content for templateType, varType and var macro</li>
-					<li>checking existing latte filters</li>
-				</ul>
-			</li>
-			<li>Increased minimum compatibility with PhpStorm version to 2017.3 from PhpStorm 8 (pre-2016.2 IDE version)</li>
-		</ul>
-		<p>0.3.3</p>
-		<ul>
-			<li>fixed null pointer exception</li>
-		</ul>
-		<p>0.3.2</p>
-		<ul>
-			<li>fixed disappearing comments</li>
-			<li>Latte 2.4: added new macros</li>
-			<li>Latte 2.4: added AUTO_EMPTY support</li>
-			<li>Latte 2.4: added info about deprecated macro(s)</li>
-		</ul>
-		<p>0.3.1</p>
-		<ul>
-			<li>fixed phpstorm 9.0 compatibility</li>
-		</ul>
-		<p>0.3.0</p>
-		<ul>
-			<li>fixed comment parsing ("todo" support)</li>
-			<li>added "modifier not allowed" inspection</li>
-			<li>added structure view</li>
-			<li>improved macro folding</li>
-
-		</ul>
-		<p>0.2.0</p>
-		<ul>
-			<li>html/xml support</li>
-			<li>better macro content parsing</li>
-			<li>parsing of n:macros content</li>
-		</ul>
-		<p>0.1.1</p>
-		<ul>
-			<li>implemented basic html tags and macros folding</li>
-			<li>typing '}' is ignored when the next character is '}'</li>
-		</ul>
-		<p>0.1.0-rc1 / 0.1.0</p>
-		<ul>
-			<li>selecting attribute macro from code-completion list auto-inserts =&quot;&quot; and put caret inside those quotes</li>
-		</ul>
-		<p>0.1.0-beta3</p>
-		<ul>
-			<li>typing '{' auto-inserts '}'</li>
-		</ul>
-		<p>0.1.0-beta2</p>
-		<ul>
-			<li>fixed minimum required IDEA build number to 133.326</li>
-		</ul>
-		<p>0.1.0-beta1</p>
-		<ul>
-			<li>registering new macro will force re-analyzing of all project files</li>
-		</ul>
-		<p>0.1.0-alpha7</p>
-		<ul>
-			<li>name of closing HTML tag must be the same the opening tag</li>
-			<li>implemented basic commenter</li>
-			<li>hard coded fix for macro _ which can be both pair and unpaired</li>
-		</ul>
-		<p>0.1.0-alpha6</p>
-		<ul>
-			<li>implemented support for custom attribute macros</li>
-			<li>only a single top-level {block} macro can be auto-closed</li>
-		</ul>
-		<p>0.1.0-alpha5</p>
-		<ul>
-			<li>plugin is now really compatible with Java 6</li>
-		</ul>
-		<p>0.1.0-alpha4</p>
-		<ul>
-			<li>implemented support for custom macros</li>
-			<li>macros are auto-closed at end of file</li>
-		</ul>
-		<p>0.1.0-alpha3</p>
-		<ul>
-			<li>plugin should be compatible with Java 6</li>
-			<li>new icon for Latte file</li>
-		</ul>
-		<p>0.1.0-alpha2</p>
-		<ul>
-			<li>fixed macro comment priority when macro comment contained a quote</li>
-		</ul>
-	]]>
-	</change-notes>
-
 	<!-- http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges -->
 	<idea-version since-build="183.3283.2"/>
 
@@ -287,6 +149,10 @@
 						 displayName="Var definition"
 						 groupName="Latte" enabledByDefault="true"
 						 implementationClass="com.jantvrdik.intellij.latte.inspections.MacroVarInspection"/>
+
+		<liveTemplateContext implementation="com.jantvrdik.intellij.latte.liveTemplates.LatteTemplateContext"/>
+		<defaultLiveTemplatesProvider implementation="com.jantvrdik.intellij.latte.liveTemplates.LatteTemplateProvider"/>
+		<liveTemplatePreprocessor implementation="com.jantvrdik.intellij.latte.liveTemplates.LatteTemplatePreprocessor"/>
 	</extensions>
 
 	<application-components>
