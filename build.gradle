@@ -1,0 +1,113 @@
+import org.jetbrains.grammarkit.tasks.*
+
+plugins {
+    id 'org.jetbrains.intellij' version "0.4.11"
+    id "org.jetbrains.grammarkit" version "2019.3"
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs += ["src/main/gen"]
+        }
+    }
+}
+
+sourceCompatibility = 1.8
+version '1.0.3'
+
+jar {
+    archiveName 'intellij-latte-' + version + '.jar'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
+apply plugin: 'org.jetbrains.intellij'
+
+intellij {
+    version ideaVersion
+    updateSinceUntilBuild false
+    plugins = [
+            "com.jetbrains.php:${phpPluginVersion}",
+            'java',
+            'properties'
+    ]
+    pluginName 'Latte'
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://mvnrepository.com/artifact/org.hamcrest/hamcrest-core' }
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+dependencies {
+    compileOnly 'com.intellij.psi:java-psi-api-142.1'
+    compileOnly 'com.intellij.psi:css-openapi'
+    compileOnly 'com.intellij.psi:javascript-openapi'
+    compileOnly 'org.hamcrest:hamcrest-core:1.3'
+    testCompile 'junit:junit:4.13'
+}
+
+apply plugin: 'org.jetbrains.grammarkit'
+
+grammarKit {
+    jflexRelease = '1.7.0-1'
+    grammarKitRelease = '6452fde524'
+}
+
+/*task generateLatteParser(type: GenerateParser) {
+    source = "src/main/java/com/jantvrdik/intellij/latte/parser/LatteParser.bnf"
+    targetRoot = "src/main/gen"
+    pathToParser = '/com/jantvrdik/intellij/latte/parser/LatteParser.java'
+    pathToPsiRoot = '/com/jantvrdik/intellij/latte/psi'
+    purgeOldFiles = true
+}*/
+
+task generateLatteLexer(type: GenerateLexer) {
+    source = "src/main/java/com/jantvrdik/intellij/latte/parser/_LatteLexer.flex"
+    targetDir = "src/main/gen/com/jantvrdik/intellij/latte/parser/"
+    targetClass = "_LatteLexer"
+    purgeOldFiles = true
+}
+
+task generateLatteMacroContentLexer(type: GenerateLexer) {
+    source = "src/main/java/com/jantvrdik/intellij/latte/lexer/grammars/LatteMacroContentLexer.flex"
+    targetDir = "src/main/gen/com/jantvrdik/intellij/latte/lexer/"
+    targetClass = "LatteMacroContentLexer"
+    purgeOldFiles = true
+}
+
+task generateLatteMacroLexer(type: GenerateLexer) {
+    source = "src/main/java/com/jantvrdik/intellij/latte/lexer/grammars/LatteMacroLexer.flex"
+    targetDir = "src/main/gen/com/jantvrdik/intellij/latte/lexer/"
+    targetClass = "LatteMacroLexer"
+    purgeOldFiles = true
+}
+
+task generateLatteTopLexer(type: GenerateLexer) {
+    source = "src/main/java/com/jantvrdik/intellij/latte/lexer/grammars/LatteTopLexer.flex"
+    targetDir = "src/main/gen/com/jantvrdik/intellij/latte/lexer/"
+    targetClass = "LatteTopLexer"
+    purgeOldFiles = true
+}
+
+task generateLattePhpLexer(type: GenerateLexer) {
+    source = "src/main/java/com/jantvrdik/intellij/latte/lexer/grammars/LattePhpLexer.flex"
+    targetDir = "src/main/gen/com/jantvrdik/intellij/latte/lexer/"
+    targetClass = "LattePhpLexer"
+    purgeOldFiles = true
+}
+
+task generateFlexFiles {
+    println('Generating Classes (Lexer)')
+    //dependsOn(generateLatteParser)
+    dependsOn(generateLatteLexer)
+    dependsOn(generateLatteMacroContentLexer)
+    dependsOn(generateLatteMacroLexer)
+    dependsOn(generateLattePhpLexer)
+    dependsOn(generateLatteTopLexer)
+}
+
+compileJava.dependsOn(generateFlexFiles)

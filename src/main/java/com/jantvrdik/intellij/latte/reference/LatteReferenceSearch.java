@@ -26,7 +26,7 @@ import java.util.Collection;
 public class LatteReferenceSearch extends QueryExecutorBase<PsiReference, ReferencesSearch.SearchParameters> {
 
     @Override
-    public void processQuery(ReferencesSearch.@NotNull SearchParameters searchParameters, @NotNull Processor<? super PsiReference> processor) {
+    public void processQuery(ReferencesSearch.SearchParameters searchParameters, @NotNull Processor<? super PsiReference> processor) {
         if (searchParameters.getElementToSearch() instanceof Field) {
             processField((Field) searchParameters.getElementToSearch(), searchParameters.getScopeDeterminedByUser(), processor);
 
