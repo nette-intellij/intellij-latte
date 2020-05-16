@@ -1,7 +1,7 @@
 <idea-plugin>
 	<id>com.jantvrdik.intellij.latte</id>
 	<name>Latte</name>
-	<vendor>Jan Tvrdík</vendor>
+	<vendor>Jan Tvrdík, Matouš Němec</vendor>
 
 	<description><![CDATA[
 		<p>
