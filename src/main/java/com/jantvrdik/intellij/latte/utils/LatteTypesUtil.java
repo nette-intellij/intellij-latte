@@ -13,6 +13,8 @@ public class LatteTypesUtil {
 
     final private static String[] nativeTypeHints = new String[]{"string", "int", "bool", "object", "float", "array", "mixed", "null", "callable", "iterable"};
 
+    final private static String[] nativeIterableTypeHints = new String[]{"array", "iterable"};
+
     final private static String[] excludedCompletion = new String[]{"__construct", "__callstatic", "__call", "__get", "__isset", "__clone", "__set", "__unset"};
 
     final private static TokenSet whitespaceTokens = TokenSet.create(LatteTypes.T_WHITESPACE, TokenType.WHITE_SPACE);
@@ -36,6 +38,21 @@ public class LatteTypesUtil {
     public static boolean isNativeTypeHint(@NotNull String value) {
         value = value.toLowerCase();
         return Arrays.asList(nativeTypeHints).contains(value.startsWith("\\") ? value.substring(1) : value);
+    }
+
+    public static boolean isIterable(@NotNull String value) {
+        value = value.toLowerCase();
+        return Arrays.asList(nativeIterableTypeHints).contains(value.startsWith("\\") ? value.substring(1) : value);
+    }
+
+    public static boolean isNull(@NotNull String value) {
+        value = value.toLowerCase();
+        return "null".equals(value.startsWith("\\") ? value.substring(1) : value);
+    }
+
+    public static boolean isMixed(@NotNull String value) {
+        value = value.toLowerCase();
+        return "mixed".equals(value.startsWith("\\") ? value.substring(1) : value);
     }
 
     public static boolean isExcludedCompletion(@NotNull String value) {

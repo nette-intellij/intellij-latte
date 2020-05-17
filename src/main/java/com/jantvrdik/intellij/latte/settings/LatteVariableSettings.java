@@ -25,7 +25,7 @@ public class LatteVariableSettings {
 	}
 
 	public LattePhpType toPhpType() {
-		return new LattePhpType(varName, varType);
+		return LattePhpType.create(varName, varType);
 	}
 
 	@Attribute("VarName")

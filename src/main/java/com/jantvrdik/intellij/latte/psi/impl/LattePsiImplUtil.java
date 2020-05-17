@@ -16,6 +16,7 @@ import com.jantvrdik.intellij.latte.utils.PsiPositionedElement;
 import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -157,7 +158,7 @@ public class LattePsiImplUtil {
 			return null;
 		}
 
-		LattePhpType templateType = LatteUtil.findFirstLatteTemplateType((LatteFile) element.getContainingFile());
+		LattePhpType templateType = LatteUtil.findFirstLatteTemplateType(element.getContainingFile());
 		if (templateType == null) {
 			return null;
 		}
@@ -169,7 +170,7 @@ public class LattePsiImplUtil {
 		for (PhpClass phpClass : classes) {
 			for (Field field : phpClass.getFields()) {
 				if (!field.isConstant() && field.getModifier().isPublic() && variableName.equals(field.getName())) {
-					return new LattePhpType(field.getName(), field.getType().toString(), LattePhpUtil.isNullable(field.getType()));
+					return LattePhpType.create(field.getName(), field.getType().toString(), LattePhpUtil.isNullable(field.getType()));
 				}
 			}
 		}
@@ -192,7 +193,7 @@ public class LattePsiImplUtil {
 			PsiElement current = positionedElement.getElement();
 			if (isVarTypeDefinition((LattePhpVariable) current) || isVarDefinition((LattePhpVariable) current)) {
 				String prevPhpType = findPrevPhpType(positionedElement.getElement());
-				return new LattePhpType(prevPhpType.length() == 0 ? "mixed" : prevPhpType);
+				return LattePhpType.create(prevPhpType.length() == 0 ? "mixed" : prevPhpType);
 			}
 		}
 
@@ -206,7 +207,7 @@ public class LattePsiImplUtil {
 			return defaultVariable.toPhpType();
 		}
 
-		return new LattePhpType("mixed", false);
+		return LattePhpType.MIXED;
 	}
 
 	private static String findPrevPhpType(PsiElement element)
@@ -235,7 +236,7 @@ public class LattePsiImplUtil {
 			if (element instanceof LattePhpVariable) {
 				return detectVariableType(element, ((LattePhpVariable) element).getVariableName());
 			}
-			return new LattePhpType("mixed", false);
+			return LattePhpType.MIXED;
 		}
 
 		PsiElement prevElement;
@@ -270,7 +271,7 @@ public class LattePsiImplUtil {
 		} else if (prevElement instanceof LattePhpVariable) {
 			type = ((LattePhpVariable) prevElement).getPhpType();
 		}
-		return type != null ? type : new LattePhpType("mixed", false);
+		return type != null ? type : LattePhpType.MIXED;
 	}
 
 	public static boolean isStatic(@NotNull PsiElement element) {
@@ -289,13 +290,13 @@ public class LattePsiImplUtil {
 		String name = element.getMethodName();
 		if (phpClasses.size() == 0) {
 			LatteCustomFunctionSettings customFunction = LatteConfiguration.INSTANCE.getFunction(element.getProject(), name);
-			return customFunction == null ? null : new LattePhpType(customFunction.getFunctionReturnType());
+			return customFunction == null ? null : LattePhpType.create(customFunction.getFunctionReturnType());
 		}
 
 		for (PhpClass phpClass : phpClasses) {
 			for (Method phpMethod : phpClass.getMethods()) {
 				if (phpMethod.getName().equals(name)) {
-					return new LattePhpType(phpMethod.getType().toString(), LattePhpUtil.isNullable(phpMethod.getType()));
+					return LattePhpType.create(phpMethod.getType());
 				}
 			}
 		}
@@ -323,7 +324,7 @@ public class LattePsiImplUtil {
 		for (PhpClass phpClass : phpClasses) {
 			for (Field field : phpClass.getFields()) {
 				if (field.getName().equals(LattePhpUtil.normalizePhpVariable(elementName))) {
-					return new LattePhpType(field.getType().toString(), LattePhpUtil.isNullable(field.getType()));
+					return LattePhpType.create(field.getType());
 				}
 			}
 		}
@@ -331,7 +332,7 @@ public class LattePsiImplUtil {
 	}
 
 	public static LattePhpType getPhpType(@NotNull LattePhpClass element) {
-		return new LattePhpType(element.getClassName(), false);
+		return LattePhpType.create(element.getClassName(), false);
 	}
 
 	public static boolean isTemplateType(@NotNull LattePhpClass element) {

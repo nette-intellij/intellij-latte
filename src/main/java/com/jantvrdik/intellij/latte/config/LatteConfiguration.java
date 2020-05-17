@@ -42,7 +42,7 @@ public class LatteConfiguration {
 		addStandardMacroWithoutModifiers("else", UNPAIRED, false);
 		addStandardMacroWithoutModifiers("elseif", UNPAIRED);
 		addStandardMacroWithoutModifiers("elseifset", UNPAIRED);
-		addStandardMacro("ifcontent", PAIR);
+		addStandardMacroWithoutParameters("ifcontent", PAIR);
 
 		addStandardMacroWithoutModifiers("switch", PAIR);
 		addStandardMacroWithoutModifiers("case", UNPAIRED);

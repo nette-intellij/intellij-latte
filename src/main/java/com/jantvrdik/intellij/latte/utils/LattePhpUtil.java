@@ -176,6 +176,11 @@ public class LattePhpUtil {
     }
 
     public static String normalizeClassName(@Nullable String className) {
+        if (className != null && className.startsWith("#S")) {
+            // since 2019.2.3 phpstorm started to prefix _static_ class type with "#S"
+            className = className.substring(2);
+        }
+
         String normalized = className == null ? "" : (className.startsWith("\\") ? className : ("\\" + className));
         if (normalized.contains("|null")) {
             normalized = normalized.replace("|null", "");
