@@ -9,6 +9,8 @@ public interface BaseLattePhpElement extends PsiNameIdentifierOwner {
 
 	public abstract LattePhpType getPhpType();
 
+	public abstract LattePhpType getReturnType();
+
 	public abstract String getPhpElementName();
 
 	@Nullable

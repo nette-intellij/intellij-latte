@@ -12,6 +12,7 @@ import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.jantvrdik.intellij.latte.LatteLanguage;
+import com.jantvrdik.intellij.latte.lexer.LatteHighlightingLexer;
 import com.jantvrdik.intellij.latte.lexer.LatteLexer;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
@@ -27,7 +28,7 @@ public class LatteParserDefinition implements ParserDefinition {
 	@NotNull
 	@Override
 	public Lexer createLexer(Project project) {
-		return new LatteLexer();
+		return new LatteHighlightingLexer(new LatteLexer());
 	}
 
 	@Override

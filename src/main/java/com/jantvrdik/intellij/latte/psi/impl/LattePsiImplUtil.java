@@ -6,6 +6,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
+import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
 import com.jantvrdik.intellij.latte.settings.LatteCustomFunctionSettings;
 import com.jantvrdik.intellij.latte.settings.LatteVariableSettings;
 import com.jantvrdik.intellij.latte.psi.*;
@@ -16,7 +17,6 @@ import com.jantvrdik.intellij.latte.utils.PsiPositionedElement;
 import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -193,7 +193,15 @@ public class LattePsiImplUtil {
 			PsiElement current = positionedElement.getElement();
 			if (isVarTypeDefinition((LattePhpVariable) current) || isVarDefinition((LattePhpVariable) current)) {
 				String prevPhpType = findPrevPhpType(positionedElement.getElement());
-				return LattePhpType.create(prevPhpType.length() == 0 ? "mixed" : prevPhpType);
+				if (prevPhpType.length() > 0)  {
+					return LattePhpType.create(prevPhpType);
+				}
+
+				LattePhpContent phpContent = PsiTreeUtil.getParentOfType(current, LattePhpContent.class);
+				if (phpContent != null && phpContent.getLastChild() instanceof BaseLattePhpElement) {
+					return ((BaseLattePhpElement) phpContent.getLastChild()).getReturnType();
+				}
+				return LattePhpType.MIXED;
 			}
 		}
 
@@ -259,15 +267,15 @@ public class LattePsiImplUtil {
 
 		LattePhpType type = null;
 		if (prevElement instanceof LattePhpStaticVariable) {
-			type = ((LattePhpStaticVariable) prevElement).getPropertyType();
+			type = ((LattePhpStaticVariable) prevElement).getReturnType();
 		} else if (prevElement instanceof LattePhpClass) {
 			type = ((LattePhpClass) prevElement).getPhpType();
 		} else if (prevElement instanceof LattePhpMethod) {
 			type = ((LattePhpMethod) prevElement).getReturnType();
 		} else if (prevElement instanceof LattePhpProperty) {
-			type = ((LattePhpProperty) prevElement).getPropertyType();
+			type = ((LattePhpProperty) prevElement).getReturnType();
 		} else if (prevElement instanceof LattePhpConstant) {
-			type = ((LattePhpConstant) prevElement).getConstantType();
+			type = ((LattePhpConstant) prevElement).getReturnType();
 		} else if (prevElement instanceof LattePhpVariable) {
 			type = ((LattePhpVariable) prevElement).getPhpType();
 		}
@@ -282,6 +290,14 @@ public class LattePsiImplUtil {
 	public static boolean isFunction(@NotNull PsiElement element) {
 		PsiElement prev = PsiTreeUtil.skipWhitespacesBackward(element);
 		return prev == null || (prev.getNode().getElementType() != T_PHP_DOUBLE_COLON && prev.getNode().getElementType() != T_PHP_OBJECT_OPERATOR);
+	}
+
+	public static LattePhpType getReturnType(@NotNull LattePhpVariable element) {
+		return element.getPhpType();
+	}
+
+	public static LattePhpType getReturnType(@NotNull LattePhpClass element) {
+		return element.getPhpType();
 	}
 
 	public static LattePhpType getReturnType(@NotNull LattePhpMethod element) {
@@ -303,19 +319,19 @@ public class LattePsiImplUtil {
 		return null;
 	}
 
-	public static LattePhpType getPropertyType(@NotNull LattePhpStaticVariable element) {
-		return getPropertyType(element.getProject(), element.getPhpType(), element.getVariableName());
+	public static LattePhpType getReturnType(@NotNull LattePhpStaticVariable element) {
+		return getReturnType(element.getProject(), element.getPhpType(), element.getVariableName());
 	}
 
-	public static LattePhpType getConstantType(@NotNull LattePhpConstant element) {
-		return getPropertyType(element.getProject(), element.getPhpType(), element.getConstantName());
+	public static LattePhpType getReturnType(@NotNull LattePhpConstant element) {
+		return getReturnType(element.getProject(), element.getPhpType(), element.getConstantName());
 	}
 
-	public static LattePhpType getPropertyType(@NotNull LattePhpProperty element) {
-		return getPropertyType(element.getProject(), element.getPhpType(), element.getPropertyName());
+	public static LattePhpType getReturnType(@NotNull LattePhpProperty element) {
+		return getReturnType(element.getProject(), element.getPhpType(), element.getPropertyName());
 	}
 
-	private static LattePhpType getPropertyType(@NotNull Project project, @NotNull LattePhpType type, @NotNull String elementName) {
+	private static LattePhpType getReturnType(@NotNull Project project, @NotNull LattePhpType type, @NotNull String elementName) {
 		Collection<PhpClass> phpClasses = type.getPhpClasses(project);
 		if (phpClasses.size() == 0) {
 			return null;

@@ -58,7 +58,7 @@ public class MethodUsagesInspection extends BaseLocalInspectionTool {
 			}
 		});
 
-		return problems.toArray(new ProblemDescriptor[problems.size()]);
+		return problems.toArray(new ProblemDescriptor[0]);
 	}
 
 	private void processFunction(
@@ -68,6 +68,10 @@ public class MethodUsagesInspection extends BaseLocalInspectionTool {
 			final boolean isOnTheFly
 	) {
 		String name = element.getMethodName();
+		if (name == null) {
+			return;
+		}
+
 		LatteCustomFunctionSettings customFunction = LatteConfiguration.INSTANCE.getFunction(element.getProject(), name);
 		if (customFunction != null) {
 			return;
@@ -78,7 +82,14 @@ public class MethodUsagesInspection extends BaseLocalInspectionTool {
 			LocalQuickFix addFunctionFix = IntentionManager.getInstance().convertToFix(new AddCustomLatteFunction(name));
 			ProblemHighlightType type = ProblemHighlightType.GENERIC_ERROR_OR_WARNING;
 			String description = "Function '" + name + "' not found";
-			ProblemDescriptor problem = manager.createProblemDescriptor(element, description, true, type, isOnTheFly, addFunctionFix);
+			ProblemDescriptor problem = manager.createProblemDescriptor(
+					getElementToLook(element),
+					description,
+					true,
+					type,
+					isOnTheFly,
+					addFunctionFix
+			);
 			problems.add(problem);
 		}
 	}
@@ -99,21 +110,21 @@ public class MethodUsagesInspection extends BaseLocalInspectionTool {
 				for (Method method : phpClass.getMethods()) {
 					if (method.getName().equals(methodName)) {
 						if (method.getModifier().isPrivate()) {
-							addProblem(manager, problems, element, "Used private method '" + methodName + "'", isOnTheFly);
+							addProblem(manager, problems, getElementToLook(element), "Used private method '" + methodName + "'", isOnTheFly);
 
 						} else if (method.getModifier().isProtected()) {
-							addProblem(manager, problems, element, "Used protected method '" + methodName + "'", isOnTheFly);
+							addProblem(manager, problems, getElementToLook(element), "Used protected method '" + methodName + "'", isOnTheFly);
 						}
 
 						String description;
 						boolean isStatic = ((LattePhpMethod) element).isStatic();
 						if (isStatic && !method.getModifier().isStatic()) {
 							description = "Method '" + methodName + "' is not static but called statically";
-							addProblem(manager, problems, element, description, isOnTheFly);
+							addProblem(manager, problems, getElementToLook(element), description, isOnTheFly);
 
 						} else if (!isStatic && method.getModifier().isStatic()) {
 							description = "Method '" + methodName + "' is static but called non statically";
-							addProblem(manager, problems, element, description, isOnTheFly);
+							addProblem(manager, problems, getElementToLook(element), description, isOnTheFly);
 						}
 						isFound = true;
 					}
@@ -122,7 +133,12 @@ public class MethodUsagesInspection extends BaseLocalInspectionTool {
 		}
 
 		if (!isFound) {
-			addProblem(manager, problems, element, "Method '" + methodName + "' not found", ProblemHighlightType.GENERIC_ERROR_OR_WARNING, isOnTheFly);
+			addProblem(manager, problems, getElementToLook(element), "Method '" + methodName + "' not found", ProblemHighlightType.GENERIC_ERROR_OR_WARNING, isOnTheFly);
 		}
+	}
+
+	private PsiElement getElementToLook(LattePhpMethod method) {
+		PsiElement nameIdentifier = method.getNameIdentifier();
+		return nameIdentifier != null ? nameIdentifier : method;
 	}
 }

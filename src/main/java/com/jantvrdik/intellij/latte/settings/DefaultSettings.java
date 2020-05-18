@@ -32,6 +32,7 @@ public class DefaultSettings {
 		new LatteCustomMacroSettings("formContainer", LatteMacro.Type.PAIR, false, true),
 		new LatteCustomMacroSettings("label", LatteMacro.Type.AUTO_EMPTY, false, true),
 		new LatteCustomMacroSettings("input", LatteMacro.Type.UNPAIRED, false, true),
+		new LatteCustomMacroSettings("inputError", LatteMacro.Type.UNPAIRED, false, true),
 		new LatteCustomMacroSettings("name", LatteMacro.Type.ATTR_ONLY),
 		new LatteCustomMacroSettings("inputError", LatteMacro.Type.UNPAIRED, false, true),
 		new LatteCustomMacroSettings("_", LatteMacro.Type.PAIR),

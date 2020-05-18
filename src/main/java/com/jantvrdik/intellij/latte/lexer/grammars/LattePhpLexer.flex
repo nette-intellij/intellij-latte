@@ -163,10 +163,6 @@ AS="as"
         return T_PHP_OR_INCLUSIVE;
     }
 
-    {IDENTIFIER} / ("(") {
-        return T_PHP_METHOD;
-    }
-
     {IDENTIFIER} {
         return T_PHP_IDENTIFIER;
     }

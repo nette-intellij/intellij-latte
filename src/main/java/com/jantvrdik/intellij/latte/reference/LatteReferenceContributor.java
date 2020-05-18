@@ -41,10 +41,10 @@ public class LatteReferenceContributor extends PsiReferenceContributor {
                             return PsiReference.EMPTY_ARRAY;
                         }
 
-                        PsiElement value = ((LattePhpMethod) element).getTextElement();
-                        if (value != null && value.getTextLength() > 0) {
+                        String methodName = ((LattePhpMethod) element).getMethodName();
+                        if (methodName != null && methodName.length() > 0) {
                             return new PsiReference[]{
-                                    new LattePhpMethodReference((LattePhpMethod) element, new TextRange(0, value.getTextLength()))
+                                    new LattePhpMethodReference((LattePhpMethod) element, new TextRange(0, methodName.length()))
                             };
                         }
 

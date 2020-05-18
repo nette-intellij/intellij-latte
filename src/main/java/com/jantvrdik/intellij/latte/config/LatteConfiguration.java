@@ -61,6 +61,7 @@ public class LatteConfiguration {
 
 		addStandardMacroWithoutModifiers("var", UNPAIRED);
 		addStandardMacroWithoutModifiers("varType", UNPAIRED);
+		addStandardMacroWithoutModifiers("varPrint", UNPAIRED);
 		addStandardMacroWithoutModifiers("templateType", UNPAIRED);
 		addStandardMacroWithoutModifiers("templatePrint", UNPAIRED);
 
@@ -73,9 +74,11 @@ public class LatteConfiguration {
 		addStandardMacro("=", UNPAIRED);
 		addStandardMacro("?", UNPAIRED);
 		addStandardMacro("php", UNPAIRED);
+		addStandardMacro("do", UNPAIRED); // alias for {php }
 
 		addStandardMacro("capture", PAIR);
 		addStandardMacro("include", UNPAIRED);
+		addStandardMacro("sandbox", UNPAIRED);
 		addStandardMacroWithoutModifiers("use", UNPAIRED);
 
 		addStandardMacro("class", ATTR_ONLY);
@@ -103,7 +106,7 @@ public class LatteConfiguration {
 		addStandardModifier("truncate", "shortens the length preserving whole words", ":(length, append = '…')");
 		addStandardModifier("substr", "returns part of the string", ":(offset [, length])");
 		addStandardModifier("trim", "strips whitespace or other characters from the beginning and end of the string", ":(charset = mezery)");
-		addStandardModifier("striptags", "removes HTML tags");
+		addStandardModifier("stripHtml", "removes HTML tags and converts HTML entities to text");
 		addStandardModifier("strip", "removes whitespace");
 		addStandardModifier("indent", "indents the text from left with number of tabs", ":(level = 1, char = \"\\t\")");
 		addStandardModifier("replace", "replaces all occurrences of the search string with the replacement", ":(search, replace = '')");
@@ -116,6 +119,7 @@ public class LatteConfiguration {
 		addStandardModifier("breaklines", "inserts HTML line breaks before all newlines");
 		addStandardModifier("reverse", "reverse an UTF-8 string or array");
 		addStandardModifier("length", "returns length of a string or array");
+		addStandardModifier("batch", "returns length of a string or array", ":(array, length [, item])");
 
 		addStandardModifier("lower", "makes a string lower case");
 		addStandardModifier("upper", "makes a string upper case");
@@ -129,6 +133,7 @@ public class LatteConfiguration {
 
 		addStandardModifier("noescape", "prints a variable without escaping");
 		addStandardModifier("escapeurl", "escapes parameter in URL");
+
 		addStandardModifier("nocheck", "prevents automatic URL sanitization");
 		addStandardModifier("checkurl", "sanitizes string for use inside href attribute");
 	}
