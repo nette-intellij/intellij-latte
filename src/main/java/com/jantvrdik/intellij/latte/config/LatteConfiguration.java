@@ -71,14 +71,18 @@ public class LatteConfiguration {
 		addStandardMacroWithoutModifiers("l", UNPAIRED, false);
 		addStandardMacroWithoutModifiers("r", UNPAIRED, false);
 
+		LatteMacro unknown = addStandardMacro("?", UNPAIRED);
+		unknown.deprecated = true;
+		unknown.deprecatedMessage = "Tag {? ...} is deprecated in Latte 2.4. For variable definitions use {var ...} or {php ...} in other cases.";
+
 		addStandardMacro("=", UNPAIRED);
-		addStandardMacro("?", UNPAIRED);
 		addStandardMacro("php", UNPAIRED);
 		addStandardMacro("do", UNPAIRED); // alias for {php }
 
 		addStandardMacro("capture", PAIR);
 		addStandardMacro("include", UNPAIRED);
 		addStandardMacro("sandbox", UNPAIRED);
+		addStandardMacro("widget", PAIR);
 		addStandardMacroWithoutModifiers("use", UNPAIRED);
 
 		addStandardMacro("class", ATTR_ONLY);
@@ -289,8 +293,8 @@ public class LatteConfiguration {
 		standardMacros.put(macro.name, macro);
 	}
 
-	private void addStandardMacro(String name, LatteMacro.Type type) {
-		addStandardMacro(name, type, true);
+	private LatteMacro addStandardMacro(String name, LatteMacro.Type type) {
+		return addStandardMacro(name, type, true);
 	}
 
 	private void addStandardMacroWithoutParameters(String name, LatteMacro.Type type) {

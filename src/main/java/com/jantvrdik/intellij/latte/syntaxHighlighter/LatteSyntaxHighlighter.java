@@ -6,6 +6,7 @@ import com.intellij.openapi.editor.HighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.tree.IElementType;
+import com.jantvrdik.intellij.latte.lexer.LatteHighlightingLexer;
 import com.jantvrdik.intellij.latte.lexer.LatteLexer;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +40,7 @@ public class LatteSyntaxHighlighter extends SyntaxHighlighterBase {
 	@NotNull
 	@Override
 	public Lexer getHighlightingLexer() {
-		return new LatteLexer();
+		return new LatteHighlightingLexer(new LatteLexer());
 	}
 
 	@NotNull

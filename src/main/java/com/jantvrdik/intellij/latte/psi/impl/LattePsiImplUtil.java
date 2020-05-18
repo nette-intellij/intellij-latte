@@ -107,7 +107,7 @@ public class LattePsiImplUtil {
 	}
 
 	public static String getMethodName(@NotNull LattePhpMethod element) {
-		PsiElement found = findFirstChildWithType(element, T_PHP_METHOD);
+		PsiElement found = findFirstChildWithType(element, T_PHP_IDENTIFIER);
 		return found != null ? found.getText() : null;
 	}
 
@@ -118,7 +118,7 @@ public class LattePsiImplUtil {
 
 	@Nullable
 	public static PsiElement getTextElement(@NotNull LattePhpMethod element) {
-		return findFirstChildWithType(element, T_PHP_METHOD);
+		return findFirstChildWithType(element, T_PHP_IDENTIFIER);
 	}
 
 	@Nullable
@@ -521,7 +521,7 @@ public class LattePsiImplUtil {
 	}
 
 	public static PsiElement getNameIdentifier(PsiElement element) {
-		return findFirstChildWithType(element, T_PHP_METHOD);
+		return findFirstChildWithType(element, T_PHP_IDENTIFIER);
 	}
 
 	public static PsiElement getNameIdentifier(LattePhpConstant element) {
@@ -545,7 +545,7 @@ public class LattePsiImplUtil {
 	}
 
 	public static String getName(PsiElement element) {
-		PsiElement found = findFirstChildWithType(element, T_PHP_METHOD);
+		PsiElement found = findFirstChildWithType(element, T_PHP_IDENTIFIER);
 		return found != null ? found.getText() : null;
 	}
 
@@ -559,7 +559,7 @@ public class LattePsiImplUtil {
 	}
 
 	public static String getName(LattePhpClass element) {
-		PsiElement found = findFirstChildWithType(element, T_PHP_METHOD);
+		PsiElement found = findFirstChildWithType(element, T_PHP_CLASS_NAME);
 		return found != null ? LattePhpUtil.normalizeClassName(found.getText()) : null;
 	}
 

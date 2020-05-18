@@ -15,6 +15,7 @@ import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
 %state SINGLE_QUOTED
 %state DOUBLE_QUOTED
 %state MACRO_FILTERS
+%state PHP_TYPE_PART
 
 WHITE_SPACE=[ \t\r\n]+
 IDENTIFIER=[a-zA-Z_][a-zA-Z0-9_]*
@@ -154,6 +155,11 @@ AS="as"
         return T_PHP_TYPE;
     }
 
+    "|" / ({AS} | {KEYWORD} | {NULL} | {MIXED} | {TYPES} | {CLASS_NAME}) {
+        yybegin(PHP_TYPE_PART);
+        return T_PHP_OR_INCLUSIVE;
+    }
+
     "|" / ({IDENTIFIER} | {CLASS_NAME}) {
         yybegin(MACRO_FILTERS);
         return T_PHP_MACRO_SEPARATOR;
@@ -191,7 +197,7 @@ AS="as"
 
 }
 
-<MACRO_FILTERS> {
+<PHP_TYPE_PART> {
 	{CLASS_NAME} {
         pushState(YYINITIAL);
         return T_PHP_CLASS_NAME;
@@ -222,6 +228,13 @@ AS="as"
         return T_PHP_TYPE;
     }
 
+    "|" {
+        pushState(YYINITIAL);
+        return T_PHP_OR_INCLUSIVE;
+    }
+}
+
+<MACRO_FILTERS> {
     {IDENTIFIER} {
         pushState(YYINITIAL);
         return T_MACRO_FILTERS;

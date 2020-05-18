@@ -126,7 +126,7 @@ phpStaticVariable  ::= T_MACRO_ARGS_VAR {
                         methods=[getName setName getNameIdentifier getTextElement getVariableName getPhpType getReturnType]
                     }
 
-phpMethod        ::= (T_PHP_METHOD | phpVariable) T_WHITESPACE? phpArgumentList T_WHITESPACE? {
+phpMethod        ::= (T_PHP_IDENTIFIER | phpVariable) T_WHITESPACE? phpArgumentList T_WHITESPACE? {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpMethodElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpMethodElement"
                         methods=[getName setName getNameIdentifier getTextElement getMethodName getPhpType getReturnType isStatic isFunction]
@@ -215,4 +215,4 @@ structureToken   ::= outerHtml | macro | netteAttr
 
 
 private
-topLevelTokens   ::= T_MACRO_CLASSIC T_MACRO_CONTENT T_PHP_CONTENT topLevelTokens
+topLevelTokens   ::= T_MACRO_CLASSIC T_MACRO_CONTENT T_PHP_CONTENT T_PHP_METHOD topLevelTokens

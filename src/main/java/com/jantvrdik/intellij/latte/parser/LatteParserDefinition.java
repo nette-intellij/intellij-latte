@@ -28,7 +28,7 @@ public class LatteParserDefinition implements ParserDefinition {
 	@NotNull
 	@Override
 	public Lexer createLexer(Project project) {
-		return new LatteHighlightingLexer(new LatteLexer());
+		return new LatteLexer();
 	}
 
 	@Override

@@ -182,7 +182,7 @@ public class LattePhpLexerTest {
 	@Test
 	@SuppressWarnings("unchecked")
 	public void testMethod() throws Exception {
-		Lexer lexer = new LatteLexer();
+		Lexer lexer = new LatteHighlightingLexer(new LatteLexer());
 		lexer.start("{$object->getFoo()}");
 		assertTokens(lexer, new Pair[] {
 			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
@@ -254,7 +254,7 @@ public class LattePhpLexerTest {
 			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
 			Pair.create(T_MACRO_ARGS_VAR, "$object"),
 			Pair.create(T_PHP_DOUBLE_COLON, "::"),
-			Pair.create(T_PHP_METHOD, "getFoo"),
+			Pair.create(T_PHP_IDENTIFIER, "getFoo"),
 			Pair.create(T_PHP_LEFT_NORMAL_BRACE, "("),
 			Pair.create(T_PHP_RIGHT_NORMAL_BRACE, ")"),
 			Pair.create(T_MACRO_TAG_CLOSE, "}"),
@@ -265,7 +265,7 @@ public class LattePhpLexerTest {
 			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
 			Pair.create(T_PHP_CLASS_NAME, "\\Foo\\Bar"),
 			Pair.create(T_PHP_DOUBLE_COLON, "::"),
-			Pair.create(T_PHP_METHOD, "getFoo"),
+			Pair.create(T_PHP_IDENTIFIER, "getFoo"),
 			Pair.create(T_PHP_LEFT_NORMAL_BRACE, "("),
 			Pair.create(T_MACRO_ARGS_VAR, "$var"),
 			Pair.create(T_MACRO_ARGS, ","),
@@ -278,7 +278,7 @@ public class LattePhpLexerTest {
 			Pair.create(T_MACRO_ARGS_NUMBER, "123"),
 			Pair.create(T_PHP_RIGHT_NORMAL_BRACE, ")"),
 			Pair.create(T_PHP_DOUBLE_COLON, "::"),
-			Pair.create(T_PHP_METHOD, "getBar"),
+			Pair.create(T_PHP_IDENTIFIER, "getBar"),
 			Pair.create(T_PHP_LEFT_NORMAL_BRACE, "("),
 			Pair.create(T_PHP_RIGHT_NORMAL_BRACE, ")"),
 			Pair.create(T_MACRO_TAG_CLOSE, "}"),
@@ -289,7 +289,7 @@ public class LattePhpLexerTest {
 			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
 			Pair.create(T_PHP_CLASS_NAME, "Foo\\Bar"),
 			Pair.create(T_PHP_DOUBLE_COLON, "::"),
-			Pair.create(T_PHP_METHOD, "getFoo"),
+			Pair.create(T_PHP_IDENTIFIER, "getFoo"),
 			Pair.create(T_PHP_LEFT_NORMAL_BRACE, "("),
 			Pair.create(T_PHP_RIGHT_NORMAL_BRACE, ")"),
 			Pair.create(T_PHP_DOUBLE_COLON, "::"),
@@ -301,7 +301,7 @@ public class LattePhpLexerTest {
 	@Test
 	@SuppressWarnings("unchecked")
 	public void testSpecialCases() throws Exception {
-		Lexer lexer = new LatteLexer();
+		Lexer lexer = new LatteHighlightingLexer(new LatteLexer());
 		lexer.start("{count($ccc)}");
 		assertTokens(lexer, new Pair[] {
 			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
@@ -328,7 +328,7 @@ public class LattePhpLexerTest {
 		assertTokens(lexer, new Pair[] {
 			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
 			Pair.create(T_MACRO_ARGS_VAR, "$object"),
-			Pair.create(T_PHP_OR_INCLUSIVE, "|"),
+			Pair.create(T_PHP_MACRO_SEPARATOR, "|"),
 			Pair.create(T_MACRO_FILTERS, "bytes"),
 			Pair.create(T_MACRO_TAG_CLOSE, "}"),
 		});
@@ -337,7 +337,7 @@ public class LattePhpLexerTest {
 		assertTokens(lexer, new Pair[] {
 			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
 			Pair.create(T_MACRO_ARGS_VAR, "$object"),
-			Pair.create(T_PHP_OR_INCLUSIVE, "|"),
+			Pair.create(T_PHP_MACRO_SEPARATOR, "|"),
 			Pair.create(T_MACRO_FILTERS, "bytes"),
 			Pair.create(T_PHP_EXPRESSION, ":"),
 			Pair.create(T_MACRO_ARGS_NUMBER, "2"),
@@ -352,11 +352,11 @@ public class LattePhpLexerTest {
 		assertTokens(lexer, new Pair[] {
 			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
 			Pair.create(T_MACRO_ARGS_VAR, "$object"),
-			Pair.create(T_PHP_OR_INCLUSIVE, "|"),
+			Pair.create(T_PHP_MACRO_SEPARATOR, "|"),
 			Pair.create(T_MACRO_FILTERS, "bytes"),
 			Pair.create(T_PHP_EXPRESSION, ":"),
 			Pair.create(T_MACRO_ARGS_NUMBER, "2"),
-			Pair.create(T_PHP_OR_INCLUSIVE, "|"),
+			Pair.create(T_PHP_MACRO_SEPARATOR, "|"),
 			Pair.create(T_MACRO_FILTERS, "noescape"),
 			Pair.create(T_MACRO_TAG_CLOSE, "}"),
 		});
