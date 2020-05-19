@@ -13,9 +13,20 @@ import com.jantvrdik.intellij.latte.psi.LatteTypes;
  * It reuses the simple lexer, changing types of some tokens
  */
 public class LatteHighlightingLexer extends LookAheadLexer {
+	private IElementType lastToken = null;
 
 	public LatteHighlightingLexer(Lexer baseLexer) {
 		super(baseLexer, 1);
+	}
+
+	@Override
+	protected void addToken(int endOffset, IElementType type) {
+		if (lastToken == LatteTypes.T_PHP_NAMESPACE_RESOLUTION && (type == LatteTypes.T_PHP_IDENTIFIER)) {
+			type = LatteTypes.T_PHP_NAMESPACE_REFERENCE;
+		}
+
+		super.addToken(endOffset, type);
+		lastToken = type;
 	}
 
 	@Override

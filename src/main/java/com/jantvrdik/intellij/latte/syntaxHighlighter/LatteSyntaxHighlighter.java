@@ -6,6 +6,7 @@ import com.intellij.openapi.editor.HighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
 import com.jantvrdik.intellij.latte.lexer.LatteHighlightingLexer;
 import com.jantvrdik.intellij.latte.lexer.LatteLexer;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
@@ -72,7 +73,7 @@ public class LatteSyntaxHighlighter extends SyntaxHighlighterBase {
 		} else if (token == LatteTypes.T_PHP_KEYWORD || token == LatteTypes.T_PHP_AS) {
 			return pack(PHP_KEYWORD);
 
-		} else if (token == LatteTypes.T_PHP_CLASS_NAME) {
+		} else if (TokenSet.create(LatteTypes.T_PHP_NAMESPACE_REFERENCE, LatteTypes.T_PHP_NAMESPACE_RESOLUTION, LatteTypes.T_PHP_NAMESPACE_REFERENCE).contains(token)) {
 			return pack(PHP_CLASS_NAME);
 
 		} else if (token == LatteTypes.T_PHP_METHOD) {

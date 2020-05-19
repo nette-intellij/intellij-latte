@@ -31,7 +31,7 @@ public class PhpClassInsertHandler extends PhpReferenceInsertHandler {
 			return;
 		}
 
-		if (element.getNode().getElementType() == LatteTypes.T_PHP_CLASS_NAME) {
+		if (element.getNode().getElementType() == LatteTypes.PHP_CLASS_USAGE) {
 			Editor editor = context.getEditor();
 			CaretModel caretModel = editor.getCaretModel();
 			int offset = caretModel.getOffset();

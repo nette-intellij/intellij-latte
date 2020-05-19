@@ -151,4 +151,20 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 		return false;
 	}
 
+	public static boolean isNamespace(PsiBuilder builder, int level) {
+		PsiBuilder.Marker marker = builder.mark();
+
+		boolean result = false;
+
+		IElementType type = builder.getTokenType();
+		IElementType nextToken = builder.lookAhead(1);
+		if (type == LatteTypes.T_PHP_NAMESPACE_REFERENCE && nextToken == LatteTypes.T_PHP_NAMESPACE_RESOLUTION) {
+			result = true;
+		}
+
+		marker.rollbackTo();
+
+		return result;
+	}
+
 }

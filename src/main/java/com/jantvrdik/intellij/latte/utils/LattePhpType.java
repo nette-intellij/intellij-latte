@@ -71,18 +71,20 @@ public class LattePhpType {
 
         String trimmed = type.trim().toLowerCase();
         if (LatteTypesUtil.isNativeTypeHint(trimmed)) {
-            return nativeTypes.get(trimmed)[0];
+            return nativeTypes.get(LatteTypesUtil.normalizeTypeHint(trimmed))[0];
 
         } else if (trimmed.endsWith("[]")) {
             String typeHint = trimmed.substring(0, trimmed.length() - 2);
             if (LatteTypesUtil.isNativeTypeHint(typeHint)) {
-                return nativeTypes.get(typeHint)[2];
+                return nativeTypes.get(LatteTypesUtil.normalizeTypeHint(typeHint))[2];
             }
 
-        } else if (trimmed.endsWith("|null") || trimmed.startsWith("null|")) {
+        }
+
+        if (trimmed.endsWith("|null") || trimmed.startsWith("null|")) {
             String typeHint = trimmed.startsWith("null|") ? trimmed.substring(6) : trimmed.substring(0, trimmed.length() - 5);
             if (LatteTypesUtil.isNativeTypeHint(typeHint)) {
-                return nativeTypes.get(typeHint)[1];
+                return nativeTypes.get(LatteTypesUtil.normalizeTypeHint(typeHint))[1];
             }
         }
 

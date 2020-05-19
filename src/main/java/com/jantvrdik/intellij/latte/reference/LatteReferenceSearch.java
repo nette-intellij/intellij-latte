@@ -8,7 +8,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.*;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.util.Processor;
-import com.jantvrdik.intellij.latte.psi.LattePhpClass;
+import com.jantvrdik.intellij.latte.psi.LattePhpClassUsage;
 import com.jantvrdik.intellij.latte.psi.LattePhpStaticVariable;
 import com.jantvrdik.intellij.latte.psi.LattePhpVariable;
 import com.jantvrdik.intellij.latte.reference.references.LattePhpClassReference;
@@ -42,11 +42,11 @@ public class LatteReferenceSearch extends QueryExecutorBase<PsiReference, Refere
             PsiSearchHelper.getInstance(phpClass.getProject())
                     .processElementsWithWord(new TextOccurenceProcessor() {
                         @Override
-                        public boolean execute(PsiElement psiElement, int i) {
+                        public boolean execute(@NotNull PsiElement psiElement, int i) {
                             PsiElement currentClass = psiElement.getParent();
-                            if (currentClass instanceof LattePhpClass) {
-                                String value = ((LattePhpClass) currentClass).getClassName();
-                                processor.process(new LattePhpClassReference((LattePhpClass) currentClass, new TextRange(0, value.length())));
+                            if (currentClass instanceof LattePhpClassUsage) {
+                                String value = ((LattePhpClassUsage) currentClass).getClassName();
+                                processor.process(new LattePhpClassReference((LattePhpClassUsage) currentClass, new TextRange(0, value.length())));
 
                             }
                             return true;

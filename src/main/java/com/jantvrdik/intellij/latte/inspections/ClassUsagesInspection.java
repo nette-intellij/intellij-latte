@@ -5,7 +5,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
-import com.jantvrdik.intellij.latte.psi.LattePhpClass;
+import com.jantvrdik.intellij.latte.psi.LattePhpClassReference;
+import com.jantvrdik.intellij.latte.psi.LattePhpClassUsage;
 import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,8 +33,8 @@ public class ClassUsagesInspection extends LocalInspectionTool {
 		file.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
 			@Override
 			public void visitElement(PsiElement element) {
-				if (element instanceof LattePhpClass) {
-					String className = ((LattePhpClass) element).getClassName();
+				if (element instanceof LattePhpClassReference) {
+					String className = ((LattePhpClassReference) element).getClassName();
 					if (LattePhpUtil.getClassesByFQN(element.getProject(), className).size() == 0) {
 						String description = "Undefined class '" + className + "'";
 						ProblemDescriptor problem = manager.createProblemDescriptor(element, description, true, ProblemHighlightType.GENERIC_ERROR, isOnTheFly);
@@ -46,6 +47,6 @@ public class ClassUsagesInspection extends LocalInspectionTool {
 			}
 		});
 
-		return problems.toArray(new ProblemDescriptor[problems.size()]);
+		return problems.toArray(new ProblemDescriptor[0]);
 	}
 }

@@ -9,7 +9,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LatteMacroTag;
-import com.jantvrdik.intellij.latte.psi.LattePhpClass;
+import com.jantvrdik.intellij.latte.psi.LattePhpClassUsage;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,7 +50,7 @@ public class MacroTemplateTypeInspection extends LocalInspectionTool {
 						problems.add(problem);
 
 					} else {
-						List<LattePhpClass> currentClasses = new ArrayList<LattePhpClass>();
+						List<LattePhpClassUsage> currentClasses = new ArrayList<LattePhpClassUsage>();
 						LatteUtil.findLatteTemplateType(currentClasses, element);
 						if (currentClasses.size() == 0) {
 							ProblemDescriptor problem = manager.createProblemDescriptor(

@@ -147,6 +147,10 @@ public class LattePhpUtil {
         return getPhpIndex(project).getFunctionsByName(functionName);
     }
 
+    public static Collection<PhpNamespace> getNamespacesByName(Project project, String className) {
+        return getPhpIndex(project).getNamespacesByName(className);
+    }
+
     public static Collection<String> getAllExistingFunctionNames(Project project, PrefixMatcher prefixMatcher) {
         return getPhpIndex(project).getAllFunctionNames(prefixMatcher);
     }

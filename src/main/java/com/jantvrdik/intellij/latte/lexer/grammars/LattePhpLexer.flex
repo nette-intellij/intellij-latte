@@ -16,6 +16,8 @@ import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
 %state DOUBLE_QUOTED
 %state MACRO_FILTERS
 %state PHP_TYPE_PART
+%state CLASS_REFERENCE
+%state CLASS_REFERENCE_TYPE
 
 WHITE_SPACE=[ \t\r\n]+
 IDENTIFIER=[a-zA-Z_][a-zA-Z0-9_]*
@@ -35,8 +37,14 @@ AS="as"
         return T_MACRO_ARGS_VAR;
     }
 
-    {CLASS_NAME} {
-        return T_PHP_CLASS_NAME;
+    "\\" / {IDENTIFIER} {
+        yybegin(CLASS_REFERENCE);
+        return T_PHP_NAMESPACE_RESOLUTION;
+    }
+
+    {IDENTIFIER} / ("\\") {
+        yybegin(CLASS_REFERENCE);
+        return T_PHP_NAMESPACE_REFERENCE;
     }
 
     {CONTENT_TYPE} {
@@ -160,7 +168,7 @@ AS="as"
         return T_PHP_OR_INCLUSIVE;
     }
 
-    "|" / ({IDENTIFIER} | {CLASS_NAME}) {
+    "|" / {IDENTIFIER} {
         yybegin(MACRO_FILTERS);
         return T_PHP_MACRO_SEPARATOR;
     }
@@ -198,9 +206,14 @@ AS="as"
 }
 
 <PHP_TYPE_PART> {
-	{CLASS_NAME} {
-        pushState(YYINITIAL);
-        return T_PHP_CLASS_NAME;
+	"\\" / {IDENTIFIER} {
+        yybegin(CLASS_REFERENCE_TYPE);
+        return T_PHP_NAMESPACE_RESOLUTION;
+    }
+
+    {IDENTIFIER} / ("\\") {
+        yybegin(CLASS_REFERENCE_TYPE);
+        return T_PHP_NAMESPACE_REFERENCE;
     }
 
 	{AS} {
@@ -228,9 +241,38 @@ AS="as"
         return T_PHP_TYPE;
     }
 
+    {IDENTIFIER} {
+        yybegin(CLASS_REFERENCE);
+        return T_PHP_IDENTIFIER;
+    }
+
     "|" {
         pushState(YYINITIAL);
         return T_PHP_OR_INCLUSIVE;
+    }
+}
+
+<CLASS_REFERENCE> {
+    {IDENTIFIER} {
+        pushState(YYINITIAL);
+        return T_PHP_NAMESPACE_REFERENCE;
+    }
+
+    "\\" {
+        pushState(YYINITIAL);
+        return T_PHP_NAMESPACE_RESOLUTION;
+    }
+}
+
+<CLASS_REFERENCE_TYPE> {
+    {IDENTIFIER} {
+        pushState(YYINITIAL);
+        return T_PHP_NAMESPACE_REFERENCE;
+    }
+
+    "\\" {
+        pushState(YYINITIAL);
+        return T_PHP_NAMESPACE_RESOLUTION;
     }
 }
 

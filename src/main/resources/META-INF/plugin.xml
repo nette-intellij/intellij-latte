@@ -8,12 +8,6 @@
 			Provides support for <a href="https://github.com/nette/latte/">Latte</a> &ndash; a template engine for PHP.
 			It's a must have plugin for Nette developers.
 		</p>
-
-		<h2>IMPORTANT notes</h2>
-
-		<ul>
-			<li><b>Refactoring for class names is now supported only from PHP to Latte</b></li>
-		</ul>
 	]]></description>
 
 	<!-- http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges -->

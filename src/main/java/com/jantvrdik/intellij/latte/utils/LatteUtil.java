@@ -93,8 +93,12 @@ public class LatteUtil {
         return findElementsInAllFiles(project, key, LattePhpConstant.class, phpClass);
     }
 
-    public static Collection<LattePhpClass> findClasses(Project project, String key) {
-        return findElementsInAllFiles(project, key, LattePhpClass.class, null);
+    public static Collection<LattePhpClassUsage> findClasses(Project project, String key) {
+        return findElementsInAllFiles(project, key, LattePhpClassUsage.class, null);
+    }
+
+    public static Collection<LattePhpNamespaceReference> findNamespaceReferences(Project project, String key) {
+        return findElementsInAllFiles(project, key, LattePhpNamespaceReference.class, null);
     }
 
     public static Collection<LattePhpStaticVariable> findStaticVariables(Project project, String key, @NotNull Collection<PhpClass> phpClass) {
@@ -206,17 +210,17 @@ public class LatteUtil {
 
     @Nullable
     public static LattePhpType findFirstLatteTemplateType(PsiElement element) {
-        List<LattePhpClass> out = new ArrayList<LattePhpClass>();
+        List<LattePhpClassUsage> out = new ArrayList<LattePhpClassUsage>();
         findLatteTemplateType(out, element);
         return out.isEmpty() ? null : out.get(0).getPhpType();
     }
 
-    public static void findLatteTemplateType(List<LattePhpClass> classes, PsiElement psiElement) {
+    public static void findLatteTemplateType(List<LattePhpClassUsage> classes, PsiElement psiElement) {
         psiElement.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
             @Override
             public void visitElement(PsiElement element) {
-                if (element instanceof LattePhpClass && ((LattePhpClass) element).isTemplateType()) {
-                    classes.add((LattePhpClass) element);
+                if (element instanceof LattePhpClassUsage && ((LattePhpClassUsage) element).isTemplateType()) {
+                    classes.add((LattePhpClassUsage) element);
                 } else {
                     super.visitElement(element);
                 }

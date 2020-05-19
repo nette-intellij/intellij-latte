@@ -19,7 +19,15 @@ public class LatteTypesUtil {
 
     final private static TokenSet whitespaceTokens = TokenSet.create(LatteTypes.T_WHITESPACE, TokenType.WHITE_SPACE);
 
-    final private static TokenSet typeHintTokens = TokenSet.create(LatteTypes.T_PHP_TYPE, LatteTypes.PHP_CLASS, LatteTypes.T_PHP_NULL, LatteTypes.T_PHP_MIXED);
+    final private static TokenSet typeHintTokens = TokenSet.create(
+            LatteTypes.T_PHP_TYPE,
+            LatteTypes.PHP_CLASS_REFERENCE,
+            LatteTypes.PHP_CLASS_USAGE,
+            LatteTypes.PHP_NAMESPACE_REFERENCE,
+            LatteTypes.T_PHP_NAMESPACE_RESOLUTION,
+            LatteTypes.T_PHP_NULL,
+            LatteTypes.T_PHP_MIXED
+    );
 
     final private static TokenSet typeHintOperatorTokens = TokenSet.create(
             LatteTypes.T_PHP_OR_INCLUSIVE,
@@ -36,23 +44,19 @@ public class LatteTypesUtil {
     }
 
     public static boolean isNativeTypeHint(@NotNull String value) {
-        value = value.toLowerCase();
-        return Arrays.asList(nativeTypeHints).contains(value.startsWith("\\") ? value.substring(1) : value);
+        return Arrays.asList(nativeTypeHints).contains(normalizeTypeHint(value));
     }
 
     public static boolean isIterable(@NotNull String value) {
-        value = value.toLowerCase();
-        return Arrays.asList(nativeIterableTypeHints).contains(value.startsWith("\\") ? value.substring(1) : value);
+        return Arrays.asList(nativeIterableTypeHints).contains(normalizeTypeHint(value));
     }
 
     public static boolean isNull(@NotNull String value) {
-        value = value.toLowerCase();
-        return "null".equals(value.startsWith("\\") ? value.substring(1) : value);
+        return "null".equals(normalizeTypeHint(value));
     }
 
     public static boolean isMixed(@NotNull String value) {
-        value = value.toLowerCase();
-        return "mixed".equals(value.startsWith("\\") ? value.substring(1) : value);
+        return "mixed".equals(normalizeTypeHint(value));
     }
 
     public static boolean isExcludedCompletion(@NotNull String value) {
@@ -69,6 +73,11 @@ public class LatteTypesUtil {
 
     public static TokenSet getAllSkippedHintTokens() {
         return TokenSet.orSet(typeHintOperatorTokens, whitespaceTokens);
+    }
+
+    public static String normalizeTypeHint(String value) {
+        value = value.toLowerCase();
+        return value.startsWith("\\") ? value.substring(1) : value;
     }
 
 }
