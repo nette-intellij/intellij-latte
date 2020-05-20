@@ -11,9 +11,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-/**
- * @author Daniel Espendiller <daniel@espendiller.net>
- */
 public class LatteCustomModifierSettingsDialog extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
@@ -21,6 +18,7 @@ public class LatteCustomModifierSettingsDialog extends JDialog {
     private JTextField textName;
     private JTextField textHelp;
     private JTextArea textDescription;
+    private JTextField textInsert;
     private LatteCustomModifierSettings latteCustomModifierSettings;
     private TableView<LatteCustomModifierSettings> tableView;
 
@@ -38,6 +36,7 @@ public class LatteCustomModifierSettingsDialog extends JDialog {
         this.textName.getDocument().addDocumentListener(new ChangeDocumentListener());
         this.textHelp.getDocument().addDocumentListener(new ChangeDocumentListener());
         this.textDescription.getDocument().addDocumentListener(new ChangeDocumentListener());
+        this.textInsert.getDocument().addDocumentListener(new ChangeDocumentListener());
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
@@ -55,11 +54,17 @@ public class LatteCustomModifierSettingsDialog extends JDialog {
         this.textName.setText(latteCustomModifierSettings.getModifierName());
         this.textHelp.setText(latteCustomModifierSettings.getModifierHelp());
         this.textDescription.setText(latteCustomModifierSettings.getModifierDescription());
+        this.textInsert.setText(latteCustomModifierSettings.getModifierInsert());
         this.latteCustomModifierSettings = latteCustomModifierSettings;
     }
 
     private void onOK() {
-        LatteCustomModifierSettings settings = new LatteCustomModifierSettings(this.textName.getText(), this.textDescription.getText(), this.textHelp.getText());
+        LatteCustomModifierSettings settings = new LatteCustomModifierSettings(
+                this.textName.getText(),
+                this.textDescription.getText(),
+                this.textHelp.getText(),
+                this.textInsert.getText()
+        );
 
         if (this.latteCustomModifierSettings != null) {
             int row = this.tableView.getSelectedRows()[0];

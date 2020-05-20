@@ -8,25 +8,50 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-import static com.jantvrdik.intellij.latte.config.LatteMacro.Type.*;
+import static com.jantvrdik.intellij.latte.settings.LatteCustomMacroSettings.Type.*;
 
 public class LatteConfiguration {
 
 	public static String LATTE_HELP_URL = "https://latte.nette.org/";
+	public static String LATTE_DOCS_XML_FILES_URL = "https://github.com/nette-intellij/intellij-latte/blob/master/docs/en/xmlFilesConfiguration.md";
 	public static String FORUM_URL = "https://forum.nette.org/";
 
-	/** globally available class instance */
-	public static final LatteConfiguration INSTANCE = new LatteConfiguration();
+	private static Map<Project, LatteConfiguration> instances = new HashMap<>();
 
 	/** list of standard macros, indexed by macro name */
-	private Map<String, LatteMacro> standardMacros = new HashMap<String, LatteMacro>();
+	private Map<String, LatteCustomMacroSettings> standardMacros = new HashMap<>();
 
 	/** list of standard macros, indexed by macro name */
-	private Map<String, LatteModifier> standardModifiers = new HashMap<String, LatteModifier>();
+	private Map<String, LatteCustomModifierSettings> standardModifiers = new HashMap<>();
 
-	public LatteConfiguration() {
+	@NotNull
+	private Project project;
+
+	public LatteConfiguration(@NotNull Project project) {
+		this.project = project;
+		if (getSettings().disableDefaultLoading) {
+			return;
+		}
+
 		initStandardMacros();
 		initStandardModifiers();
+	}
+
+	public void reinitialize() {
+		standardMacros = new HashMap<>();
+		standardModifiers = new HashMap<>();
+		if (!getSettings().disableDefaultLoading) {
+			initStandardMacros();
+			initStandardModifiers();
+		}
+		LatteFileConfiguration.getInstance(project).reinitialize();
+	}
+
+	public static LatteConfiguration getInstance(@NotNull Project project) {
+		if (!instances.containsKey(project)) {
+			instances.put(project, new LatteConfiguration(project));
+		}
+		return instances.get(project);
 	}
 
 	/**
@@ -71,18 +96,18 @@ public class LatteConfiguration {
 		addStandardMacroWithoutModifiers("l", UNPAIRED, false);
 		addStandardMacroWithoutModifiers("r", UNPAIRED, false);
 
-		LatteMacro unknown = addStandardMacro("?", UNPAIRED);
-		unknown.deprecated = true;
-		unknown.deprecatedMessage = "Tag {? ...} is deprecated in Latte 2.4. For variable definitions use {var ...} or {php ...} in other cases.";
+		LatteCustomMacroSettings unknown = addStandardMacro("?", UNPAIRED);
+		unknown.setDeprecated(true);
+		unknown.setDeprecatedMessage("Tag {? ...} is deprecated in Latte 2.4. For variable definitions use {var ...} or {php ...} in other cases.");
 
 		addStandardMacro("=", UNPAIRED);
 		addStandardMacro("php", UNPAIRED);
 		addStandardMacro("do", UNPAIRED); // alias for {php }
 
 		addStandardMacro("capture", PAIR);
-		addStandardMacro("include", UNPAIRED);
-		addStandardMacro("sandbox", UNPAIRED);
-		addStandardMacro("widget", PAIR);
+		addStandardMacroWithoutModifiers("include", UNPAIRED);
+		addStandardMacroWithoutModifiers("sandbox", UNPAIRED);
+		addStandardMacroWithoutModifiers("widget", PAIR);
 		addStandardMacroWithoutModifiers("use", UNPAIRED);
 
 		addStandardMacro("class", ATTR_ONLY);
@@ -90,47 +115,47 @@ public class LatteConfiguration {
 		addStandardMacroWithoutParameters("nonce", ATTR_ONLY);
 
 		// BlockMacros
-		LatteMacro includeBlock = addStandardMacroWithoutModifiers("includeblock", UNPAIRED);
-		includeBlock.deprecated = true;
-		includeBlock.deprecatedMessage = "Tag {includeblock} is deprecated in Latte 2.4. Use {import} tag instead.";
-		addStandardMacro("import", UNPAIRED);
+		LatteCustomMacroSettings includeBlock = addStandardMacroWithoutModifiers("includeblock", UNPAIRED);
+		includeBlock.setDeprecated(true);
+		includeBlock.setDeprecatedMessage("Tag {includeblock} is deprecated in Latte 2.4. Use {include} tag instead.");
+		addStandardMacroWithoutModifiers("import", UNPAIRED);
 		addStandardMacroWithoutModifiers("extends", UNPAIRED);
-		addStandardMacro("layout", UNPAIRED);
-		addStandardMacro("block", PAIR);
-		addStandardMacro("define", PAIR);
+		addStandardMacroWithoutModifiers("layout", UNPAIRED);
+		addStandardMacroWithoutModifiers("block", PAIR);
+		addStandardMacroWithoutModifiers("define", PAIR);
 
-		LatteMacro ifCurrent = addStandardMacroWithoutModifiers("ifCurrent", PAIR);
-		ifCurrent.deprecated = true;
-		ifCurrent.deprecatedMessage = "Tag {ifCurrent} is deprecated in Latte 2.6. Use custom function isLinkCurrent() instead.";
+		LatteCustomMacroSettings ifCurrent = addStandardMacroWithoutModifiers("ifCurrent", PAIR);
+		ifCurrent.setDeprecated(true);
+		ifCurrent.setDeprecatedMessage("Tag {ifCurrent} is deprecated in Latte 2.6. Use custom function isLinkCurrent() instead.");
 
 		addStandardMacroWithoutModifiers("contentType", UNPAIRED);
 	}
 
 	private void initStandardModifiers() {
-		addStandardModifier("truncate", "shortens the length preserving whole words", ":(length, append = '…')");
-		addStandardModifier("substr", "returns part of the string", ":(offset [, length])");
+		addStandardModifier("truncate", "shortens the length preserving whole words", ":(length, append = '…')", ":");
+		addStandardModifier("substr", "returns part of the string", ":(offset [, length])", ":");
 		addStandardModifier("trim", "strips whitespace or other characters from the beginning and end of the string", ":(charset = mezery)");
 		addStandardModifier("stripHtml", "removes HTML tags and converts HTML entities to text");
 		addStandardModifier("strip", "removes whitespace");
 		addStandardModifier("indent", "indents the text from left with number of tabs", ":(level = 1, char = \"\\t\")");
-		addStandardModifier("replace", "replaces all occurrences of the search string with the replacement", ":(search, replace = '')");
-		addStandardModifier("replaceRE", "replaces all occurrences according to regular expression", ":(pattern, replace = '')");
-		addStandardModifier("padLeft", "completes the string to given length from left", ":(length, pad = ' ')");
-		addStandardModifier("padRight", "completes the string to given length from right", ":(length, pad = ' ')");
-		addStandardModifier("repeat", "repeats the string", ":(count)");
+		addStandardModifier("replace", "replaces all occurrences of the search string with the replacement", ":(search, replace = '')", ":");
+		addStandardModifier("replaceRE", "replaces all occurrences according to regular expression", ":(pattern, replace = '')", ":");
+		addStandardModifier("padLeft", "completes the string to given length from left", ":(length, pad = ' ')", ":");
+		addStandardModifier("padRight", "completes the string to given length from right", ":(length, pad = ' ')", ":");
+		addStandardModifier("repeat", "repeats the string", ":(count)", ":");
 		addStandardModifier("implode", "joins an array to a string", ":(glue = '')");
 		addStandardModifier("webalize", "adjusts the UTF-8 string to the shape used in the URL");
 		addStandardModifier("breaklines", "inserts HTML line breaks before all newlines");
 		addStandardModifier("reverse", "reverse an UTF-8 string or array");
 		addStandardModifier("length", "returns length of a string or array");
-		addStandardModifier("batch", "returns length of a string or array", ":(array, length [, item])");
+		addStandardModifier("batch", "returns length of a string or array", ":(array, length [, item])", "::");
 
 		addStandardModifier("lower", "makes a string lower case");
 		addStandardModifier("upper", "makes a string upper case");
 		addStandardModifier("firstUpper", "makes the first letter upper case");
 		addStandardModifier("capitalize", "lower case, the first letter of each word upper case");
 
-		addStandardModifier("date", "formats date", ":(format)");
+		addStandardModifier("date", "formats date", ":(format)", ":");
 		addStandardModifier("number", "format number", ":(decimals = 0, decPoint = '.', thousandsSep = ',')");
 		addStandardModifier("bytes", "formats size in bytes", ":(precision = 2)");
 		addStandardModifier("dataStream", "Data URI protocol conversion", ":(mimetype = detect)");
@@ -146,12 +171,12 @@ public class LatteConfiguration {
 	 * @return macro with given name or null macro is not available
 	 */
 	@Nullable
-	public LatteMacro getMacro(Project project, String name) {
+	public LatteCustomMacroSettings getMacro(String name) {
 		if (standardMacros.containsKey(name)) {
 			return standardMacros.get(name);
 		}
 
-		Map<String, LatteMacro> projectMacros = getCustomMacros(project);
+		Map<String, LatteCustomMacroSettings> projectMacros = getTags();
 		if (projectMacros.containsKey(name)) {
 			return projectMacros.get(name);
 		}
@@ -163,12 +188,12 @@ public class LatteConfiguration {
 	 * @return macro with given name or null macro is not available
 	 */
 	@Nullable
-	public LatteModifier getModifier(Project project, String name) {
+	public LatteCustomModifierSettings getModifier(String name) {
 		if (standardModifiers.containsKey(name)) {
 			return standardModifiers.get(name);
 		}
 
-		Map<String, LatteModifier> projectModifiers = getCustomModifiers(project);
+		Map<String, LatteCustomModifierSettings> projectModifiers = getFilters();
 		if (projectModifiers.containsKey(name)) {
 			return projectModifiers.get(name);
 		}
@@ -177,13 +202,13 @@ public class LatteConfiguration {
 	}
 
 	@Nullable
-	public LatteCustomFunctionSettings getFunction(Project project, String name) {
-		LatteSettings settings = getSettings(project);
+	public LatteCustomFunctionSettings getFunction(String name) {
+		LatteSettings settings = getSettings();
 		if (!settings.enableCustomModifiers) {
 			return null;
 		}
 
-		for (LatteCustomFunctionSettings functionSettings : settings.customFunctionSettings) {
+		for (LatteCustomFunctionSettings functionSettings : getFunctions()) {
 			if (functionSettings.getFunctionName().equals(name)) {
 				return functionSettings;
 			}
@@ -195,15 +220,15 @@ public class LatteConfiguration {
 	 * @return variable with given name
 	 */
 	@Nullable
-	public LatteVariableSettings getVariable(Project project, String name) {
+	public LatteVariableSettings getVariable(String name) {
 		name = LattePhpUtil.normalizePhpVariable(name);
 
-		LatteSettings settings = getSettings(project);
-		if (settings == null || !settings.enableDefaultVariables || settings.variableSettings == null) {
+		LatteSettings settings = getSettings();
+		if (settings == null) {
 			return null;
 		}
 
-		for (LatteVariableSettings variable : settings.variableSettings) {
+		for (LatteVariableSettings variable : getVariables()) {
 			if (variable.getVarName().equals(name)) {
 				return variable;
 			}
@@ -211,60 +236,58 @@ public class LatteConfiguration {
 		return null;
 	}
 
-	public LatteSettings getSettings(Project project) {
+	private LatteSettings getSettings() {
 		return LatteSettings.getInstance(project);
 	}
 
 	@NotNull
-	public List<LatteVariableSettings> getVariables(Project project) {
-		LatteSettings settings = getSettings(project);
-		if (!settings.enableDefaultVariables || settings.variableSettings == null) {
-			return Collections.emptyList();
+	public List<LatteVariableSettings> getVariables() {
+		LatteSettings settings = getSettings();
+		List<LatteVariableSettings> variableSettings = new ArrayList<>();
+		for (Map.Entry<String, LatteVariableSettings> entry : LatteFileConfiguration.getInstance(project).getVariables().entrySet()) {
+			variableSettings.add(entry.getValue());
 		}
-		return new ArrayList<LatteVariableSettings>(settings.variableSettings);
+
+		if (!settings.enableDefaultVariables || settings.variableSettings == null) {
+			return variableSettings;
+		}
+		variableSettings.addAll(settings.variableSettings);
+		return variableSettings;
 	}
 
 	@NotNull
-	public List<LatteCustomFunctionSettings> getFunctions(Project project) {
-		LatteSettings settings = getSettings(project);
+	public List<LatteCustomFunctionSettings> getFunctions() {
+		LatteSettings settings = getSettings();
+
+		List<LatteCustomFunctionSettings> functionSettings = new ArrayList<>();
+		for (Map.Entry<String, LatteCustomFunctionSettings> entry : LatteFileConfiguration.getInstance(project).getFunctions().entrySet()) {
+			functionSettings.add(entry.getValue());
+		}
+
 		if (!settings.enableCustomFunctions) {
 			return Collections.emptyList();
 		}
-		return new ArrayList<LatteCustomFunctionSettings>(settings.customFunctionSettings);
-	}
-
-	/**
-	 * @return list of standard macros
-	 */
-	@NotNull
-	public Map<String, LatteMacro> getStandardMacros() {
-		return Collections.unmodifiableMap(standardMacros);
-	}
-
-	/**
-	 * @return list of standard modifiers
-	 */
-	@NotNull
-	public Map<String, LatteModifier> getStandardModifiers() {
-		return Collections.unmodifiableMap(standardModifiers);
+		functionSettings.addAll(settings.customFunctionSettings);
+		return functionSettings;
 	}
 
 	/**
 	 * @return custom (project-specific) macros
 	 */
 	@NotNull
-	public Map<String, LatteMacro> getCustomMacros(Project project) {
-		LatteSettings settings = getSettings(project);
-		if (!settings.enableCustomMacros) {
-			return Collections.emptyMap();
+	public Map<String, LatteCustomMacroSettings> getTags() {
+		LatteSettings settings = getSettings();
+		Map<String, LatteCustomMacroSettings> projectMacros = new HashMap<>();
+		for (Map.Entry<String, LatteCustomMacroSettings> entry : LatteFileConfiguration.getInstance(project).getTags().entrySet()) {
+			projectMacros.put(entry.getKey(), entry.getValue());
 		}
 
-		Map<String, LatteMacro> projectMacros = new HashMap<String, LatteMacro>();
+		if (!settings.enableCustomMacros) {
+			return projectMacros;
+		}
+
 		for (LatteCustomMacroSettings customMacro : settings.customMacroSettings) {
-			projectMacros.put(
-					customMacro.getMacroName(),
-					new LatteMacro(customMacro.getMacroName(), customMacro.getType(), customMacro.isAllowedModifiers(), customMacro.hasParameters())
-			);
+			projectMacros.put(customMacro.getMacroName(), customMacro);
 		}
 		return Collections.unmodifiableMap(projectMacros);
 	}
@@ -273,59 +296,64 @@ public class LatteConfiguration {
 	 * @return custom (project-specific) modifiers
 	 */
 	@NotNull
-	public Map<String, LatteModifier> getCustomModifiers(Project project) {
-		LatteSettings settings = getSettings(project);
+	public Map<String, LatteCustomModifierSettings> getFilters() {
+		LatteSettings settings = getSettings();
+		Map<String, LatteCustomModifierSettings> projectFilters = new HashMap<>();
+		for (Map.Entry<String, LatteCustomModifierSettings> entry : LatteFileConfiguration.getInstance(project).getFilters().entrySet()) {
+			projectFilters.put(entry.getKey(), entry.getValue());
+		}
+
 		if (!settings.enableCustomModifiers) {
 			return Collections.emptyMap();
 		}
 
-		Map<String, LatteModifier> projectModifiers = new HashMap<String, LatteModifier>();
 		for (LatteCustomModifierSettings customModifier : settings.customModifierSettings) {
-			projectModifiers.put(
-					customModifier.getModifierName(),
-					new LatteModifier(customModifier.getModifierName(), customModifier.getModifierDescription(), customModifier.getModifierHelp())
-			);
+			projectFilters.put(customModifier.getModifierName(), customModifier);
 		}
-		return Collections.unmodifiableMap(projectModifiers);
+		return Collections.unmodifiableMap(projectFilters);
 	}
 
-	private void addStandardMacro(LatteMacro macro) {
-		standardMacros.put(macro.name, macro);
+	private void addStandardMacro(LatteCustomMacroSettings macro) {
+		standardMacros.put(macro.getMacroName(), macro);
 	}
 
-	private LatteMacro addStandardMacro(String name, LatteMacro.Type type) {
+	private LatteCustomMacroSettings addStandardMacro(String name, LatteCustomMacroSettings.Type type) {
 		return addStandardMacro(name, type, true);
 	}
 
-	private void addStandardMacroWithoutParameters(String name, LatteMacro.Type type) {
+	private void addStandardMacroWithoutParameters(String name, LatteCustomMacroSettings.Type type) {
 		addStandardMacro(name, type, true, false);
 	}
 
-	private LatteMacro addStandardMacroWithoutModifiers(String name, LatteMacro.Type type) {
+	private LatteCustomMacroSettings addStandardMacroWithoutModifiers(String name, LatteCustomMacroSettings.Type type) {
 		return addStandardMacro(name, type, false);
 	}
 
-	private void addStandardMacroWithoutModifiers(String name, LatteMacro.Type type, boolean hasParameters) {
+	private void addStandardMacroWithoutModifiers(String name, LatteCustomMacroSettings.Type type, boolean hasParameters) {
 		addStandardMacro(name, type, false, hasParameters);
 	}
 
-	private LatteMacro addStandardMacro(String name, LatteMacro.Type type, boolean allowedModifiers) {
+	private LatteCustomMacroSettings addStandardMacro(String name, LatteCustomMacroSettings.Type type, boolean allowedModifiers) {
 		return addStandardMacro(name, type, allowedModifiers, true);
 	}
 
-	private LatteMacro addStandardMacro(String name, LatteMacro.Type type, boolean allowedModifiers, boolean hasParameters) {
-		LatteMacro macro = new LatteMacro(name, type, allowedModifiers, hasParameters);
+	private LatteCustomMacroSettings addStandardMacro(String name, LatteCustomMacroSettings.Type type, boolean allowedModifiers, boolean hasParameters) {
+		LatteCustomMacroSettings macro = new LatteCustomMacroSettings(name, type, allowedModifiers, hasParameters);
 		addStandardMacro(macro);
 		return macro;
 	}
 
 	private void addStandardModifier(String name, String description) {
-		addStandardModifier(name, description, "");
+		addStandardModifier(name, description, "", "");
 	}
 
 	private void addStandardModifier(String name, String description, String help) {
-		LatteModifier modifier = new LatteModifier(name, description, help);
-		standardModifiers.put(modifier.name, modifier);
+		addStandardModifier(name, description, help, "");
+	}
+
+	private void addStandardModifier(String name, String description, String help, String insertColons) {
+		LatteCustomModifierSettings modifier = new LatteCustomModifierSettings(name, description, help, insertColons);
+		standardModifiers.put(modifier.getModifierName(), modifier);
 	}
 
 }

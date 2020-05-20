@@ -237,7 +237,7 @@ public class LattePsiImplUtil {
 			return templateType;
 		}
 
-		LatteVariableSettings defaultVariable = LatteConfiguration.INSTANCE.getVariable(element.getProject(), variableName);
+		LatteVariableSettings defaultVariable = LatteConfiguration.getInstance(element.getProject()).getVariable(variableName);
 		if (defaultVariable != null) {
 			return defaultVariable.toPhpType();
 		}
@@ -340,7 +340,7 @@ public class LattePsiImplUtil {
 		Collection<PhpClass> phpClasses = type.getPhpClasses(element.getProject());
 		String name = element.getMethodName();
 		if (phpClasses.size() == 0) {
-			LatteCustomFunctionSettings customFunction = LatteConfiguration.INSTANCE.getFunction(element.getProject(), name);
+			LatteCustomFunctionSettings customFunction = LatteConfiguration.getInstance(element.getProject()).getFunction(name);
 			return customFunction == null ? null : LattePhpType.create(customFunction.getFunctionReturnType());
 		}
 

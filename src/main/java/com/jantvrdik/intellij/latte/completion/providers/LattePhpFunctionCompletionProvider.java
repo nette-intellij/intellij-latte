@@ -59,7 +59,7 @@ public class LattePhpFunctionCompletionProvider extends BaseLatteCompletionProvi
 			results.addElement(lookupItem);
 		}
 
-		List<LatteCustomFunctionSettings> customFunctions = LatteConfiguration.INSTANCE.getFunctions(project);
+		List<LatteCustomFunctionSettings> customFunctions = LatteConfiguration.getInstance(project).getFunctions();
 		for (LatteCustomFunctionSettings item : customFunctions) {
 			LookupElementBuilder builder = createBuilderWithHelp(item);
 			results.addElement(builder);

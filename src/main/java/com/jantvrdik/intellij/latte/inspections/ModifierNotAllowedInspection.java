@@ -8,8 +8,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.config.LatteMacro;
 import com.jantvrdik.intellij.latte.psi.*;
+import com.jantvrdik.intellij.latte.settings.LatteCustomMacroSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,7 +32,7 @@ public class ModifierNotAllowedInspection extends LocalInspectionTool {
 			return null;
 		}
 
-		final List<ProblemDescriptor> problems = new ArrayList<ProblemDescriptor>();
+		final List<ProblemDescriptor> problems = new ArrayList<>();
 		file.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
 			@Override
 			public void visitElement(PsiElement element) {
@@ -44,7 +44,7 @@ public class ModifierNotAllowedInspection extends LocalInspectionTool {
 				}
 			}
 		});
-		return problems.toArray(new ProblemDescriptor[problems.size()]);
+		return problems.toArray(new ProblemDescriptor[0]);
 	}
 
 	private static void checkClassicMacro(
@@ -54,8 +54,8 @@ public class ModifierNotAllowedInspection extends LocalInspectionTool {
 			final boolean isOnTheFly
 	) {
 		String name = macroTag.getMacroName();
-		LatteMacro macro = LatteConfiguration.INSTANCE.getMacro(macroTag.getProject(), name);
-		if (macro == null || macro.allowedModifiers) {
+		LatteCustomMacroSettings macro = LatteConfiguration.getInstance(macroTag.getProject()).getMacro(name);
+		if (macro == null || macro.isAllowedModifiers()) {
 			return;
 		}
 

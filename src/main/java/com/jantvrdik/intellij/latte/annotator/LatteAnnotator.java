@@ -3,11 +3,12 @@ package com.jantvrdik.intellij.latte.annotator;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.config.LatteMacro;
 import com.jantvrdik.intellij.latte.intentions.*;
 import com.jantvrdik.intellij.latte.psi.*;
+import com.jantvrdik.intellij.latte.settings.LatteCustomMacroSettings;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -48,13 +49,14 @@ public class LatteAnnotator implements Annotator {
 			macroName = macroName.substring(2);
 		}
 
-		LatteMacro macro = LatteConfiguration.INSTANCE.getMacro(element.getProject(), macroName);
-		if (macro == null || macro.type == LatteMacro.Type.UNPAIRED) {
+		Project project = element.getProject();
+		LatteCustomMacroSettings macro = LatteConfiguration.getInstance(project).getMacro(macroName);
+		if (macro == null || macro.getType() == LatteCustomMacroSettings.Type.UNPAIRED) {
 			Annotation annotation = holder.createErrorAnnotation(attrName, "Unknown attribute tag " + attrName.getText());
 			annotation.registerFix(new AddCustomPairMacro(macroName));
 			if (!prefixed) annotation.registerFix(new AddCustomAttrOnlyMacro(macroName));
 
-		} else if (prefixed && macro.type != LatteMacro.Type.PAIR && macro.type != LatteMacro.Type.AUTO_EMPTY) {
+		} else if (prefixed && macro.getType() != LatteCustomMacroSettings.Type.PAIR && macro.getType() != LatteCustomMacroSettings.Type.AUTO_EMPTY) {
 			holder.createErrorAnnotation(attrName, "Attribute tag n:" + macroName + " can not be used with prefix.");
 		}
 	}
@@ -64,8 +66,8 @@ public class LatteAnnotator implements Annotator {
 		LatteMacroTag closeTag = element.getCloseTag();
 
 		String openTagName = openTag.getMacroName();
-		LatteMacro macro = LatteConfiguration.INSTANCE.getMacro(element.getProject(), openTagName);
-		if (macro == null || macro.type == LatteMacro.Type.ATTR_ONLY) {
+		LatteCustomMacroSettings macro = LatteConfiguration.getInstance(element.getProject()).getMacro(openTagName);
+		if (macro == null || macro.getType() == LatteCustomMacroSettings.Type.ATTR_ONLY) {
 			boolean isOk = false;
 			LatteMacroContent content = openTag.getMacroContent();
 			if (content != null) {
@@ -98,7 +100,7 @@ public class LatteAnnotator implements Annotator {
 		if (
 				macro != null
 				&& closeTag == null
-				&& ((element instanceof LattePairMacro && macro.type == LatteMacro.Type.AUTO_EMPTY) || macro.type == LatteMacro.Type.PAIR)
+				&& ((element instanceof LattePairMacro && macro.getType() == LatteCustomMacroSettings.Type.AUTO_EMPTY) || macro.getType() == LatteCustomMacroSettings.Type.PAIR)
 				&& !openTagName.equals("block")
 				&& !openTagName.equals("_")
 		) {

@@ -11,11 +11,15 @@
 	]]></description>
 
 	<!-- http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges -->
-	<idea-version since-build="183.3283.2"/>
+	<idea-version since-build="193.5233.102"/>
 
 	<!-- http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products -->
 	<depends>com.intellij.modules.lang</depends>
 	<depends>com.jetbrains.php</depends>
+
+	<applicationListeners>
+		<listener class="com.jantvrdik.intellij.latte.file.LatteFileListener" topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
+	</applicationListeners>
 
 	<extensions defaultExtensionNs="com.intellij">
 
@@ -48,6 +52,10 @@
 		<langCodeStyleSettingsProvider implementation="com.jantvrdik.intellij.latte.codeStyle.LatteLanguageCodeStyleSettingsProvider"/>
 
 		<psi.referenceContributor implementation="com.jantvrdik.intellij.latte.reference.LatteReferenceContributor"/>
+
+		<liveTemplateContext implementation="com.jantvrdik.intellij.latte.liveTemplates.LatteTemplateContext"/>
+		<defaultLiveTemplatesProvider implementation="com.jantvrdik.intellij.latte.liveTemplates.LatteTemplateProvider"/>
+		<liveTemplatePreprocessor implementation="com.jantvrdik.intellij.latte.liveTemplates.LatteTemplatePreprocessor"/>
 
 		<projectConfigurable instance="com.jantvrdik.intellij.latte.ui.LatteSettingsForm"
 							 displayName="Latte"
@@ -143,10 +151,6 @@
 						 displayName="Var definition"
 						 groupName="Latte" enabledByDefault="true"
 						 implementationClass="com.jantvrdik.intellij.latte.inspections.MacroVarInspection"/>
-
-		<liveTemplateContext implementation="com.jantvrdik.intellij.latte.liveTemplates.LatteTemplateContext"/>
-		<defaultLiveTemplatesProvider implementation="com.jantvrdik.intellij.latte.liveTemplates.LatteTemplateProvider"/>
-		<liveTemplatePreprocessor implementation="com.jantvrdik.intellij.latte.liveTemplates.LatteTemplatePreprocessor"/>
 	</extensions>
 
 	<application-components>

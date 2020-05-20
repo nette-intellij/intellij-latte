@@ -6,10 +6,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.config.LatteModifier;
 import com.jantvrdik.intellij.latte.intentions.AddCustomLatteModifier;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LatteMacroModifier;
+import com.jantvrdik.intellij.latte.settings.LatteCustomModifierSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,14 +31,14 @@ public class ModifierDefinitionInspection extends LocalInspectionTool {
 			return null;
 		}
 
-		final List<ProblemDescriptor> problems = new ArrayList<ProblemDescriptor>();
+		final List<ProblemDescriptor> problems = new ArrayList<>();
 		file.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
 			@Override
 			public void visitElement(PsiElement element) {
 				if (element instanceof LatteMacroModifier) {
 					String filterName = ((LatteMacroModifier) element).getModifierName();
-					LatteModifier latteModifier = LatteConfiguration.INSTANCE.getModifier(element.getProject(), filterName);
-					if (latteModifier == null) {
+					LatteCustomModifierSettings latteFilter = LatteConfiguration.getInstance(element.getProject()).getModifier(filterName);
+					if (latteFilter == null) {
 						LocalQuickFix addModifierFix = IntentionManager.getInstance().convertToFix(new AddCustomLatteModifier(filterName));
 						ProblemHighlightType type = ProblemHighlightType.GENERIC_ERROR_OR_WARNING;
 						String description = "Undefined latte filter '" + filterName + "'";
@@ -52,6 +52,6 @@ public class ModifierDefinitionInspection extends LocalInspectionTool {
 			}
 		});
 
-		return problems.toArray(new ProblemDescriptor[problems.size()]);
+		return problems.toArray(new ProblemDescriptor[0]);
 	}
 }

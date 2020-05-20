@@ -8,7 +8,7 @@
 		<variable name="VAR_VALUE" expression="phpSuggestVariableName()" defaultValue="&quot;$item&quot;" alwaysStopAt="true" />
 		<variable name="VAR_VALUE" expression="phpSuggestVariableName()" defaultValue="&quot;$item&quot;" alwaysStopAt="true" />
 		<context>
-			<option name="LATTE" value="true"/>
+			<option name="LATTE" value="true" />
 		</context>
 	</template>
 	<template name="{forek"
@@ -20,18 +20,17 @@
 		<variable name="VAR_KEY" expression="phpSuggestVariableName()" defaultValue="&quot;$index&quot;" alwaysStopAt="true" />
 		<variable name="VAR_VALUE" expression="phpSuggestVariableName()" defaultValue="&quot;$item&quot;" alwaysStopAt="true" />
 		<context>
-			<option name="LATTE" value="true"/>
+			<option name="LATTE" value="true" />
 		</context>
 	</template>
-	<template name="{fori"
-			  value="{for $INDEX$ = 0; $INDEX$ < $LIMIT$; $INDEX$++}&#10;    $END$&#10;{/for}"
-			  description="{for i = 0; i < limit; i++}...{\for}"
+	<template name="{fori" value="{for $INDEX$ = 0; $INDEX$ &lt; $LIMIT$; $INDEX$++}&#10;    $END$&#10;{/for}"
+			  description="{for i = 0; i &lt; limit; i++}...{\for}"
 			  toReformat="true"
 			  toShortenFQNames="true">
 		<variable name="INDEX" expression="phpSuggestVariableName()" defaultValue="" alwaysStopAt="true" />
 		<variable name="LIMIT" expression="" defaultValue="" alwaysStopAt="true" />
 		<context>
-			<option name="LATTE" value="true"/>
+			<option name="LATTE" value="true" />
 		</context>
 	</template>
 	<template name="{ife"
@@ -42,18 +41,7 @@
 		<variable name="CONDITION" expression="" defaultValue="" alwaysStopAt="true" />
 		<variable name="MIDDLE" expression="" defaultValue="" alwaysStopAt="true" />
 		<context>
-			<option name="LATTE" value="true"/>
-		</context>
-	</template>
-	<template name="{frm"
-			  value="{form $NAME$}&#10;    $END$&#10;{/form}"
-			  description="{form name}...{/form}"
-			  toReformat="true"
-			  toShortenFQNames="true">
-		<variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
-		<variable name="END" expression="" defaultValue="" alwaysStopAt="true" />
-		<context>
-			<option name="LATTE" value="true"/>
+			<option name="LATTE" value="true" />
 		</context>
 	</template>
 </templateSet>

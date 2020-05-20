@@ -40,7 +40,7 @@ public class MethodUsagesInspection extends BaseLocalInspectionTool {
 			return null;
 		}
 
-		final List<ProblemDescriptor> problems = new ArrayList<ProblemDescriptor>();
+		final List<ProblemDescriptor> problems = new ArrayList<>();
 		file.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
 			@Override
 			public void visitElement(PsiElement element) {
@@ -72,7 +72,7 @@ public class MethodUsagesInspection extends BaseLocalInspectionTool {
 			return;
 		}
 
-		LatteCustomFunctionSettings customFunction = LatteConfiguration.INSTANCE.getFunction(element.getProject(), name);
+		LatteCustomFunctionSettings customFunction = LatteConfiguration.getInstance(element.getProject()).getFunction(name);
 		if (customFunction != null) {
 			return;
 		}
@@ -111,13 +111,16 @@ public class MethodUsagesInspection extends BaseLocalInspectionTool {
 					if (method.getName().equals(methodName)) {
 						if (method.getModifier().isPrivate()) {
 							addProblem(manager, problems, getElementToLook(element), "Used private method '" + methodName + "'", isOnTheFly);
-
 						} else if (method.getModifier().isProtected()) {
 							addProblem(manager, problems, getElementToLook(element), "Used protected method '" + methodName + "'", isOnTheFly);
+						} else if (method.isDeprecated()) {
+							addDeprecated(manager, problems, getElementToLook(element), "Used method '" + methodName + "' is marked as deprecated", isOnTheFly);
+						} else if (method.isInternal()) {
+							addDeprecated(manager, problems, getElementToLook(element), "Used method '" + methodName + "' is marked as internal", isOnTheFly);
 						}
 
 						String description;
-						boolean isStatic = ((LattePhpMethod) element).isStatic();
+						boolean isStatic = element.isStatic();
 						if (isStatic && !method.getModifier().isStatic()) {
 							description = "Method '" + methodName + "' is not static but called statically";
 							addProblem(manager, problems, getElementToLook(element), description, isOnTheFly);

@@ -35,11 +35,12 @@ public class LatteCustomModifierSettingsForm implements Configurable {
 	public LatteCustomModifierSettingsForm(Project project) {
 		this.project = project;
 
-		this.tableView = new TableView<LatteCustomModifierSettings>();
-		this.modelList = new ListTableModel<LatteCustomModifierSettings>(
+		this.tableView = new TableView<>();
+		this.modelList = new ListTableModel<>(
 				new NameColumn(),
 				new HelpColumn(),
-				new DescriptionColumn()
+				new DescriptionColumn(),
+				new InsertColonColumn()
 		);
 
 		this.attachItems();
@@ -158,7 +159,7 @@ public class LatteCustomModifierSettingsForm implements Configurable {
 
 	}
 
-	private class NameColumn extends ColumnInfo<LatteCustomModifierSettings, String> {
+	private static class NameColumn extends ColumnInfo<LatteCustomModifierSettings, String> {
 
 		public NameColumn() {
 			super("Name");
@@ -171,10 +172,10 @@ public class LatteCustomModifierSettingsForm implements Configurable {
 		}
 	}
 
-	private class HelpColumn extends ColumnInfo<LatteCustomModifierSettings, String> {
+	private static class HelpColumn extends ColumnInfo<LatteCustomModifierSettings, String> {
 
 		public HelpColumn() {
-			super("Help");
+			super("Arguments");
 		}
 
 		@Nullable
@@ -184,7 +185,7 @@ public class LatteCustomModifierSettingsForm implements Configurable {
 		}
 	}
 
-	private class DescriptionColumn extends ColumnInfo<LatteCustomModifierSettings, String> {
+	private static class DescriptionColumn extends ColumnInfo<LatteCustomModifierSettings, String> {
 
 		public DescriptionColumn() {
 			super("Description");
@@ -194,6 +195,19 @@ public class LatteCustomModifierSettingsForm implements Configurable {
 		@Override
 		public String valueOf(LatteCustomModifierSettings modifierSettings) {
 			return modifierSettings.getModifierDescription();
+		}
+	}
+
+	private static class InsertColonColumn extends ColumnInfo<LatteCustomModifierSettings, String> {
+
+		public InsertColonColumn() {
+			super("Insert color");
+		}
+
+		@Nullable
+		@Override
+		public String valueOf(LatteCustomModifierSettings modifierSettings) {
+			return modifierSettings.getModifierInsert();
 		}
 	}
 

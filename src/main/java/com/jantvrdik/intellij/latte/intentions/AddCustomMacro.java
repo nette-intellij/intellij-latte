@@ -7,7 +7,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.IncorrectOperationException;
 import com.jantvrdik.intellij.latte.LatteLanguage;
-import com.jantvrdik.intellij.latte.config.LatteMacro;
 import com.jantvrdik.intellij.latte.settings.LatteCustomMacroSettings;
 import com.jantvrdik.intellij.latte.settings.LatteSettings;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +24,7 @@ abstract public class AddCustomMacro extends BaseIntentionAction {
 	}
 
 	@NotNull
-	protected abstract LatteMacro.Type getMacroType();
+	protected abstract LatteCustomMacroSettings.Type getMacroType();
 
 	@NotNull
 	@Override

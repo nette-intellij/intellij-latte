@@ -1,11 +1,11 @@
 package com.jantvrdik.intellij.latte.settings;
 
-import com.jantvrdik.intellij.latte.config.LatteMacro;
 import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import static com.jantvrdik.intellij.latte.settings.LatteCustomMacroSettings.Type.*;
 
 public class DefaultSettings {
 
@@ -22,22 +22,22 @@ public class DefaultSettings {
 	};
 
 	public static LatteCustomMacroSettings[] defaultMacros = new LatteCustomMacroSettings[]{
-		new LatteCustomMacroSettings("href", LatteMacro.Type.ATTR_ONLY),
-		new LatteCustomMacroSettings("link", LatteMacro.Type.UNPAIRED),
-		new LatteCustomMacroSettings("plink", LatteMacro.Type.UNPAIRED),
-		new LatteCustomMacroSettings("control", LatteMacro.Type.UNPAIRED),
-		new LatteCustomMacroSettings("snippet", LatteMacro.Type.PAIR),
-		new LatteCustomMacroSettings("snippetArea", LatteMacro.Type.PAIR),
-		new LatteCustomMacroSettings("form", LatteMacro.Type.PAIR, false, true),
-		new LatteCustomMacroSettings("formContainer", LatteMacro.Type.PAIR, false, true),
-		new LatteCustomMacroSettings("label", LatteMacro.Type.AUTO_EMPTY, false, true),
-		new LatteCustomMacroSettings("input", LatteMacro.Type.UNPAIRED, false, true),
-		new LatteCustomMacroSettings("inputError", LatteMacro.Type.UNPAIRED, false, true),
-		new LatteCustomMacroSettings("name", LatteMacro.Type.ATTR_ONLY),
-		new LatteCustomMacroSettings("inputError", LatteMacro.Type.UNPAIRED, false, true),
-		new LatteCustomMacroSettings("_", LatteMacro.Type.PAIR),
-		new LatteCustomMacroSettings("dump", LatteMacro.Type.UNPAIRED, false, true),
-		new LatteCustomMacroSettings("cache", LatteMacro.Type.PAIR),
+		new LatteCustomMacroSettings("href", ATTR_ONLY),
+		new LatteCustomMacroSettings("link", UNPAIRED),
+		new LatteCustomMacroSettings("plink", UNPAIRED),
+		new LatteCustomMacroSettings("control", UNPAIRED, false, true),
+		new LatteCustomMacroSettings("snippet", PAIR),
+		new LatteCustomMacroSettings("snippetArea", PAIR),
+		new LatteCustomMacroSettings("form", PAIR, false, true),
+		new LatteCustomMacroSettings("formContainer", PAIR, false, true),
+		new LatteCustomMacroSettings("label", AUTO_EMPTY, false, true),
+		new LatteCustomMacroSettings("input", UNPAIRED, false, true),
+		new LatteCustomMacroSettings("inputError", UNPAIRED, false, true),
+		new LatteCustomMacroSettings("name", ATTR_ONLY),
+		new LatteCustomMacroSettings("inputError", UNPAIRED, false, true),
+		new LatteCustomMacroSettings("_", PAIR),
+		new LatteCustomMacroSettings("dump", UNPAIRED, false, true),
+		new LatteCustomMacroSettings("cache", PAIR, false, true),
 	};
 
 	public static LatteCustomFunctionSettings[] defaultCustomFunctions = new LatteCustomFunctionSettings[]{

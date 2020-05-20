@@ -23,6 +23,8 @@ public class LatteSettings implements PersistentStateComponent<LatteSettings> {
 
 	public boolean wasFirstInitialized = false;
 
+	public boolean disableDefaultLoading = true;
+
 	public boolean enableDefaultVariables = true;
 
 	public boolean enableCustomMacros = true;
@@ -30,8 +32,6 @@ public class LatteSettings implements PersistentStateComponent<LatteSettings> {
 	public boolean enableCustomModifiers = true;
 
 	public boolean enableCustomFunctions = true;
-
-	public boolean codeCompletionEnabled = true;
 
 	public List<LatteVariableSettings> variableSettings = new ArrayList<>();
 

@@ -140,6 +140,26 @@ public class LatteUtil {
         return macroClassic.getOpenTag().getMacroName().equals(name);
     }
 
+    public static String getSpacesBeforeCaret(@NotNull Editor editor) {
+        int startOffset = editor.getCaretModel().getOffset();
+        String fileText = editor.getDocument().getText();
+        if (fileText.length() < startOffset) {
+            return "";
+        }
+
+        StringBuilder out = new StringBuilder();
+        int position = 1;
+        char letter = fileText.charAt(startOffset - position);
+        while (letter != '\n' && startOffset > 1) {
+            if (letter == '\t' || letter == ' ') {
+                out.append(letter);
+            }
+            position = position + 1;
+            letter = fileText.charAt(startOffset - position);
+        }
+        return out.reverse().toString();
+    }
+
     public static boolean isStringAtCaret(@NotNull Editor editor, @NotNull String string) {
         int startOffset = editor.getCaretModel().getOffset();
         String fileText = editor.getDocument().getText();

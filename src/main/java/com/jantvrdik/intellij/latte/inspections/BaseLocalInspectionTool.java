@@ -11,6 +11,16 @@ import java.util.List;
 
 abstract class BaseLocalInspectionTool extends LocalInspectionTool {
 
+	protected void addError(
+			@NotNull final InspectionManager manager,
+			List<ProblemDescriptor> problems,
+			@NotNull PsiElement element,
+			@NotNull String description,
+			boolean isOnTheFly
+	) {
+		addProblem(manager, problems, element, description, ProblemHighlightType.GENERIC_ERROR, isOnTheFly);
+	}
+
 	protected void addProblem(
 			@NotNull final InspectionManager manager,
 			List<ProblemDescriptor> problems,
@@ -19,6 +29,16 @@ abstract class BaseLocalInspectionTool extends LocalInspectionTool {
 			boolean isOnTheFly
 	) {
 		addProblem(manager, problems, element, description, ProblemHighlightType.GENERIC_ERROR_OR_WARNING, isOnTheFly);
+	}
+
+	protected void addDeprecated(
+			@NotNull final InspectionManager manager,
+			List<ProblemDescriptor> problems,
+			@NotNull PsiElement element,
+			@NotNull String description,
+			boolean isOnTheFly
+	) {
+		addProblem(manager, problems, element, description, ProblemHighlightType.LIKE_DEPRECATED, isOnTheFly);
 	}
 
 	protected void addProblem(

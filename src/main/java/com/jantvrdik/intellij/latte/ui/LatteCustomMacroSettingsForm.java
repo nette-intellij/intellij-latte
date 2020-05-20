@@ -38,12 +38,14 @@ public class LatteCustomMacroSettingsForm implements Configurable {
 	public LatteCustomMacroSettingsForm(Project project) {
 		this.project = project;
 
-		this.tableView = new TableView<LatteCustomMacroSettings>();
-		this.modelList = new ListTableModel<LatteCustomMacroSettings>(
+		this.tableView = new TableView<>();
+		this.modelList = new ListTableModel<>(
 				new MacroNameColumn(),
 				new TypeColumn(),
 				new AllowedModifiersColumn(),
 				new HasParametersColumn(),
+				new IsMultiLineColumn(),
+				new IsDeprecatedColumn(),
 				new SourceColumn()
 		);
 
@@ -166,8 +168,8 @@ public class LatteCustomMacroSettingsForm implements Configurable {
 	}
 
 	public void resetToDefaults() {
-		List<String> foundMacros = new ArrayList<String>();
-		List<LatteCustomMacroSettings> newSettings = new ArrayList<LatteCustomMacroSettings>();
+		List<String> foundMacros = new ArrayList<>();
+		List<LatteCustomMacroSettings> newSettings = new ArrayList<>();
 		for (LatteCustomMacroSettings macroSettings : this.modelList.getItems()) {
 			LatteCustomMacroSettings defaultMacro = DefaultSettings.getDefaultMacro(macroSettings.getMacroName());
 			if (defaultMacro != null) {
@@ -247,6 +249,32 @@ public class LatteCustomMacroSettingsForm implements Configurable {
 		}
 	}
 
+	private static class IsMultiLineColumn extends ColumnInfo<LatteCustomMacroSettings, String> {
+
+		public IsMultiLineColumn() {
+			super("Multi line");
+		}
+
+		@Nullable
+		@Override
+		public String valueOf(LatteCustomMacroSettings customMacroSettings) {
+			return customMacroSettings.isMultiLine() ? "yes" : "no";
+		}
+	}
+
+	private static class IsDeprecatedColumn extends ColumnInfo<LatteCustomMacroSettings, String> {
+
+		public IsDeprecatedColumn() {
+			super("Deprecated");
+		}
+
+		@Nullable
+		@Override
+		public String valueOf(LatteCustomMacroSettings customMacroSettings) {
+			return customMacroSettings.isDeprecated() ? "yes" : "no";
+		}
+	}
+
 	private static class SourceColumn extends SourceTypeColumn<LatteCustomMacroSettings> {
 
 		public SourceColumn() {
@@ -263,9 +291,9 @@ public class LatteCustomMacroSettingsForm implements Configurable {
 	private void openMacroDialog(@Nullable LatteCustomMacroSettings customMacroSettings) {
 		LatteCustomMacroSettingsDialog latteVariableDialog;
 		if(customMacroSettings == null) {
-			latteVariableDialog = new LatteCustomMacroSettingsDialog(project, this.tableView);
+			latteVariableDialog = new LatteCustomMacroSettingsDialog(this.tableView);
 		} else {
-			latteVariableDialog = new LatteCustomMacroSettingsDialog(project, this.tableView, customMacroSettings);
+			latteVariableDialog = new LatteCustomMacroSettingsDialog(this.tableView, customMacroSettings);
 		}
 
 		Dimension dim = new Dimension();

@@ -1,9 +1,18 @@
 package com.jantvrdik.intellij.latte.utils;
 
 import com.intellij.ide.util.PsiNavigationSupport;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationAction;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.pom.Navigatable;
 import com.intellij.psi.PsiElement;
+import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.io.IOException;
@@ -11,6 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public class LatteIdeHelper {
+    public static String NOTIFICATION_GROUP = "Latte";
 
     public static void openUrl(String url) {
         if (Desktop.isDesktopSupported()) {
@@ -22,6 +32,40 @@ public class LatteIdeHelper {
                     desktop.browse(uri);
                 } catch (URISyntaxException | IOException ignored) {
                 }
+            }
+        }
+    }
+
+    public static void doNotify(
+            @NotNull String title,
+            @NotNull @Nls(capitalization = Nls.Capitalization.Sentence) String content,
+            @NotNull NotificationType type,
+            @Nullable Project project
+    ) {
+        doNotify(title, content, type, project, null);
+    }
+
+    public static void doNotify(
+            @NotNull String title,
+            @NotNull @Nls(capitalization = Nls.Capitalization.Sentence) String content,
+            @NotNull NotificationType type,
+            @Nullable Project project,
+            @Nullable NotificationAction notificationAction
+    ) {
+        Notification notification = new Notification(NOTIFICATION_GROUP, title, content, type);
+        if (notificationAction != null) {
+            notification.addAction(notificationAction);
+        }
+        doNotify(notification, project);
+    }
+
+    public static void doNotify(Notification notification, @Nullable Project project) {
+        if (project != null && !project.isDisposed() && !project.isDefault()) {
+            project.getMessageBus().syncPublisher(Notifications.TOPIC).notify(notification);
+        } else {
+            Application app = ApplicationManager.getApplication();
+            if (!app.isDisposed()) {
+                app.getMessageBus().syncPublisher(Notifications.TOPIC).notify(notification);
             }
         }
     }

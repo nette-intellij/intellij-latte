@@ -3,8 +3,8 @@ package com.jantvrdik.intellij.latte.parser;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.psi.tree.IElementType;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.config.LatteMacro;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
+import com.jantvrdik.intellij.latte.settings.LatteCustomMacroSettings;
 import org.jetbrains.annotations.NotNull;
 
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
@@ -26,8 +26,8 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 
 		boolean result;
 
-		LatteMacro macro = LatteConfiguration.INSTANCE.getMacro(builder.getProject(), macroName);
-		if (macro != null && macro.type == LatteMacro.Type.AUTO_EMPTY) {
+		LatteCustomMacroSettings macro = LatteConfiguration.getInstance(builder.getProject()).getMacro(macroName);
+		if (macro != null && macro.getType() == LatteCustomMacroSettings.Type.AUTO_EMPTY) {
 			result = pair == isAutoEmptyPair(macroName, builder);
 		} else if (macroName.equals("_")) {
 			// hard coded rule for macro _ because of dg's poor design decision
@@ -38,7 +38,7 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 
 			// all other macros which respect rules
 		} else {
-			result = (macro != null ? (macro.type == (pair ? LatteMacro.Type.PAIR : LatteMacro.Type.UNPAIRED)) : !pair);
+			result = (macro != null ? (macro.getType() == (pair ? LatteCustomMacroSettings.Type.PAIR : LatteCustomMacroSettings.Type.UNPAIRED)) : !pair);
 		}
 
 		marker.rollbackTo();
@@ -74,16 +74,16 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 			return false;
 		}
 		marker.rollbackTo();
-		LatteMacro macro = LatteConfiguration.INSTANCE.getMacro(builder.getProject(), macroName);
+		LatteCustomMacroSettings macro = LatteConfiguration.getInstance(builder.getProject()).getMacro(macroName);
 
-		if (macro != null && macro.type == LatteMacro.Type.AUTO_EMPTY) {
+		if (macro != null && macro.getType() == LatteCustomMacroSettings.Type.AUTO_EMPTY) {
 			return isAutoEmptyPair(macroName, builder);
 		}
 		if (macroName.equals("_")) {
 			builder.advanceLexer();
 			return builder.getTokenType() == T_MACRO_TAG_CLOSE;
 		}
-		return macro != null && macro.type == LatteMacro.Type.PAIR;
+		return macro != null && macro.getType() == LatteCustomMacroSettings.Type.PAIR;
 	}
 
 	@NotNull

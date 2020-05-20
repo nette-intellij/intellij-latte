@@ -8,9 +8,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.config.LatteMacro;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LatteMacroTag;
+import com.jantvrdik.intellij.latte.settings.LatteCustomMacroSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,15 +31,17 @@ public class DeprecatedTagInspection extends LocalInspectionTool {
 		if (!(file instanceof LatteFile)) {
 			return null;
 		}
-		final List<ProblemDescriptor> problems = new ArrayList<ProblemDescriptor>();
+		final List<ProblemDescriptor> problems = new ArrayList<>();
 		file.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
 			@Override
 			public void visitElement(PsiElement element) {
 				if (element instanceof LatteMacroTag) {
 					String macroName = ((LatteMacroTag) element).getMacroName();
-					LatteMacro macro = LatteConfiguration.INSTANCE.getMacro(element.getProject(), macroName);
-					if (macro != null && macro.deprecated) {
-						String description = macro.deprecatedMessage != null ? macro.deprecatedMessage : "Tag {" + macroName + "} is deprecated";
+					LatteCustomMacroSettings macro = LatteConfiguration.getInstance(element.getProject()).getMacro(macroName);
+					if (macro != null && macro.isDeprecated()) {
+						String description = macro.getDeprecatedMessage() != null && macro.getDeprecatedMessage().length() > 0
+								? macro.getDeprecatedMessage()
+								: "Tag {" + macroName + "} is deprecated";
 						ProblemDescriptor problem = manager.createProblemDescriptor(element, description, true, ProblemHighlightType.LIKE_DEPRECATED, isOnTheFly);
 						problems.add(problem);
 
@@ -50,6 +52,6 @@ public class DeprecatedTagInspection extends LocalInspectionTool {
 			}
 		});
 
-		return problems.toArray(new ProblemDescriptor[problems.size()]);
+		return problems.toArray(new ProblemDescriptor[0]);
 	}
 }

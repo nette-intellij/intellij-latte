@@ -1,12 +1,14 @@
 <html>
-<p>1.0.3</p>
+<p>1.1.0 - XML config update</p>
 <ul>
+	<li>added support for load configuration from XML files (issue #81)</li>
+	<li>added support for multi line macro settings</li>
 	<li>added support for reformat code for spaces around assignment and equality operators</li>
 	<li>added support for reformat code for spaces after tag name and before closing tag</li>
 	<li>added support for reformat code for spaces before tag filters</li>
 	<li>added support for change syntax highlight for operators</li>
 	<li>added Latte context for live templates</li>
-	<li>added live templates {fore, {forek, {fori, {ife and {frm</li>
+	<li>added live templates {fore, {forek, {fori and {ife</li>
 	<li>added new tags {do}, {sandbox}, {widget} and {varPrint}</li>
 	<li>added new filter |batch:(array, length [, item])</li>
 	<li>added tag {inputError} - (reload for Nette tag settings needed)</li>
@@ -15,12 +17,15 @@
 	<li>improved LattePhpType to use less memory and work faster (about -75% processing time)</li>
 	<li>implemented Gradle (for better plugin development)</li>
 	<li>tag {? ...} was tagged as deprecated since Nette 2.4</li>
+	<li>increased minimum compatibility to PhpStorm 193.5233.102</li>
 	<li>fixed issue #66 - methods, constants and properties are now recognized for static classes</li>
 	<li>fixed issue #64 - ifcontent is now macro without parameters</li>
 	<li>fixed issue #61 - improved working with methods (now it is prepared for future enhacements)</li>
 	<li>fixed issue #69 - determine type for a variable, if call some on this now working</li>
 	<li>fixed issue #62 - now is space after function name allowed and it is determined as function</li>
 	<li>fixed issue #80 - better parsing for namespaces and classes and fixed refactoring for classes</li>
+	<li>fixed issue #72 - added support for double colons in filters</li>
+	<li>fixed issue #77 - added inspection for deprecated and internal usages</li>
 </ul>
 
 <p>1.0.2</p>

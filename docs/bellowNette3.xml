@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<latte version="1">
+    <tags>
+        <tag name="if" type="PAIR" hasParameters="true" allowedModifiers="false" />
+        <tag name="ifset" type="PAIR" hasParameters="true" allowedModifiers="false" />
+        <tag name="else" type="UNPAIRED" hasParameters="false" allowedModifiers="false" />
+        <tag name="elseif" type="UNPAIRED" hasParameters="true" allowedModifiers="false" />
+        <tag name="elseifset" type="UNPAIRED" hasParameters="true" allowedModifiers="false" />
+        <tag name="ifcontent" type="PAIR" hasParameters="false" allowedModifiers="false" />
+
+        <tag name="switch" type="PAIR" hasParameters="true" allowedModifiers="false" multiLine="true" />
+        <tag name="case" type="UNPAIRED" hasParameters="true" allowedModifiers="false" />
+
+        <tag name="foreach" type="PAIR" hasParameters="true" allowedModifiers="false" multiLine="true" />
+        <tag name="for" type="PAIR" hasParameters="true" allowedModifiers="false" multiLine="true" />
+        <tag name="while" type="PAIR" hasParameters="true" allowedModifiers="false" multiLine="true" />
+        <tag name="continueIf" type="UNPAIRED" hasParameters="true" allowedModifiers="false" />
+        <tag name="breakIf" type="UNPAIRED" hasParameters="true" allowedModifiers="false" />
+
+        <tag name="first" type="PAIR" hasParameters="false" allowedModifiers="true" />
+        <tag name="last" type="PAIR" hasParameters="false" allowedModifiers="true" />
+        <tag name="sep" type="PAIR" hasParameters="false" allowedModifiers="true" />
+
+        <tag name="spaceless" type="PAIR" hasParameters="false" allowedModifiers="false" />
+
+        <tag name="var" type="UNPAIRED" hasParameters="true" allowedModifiers="false" />
+        <tag name="varType" type="UNPAIRED" hasParameters="true" allowedModifiers="false" />
+        <tag name="varPrint" type="UNPAIRED" hasParameters="true" allowedModifiers="false" />
+        <tag name="templateType" type="UNPAIRED" hasParameters="true" allowedModifiers="false" />
+        <tag name="templatePrint" type="UNPAIRED" hasParameters="true" allowedModifiers="false" />
+
+        <tag name="assign" type="UNPAIRED" hasParameters="true" allowedModifiers="true" />
+        <tag name="default" type="UNPAIRED" hasParameters="true" allowedModifiers="true" />
+        <tag name="debugbreak" type="UNPAIRED" hasParameters="true" allowedModifiers="false" />
+        <tag name="l" type="UNPAIRED" hasParameters="false" allowedModifiers="false" />
+        <tag name="r" type="UNPAIRED" hasParameters="false" allowedModifiers="false" />
+
+        <tag name="?" type="UNPAIRED" hasParameters="true" allowedModifiers="true" deprecated="true" deprecatedMessage="Tag {? ...} is deprecated in Latte 2.4. For variable definitions use {var ...} or {php ...} in other cases." />
+        <tag name="=" type="UNPAIRED" hasParameters="true" allowedModifiers="true" />
+        <tag name="php" type="UNPAIRED" hasParameters="true" allowedModifiers="true" />
+        <tag name="do" type="UNPAIRED" hasParameters="true" allowedModifiers="true" />
+
+        <tag name="capture" type="PAIR" hasParameters="true" allowedModifiers="true" multiLine="true" />
+        <tag name="include" type="UNPAIRED" hasParameters="true" allowedModifiers="false" />
+        <tag name="sandbox" type="UNPAIRED" hasParameters="true" allowedModifiers="false" />
+        <tag name="widget" type="PAIR" hasParameters="true" allowedModifiers="false" />
+        <tag name="use" type="UNPAIRED" hasParameters="true" allowedModifiers="false" />
+
+        <tag name="class" type="ATTR_ONLY" hasParameters="true" allowedModifiers="false" />
+        <tag name="attr" type="ATTR_ONLY" hasParameters="true" allowedModifiers="false" />
+        <tag name="nonce" type="ATTR_ONLY" hasParameters="false" allowedModifiers="false" />
+
+        <tag name="includeblock" type="UNPAIRED" hasParameters="true" allowedModifiers="false" deprecated="true" deprecatedMessage="Tag {includeblock} is deprecated in Latte 2.4. Use {include} tag instead." />
+        <tag name="import" type="UNPAIRED" hasParameters="true" allowedModifiers="false" />
+        <tag name="extends" type="UNPAIRED" hasParameters="true" allowedModifiers="false" />
+        <tag name="layout" type="UNPAIRED" hasParameters="true" allowedModifiers="false" />
+        <tag name="block" type="PAIR" hasParameters="true" allowedModifiers="false" multiLine="true" />
+        <tag name="define" type="PAIR" hasParameters="true" allowedModifiers="false" multiLine="true" />
+
+        <tag name="contentType" type="UNPAIRED" hasParameters="true" allowedModifiers="false" />
+
+        <!-- Nette tags -->
+        <tag name="ifCurrent" type="PAIR" hasParameters="true" allowedModifiers="false" deprecated="true" deprecatedMessage="Tag {ifCurrent} is deprecated in Latte 2.6. Use custom function isLinkCurrent() instead." />
+        <tag name="href" type="ATTR_ONLY" hasParameters="true" allowedModifiers="true" />
+        <tag name="link" type="UNPAIRED" hasParameters="true" allowedModifiers="true" />
+        <tag name="plink" type="UNPAIRED" hasParameters="true" allowedModifiers="true" />
+        <tag name="control" type="UNPAIRED" hasParameters="true" allowedModifiers="false" />
+        <tag name="snippet" type="PAIR" hasParameters="true" allowedModifiers="true" multiLine="true" />
+        <tag name="snippetArea" type="PAIR" hasParameters="true" allowedModifiers="true" multiLine="true" />
+        <tag name="form" type="PAIR" hasParameters="true" allowedModifiers="false" multiLine="true" />
+        <tag name="formContainer" type="PAIR" hasParameters="true" allowedModifiers="false" multiLine="true" />
+        <tag name="label" type="AUTO_EMPTY" hasParameters="true" allowedModifiers="false" />
+        <tag name="input" type="UNPAIRED" hasParameters="true" allowedModifiers="false" />
+        <tag name="inputError" type="UNPAIRED" hasParameters="true" allowedModifiers="false" />
+        <tag name="name" type="ATTR_ONLY" hasParameters="true" allowedModifiers="true" />
+        <tag name="_" type="PAIR" hasParameters="true" allowedModifiers="true" />
+        <tag name="dump" type="UNPAIRED" hasParameters="true" allowedModifiers="false" />
+        <tag name="cache" type="PAIR" hasParameters="true" allowedModifiers="false" />
+    </tags>
+    <filters>
+        <filter name="truncate" arguments=":(length, append = '…')" description="shortens the length preserving whole words" insertColons=":" />
+        <filter name="substr" arguments=":(offset [, length])" description="returns part of the string" insertColons=":" />
+        <filter name="trim" arguments=":(charset = mezery)" description="strips whitespace or other characters from the beginning and end of the string" />
+        <filter name="stripHtml" arguments="" description="removes HTML tags and converts HTML entities to text" />
+        <filter name="strip" arguments="" description="removes whitespace" />
+        <filter name="indent" arguments=":(level = 1, char = '\t')" description="indents the text from left with number of tabs" />
+        <filter name="replace" arguments=":(search, replace = '')" description="replaces all occurrences of the search string with the replacement" insertColons=":" />
+        <filter name="replaceRE" arguments=":(pattern, replace = '')" description="replaces all occurrences according to regular expression" insertColons=":" />
+        <filter name="padLeft" arguments=":(length, pad = ' ')" description="completes the string to given length from left" insertColons=":" />
+        <filter name="padRight" arguments=":(length, pad = ' ')" description="completes the string to given length from right" insertColons=":" />
+        <filter name="repeat" arguments=":(count)" description="repeats the string" insertColons=":" />
+        <filter name="implode" arguments=":(glue = '')" description="joins an array to a string" />
+        <filter name="webalize" description="adjusts the UTF-8 string to the shape used in the URL" />
+        <filter name="breaklines" description="inserts HTML line breaks before all newlines" />
+        <filter name="reverse" description="reverse an UTF-8 string or array" />
+        <filter name="length" description="returns length of a string or array" />
+        <filter name="batch" arguments=":(array, length [, item])" description="returns length of a string or array" insertColons="::" />
+
+        <filter name="lower" description="makes a string lower case" />
+        <filter name="upper" description="makes a string upper case" />
+        <filter name="firstUpper" description="makes the first letter upper case" />
+        <filter name="capitalize" description="lower case, the first letter of each word upper case" />
+
+        <filter name="date" arguments=":(format)" description="formats date" insertColons=":" />
+        <filter name="number" arguments=":(decimals = 0, decPoint = '.', thousandsSep = ',')" description="format number" />
+        <filter name="bytes" arguments=":(precision = 2)" description="formats size in bytes" />
+        <filter name="dataStream" arguments=":(mimetype = detect)" description="Data URI protocol conversion" />
+
+        <filter name="noescape" description="prints a variable without escaping" />
+        <filter name="escapeurl" description="escapes parameter in URL" />
+
+        <filter name="nocheck" description="prevents automatic URL sanitization" />
+        <filter name="checkurl" description="sanitizes string for use inside href attribute" />
+    </filters>
+    <variables>
+        <variable name="control" type="\Nette\Application\UI\Control" />
+        <variable name="basePath" type="string" />
+        <variable name="baseUrl" type="string" />
+        <variable name="baseUri" type="string" />
+        <variable name="flashes" type="mixed[]" />
+        <variable name="presenter" type="\Nette\Application\UI\Presenter" />
+        <variable name="iterator" type="\Latte\Runtime\CachingIterator" />
+        <variable name="form" type="\Nette\Application\UI\Form" />
+        <variable name="user" type="\Nette\Security\User" />
+    </variables>
+    <functions>
+        <function name="isLinkCurrent" returnType="bool" arguments="(string $destination = null, $args = [])" />
+        <function name="isModuleCurrent" returnType="bool" arguments="(string $moduleName)" />
+    </functions>
+</latte>

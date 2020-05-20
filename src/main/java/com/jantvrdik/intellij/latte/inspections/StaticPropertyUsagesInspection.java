@@ -1,7 +1,6 @@
 package com.jantvrdik.intellij.latte.inspections;
 
 import com.intellij.codeInspection.InspectionManager;
-import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.psi.PsiElement;
@@ -20,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class StaticPropertyUsagesInspection extends LocalInspectionTool {
+public class StaticPropertyUsagesInspection extends BaseLocalInspectionTool {
 
 	@NotNull
 	@Override
@@ -35,7 +34,7 @@ public class StaticPropertyUsagesInspection extends LocalInspectionTool {
 			return null;
 		}
 
-		final List<ProblemDescriptor> problems = new ArrayList<ProblemDescriptor>();
+		final List<ProblemDescriptor> problems = new ArrayList<>();
 		file.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
 			@Override
 			public void visitElement(PsiElement element) {
@@ -55,9 +54,12 @@ public class StaticPropertyUsagesInspection extends LocalInspectionTool {
 								PhpModifier modifier = field.getModifier();
 								if (modifier.isPrivate()) {
 									addProblem(manager, problems, element, "Used private static property '" + variableName + "'", isOnTheFly);
-
 								} else if (modifier.isProtected()) {
 									addProblem(manager, problems, element, "Used protected static property '" + variableName + "'", isOnTheFly);
+								} else if (field.isDeprecated()) {
+									addDeprecated(manager, problems, element, "Used static property '" + variableName + "' is marked as deprecated", isOnTheFly);
+								} else if (field.isInternal()) {
+									addDeprecated(manager, problems, element, "Used static property '" + variableName + "' is marked as internal", isOnTheFly);
 								}
 
 								if (!modifier.isStatic()) {
@@ -80,28 +82,6 @@ public class StaticPropertyUsagesInspection extends LocalInspectionTool {
 			}
 		});
 
-		return problems.toArray(new ProblemDescriptor[problems.size()]);
-	}
-
-	private void addProblem(
-			@NotNull final InspectionManager manager,
-			List<ProblemDescriptor> problems,
-			@NotNull PsiElement element,
-			@NotNull String description,
-			boolean isOnTheFly
-	) {
-		addProblem(manager, problems, element, description, ProblemHighlightType.GENERIC_ERROR_OR_WARNING, isOnTheFly);
-	}
-
-	private void addProblem(
-			@NotNull final InspectionManager manager,
-			List<ProblemDescriptor> problems,
-			@NotNull PsiElement element,
-			@NotNull String description,
-			@NotNull ProblemHighlightType type,
-			boolean isOnTheFly
-	) {
-		ProblemDescriptor problem = manager.createProblemDescriptor(element, description, true, type, isOnTheFly);
-		problems.add(problem);
+		return problems.toArray(new ProblemDescriptor[0]);
 	}
 }

@@ -1,6 +1,6 @@
 package com.jantvrdik.intellij.latte.intentions;
 
-import com.jantvrdik.intellij.latte.config.LatteMacro;
+import com.jantvrdik.intellij.latte.settings.LatteCustomMacroSettings;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -14,8 +14,8 @@ public class AddCustomUnpairedMacro extends AddCustomMacro {
 
 	@NotNull
 	@Override
-	public LatteMacro.Type getMacroType() {
-		return LatteMacro.Type.UNPAIRED;
+	public LatteCustomMacroSettings.Type getMacroType() {
+		return LatteCustomMacroSettings.Type.UNPAIRED;
 	}
 
 	@NotNull

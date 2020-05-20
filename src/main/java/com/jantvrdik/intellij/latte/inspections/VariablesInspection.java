@@ -37,7 +37,7 @@ public class VariablesInspection extends LocalInspectionTool {
 			return null;
 		}
 
-		final List<ProblemDescriptor> problems = new ArrayList<ProblemDescriptor>();
+		final List<ProblemDescriptor> problems = new ArrayList<>();
 		file.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
 			@Override
 			public void visitElement(PsiElement element) {
@@ -80,7 +80,7 @@ public class VariablesInspection extends LocalInspectionTool {
 								.collect(Collectors.toList());
 
 						if (varDefinitions > 0 && !((LattePhpVariable) element).isVarTypeDefinition()) {
-							LatteVariableSettings defaultVariable = LatteConfiguration.INSTANCE.getVariable(element.getProject(), variableName);
+							LatteVariableSettings defaultVariable = LatteConfiguration.getInstance(element.getProject()).getVariable(variableName);
 							if (defaultVariable != null) {
 								ProblemDescriptor descriptor = manager.createProblemDescriptor(
 										element,
@@ -107,7 +107,7 @@ public class VariablesInspection extends LocalInspectionTool {
 						}
 
 					} else if (beforeElement.size() == 0) {
-						LatteVariableSettings defaultVariable = LatteConfiguration.INSTANCE.getVariable(element.getProject(), variableName);
+						LatteVariableSettings defaultVariable = LatteConfiguration.getInstance(element.getProject()).getVariable(variableName);
 						if (defaultVariable == null && LattePsiImplUtil.detectVariableTypeFromTemplateType(element, variableName) == null) {
 							type = ProblemHighlightType.GENERIC_ERROR_OR_WARNING;
 							description = "Undefined variable '" + variableName + "'";
