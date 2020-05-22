@@ -10,9 +10,11 @@ XML configuration files for Latte plugin are files contains information about ta
 
 This is example file content with sample values:
 
+- Replace `myVendor/myPackage` to your unique vendor name
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<latte version="1">
+<latte version="1" vendor="myVendor/myPackage">
     <tags>
         <tag name="myIf" type="PAIR" hasParameters="true" allowedModifiers="false" deprecated="false" deprecatedMessage="MyIf is deprecated, use xxx instead." />
         <tag name="myFor" type="PAIR" hasParameters="true" allowedModifiers="false" multiLine="true" />
