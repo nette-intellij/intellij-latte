@@ -52,11 +52,24 @@ public class LatteIdeHelper {
             @Nullable Project project,
             @Nullable NotificationAction notificationAction
     ) {
+        doNotify(title, content, type, project, false, notificationAction);
+    }
+
+    public static Notification doNotify(
+            @NotNull String title,
+            @NotNull @Nls(capitalization = Nls.Capitalization.Sentence) String content,
+            @NotNull NotificationType type,
+            @Nullable Project project,
+            boolean important,
+            @Nullable NotificationAction notificationAction
+    ) {
         Notification notification = new Notification(NOTIFICATION_GROUP, title, content, type);
+        notification.setImportant(important);
         if (notificationAction != null) {
             notification.addAction(notificationAction);
         }
         doNotify(notification, project);
+        return notification;
     }
 
     public static void doNotify(Notification notification, @Nullable Project project) {

@@ -2,7 +2,9 @@ package com.jantvrdik.intellij.latte.ui;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.table.TableView;
-import com.jantvrdik.intellij.latte.settings.LatteCustomModifierSettings;
+import com.jantvrdik.intellij.latte.config.LatteConfiguration;
+import com.jantvrdik.intellij.latte.indexes.LatteIndexUtil;
+import com.jantvrdik.intellij.latte.settings.LatteFilterSettings;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -19,11 +21,13 @@ public class LatteCustomModifierSettingsDialog extends JDialog {
     private JTextField textHelp;
     private JTextArea textDescription;
     private JTextField textInsert;
-    private LatteCustomModifierSettings latteCustomModifierSettings;
-    private TableView<LatteCustomModifierSettings> tableView;
+    private LatteFilterSettings latteCustomModifierSettings;
+    private TableView<LatteFilterSettings> tableView;
+    private Project project;
 
-    public LatteCustomModifierSettingsDialog(Project project, TableView<LatteCustomModifierSettings> tableView) {
+    public LatteCustomModifierSettingsDialog(TableView<LatteFilterSettings> tableView, Project project) {
         this.tableView = tableView;
+        this.project = project;
 
         setContentPane(contentPane);
         setModal(true);
@@ -48,8 +52,8 @@ public class LatteCustomModifierSettingsDialog extends JDialog {
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    public LatteCustomModifierSettingsDialog(Project project, TableView<LatteCustomModifierSettings> tableView, LatteCustomModifierSettings latteCustomModifierSettings) {
-        this(project, tableView);
+    public LatteCustomModifierSettingsDialog(TableView<LatteFilterSettings> tableView, Project project, LatteFilterSettings latteCustomModifierSettings) {
+        this(tableView, project);
 
         this.textName.setText(latteCustomModifierSettings.getModifierName());
         this.textHelp.setText(latteCustomModifierSettings.getModifierHelp());
@@ -59,12 +63,13 @@ public class LatteCustomModifierSettingsDialog extends JDialog {
     }
 
     private void onOK() {
-        LatteCustomModifierSettings settings = new LatteCustomModifierSettings(
+        LatteFilterSettings settings = new LatteFilterSettings(
                 this.textName.getText(),
                 this.textDescription.getText(),
                 this.textHelp.getText(),
                 this.textInsert.getText()
         );
+        settings.setVendor(LatteConfiguration.Vendor.CUSTOM);
 
         if (this.latteCustomModifierSettings != null) {
             int row = this.tableView.getSelectedRows()[0];
@@ -77,7 +82,9 @@ public class LatteCustomModifierSettingsDialog extends JDialog {
             this.tableView.setRowSelectionInterval(row, row);
         }
 
-        dispose();
+        if (LatteIndexUtil.reinitialize(project)) {
+            dispose();
+        }
     }
 
     private void setOkState() {

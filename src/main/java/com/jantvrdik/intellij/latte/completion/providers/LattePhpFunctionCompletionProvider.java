@@ -11,7 +11,7 @@ import com.intellij.util.ProcessingContext;
 import com.jantvrdik.intellij.latte.completion.handlers.MacroCustomFunctionInsertHandler;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.psi.LattePhpContent;
-import com.jantvrdik.intellij.latte.settings.LatteCustomFunctionSettings;
+import com.jantvrdik.intellij.latte.settings.LatteFunctionSettings;
 import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
 import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.completion.PhpLookupElement;
@@ -59,14 +59,14 @@ public class LattePhpFunctionCompletionProvider extends BaseLatteCompletionProvi
 			results.addElement(lookupItem);
 		}
 
-		List<LatteCustomFunctionSettings> customFunctions = LatteConfiguration.getInstance(project).getFunctions();
-		for (LatteCustomFunctionSettings item : customFunctions) {
+		Collection<LatteFunctionSettings> customFunctions = LatteConfiguration.getInstance(project).getFunctions();
+		for (LatteFunctionSettings item : customFunctions) {
 			LookupElementBuilder builder = createBuilderWithHelp(item);
 			results.addElement(builder);
 		}
 	}
 
-	private LookupElementBuilder createBuilderWithHelp(LatteCustomFunctionSettings settings) {
+	private LookupElementBuilder createBuilderWithHelp(LatteFunctionSettings settings) {
 		LookupElementBuilder builder = LookupElementBuilder.create(settings.getFunctionName());
 		builder = builder.withIcon(PhpIcons.FUNCTION_ICON);
 		builder = builder.withInsertHandler(MacroCustomFunctionInsertHandler.getInstance());

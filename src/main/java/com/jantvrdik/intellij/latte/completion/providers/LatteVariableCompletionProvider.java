@@ -94,7 +94,7 @@ public class LatteVariableCompletionProvider extends BaseLatteCompletionProvider
 			foundVariables.add(variableName);
 		}
 
-		List<LatteVariableSettings> defaultVariables = LatteConfiguration.getInstance(psiElement.getProject()).getVariables();
+		Collection<LatteVariableSettings> defaultVariables = LatteConfiguration.getInstance(psiElement.getProject()).getVariables();
 
 		for (LatteVariableSettings variable : defaultVariables) {
 			String variableName = variable.getVarName();

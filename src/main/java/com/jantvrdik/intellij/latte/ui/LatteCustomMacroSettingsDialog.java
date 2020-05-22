@@ -1,7 +1,10 @@
 package com.jantvrdik.intellij.latte.ui;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.table.TableView;
-import com.jantvrdik.intellij.latte.settings.LatteCustomMacroSettings;
+import com.jantvrdik.intellij.latte.config.LatteConfiguration;
+import com.jantvrdik.intellij.latte.indexes.LatteIndexUtil;
+import com.jantvrdik.intellij.latte.settings.LatteTagSettings;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -19,11 +22,13 @@ public class LatteCustomMacroSettingsDialog extends JDialog {
     private JCheckBox multiLineOnlyUsedCheckBox;
     private JCheckBox deprecatedCheckBox;
     private JTextField deprecatedMessageTextField;
-    private LatteCustomMacroSettings latteCustomMacroSettings;
-    private TableView<LatteCustomMacroSettings> tableView;
+    private LatteTagSettings latteTagSettings;
+    private TableView<LatteTagSettings> tableView;
+    private Project project;
 
-    public LatteCustomMacroSettingsDialog(TableView<LatteCustomMacroSettings> tableView) {
+    public LatteCustomMacroSettingsDialog(TableView<LatteTagSettings> tableView, Project project) {
         this.tableView = tableView;
+        this.project = project;
 
         setContentPane(contentPane);
         setModal(true);
@@ -56,38 +61,42 @@ public class LatteCustomMacroSettingsDialog extends JDialog {
         deprecatedMessageTextField.setEnabled(false);
     }
 
-    public LatteCustomMacroSettingsDialog(TableView<LatteCustomMacroSettings> tableView, LatteCustomMacroSettings latteCustomMacroSettings) {
-        this(tableView);
+    public LatteCustomMacroSettingsDialog(TableView<LatteTagSettings> tableView, Project project, LatteTagSettings latteTagSettings) {
+        this(tableView, project);
 
-        this.textVarName.setText(latteCustomMacroSettings.getMacroName());
-        this.macroType.getModel().setSelectedItem(latteCustomMacroSettings.getMacroType());
-        this.latteCustomMacroSettings = latteCustomMacroSettings;
-        this.checkBoxAllowedModifiers.setSelected(latteCustomMacroSettings.isAllowedModifiers());
-        this.checkBosHasParameters.setSelected(latteCustomMacroSettings.hasParameters());
-        this.multiLineOnlyUsedCheckBox.setSelected(latteCustomMacroSettings.isMultiLine());
-        this.deprecatedCheckBox.setSelected(latteCustomMacroSettings.isDeprecated());
-        this.deprecatedMessageTextField.setText(latteCustomMacroSettings.getDeprecatedMessage());
+        this.textVarName.setText(latteTagSettings.getMacroName());
+        this.macroType.getModel().setSelectedItem(latteTagSettings.getMacroType());
+        this.latteTagSettings = latteTagSettings;
+        this.checkBoxAllowedModifiers.setSelected(latteTagSettings.isAllowedModifiers());
+        this.checkBosHasParameters.setSelected(latteTagSettings.hasParameters());
+        this.multiLineOnlyUsedCheckBox.setSelected(latteTagSettings.isMultiLine());
+        this.deprecatedCheckBox.setSelected(latteTagSettings.isDeprecated());
+        this.deprecatedMessageTextField.setText(latteTagSettings.getDeprecatedMessage());
 
-        deprecatedMessageTextField.setEnabled(latteCustomMacroSettings.isDeprecated());
+        deprecatedMessageTextField.setEnabled(latteTagSettings.isDeprecated());
 
         attachComboBoxValues();
     }
 
     private void attachComboBoxValues() {
-        LatteCustomMacroSettings.Type[] values = LatteCustomMacroSettings.Type.values();
+        LatteTagSettings.Type[] values = LatteTagSettings.Type.values();
         if (macroType.getItemCount() == values.length) {
             return;
         }
 
-        for(LatteCustomMacroSettings.Type type: values) {
+        for(LatteTagSettings.Type type: values) {
             macroType.addItem(type.toString());
         }
     }
 
     private void onOK() {
-        LatteCustomMacroSettings settings = new LatteCustomMacroSettings(this.textVarName.getText(), LatteCustomMacroSettings.Type.valueOf((String) this.macroType.getSelectedItem()));
+        LatteTagSettings settings = new LatteTagSettings(
+                this.textVarName.getText(),
+                LatteTagSettings.Type.valueOf((String) this.macroType.getSelectedItem())
+        );
+        settings.setVendor(LatteConfiguration.Vendor.CUSTOM);
 
-        if(this.latteCustomMacroSettings != null) {
+        if (this.latteTagSettings != null) {
             int row = this.tableView.getSelectedRows()[0];
             this.tableView.getListTableModel().removeRow(row);
             this.tableView.getListTableModel().insertRow(row, settings);
@@ -103,7 +112,10 @@ public class LatteCustomMacroSettingsDialog extends JDialog {
         settings.setMultiLine(this.multiLineOnlyUsedCheckBox.isSelected());
         settings.setDeprecated(this.deprecatedCheckBox.isSelected());
         settings.setDeprecatedMessage(this.deprecatedMessageTextField.getText());
-        dispose();
+
+        if (LatteIndexUtil.reinitialize(project)) {
+            dispose();
+        }
     }
 
     private void setOkState() {

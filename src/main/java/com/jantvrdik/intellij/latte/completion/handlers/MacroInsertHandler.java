@@ -14,7 +14,7 @@ import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.psi.LatteMacroCloseTag;
 import com.jantvrdik.intellij.latte.psi.LatteMacroTag;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
-import com.jantvrdik.intellij.latte.settings.LatteCustomMacroSettings;
+import com.jantvrdik.intellij.latte.settings.LatteTagSettings;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,18 +35,18 @@ public class MacroInsertHandler implements InsertHandler<LookupElement> {
 			boolean resolvePairMacro = false;
 			boolean lastError = parent.getLastChild().getNode().getElementType() == TokenType.ERROR_ELEMENT;
 			String macroName = null;
-			LatteCustomMacroSettings macro = null;
+			LatteTagSettings macro = null;
 			if (lastError && element.getNode().getElementType() == LatteTypes.T_MACRO_NAME) {
 				macroName = element.getText();
-				macro = LatteConfiguration.getInstance(element.getProject()).getMacro(macroName);
+				macro = LatteConfiguration.getInstance(element.getProject()).getTag(macroName);
 
 			} else if (parent instanceof LatteMacroTag) {
 				macroName = ((LatteMacroTag) parent).getMacroName();
-				macro = LatteConfiguration.getInstance(element.getProject()).getMacro(macroName);
+				macro = LatteConfiguration.getInstance(element.getProject()).getTag(macroName);
 			}
 
 			boolean isCloseTag = parent instanceof LatteMacroCloseTag;
-			if (!isCloseTag && macro != null && macro.getType() == LatteCustomMacroSettings.Type.PAIR) {
+			if (!isCloseTag && macro != null && macro.getType() == LatteTagSettings.Type.PAIR) {
 				resolvePairMacro = true;
 			}
 

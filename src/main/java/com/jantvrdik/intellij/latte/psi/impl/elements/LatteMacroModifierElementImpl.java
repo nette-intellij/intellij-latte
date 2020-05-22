@@ -8,7 +8,7 @@ import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.icons.LatteIcons;
 import com.jantvrdik.intellij.latte.psi.LatteMacroContent;
 import com.jantvrdik.intellij.latte.psi.elements.LatteMacroModifierElement;
-import com.jantvrdik.intellij.latte.settings.LatteCustomModifierSettings;
+import com.jantvrdik.intellij.latte.settings.LatteFilterSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,8 +26,8 @@ public abstract class LatteMacroModifierElementImpl extends ASTWrapperPsiElement
 	}
 
 	@Nullable
-	public LatteCustomModifierSettings getMacroModifier() {
-		return LatteConfiguration.getInstance(getProject()).getModifier(getModifierName());
+	public LatteFilterSettings getMacroModifier() {
+		return LatteConfiguration.getInstance(getProject()).getFilter(getModifierName());
 	}
 
 	@Override

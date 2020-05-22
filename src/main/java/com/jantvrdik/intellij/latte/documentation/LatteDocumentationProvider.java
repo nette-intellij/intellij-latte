@@ -5,8 +5,8 @@ import com.intellij.psi.PsiElement;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.psi.LatteMacroModifier;
 import com.jantvrdik.intellij.latte.psi.LattePhpMethod;
-import com.jantvrdik.intellij.latte.settings.LatteCustomFunctionSettings;
-import com.jantvrdik.intellij.latte.settings.LatteCustomModifierSettings;
+import com.jantvrdik.intellij.latte.settings.LatteFunctionSettings;
+import com.jantvrdik.intellij.latte.settings.LatteFilterSettings;
 import org.jetbrains.annotations.Nullable;
 
 public class LatteDocumentationProvider extends AbstractDocumentationProvider {
@@ -14,7 +14,7 @@ public class LatteDocumentationProvider extends AbstractDocumentationProvider {
 	@Override
 	public @Nullable String getQuickNavigateInfo(PsiElement element, PsiElement originalElement) {
 		if (element instanceof LatteMacroModifier) {
-			LatteCustomModifierSettings modifier = ((LatteMacroModifier) element).getMacroModifier();
+			LatteFilterSettings modifier = ((LatteMacroModifier) element).getMacroModifier();
 			if (modifier == null) {
 				return null;
 			}
@@ -25,7 +25,7 @@ public class LatteDocumentationProvider extends AbstractDocumentationProvider {
 				return null;
 			}
 
-			LatteCustomFunctionSettings customFunction = LatteConfiguration.getInstance(element.getProject()).getFunction(
+			LatteFunctionSettings customFunction = LatteConfiguration.getInstance(element.getProject()).getFunction(
 					((LattePhpMethod) element).getMethodName()
 			);
 			if (customFunction == null) {

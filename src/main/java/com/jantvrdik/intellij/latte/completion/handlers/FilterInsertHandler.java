@@ -11,7 +11,7 @@ import com.intellij.psi.PsiElement;
 import com.jantvrdik.intellij.latte.LatteLanguage;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.psi.LatteMacroModifier;
-import com.jantvrdik.intellij.latte.settings.LatteCustomModifierSettings;
+import com.jantvrdik.intellij.latte.settings.LatteFilterSettings;
 import org.jetbrains.annotations.NotNull;
 
 public class FilterInsertHandler implements InsertHandler<LookupElement> {
@@ -27,10 +27,10 @@ public class FilterInsertHandler implements InsertHandler<LookupElement> {
 		if (element != null && element.getLanguage() == LatteLanguage.INSTANCE) {
 			PsiElement parent = element.getParent();
 
-			LatteCustomModifierSettings filter = null;
+			LatteFilterSettings filter = null;
 			if (parent instanceof LatteMacroModifier) {
 				String modifierName = ((LatteMacroModifier) parent).getModifierName();
-				filter = LatteConfiguration.getInstance(element.getProject()).getModifier(modifierName);
+				filter = LatteConfiguration.getInstance(element.getProject()).getFilter(modifierName);
 			}
 
 			Editor editor = context.getEditor();

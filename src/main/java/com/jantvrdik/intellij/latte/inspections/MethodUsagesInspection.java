@@ -12,7 +12,7 @@ import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.intentions.AddCustomLatteFunction;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LattePhpMethod;
-import com.jantvrdik.intellij.latte.settings.LatteCustomFunctionSettings;
+import com.jantvrdik.intellij.latte.settings.LatteFunctionSettings;
 import com.jantvrdik.intellij.latte.utils.LattePhpType;
 import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
 import com.jetbrains.php.lang.psi.elements.Function;
@@ -72,7 +72,7 @@ public class MethodUsagesInspection extends BaseLocalInspectionTool {
 			return;
 		}
 
-		LatteCustomFunctionSettings customFunction = LatteConfiguration.getInstance(element.getProject()).getFunction(name);
+		LatteFunctionSettings customFunction = LatteConfiguration.getInstance(element.getProject()).getFunction(name);
 		if (customFunction != null) {
 			return;
 		}

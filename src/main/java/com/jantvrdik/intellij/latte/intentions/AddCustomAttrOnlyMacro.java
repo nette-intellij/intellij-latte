@@ -1,6 +1,6 @@
 package com.jantvrdik.intellij.latte.intentions;
 
-import com.jantvrdik.intellij.latte.settings.LatteCustomMacroSettings;
+import com.jantvrdik.intellij.latte.settings.LatteTagSettings;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -14,8 +14,8 @@ public class AddCustomAttrOnlyMacro extends AddCustomMacro {
 
 	@NotNull
 	@Override
-	public LatteCustomMacroSettings.Type getMacroType() {
-		return LatteCustomMacroSettings.Type.ATTR_ONLY;
+	public LatteTagSettings.Type getMacroType() {
+		return LatteTagSettings.Type.ATTR_ONLY;
 	}
 
 	@NotNull

@@ -18,7 +18,7 @@
 	<depends>com.jetbrains.php</depends>
 
 	<applicationListeners>
-		<listener class="com.jantvrdik.intellij.latte.file.LatteFileListener" topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
+		<listener class="com.jantvrdik.intellij.latte.files.LatteFileListener" topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
 	</applicationListeners>
 
 	<extensions defaultExtensionNs="com.intellij">
@@ -47,6 +47,8 @@
 		<lang.braceMatcher language="Latte" implementationClass="com.jantvrdik.intellij.latte.reference.LatteBraceMatcher"/>
 		<renamePsiElementProcessor implementation="com.jantvrdik.intellij.latte.refactoring.LatteRenamePsiElementProcessor"/>
 		<lang.documentationProvider language="Latte" implementationClass="com.jantvrdik.intellij.latte.documentation.LatteDocumentationProvider"/>
+
+		<fileBasedIndex implementation="com.jantvrdik.intellij.latte.indexes.LatteIndexExtension"/>
 
  		<codeStyleSettingsProvider implementation="com.jantvrdik.intellij.latte.codeStyle.LatteCodeStyleSettingsProvider"/>
 		<langCodeStyleSettingsProvider implementation="com.jantvrdik.intellij.latte.codeStyle.LatteLanguageCodeStyleSettingsProvider"/>
@@ -151,6 +153,11 @@
 						 displayName="Var definition"
 						 groupName="Latte" enabledByDefault="true"
 						 implementationClass="com.jantvrdik.intellij.latte.inspections.MacroVarInspection"/>
+
+		<localInspection language="XML" shortName="LatteXmlFileInspection" id="LatteXmlFileInspection"
+						 displayName="Latte XML configuration files"
+						 groupName="Latte" enabledByDefault="true"
+						 implementationClass="com.jantvrdik.intellij.latte.inspections.LatteXmlFileInspection"/>
 	</extensions>
 
 	<application-components>

@@ -9,7 +9,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.psi.*;
-import com.jantvrdik.intellij.latte.settings.LatteCustomMacroSettings;
+import com.jantvrdik.intellij.latte.settings.LatteTagSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,7 +54,7 @@ public class ModifierNotAllowedInspection extends LocalInspectionTool {
 			final boolean isOnTheFly
 	) {
 		String name = macroTag.getMacroName();
-		LatteCustomMacroSettings macro = LatteConfiguration.getInstance(macroTag.getProject()).getMacro(name);
+		LatteTagSettings macro = LatteConfiguration.getInstance(macroTag.getProject()).getTag(name);
 		if (macro == null || macro.isAllowedModifiers()) {
 			return;
 		}

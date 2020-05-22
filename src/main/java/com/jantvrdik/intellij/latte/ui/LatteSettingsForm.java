@@ -4,9 +4,10 @@ import com.intellij.notification.NotificationType;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.JBColor;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
+import com.jantvrdik.intellij.latte.config.LatteFileConfiguration;
 import com.jantvrdik.intellij.latte.icons.LatteIcons;
+import com.jantvrdik.intellij.latte.indexes.LatteIndexUtil;
 import com.jantvrdik.intellij.latte.settings.LatteSettings;
 import com.jantvrdik.intellij.latte.utils.LatteIdeHelper;
 import org.jetbrains.annotations.Nls;
@@ -20,9 +21,10 @@ public class LatteSettingsForm implements Configurable {
 	private JPanel panel1;
 	private JButton buttonHelp;
 	private JLabel logoLabel;
-	private JCheckBox disableDefaultLoadingForCheckBox;
+	private JCheckBox enableXmlLoadingCheckBox;
 	private JButton buttonReinitialize;
 	private JButton moreInformationButton;
+	private JCheckBox enableNetteCheckBox;
 
 	private Project project;
 	private boolean changed = false;
@@ -52,7 +54,7 @@ public class LatteSettingsForm implements Configurable {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				super.mouseClicked(e);
-				LatteConfiguration.getInstance(project).reinitialize();
+				LatteFileConfiguration.getInstance(project).reinitialize();
 				LatteIdeHelper.doNotify(
 						"Latte plugin settings",
 						"Configuration from .xml files was refreshed.",
@@ -63,9 +65,17 @@ public class LatteSettingsForm implements Configurable {
 			}
 		});
 
-		disableDefaultLoadingForCheckBox.setSelected(getSettings().disableDefaultLoading);
+		enableXmlLoadingCheckBox.setSelected(getSettings().enableXmlLoading);
+		enableXmlLoadingCheckBox.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				super.mouseClicked(e);
+				LatteSettingsForm.this.changed = true;
+			}
+		});
 
-		disableDefaultLoadingForCheckBox.addMouseListener(new MouseAdapter() {
+		enableNetteCheckBox.setSelected(getSettings().enableNette);
+		enableNetteCheckBox.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				super.mouseClicked(e);
@@ -99,13 +109,12 @@ public class LatteSettingsForm implements Configurable {
 
 	@Override
 	public void apply() throws ConfigurationException {
-		boolean wasSelected = getSettings().disableDefaultLoading;
-		getSettings().disableDefaultLoading = disableDefaultLoadingForCheckBox.isSelected();
-		LatteConfiguration.getInstance(project).reinitialize();
-		this.changed = false;
+		getSettings().enableXmlLoading = enableXmlLoadingCheckBox.isSelected();
+		getSettings().enableNette = enableNetteCheckBox.isSelected();
 
-		if (!wasSelected && getSettings().enableCustomFunctions) {
-			buttonReinitialize.setBackground(JBColor.RED);
+		boolean success = LatteIndexUtil.reinitialize(project);
+		if (success) {
+			this.changed = false;
 		}
 	}
 

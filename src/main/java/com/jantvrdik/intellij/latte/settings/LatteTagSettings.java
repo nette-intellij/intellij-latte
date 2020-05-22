@@ -1,8 +1,13 @@
 package com.jantvrdik.intellij.latte.settings;
 
 import com.intellij.util.xmlb.annotations.Attribute;
+import com.jantvrdik.intellij.latte.config.LatteConfiguration;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
-public class LatteCustomMacroSettings {
+import java.io.Serializable;
+import java.util.Objects;
+
+public class LatteTagSettings extends BaseLatteSettings implements Serializable {
 
 	private String macroName;
 	private String macroType;
@@ -11,26 +16,49 @@ public class LatteCustomMacroSettings {
 	private boolean multiLine;
 	private boolean deprecated;
 	private String deprecatedMessage;
-
-	public LatteCustomMacroSettings() {
+	public LatteTagSettings() {
+		super();
 	}
 
-	public LatteCustomMacroSettings(String macroName, Type macroType) {
+	public LatteTagSettings(String macroName, Type macroType) {
 		this(macroName, macroType, true, true);
 	}
 
-	public LatteCustomMacroSettings(String macroName, Type macroType, boolean allowedModifiers, boolean hasParameters) {
-		this(macroName, macroType, allowedModifiers, hasParameters, false);
+	public LatteTagSettings(String macroName, Type macroType, boolean allowedFilters, boolean hasParameters) {
+		this(macroName, macroType, allowedFilters, hasParameters, false);
 	}
 
-	public LatteCustomMacroSettings(String macroName, Type macroType, boolean allowedModifiers, boolean hasParameters, boolean multiLine) {
+	public LatteTagSettings(String macroName, Type macroType, boolean allowedModifiers, boolean hasParameters, boolean multiLine) {
+		this(macroName, macroType, allowedModifiers, hasParameters, multiLine, LatteConfiguration.Vendor.OTHER, "", "");
+	}
+
+	public LatteTagSettings(String macroName, Type macroType, boolean allowedModifiers, boolean hasParameters, boolean multiLine, String deprecatedMessage) {
+		this(macroName, macroType, allowedModifiers, hasParameters, multiLine, LatteConfiguration.Vendor.OTHER, "", "");
+	}
+
+	private LatteTagSettings(
+			String macroName,
+			Type macroType,
+			boolean allowedModifiers,
+			boolean hasParameters,
+			boolean multiLine,
+			LatteConfiguration.Vendor vendor,
+			String vendorName,
+			String deprecatedMessage
+	) {
+		super(vendor, vendorName);
 		this.macroName = macroName;
 		this.macroType = macroType.toString();
 		this.allowedModifiers = allowedModifiers;
 		this.hasParameters = hasParameters;
 		this.multiLine = multiLine;
-		this.deprecated = false;
-		this.deprecatedMessage = "";
+		this.deprecated = deprecatedMessage.length() > 0;
+		this.deprecatedMessage = deprecatedMessage;
+	}
+
+	public LatteTagSettings setVendor(LatteConfiguration.Vendor vendor) {
+		super.setVendor(vendor);
+		return this;
 	}
 
 	public void setMacroName(String macroName) {
@@ -125,6 +153,31 @@ public class LatteCustomMacroSettings {
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder()
+				.append(this.macroName)
+				.append(this.macroType)
+				.append(this.allowedModifiers)
+				.append(this.hasParameters)
+				.append(this.multiLine)
+				.append(this.deprecated)
+				.append(this.deprecatedMessage)
+				.toHashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof LatteTagSettings &&
+				Objects.equals(((LatteTagSettings) obj).getMacroName(), this.getMacroName()) &&
+				Objects.equals(((LatteTagSettings) obj).getMacroType(), this.getMacroType()) &&
+				Objects.equals(((LatteTagSettings) obj).isAllowedModifiers(), this.isAllowedModifiers()) &&
+				Objects.equals(((LatteTagSettings) obj).hasParameters(), this.hasParameters()) &&
+				Objects.equals(((LatteTagSettings) obj).isMultiLine(), this.isMultiLine()) &&
+				Objects.equals(((LatteTagSettings) obj).isDeprecated(), this.isDeprecated()) &&
+				Objects.equals(((LatteTagSettings) obj).getDeprecatedMessage(), this.getDeprecatedMessage());
 	}
 
 }

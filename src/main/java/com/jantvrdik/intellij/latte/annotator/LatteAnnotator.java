@@ -8,7 +8,7 @@ import com.intellij.psi.PsiElement;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.intentions.*;
 import com.jantvrdik.intellij.latte.psi.*;
-import com.jantvrdik.intellij.latte.settings.LatteCustomMacroSettings;
+import com.jantvrdik.intellij.latte.settings.LatteTagSettings;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -29,35 +29,35 @@ public class LatteAnnotator implements Annotator {
 					|| leaf.getElementType() == LatteTypes.T_PHP_SINGLE_QUOTE_LEFT) {
 				holder.createErrorAnnotation(element, "Unclosed string");
 			} else if (leaf.getElementType() == LatteTypes.T_MACRO_OPEN_TAG_OPEN || leaf.getElementType() == LatteTypes.T_MACRO_CLOSE_TAG_OPEN) {
-				holder.createErrorAnnotation(element.getParent(), "Malformed macro. Missing closing }");
+				holder.createErrorAnnotation(element.getParent(), "Malformed tag. Missing closing }");
 			}
 		}*/
 	}
 
 	private void checkNetteAttr(@NotNull LatteNetteAttr element, @NotNull AnnotationHolder holder) {
 		PsiElement attrName = element.getAttrName();
-		String macroName = attrName.getText();
+		String tagName = attrName.getText();
 		boolean prefixed = false;
 
-		if (macroName.startsWith("n:inner-")) {
+		if (tagName.startsWith("n:inner-")) {
 			prefixed = true;
-			macroName = macroName.substring(8);
-		} else if (macroName.startsWith("n:tag-")) {
+			tagName = tagName.substring(8);
+		} else if (tagName.startsWith("n:tag-")) {
 			prefixed = true;
-			macroName = macroName.substring(6);
+			tagName = tagName.substring(6);
 		} else {
-			macroName = macroName.substring(2);
+			tagName = tagName.substring(2);
 		}
 
 		Project project = element.getProject();
-		LatteCustomMacroSettings macro = LatteConfiguration.getInstance(project).getMacro(macroName);
-		if (macro == null || macro.getType() == LatteCustomMacroSettings.Type.UNPAIRED) {
+		LatteTagSettings macro = LatteConfiguration.getInstance(project).getTag(tagName);
+		if (macro == null || macro.getType() == LatteTagSettings.Type.UNPAIRED) {
 			Annotation annotation = holder.createErrorAnnotation(attrName, "Unknown attribute tag " + attrName.getText());
-			annotation.registerFix(new AddCustomPairMacro(macroName));
-			if (!prefixed) annotation.registerFix(new AddCustomAttrOnlyMacro(macroName));
+			annotation.registerFix(new AddCustomPairMacro(tagName));
+			if (!prefixed) annotation.registerFix(new AddCustomAttrOnlyMacro(tagName));
 
-		} else if (prefixed && macro.getType() != LatteCustomMacroSettings.Type.PAIR && macro.getType() != LatteCustomMacroSettings.Type.AUTO_EMPTY) {
-			holder.createErrorAnnotation(attrName, "Attribute tag n:" + macroName + " can not be used with prefix.");
+		} else if (prefixed && macro.getType() != LatteTagSettings.Type.PAIR && macro.getType() != LatteTagSettings.Type.AUTO_EMPTY) {
+			holder.createErrorAnnotation(attrName, "Attribute tag n:" + tagName + " can not be used with prefix.");
 		}
 	}
 
@@ -66,8 +66,8 @@ public class LatteAnnotator implements Annotator {
 		LatteMacroTag closeTag = element.getCloseTag();
 
 		String openTagName = openTag.getMacroName();
-		LatteCustomMacroSettings macro = LatteConfiguration.getInstance(element.getProject()).getMacro(openTagName);
-		if (macro == null || macro.getType() == LatteCustomMacroSettings.Type.ATTR_ONLY) {
+		LatteTagSettings macro = LatteConfiguration.getInstance(element.getProject()).getTag(openTagName);
+		if (macro == null || macro.getType() == LatteTagSettings.Type.ATTR_ONLY) {
 			boolean isOk = false;
 			LatteMacroContent content = openTag.getMacroContent();
 			if (content != null) {
@@ -100,7 +100,7 @@ public class LatteAnnotator implements Annotator {
 		if (
 				macro != null
 				&& closeTag == null
-				&& ((element instanceof LattePairMacro && macro.getType() == LatteCustomMacroSettings.Type.AUTO_EMPTY) || macro.getType() == LatteCustomMacroSettings.Type.PAIR)
+				&& ((element instanceof LattePairMacro && macro.getType() == LatteTagSettings.Type.AUTO_EMPTY) || macro.getType() == LatteTagSettings.Type.PAIR)
 				&& !openTagName.equals("block")
 				&& !openTagName.equals("_")
 		) {

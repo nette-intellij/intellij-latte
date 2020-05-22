@@ -9,7 +9,7 @@ import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.intentions.AddCustomLatteModifier;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LatteMacroModifier;
-import com.jantvrdik.intellij.latte.settings.LatteCustomModifierSettings;
+import com.jantvrdik.intellij.latte.settings.LatteFilterSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,7 +37,7 @@ public class ModifierDefinitionInspection extends LocalInspectionTool {
 			public void visitElement(PsiElement element) {
 				if (element instanceof LatteMacroModifier) {
 					String filterName = ((LatteMacroModifier) element).getModifierName();
-					LatteCustomModifierSettings latteFilter = LatteConfiguration.getInstance(element.getProject()).getModifier(filterName);
+					LatteFilterSettings latteFilter = LatteConfiguration.getInstance(element.getProject()).getFilter(filterName);
 					if (latteFilter == null) {
 						LocalQuickFix addModifierFix = IntentionManager.getInstance().convertToFix(new AddCustomLatteModifier(filterName));
 						ProblemHighlightType type = ProblemHighlightType.GENERIC_ERROR_OR_WARNING;

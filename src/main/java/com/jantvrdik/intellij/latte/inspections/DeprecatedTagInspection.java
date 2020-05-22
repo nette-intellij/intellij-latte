@@ -10,7 +10,7 @@ import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LatteMacroTag;
-import com.jantvrdik.intellij.latte.settings.LatteCustomMacroSettings;
+import com.jantvrdik.intellij.latte.settings.LatteTagSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,7 +37,7 @@ public class DeprecatedTagInspection extends LocalInspectionTool {
 			public void visitElement(PsiElement element) {
 				if (element instanceof LatteMacroTag) {
 					String macroName = ((LatteMacroTag) element).getMacroName();
-					LatteCustomMacroSettings macro = LatteConfiguration.getInstance(element.getProject()).getMacro(macroName);
+					LatteTagSettings macro = LatteConfiguration.getInstance(element.getProject()).getTag(macroName);
 					if (macro != null && macro.isDeprecated()) {
 						String description = macro.getDeprecatedMessage() != null && macro.getDeprecatedMessage().length() > 0
 								? macro.getDeprecatedMessage()

@@ -9,7 +9,7 @@ import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
-import com.jantvrdik.intellij.latte.settings.LatteCustomFunctionSettings;
+import com.jantvrdik.intellij.latte.settings.LatteFunctionSettings;
 import com.jantvrdik.intellij.latte.settings.LatteVariableSettings;
 import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.utils.LattePhpType;
@@ -340,7 +340,7 @@ public class LattePsiImplUtil {
 		Collection<PhpClass> phpClasses = type.getPhpClasses(element.getProject());
 		String name = element.getMethodName();
 		if (phpClasses.size() == 0) {
-			LatteCustomFunctionSettings customFunction = LatteConfiguration.getInstance(element.getProject()).getFunction(name);
+			LatteFunctionSettings customFunction = LatteConfiguration.getInstance(element.getProject()).getFunction(name);
 			return customFunction == null ? null : LattePhpType.create(customFunction.getFunctionReturnType());
 		}
 

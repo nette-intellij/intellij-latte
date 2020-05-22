@@ -35,37 +35,37 @@ This is example file content with sample values:
 
 ### &lt;tag&gt; in &lt;tags&gt;
 
-| attribute         | required | default value | possible values                         |
-|-------------------|----------|---------------|-----------------------------------------|
-| name              | yes      | none          | any string                              |
-| type              | yes      | none          | PAIR, UNPAIRED, ATTR_ONLY or AUTO_EMPTY |
-| hasParameters     | no       | false         | true, false                             |
-| allowedModifiers  | no       | false         | true, false                             |
-| multiLine         | no       | false         | true, false                             |
-| deprecated        | no       | false         | true, false                             |
-| deprecatedMessage | no       | ""            | any string                              |
+| attribute         | required | default value | possible values                         | Description                          |
+|-------------------|----------|---------------|-----------------------------------------|--------------------------------------|
+| name              | yes      | none          | any string                              | Name for tag                         |
+| type              | yes      | none          | PAIR, UNPAIRED, ATTR_ONLY or AUTO_EMPTY | Type for tag                         |
+| hasParameters     | no       | false         | true, false                             | Used after code completion           |
+| allowedFilters    | no       | false         | true, false                             | Used for inspections and completions |
+| multiLine         | no       | false         | true, false                             | Used after code completion           |
+| deprecated        | no       | false         | true, false                             | Used for inspection                  |
+| deprecatedMessage | no       | ""            | any string                              | Message for deprecated tag           |
 
 ### &lt;filter&gt; in &lt;filters&gt;
 
-| attribute    | required | default value | possible values                               |
-|--------------|----------|---------------|-----------------------------------------------|
-| name         | yes      | none          | any string                                    |
-| arguments    | no       | ""            | any string used as filter parameters help     |
-| description  | no       | ""            | any string                                    |
-| insertColons | no       | ""            | contains double colon per required argument   |
+| attribute    | required | default value | possible values                               | Description                                   |
+|--------------|----------|---------------|-----------------------------------------------|-----------------------------------------------|
+| name         | yes      | none          | any string                                    | Name for filter                               |
+| arguments    | no       | ""            | any string used as filter parameters help     | Used for code completion (eg. `:(limit = 1)`) |
+| description  | no       | ""            | any string                                    | Used as description for code completion       |
+| insertColons | no       | ""            | contains double colon per required argument   | Used after code completion (eg. `batch::`)    |
 
 ### &lt;variable&gt; in &lt;variables&gt;
 
-| attribute | required | default value | possible values     |
-|-----------|----------|---------------|---------------------|
-| name      | yes      | none          | any string          |
-| type      | yes      | mixed         | PHP type definition |
+| attribute | required | default value | possible values     | Description                         |
+|-----------|----------|---------------|---------------------|-------------------------------------|
+| name      | yes      | none          | any string          | Name for PHP variable (without `$`) |
+| type      | yes      | mixed         | PHP type definition | PHP type definition (eg. `string`)  |
 
 ### &lt;function&gt; in &lt;functions&gt;
 
-| attribute   | required | default value | possible values                   |
-|-------------|----------|---------------|-----------------------------------|
-| name        | yes      | none          | any string                        |
-| returnType  | yes      | mixed         | PHP type definition               |
-| arguments   | no       | ""            | Used as method parameters         |
-| description | no       | ""            | any string                        |
+| attribute   | required | default value | possible values                   | Description                                 |
+|-------------|----------|---------------|-----------------------------------|---------------------------------------------|
+| name        | yes      | none          | any string                        | Name for custom function                    |
+| returnType  | yes      | mixed         | PHP type definition               | Return type (eg. `string`)                  |
+| arguments   | no       | ""            | Used as method parameters         | Used for code completion (eg. `(string $a)` |
+| description | no       | ""            | any string                        | Used as description for code completion     |

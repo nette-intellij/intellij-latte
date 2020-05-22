@@ -9,8 +9,8 @@ import com.intellij.util.ui.ColumnInfo;
 import com.intellij.util.ui.ElementProducer;
 import com.intellij.util.ui.ListTableModel;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.settings.DefaultSettings;
-import com.jantvrdik.intellij.latte.settings.LatteCustomFunctionSettings;
+import com.jantvrdik.intellij.latte.config.LatteFileConfiguration;
+import com.jantvrdik.intellij.latte.settings.LatteFunctionSettings;
 import com.jantvrdik.intellij.latte.settings.LatteSettings;
 import com.jantvrdik.intellij.latte.utils.LatteIdeHelper;
 import org.jetbrains.annotations.Nls;
@@ -21,29 +21,27 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.List;
 
 public class LatteCustomFunctionSettingsForm implements Configurable {
 	private JPanel panel1;
 	private JPanel panelConfigTableView;
 	private JCheckBox enableCustomFunctionsCheckBox;
 	private JButton buttonHelp;
-	private JButton resetToDefaultsButton;
 
-	private TableView<LatteCustomFunctionSettings> tableView;
+	private TableView<LatteFunctionSettings> tableView;
 	private Project project;
 	private boolean changed = false;
-	private ListTableModel<LatteCustomFunctionSettings> modelList;
+	private ListTableModel<LatteFunctionSettings> modelList;
 
 	public LatteCustomFunctionSettingsForm(Project project) {
 		this.project = project;
 
-		this.tableView = new TableView<LatteCustomFunctionSettings>();
-		this.modelList = new ListTableModel<LatteCustomFunctionSettings>(
+		this.tableView = new TableView<>();
+		this.modelList = new ListTableModel<>(
 				new NameColumn(),
 				new ReturnTypeColumn(),
 				new HelpColumn(),
-				new SourceColumn()
+				new VendorColumn()
 		);
 
 		this.attachItems();
@@ -56,14 +54,6 @@ public class LatteCustomFunctionSettingsForm implements Configurable {
 			public void mouseClicked(MouseEvent e) {
 				super.mouseClicked(e);
 				LatteIdeHelper.openUrl(LatteConfiguration.FORUM_URL + "en/32885-latte-version-2-6-0-released");
-			}
-		});
-
-		resetToDefaultsButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				super.mouseClicked(e);
-				resetToDefaults();
 			}
 		});
 
@@ -80,11 +70,11 @@ public class LatteCustomFunctionSettingsForm implements Configurable {
 
 	private void attachItems() {
 
-		if(this.getSettings().customMacroSettings == null) {
+		if(this.getSettings().tagSettings == null) {
 			return;
 		}
 
-		for (LatteCustomFunctionSettings customMacroSettings : this.getSettings().customFunctionSettings) {
+		for (LatteFunctionSettings customMacroSettings : this.getSettings().functionSettings) {
 			this.modelList.addRow(customMacroSettings);
 		}
 	}
@@ -104,9 +94,9 @@ public class LatteCustomFunctionSettingsForm implements Configurable {
 	@Nullable
 	@Override
 	public JComponent createComponent() {
-		ToolbarDecorator tablePanel = ToolbarDecorator.createDecorator(this.tableView, new ElementProducer<LatteCustomFunctionSettings>() {
+		ToolbarDecorator tablePanel = ToolbarDecorator.createDecorator(this.tableView, new ElementProducer<LatteFunctionSettings>() {
 			@Override
-			public LatteCustomFunctionSettings createElement() {
+			public LatteFunctionSettings createElement() {
 				//IdeFocusManager.getInstance(TwigSettingsForm.this.project).requestFocus(TwigNamespaceDialog.getWindows(), true);
 				return null;
 			}
@@ -140,7 +130,7 @@ public class LatteCustomFunctionSettingsForm implements Configurable {
 
 	@Override
 	public void apply() throws ConfigurationException {
-		getSettings().customFunctionSettings = new ArrayList<>(this.tableView.getListTableModel().getItems());
+		getSettings().functionSettings = new ArrayList<>(this.tableView.getListTableModel().getItems());
 		getSettings().enableCustomFunctions = enableCustomFunctionsCheckBox.isSelected();
 
 		this.changed = false;
@@ -165,38 +155,12 @@ public class LatteCustomFunctionSettingsForm implements Configurable {
 		this.changed = false;
 	}
 
-	public void resetToDefaults() {
-		java.util.List<String> foundMacros = new ArrayList<String>();
-		List<LatteCustomFunctionSettings> newSettings = new ArrayList<LatteCustomFunctionSettings>();
-		for (LatteCustomFunctionSettings functionSettings : this.modelList.getItems()) {
-			LatteCustomFunctionSettings defaultFunction = DefaultSettings.getDefaultFunction(functionSettings.getFunctionName());
-			if (defaultFunction != null) {
-				newSettings.add(defaultFunction);
-				foundMacros.add(functionSettings.getFunctionName());
-			} else {
-				newSettings.add(functionSettings);
-			}
-		}
-
-		for (LatteCustomFunctionSettings customFunctionSettings : DefaultSettings.getDefaultCustomFunctions()) {
-			if (!foundMacros.contains(customFunctionSettings.getFunctionName())) {
-				newSettings.add(customFunctionSettings);
-			}
-		}
-
-		this.resetList();
-
-		for (LatteCustomFunctionSettings customFunctionSettings : newSettings) {
-			this.modelList.addRow(customFunctionSettings);
-		}
-	}
-
 	@Override
 	public void disposeUIResources() {
 
 	}
 
-	private static class NameColumn extends ColumnInfo<LatteCustomFunctionSettings, String> {
+	private static class NameColumn extends ColumnInfo<LatteFunctionSettings, String> {
 
 		public NameColumn() {
 			super("Name");
@@ -204,12 +168,12 @@ public class LatteCustomFunctionSettingsForm implements Configurable {
 
 		@Nullable
 		@Override
-		public String valueOf(LatteCustomFunctionSettings functionSettings) {
+		public String valueOf(LatteFunctionSettings functionSettings) {
 			return functionSettings.getFunctionName();
 		}
 	}
 
-	private class ReturnTypeColumn extends PhpTypeColumn<LatteCustomFunctionSettings> {
+	private class ReturnTypeColumn extends PhpTypeColumn<LatteFunctionSettings> {
 
 		public ReturnTypeColumn() {
 			super("ReturnType", project);
@@ -217,11 +181,11 @@ public class LatteCustomFunctionSettingsForm implements Configurable {
 
 		@Nullable
 		@Override
-		public String valueOf(LatteCustomFunctionSettings functionSettings) {
+		public String valueOf(LatteFunctionSettings functionSettings) {
 			return functionSettings.getFunctionReturnType();
 		}
 	}
-	private static class HelpColumn extends ColumnInfo<LatteCustomFunctionSettings, String> {
+	private static class HelpColumn extends ColumnInfo<LatteFunctionSettings, String> {
 
 		public HelpColumn() {
 			super("Help");
@@ -229,32 +193,31 @@ public class LatteCustomFunctionSettingsForm implements Configurable {
 
 		@Nullable
 		@Override
-		public String valueOf(LatteCustomFunctionSettings functionSettings) {
+		public String valueOf(LatteFunctionSettings functionSettings) {
 			return functionSettings.getFunctionHelp();
 		}
 
 	}
 
-	private static class SourceColumn extends SourceTypeColumn<LatteCustomFunctionSettings> {
+	private class VendorColumn extends VendorTypeColumn<LatteFunctionSettings> {
 
-		public SourceColumn() {
-			super("Source");
+		public VendorColumn() {
+			super("Vendor");
 		}
 
 		@Nullable
 		@Override
-		public Type valueOf(LatteCustomFunctionSettings functionSettings) {
-			return DefaultSettings.isDefaultFunction(functionSettings.getFunctionName()) ? Type.NETTE : Type.CUSTOM;
+		public LatteFileConfiguration.VendorResult valueOf(LatteFunctionSettings customMacroSettings) {
+			return LatteConfiguration.getInstance(project).getVendorForFunction(customMacroSettings.getFunctionName());
 		}
-
 	}
 
-	private void openFunctionDialog(@Nullable LatteCustomFunctionSettings customMacroSettings) {
+	private void openFunctionDialog(@Nullable LatteFunctionSettings customMacroSettings) {
 		LatteCustomFunctionSettingsDialog latteVariableDialog;
 		if(customMacroSettings == null) {
-			latteVariableDialog = new LatteCustomFunctionSettingsDialog(project, this.tableView);
+			latteVariableDialog = new LatteCustomFunctionSettingsDialog(this.tableView, project);
 		} else {
-			latteVariableDialog = new LatteCustomFunctionSettingsDialog(project, this.tableView, customMacroSettings);
+			latteVariableDialog = new LatteCustomFunctionSettingsDialog(this.tableView, project, customMacroSettings);
 		}
 
 		Dimension dim = new Dimension();

@@ -9,8 +9,10 @@ import com.intellij.util.ui.ColumnInfo;
 import com.intellij.util.ui.ElementProducer;
 import com.intellij.util.ui.ListTableModel;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.settings.LatteCustomModifierSettings;
+import com.jantvrdik.intellij.latte.config.LatteFileConfiguration;
+import com.jantvrdik.intellij.latte.settings.LatteFilterSettings;
 import com.jantvrdik.intellij.latte.settings.LatteSettings;
+import com.jantvrdik.intellij.latte.settings.LatteVariableSettings;
 import com.jantvrdik.intellij.latte.utils.LatteIdeHelper;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
@@ -27,10 +29,10 @@ public class LatteCustomModifierSettingsForm implements Configurable {
 	private JCheckBox enableCustomModifiersCheckBox;
 	private JButton buttonHelp;
 
-	private TableView<LatteCustomModifierSettings> tableView;
+	private TableView<LatteFilterSettings> tableView;
 	private Project project;
 	private boolean changed = false;
-	private ListTableModel<LatteCustomModifierSettings> modelList;
+	private ListTableModel<LatteFilterSettings> modelList;
 
 	public LatteCustomModifierSettingsForm(Project project) {
 		this.project = project;
@@ -40,7 +42,8 @@ public class LatteCustomModifierSettingsForm implements Configurable {
 				new NameColumn(),
 				new HelpColumn(),
 				new DescriptionColumn(),
-				new InsertColonColumn()
+				new InsertColonColumn(),
+				new VendorColumn()
 		);
 
 		this.attachItems();
@@ -69,11 +72,11 @@ public class LatteCustomModifierSettingsForm implements Configurable {
 
 	private void attachItems() {
 
-		if(this.getSettings().customMacroSettings == null) {
+		if(this.getSettings().tagSettings == null) {
 			return;
 		}
 
-		for (LatteCustomModifierSettings customMacroSettings : this.getSettings().customModifierSettings) {
+		for (LatteFilterSettings customMacroSettings : this.getSettings().filterSettings) {
 			this.modelList.addRow(customMacroSettings);
 		}
 	}
@@ -93,9 +96,9 @@ public class LatteCustomModifierSettingsForm implements Configurable {
 	@Nullable
 	@Override
 	public JComponent createComponent() {
-		ToolbarDecorator tablePanel = ToolbarDecorator.createDecorator(this.tableView, new ElementProducer<LatteCustomModifierSettings>() {
+		ToolbarDecorator tablePanel = ToolbarDecorator.createDecorator(this.tableView, new ElementProducer<LatteFilterSettings>() {
 			@Override
-			public LatteCustomModifierSettings createElement() {
+			public LatteFilterSettings createElement() {
 				//IdeFocusManager.getInstance(TwigSettingsForm.this.project).requestFocus(TwigNamespaceDialog.getWindows(), true);
 				return null;
 			}
@@ -129,7 +132,7 @@ public class LatteCustomModifierSettingsForm implements Configurable {
 
 	@Override
 	public void apply() throws ConfigurationException {
-		getSettings().customModifierSettings = new ArrayList<>(this.tableView.getListTableModel().getItems());
+		getSettings().filterSettings = new ArrayList<>(this.tableView.getListTableModel().getItems());
 		getSettings().enableCustomModifiers = enableCustomModifiersCheckBox.isSelected();
 
 		this.changed = false;
@@ -159,7 +162,7 @@ public class LatteCustomModifierSettingsForm implements Configurable {
 
 	}
 
-	private static class NameColumn extends ColumnInfo<LatteCustomModifierSettings, String> {
+	private static class NameColumn extends ColumnInfo<LatteFilterSettings, String> {
 
 		public NameColumn() {
 			super("Name");
@@ -167,12 +170,12 @@ public class LatteCustomModifierSettingsForm implements Configurable {
 
 		@Nullable
 		@Override
-		public String valueOf(LatteCustomModifierSettings modifierSettings) {
+		public String valueOf(LatteFilterSettings modifierSettings) {
 			return modifierSettings.getModifierName();
 		}
 	}
 
-	private static class HelpColumn extends ColumnInfo<LatteCustomModifierSettings, String> {
+	private static class HelpColumn extends ColumnInfo<LatteFilterSettings, String> {
 
 		public HelpColumn() {
 			super("Arguments");
@@ -180,12 +183,12 @@ public class LatteCustomModifierSettingsForm implements Configurable {
 
 		@Nullable
 		@Override
-		public String valueOf(LatteCustomModifierSettings modifierSettings) {
+		public String valueOf(LatteFilterSettings modifierSettings) {
 			return modifierSettings.getModifierHelp();
 		}
 	}
 
-	private static class DescriptionColumn extends ColumnInfo<LatteCustomModifierSettings, String> {
+	private static class DescriptionColumn extends ColumnInfo<LatteFilterSettings, String> {
 
 		public DescriptionColumn() {
 			super("Description");
@@ -193,12 +196,12 @@ public class LatteCustomModifierSettingsForm implements Configurable {
 
 		@Nullable
 		@Override
-		public String valueOf(LatteCustomModifierSettings modifierSettings) {
+		public String valueOf(LatteFilterSettings modifierSettings) {
 			return modifierSettings.getModifierDescription();
 		}
 	}
 
-	private static class InsertColonColumn extends ColumnInfo<LatteCustomModifierSettings, String> {
+	private static class InsertColonColumn extends ColumnInfo<LatteFilterSettings, String> {
 
 		public InsertColonColumn() {
 			super("Insert color");
@@ -206,17 +209,30 @@ public class LatteCustomModifierSettingsForm implements Configurable {
 
 		@Nullable
 		@Override
-		public String valueOf(LatteCustomModifierSettings modifierSettings) {
+		public String valueOf(LatteFilterSettings modifierSettings) {
 			return modifierSettings.getModifierInsert();
 		}
 	}
 
-	private void openModifierDialog(@Nullable LatteCustomModifierSettings customMacroSettings) {
+	private class VendorColumn extends VendorTypeColumn<LatteFilterSettings> {
+
+		public VendorColumn() {
+			super("Vendor");
+		}
+
+		@Nullable
+		@Override
+		public LatteFileConfiguration.VendorResult valueOf(LatteFilterSettings customMacroSettings) {
+			return LatteConfiguration.getInstance(project).getVendorForFilter(customMacroSettings.getModifierName());
+		}
+	}
+
+	private void openModifierDialog(@Nullable LatteFilterSettings customMacroSettings) {
 		LatteCustomModifierSettingsDialog latteVariableDialog;
 		if(customMacroSettings == null) {
-			latteVariableDialog = new LatteCustomModifierSettingsDialog(project, this.tableView);
+			latteVariableDialog = new LatteCustomModifierSettingsDialog(this.tableView, project);
 		} else {
-			latteVariableDialog = new LatteCustomModifierSettingsDialog(project, this.tableView, customMacroSettings);
+			latteVariableDialog = new LatteCustomModifierSettingsDialog(this.tableView, project, customMacroSettings);
 		}
 
 		Dimension dim = new Dimension();

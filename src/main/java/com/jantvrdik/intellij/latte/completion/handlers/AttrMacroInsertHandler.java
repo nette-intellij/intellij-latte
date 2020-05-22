@@ -10,7 +10,7 @@ import com.intellij.psi.PsiElement;
 import com.jantvrdik.intellij.latte.LatteLanguage;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
-import com.jantvrdik.intellij.latte.settings.LatteCustomMacroSettings;
+import com.jantvrdik.intellij.latte.settings.LatteTagSettings;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,7 +38,7 @@ public class AttrMacroInsertHandler implements InsertHandler<LookupElement> {
 			}
 
 			String attrName = LatteUtil.normalizeNAttrNameModifier(element.getText());
-			LatteCustomMacroSettings macro = LatteConfiguration.getInstance(element.getProject()).getMacro(attrName);
+			LatteTagSettings macro = LatteConfiguration.getInstance(element.getProject()).getTag(attrName);
 			if (macro != null && !macro.hasParameters()) {
 				return;
 			}
