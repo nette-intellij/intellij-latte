@@ -95,12 +95,12 @@ public class LatteConfiguration {
 		addStandardTagWithoutFilters("elseifset", UNPAIRED);
 		addStandardTagWithoutParameters("ifcontent", PAIR);
 
-		addStandardTagWithoutFilters("switch", PAIR);
+		addStandardMultiLineTagWithoutFilters("switch", PAIR);
 		addStandardTagWithoutFilters("case", UNPAIRED);
 
-		addStandardTagWithoutFilters("foreach", PAIR);
-		addStandardTagWithoutFilters("for", PAIR);
-		addStandardTagWithoutFilters("while", PAIR);
+		addStandardMultiLineTagWithoutFilters("foreach", PAIR);
+		addStandardMultiLineTagWithoutFilters("for", PAIR);
+		addStandardMultiLineTagWithoutFilters("while", PAIR);
 		addStandardTagWithoutFilters("continueIf", UNPAIRED);
 		addStandardTagWithoutFilters("breakIf", UNPAIRED);
 
@@ -130,7 +130,7 @@ public class LatteConfiguration {
 		addStandardTag("php", UNPAIRED);
 		addStandardTag("do", UNPAIRED); // alias for {php }
 
-		addStandardTag("capture", PAIR);
+		addStandardMultiLineTag("capture", PAIR);
 		addStandardTagWithoutFilters("include", UNPAIRED);
 		addStandardTagWithoutFilters("sandbox", UNPAIRED);
 		addStandardTagWithoutFilters("widget", PAIR);
@@ -147,8 +147,8 @@ public class LatteConfiguration {
 		addStandardTagWithoutFilters("import", UNPAIRED);
 		addStandardTagWithoutFilters("extends", UNPAIRED);
 		addStandardTagWithoutFilters("layout", UNPAIRED);
-		addStandardTagWithoutFilters("block", PAIR);
-		addStandardTagWithoutFilters("define", PAIR);
+		addStandardMultiLineTagWithoutFilters("block", PAIR);
+		addStandardMultiLineTagWithoutFilters("define", PAIR);
 
 		addStandardTagWithoutFilters("contentType", UNPAIRED);
 	}
@@ -411,12 +411,20 @@ public class LatteConfiguration {
 		return addStandardTag(name, type, true);
 	}
 
+	private LatteTagSettings addStandardMultiLineTag(String name, LatteTagSettings.Type type) {
+		return addStandardTag(name, type, true, true, true);
+	}
+
 	private void addStandardTagWithoutParameters(String name, LatteTagSettings.Type type) {
 		addStandardTag(name, type, true, false);
 	}
 
 	private LatteTagSettings addStandardTagWithoutFilters(String name, LatteTagSettings.Type type) {
 		return addStandardTag(name, type, false);
+	}
+
+	private LatteTagSettings addStandardMultiLineTagWithoutFilters(String name, LatteTagSettings.Type type) {
+		return addStandardTag(name, type, false, true, true);
 	}
 
 	private void addStandardTagWithoutFilters(String name, LatteTagSettings.Type type, boolean hasParameters) {
@@ -428,7 +436,11 @@ public class LatteConfiguration {
 	}
 
 	private LatteTagSettings addStandardTag(String name, LatteTagSettings.Type type, boolean allowedFilters, boolean hasParameters) {
-		LatteTagSettings tag = new LatteTagSettings(name, type, allowedFilters, hasParameters);
+		return addStandardTag(name, type, allowedFilters, hasParameters, false);
+	}
+
+	private LatteTagSettings addStandardTag(String name, LatteTagSettings.Type type, boolean allowedFilters, boolean hasParameters, boolean multiLine) {
+		LatteTagSettings tag = new LatteTagSettings(name, type, allowedFilters, hasParameters, multiLine);
 		tag.setVendor(Vendor.LATTE);
 		addStandardTag(tag);
 		return tag;

@@ -32,7 +32,7 @@ public abstract class LatteMacroModifierElementImpl extends ASTWrapperPsiElement
 
 	@Override
 	public @Nullable Icon getIcon(int flags) {
-		return LatteIcons.MACRO;
+		return LatteIcons.MODIFIER;
 	}
 
 	@Nullable

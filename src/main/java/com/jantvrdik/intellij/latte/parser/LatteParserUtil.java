@@ -13,6 +13,7 @@ import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
  * External rules for LatteParser.
  */
 public class LatteParserUtil extends GeneratedParserUtilBase {
+	private static LatteTagSettings lastMacro = null;
 
 	/**
 	 * Looks for a classic macro a returns true if it finds the macro a and it is pair or unpaired (based on pair parameter).
@@ -26,7 +27,7 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 
 		boolean result;
 
-		LatteTagSettings macro = LatteConfiguration.getInstance(builder.getProject()).getTag(macroName);
+		LatteTagSettings macro = getTag(builder);
 		if (macro != null && macro.getType() == LatteTagSettings.Type.AUTO_EMPTY) {
 			result = pair == isAutoEmptyPair(macroName, builder);
 		} else if (macroName.equals("_")) {
@@ -42,6 +43,36 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 		}
 
 		marker.rollbackTo();
+		return result;
+	}
+
+	public static boolean checkAutoClosedMacro(PsiBuilder builder, int level) {
+		PsiBuilder.Marker marker = builder.mark();
+
+		LatteTagSettings macro = getTag(builder);
+
+		marker.rollbackTo();
+
+		if (macro != null && macro.getType() == LatteTagSettings.Type.AUTO_EMPTY) {
+			lastMacro = macro;
+			return true;
+		}
+		return false;
+	}
+
+	public static boolean checkAutoClosedEndTag(PsiBuilder builder, int level) {
+		PsiBuilder.Marker marker = builder.mark();
+
+		String macroName = getMacroName(builder);
+
+		marker.rollbackTo();
+
+		boolean result = false;
+		if (lastMacro != null && lastMacro.getMacroName().equals(macroName)) {
+			result = true;
+		}
+		lastMacro = null;
+
 		return result;
 	}
 
@@ -165,6 +196,10 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 		marker.rollbackTo();
 
 		return result;
+	}
+
+	private static LatteTagSettings getTag(PsiBuilder builder) {
+		return LatteConfiguration.getInstance(builder.getProject()).getTag(getMacroName(builder));
 	}
 
 }
