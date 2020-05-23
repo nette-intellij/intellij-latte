@@ -114,6 +114,10 @@ public class LatteXmlFileData implements Serializable {
     public boolean equals(Object obj) {
         return obj instanceof LatteXmlFileData &&
                 Objects.equals(((LatteXmlFileData) obj).getVendorResult().vendor, this.vendorResult.vendor) &&
-                Objects.equals(((LatteXmlFileData) obj).getVendorResult().vendorName, this.vendorResult.vendorName);
+                Objects.equals(((LatteXmlFileData) obj).getVendorResult().vendorName, this.vendorResult.vendorName) &&
+                Objects.equals(((LatteXmlFileData) obj).tags, this.tags) &&
+                Objects.equals(((LatteXmlFileData) obj).filters, this.filters) &&
+                Objects.equals(((LatteXmlFileData) obj).variables, this.variables) &&
+                Objects.equals(((LatteXmlFileData) obj).functions, this.functions);
     }
 }

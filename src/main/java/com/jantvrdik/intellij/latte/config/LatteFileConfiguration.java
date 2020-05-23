@@ -156,6 +156,7 @@ public class LatteFileConfiguration implements Serializable {
         filters = new HashMap<>();
         variables = new HashMap<>();
         functions = new HashMap<>();
+        vendors = new ArrayList<>();
         initialize();
     }
 
