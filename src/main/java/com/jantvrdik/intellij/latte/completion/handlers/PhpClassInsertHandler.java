@@ -7,6 +7,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorModificationUtil;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
+import com.jantvrdik.intellij.latte.psi.LattePhpClassUsage;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
 import com.jetbrains.php.completion.insert.PhpReferenceInsertHandler;
 import org.jetbrains.annotations.NotNull;
@@ -21,17 +22,19 @@ public class PhpClassInsertHandler extends PhpReferenceInsertHandler {
 
 	public void handleInsert(@NotNull InsertionContext context, @NotNull LookupElement lookupElement) {
 		// for removing first `\` (because class completion is triggered if prev element is `\` and PHP completion adding `\` before)
-		PsiElement element = context.getFile().findElementAt(context.getStartOffset());
-
 		super.handleInsert(context, lookupElement);
 
-		element = context.getFile().findElementAt(context.getStartOffset());
+		PsiElement prev = context.getFile().findElementAt(context.getStartOffset() - 1);
+		PsiElement element = context.getFile().findElementAt(context.getStartOffset());
+		String prevText = prev != null ? prev.getText() : null;
 		String text = element != null ? element.getText() : null;
-		if (element == null || text == null || (text.startsWith("\\") && !text.substring(1).contains("\\"))) {
+		if (prevText == null || text == null || (prevText.startsWith("\\") && !text.startsWith("\\"))) {
 			return;
 		}
+		LattePhpClassUsage classUsage = element.getParent() instanceof LattePhpClassUsage ? (LattePhpClassUsage) element.getParent() : null;
+		String[] className = (classUsage != null ? classUsage.getClassName() : "").split("\\\\");
 
-		if (element.getNode().getElementType() == LatteTypes.PHP_CLASS_USAGE) {
+		if ((prevText.length() > 0 || className.length > 1) && element.getNode().getElementType() == LatteTypes.T_PHP_NAMESPACE_RESOLUTION) {
 			Editor editor = context.getEditor();
 			CaretModel caretModel = editor.getCaretModel();
 			int offset = caretModel.getOffset();

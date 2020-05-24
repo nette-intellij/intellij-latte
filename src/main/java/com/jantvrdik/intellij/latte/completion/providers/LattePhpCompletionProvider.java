@@ -59,11 +59,10 @@ public class LattePhpCompletionProvider extends BaseLatteCompletionProvider {
 
 			if (LatteUtil.matchParentMacroName(element, "varType") || LatteUtil.matchParentMacroName(element, "var")) {
 				attachVarTypes(result);
-
-			} else {
-				variableCompletionProvider.addCompletions(parameters, context, result);
-				functionCompletionProvider.addCompletions(parameters, context, result);
 			}
+
+			variableCompletionProvider.addCompletions(parameters, context, result);
+			functionCompletionProvider.addCompletions(parameters, context, result);
 		}
 	}
 
