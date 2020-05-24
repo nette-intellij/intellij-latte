@@ -89,7 +89,7 @@ public class LatteVariableCompletionProvider extends BaseLatteCompletionProvider
 
 			LookupElementBuilder builder = LookupElementBuilder.create(element.getElement(), "$" + variableName);
 			builder = builder.withInsertHandler(PhpVariableInsertHandler.getInstance());
-			builder = builder.withTypeText(((LattePhpVariable) element.getElement()).getPhpType().toReadableString());
+			builder = builder.withTypeText(((LattePhpVariable) element.getElement()).getPhpType().toString());
 			builder = builder.withIcon(PhpIcons.VARIABLE);
 			builder = builder.withBoldness(true);
 			lookupElements.add(builder);
@@ -107,7 +107,7 @@ public class LatteVariableCompletionProvider extends BaseLatteCompletionProvider
 
 			LookupElementBuilder builder = LookupElementBuilder.create("$" + variableName);
 			builder = builder.withInsertHandler(PhpVariableInsertHandler.getInstance());
-			builder = builder.withTypeText(variable.toPhpType().toReadableString());
+			builder = builder.withTypeText(variable.toPhpType().toString());
 			builder = builder.withIcon(PhpIcons.VARIABLE_READ_ACCESS);
 			builder = builder.withBoldness(false);
 			lookupElements.add(builder);

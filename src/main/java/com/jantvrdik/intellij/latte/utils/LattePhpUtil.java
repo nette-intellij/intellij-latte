@@ -77,15 +77,31 @@ public class LattePhpUtil {
     }
 
     public static boolean isReferenceFor(@NotNull String originalClass, @NotNull PhpClass targetClass) {
-        originalClass = normalizeClassName(originalClass);
-        if (originalClass.equals(targetClass.getFQN())) {
-            return true;
+        return isReferenceFor(new String[]{originalClass}, targetClass);
+    }
+
+    public static boolean isReferenceFor(@NotNull String[] originalClasses, @NotNull PhpClass targetClass) {
+        List<String> normalized = new ArrayList<>();
+        for (String originalClass : originalClasses) {
+            originalClass = normalizeClassName(originalClass);
+            normalized.add(originalClass);
+            if (originalClass.equals(targetClass.getFQN())) {
+                return true;
+            }
         }
+
 
         ExtendsList extendsList = targetClass.getExtendsList();
         for (ClassReference reference : extendsList.getReferenceElements()) {
-            if (reference.getFQN() != null && reference.getFQN().equals(originalClass)) {
-                return true;
+            String fqn = reference.getFQN();
+            if (fqn == null) {
+                continue;
+            }
+
+            for (String originalClass : normalized) {
+                if (fqn.equals(originalClass)) {
+                    return true;
+                }
             }
         }
         return false;

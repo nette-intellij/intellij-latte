@@ -97,7 +97,7 @@ public class LatteSyntaxHighlighter extends SyntaxHighlighterBase {
 		} else if (token == LatteTypes.T_PHP_CONCATENATION) {
 			return pack(PHP_CONCATENATION);
 
-		} else if (token == LatteTypes.T_PHP_TYPE) {
+		} else if (token == LatteTypes.T_PHP_TYPE || token == LatteTypes.T_PHP_ARRAY) {
 			return pack(PHP_TYPE);
 
 		} else if (token == LatteTypes.T_PHP_CAST) {

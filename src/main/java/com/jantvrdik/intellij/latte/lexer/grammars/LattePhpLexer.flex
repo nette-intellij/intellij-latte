@@ -135,8 +135,12 @@ AS="as"
         return T_PHP_MULTIPLICATIVE_OPERATORS;
     }
 
-    ("?" | ":") {
+    ":" {
         return T_PHP_EXPRESSION;
+    }
+
+    "?" {
+        return T_PHP_NULL_MARK;
     }
 
     "=" {
@@ -157,6 +161,10 @@ AS="as"
 
     {MIXED} {
         return T_PHP_MIXED;
+    }
+
+    "array" / {WHITE_SPACE}? "(" {
+        return T_PHP_ARRAY;
     }
 
     {TYPES} {

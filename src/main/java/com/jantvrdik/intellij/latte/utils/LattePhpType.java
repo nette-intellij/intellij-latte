@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class LattePhpType {
     private static Map<String, LattePhpType> instances = new HashMap<>();
@@ -37,11 +38,13 @@ public class LattePhpType {
 
     private final String name;
     private final List<String> types = new ArrayList<>();
+    private final Map<Integer, List<String>> wholeTypes = new HashMap<>();
     private final List<Integer> nullable = new ArrayList<>();
     private final List<Integer> mixed = new ArrayList<>();
     private final List<Integer> iterable = new ArrayList<>();
     private final List<Integer> natives = new ArrayList<>();
     private Map<Integer, List<String>> classes = new HashMap<>();
+    private Map<Integer, LattePhpType> forDepth = new HashMap<>();
 
     @NotNull
     public static LattePhpType create(String type, boolean nullable) {
@@ -61,6 +64,18 @@ public class LattePhpType {
     @NotNull
     public static LattePhpType create(PhpType phpType) {
         return create(null, String.join("|", phpType.getTypes()), LattePhpUtil.isNullable(phpType));
+    }
+
+    @NotNull
+    public static LattePhpType create(List<PhpType> phpTypes) {
+        List<String> typesStrings = new ArrayList<>();
+        for (PhpType type : phpTypes) {
+            typesStrings.add(type.toString());
+        }
+        Set<String> temp = new LinkedHashSet<String>(
+                Arrays.asList(String.join("|", typesStrings).split("\\|"))
+        );
+        return create(null, String.join("|", temp));
     }
 
     @NotNull
@@ -130,6 +145,9 @@ public class LattePhpType {
                 this.iterable.add(typePart.depth);
             }
             types.add(typePart.getPart());
+
+            wholeTypes.putIfAbsent(typePart.depth, new ArrayList<>());
+            wholeTypes.get(typePart.depth).add(typePart.getWholePart());
         }
         this.name = name == null ? null : LattePhpUtil.normalizePhpVariable(name);
 
@@ -203,17 +221,31 @@ public class LattePhpType {
         return mixed.contains(depth);
     }
 
-    public boolean isIterable() {
-        return isIterable(0);
+    public boolean isIterable(Project project) {
+        return isIterable(project, 0);
     }
 
-    public boolean isIterable(int depth) {
-        return iterable.contains(depth);
+    public boolean isIterable(Project project, int depth) {
+        if (iterable.contains(depth)) {
+            return true;
+        }
+
+        Collection<PhpClass> classes = getPhpClasses(project, depth);
+        for (PhpClass phpClass : classes) {
+            if (LattePhpUtil.isReferenceFor(LatteTypesUtil.getIterableInterfaces(), phpClass)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Collection<PhpClass> getPhpClasses(Project project) {
+        return getPhpClasses(project, 0);
+    }
+
+    public Collection<PhpClass> getPhpClasses(Project project, int depth) {
         List<PhpClass> output = new ArrayList<>();
-        for (String wholeType : findClasses()) {
+        for (String wholeType : findClasses(depth)) {
             output.addAll(LattePhpUtil.getClassesByFQN(project, wholeType));
         }
         return output;
@@ -230,12 +262,55 @@ public class LattePhpType {
         return this.classes.get(depth).toArray(new String[0]);
     }
 
-    @Override
-    public String toString() {
-        return toReadableString();
+    public LattePhpType withDepth(int depth) {
+        if (depth == 0) {
+            return this;
+        }
+
+        LattePhpType found = forDepth.get(depth);
+        if (found != null) {
+            return found;
+        }
+
+        List<String> depthTypes = getTypesForDepth(depth);
+        if (depthTypes.size() > 0) {
+            found = new LattePhpType(String.join("|", depthTypes));
+        }
+        found = found == null ? LattePhpType.MIXED : found;
+        forDepth.put(depth, found);
+        return found;
     }
 
-    public String toReadableString() {
+    private List<String> getTypesForDepth(int depth) {
+        if (depth == 0) {
+            return types;
+        }
+
+        List<String> depthTypes = new ArrayList<>();
+
+        for (int key : wholeTypes.keySet()) {
+            if (key < depth) {
+                continue;
+            }
+            getTypesForDepth(depthTypes, depth, key - depth);
+        }
+        return depthTypes;
+    }
+
+    private void getTypesForDepth(List<String> depthTypes, int depth, int subDepth) {
+        List<String> currentTypes = wholeTypes.get(depth + subDepth);
+        if (currentTypes == null) {
+            return;
+        }
+        depthTypes.addAll(
+                currentTypes.stream()
+                        .map(type -> type + String.join("", Collections.nCopies(subDepth, "[]")))
+                        .collect(Collectors.toList())
+        );
+    }
+
+    @Override
+    public String toString() {
         return String.join("|", types);
     }
 
@@ -308,6 +383,10 @@ public class LattePhpType {
             return arrayOf == null || isNative
                     ? part
                     : (arrayOf.getPart() + String.join("", Collections.nCopies(depth, "[]")));
+        }
+
+        String getWholePart() {
+            return arrayOf == null || isNative ? part : arrayOf.getWholePart();
         }
     }
 

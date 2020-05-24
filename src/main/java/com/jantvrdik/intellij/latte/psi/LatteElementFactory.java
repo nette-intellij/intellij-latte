@@ -23,22 +23,22 @@ public class LatteElementFactory {
 		}
 	}
 
-	public static PsiElement createMethod(Project project, String name) {
-		final LatteFile file = createFileWithPhpMacro(project, "->" + name + "()");
+	public static LattePhpMethod createMethod(Project project, String name) {
+		final LatteFile file = createFileWithPhpMacro(project, "$x->" + name + "()");
 		LattePhpContent phpContent = findFirstPhpContent(file);
-		if (phpContent == null) {
+		if (phpContent == null || phpContent.getPhpStatementList().size() == 0) {
 			return null;
 		}
 
 		try {
-			return phpContent.getFirstChild().getNextSibling();
+			return phpContent.getPhpStatementList().get(0).getPhpStatementPartList().get(0).getPhpMethod();
 
 		} catch (NullPointerException e) {
 			return null;
 		}
 	}
 
-	public static PsiElement createProperty(Project project, String name) {
+	public static LattePhpProperty createProperty(Project project, String name) {
 		final LatteFile file = createFileWithPhpMacro(project, "$x->" + name);
 		LattePhpContent phpContent = findFirstPhpContent(file);
 		if (phpContent == null) {
@@ -46,14 +46,14 @@ public class LatteElementFactory {
 		}
 
 		try {
-			return phpContent.getFirstChild().getNextSibling().getNextSibling();
+			return phpContent.getPhpStatementList().get(0).getPhpStatementPartList().get(0).getPhpProperty();
 
 		} catch (NullPointerException e) {
 			return null;
 		}
 	}
 
-	public static PsiElement createConstant(Project project, String name) {
+	public static LattePhpConstant createConstant(Project project, String name) {
 		final LatteFile file = createFileWithPhpMacro(project, "$x::" + name);
 		LattePhpContent phpContent = findFirstPhpContent(file);
 		if (phpContent == null) {
@@ -61,7 +61,7 @@ public class LatteElementFactory {
 		}
 
 		try {
-			return phpContent.getFirstChild().getNextSibling().getNextSibling();
+			return phpContent.getPhpStatementList().get(0).getPhpStatementPartList().get(0).getPhpConstant();
 
 		} catch (NullPointerException e) {
 			return null;
@@ -104,7 +104,7 @@ public class LatteElementFactory {
 		}
 
 		try {
-			return phpContent.getFirstChild().getNextSibling().getNextSibling();
+			return phpContent.getPhpStatementList().get(0).getPhpStatementPartList().get(0).getPhpStaticVariable();
 
 		} catch (NullPointerException e) {
 			return null;

@@ -12,7 +12,7 @@ import com.jantvrdik.intellij.latte.intentions.AddCustomNotNullVariable;
 import com.jantvrdik.intellij.latte.intentions.AddCustomNullableVariable;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LattePhpVariable;
-import com.jantvrdik.intellij.latte.psi.impl.LattePsiImplUtil;
+import com.jantvrdik.intellij.latte.utils.LattePhpVariableUtil;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import com.jantvrdik.intellij.latte.utils.PsiPositionedElement;
 import com.jetbrains.php.lang.psi.elements.Field;
@@ -110,7 +110,7 @@ public class VariablesInspection extends BaseLocalInspectionTool {
 					} else if (beforeElement.size() == 0) {
 						LatteVariableSettings defaultVariable = LatteConfiguration.getInstance(element.getProject()).getVariable(variableName);
 						if (defaultVariable == null) {
-							List<Field> fields = LattePsiImplUtil.findPhpFiledListFromTemplateTypeTag(element, variableName);
+							List<Field> fields = LattePhpVariableUtil.findPhpFiledListFromTemplateTypeTag(element, variableName);
 							if (fields.size() == 0) {
 								type = ProblemHighlightType.GENERIC_ERROR_OR_WARNING;
 								description = "Undefined variable '" + variableName + "'";
@@ -127,7 +127,7 @@ public class VariablesInspection extends BaseLocalInspectionTool {
 								}
 							}
 						}
-						if (LattePsiImplUtil.detectVariableTypeFromTemplateType(element, variableName) == null) {
+						if (LattePhpVariableUtil.detectVariableTypeFromTemplateType(element, variableName) == null) {
 							type = ProblemHighlightType.GENERIC_ERROR_OR_WARNING;
 							description = "Undefined variable '" + variableName + "'";
 							isUndefined = true;

@@ -2,7 +2,6 @@ package com.jantvrdik.intellij.latte.inspections;
 
 import com.intellij.codeInspection.InspectionManager;
 import com.intellij.codeInspection.ProblemDescriptor;
-import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
@@ -74,7 +73,7 @@ public class PropertyUsagesInspection extends BaseLocalInspectionTool {
 					}
 
 					if (!isFound) {
-						addProblem(manager, problems, element, "Property '" + variableName + "' not found", ProblemHighlightType.GENERIC_ERROR_OR_WARNING, isOnTheFly);
+						addProblem(manager, problems, element, "Property '" + variableName + "' not found for type '" + phpType.toString() + "'", isOnTheFly);
 					}
 
 				} else {
@@ -83,6 +82,6 @@ public class PropertyUsagesInspection extends BaseLocalInspectionTool {
 			}
 		});
 
-		return problems.toArray(new ProblemDescriptor[problems.size()]);
+		return problems.toArray(new ProblemDescriptor[0]);
 	}
 }

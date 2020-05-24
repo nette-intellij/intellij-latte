@@ -136,7 +136,7 @@ public class MethodUsagesInspection extends BaseLocalInspectionTool {
 		}
 
 		if (!isFound) {
-			addProblem(manager, problems, getElementToLook(element), "Method '" + methodName + "' not found", ProblemHighlightType.GENERIC_ERROR_OR_WARNING, isOnTheFly);
+			addProblem(manager, problems, getElementToLook(element), "Method '" + methodName + "' not found for type '" + phpType.toString() + "'", isOnTheFly);
 		}
 	}
 

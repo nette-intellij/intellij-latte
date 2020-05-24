@@ -154,6 +154,11 @@
 						 groupName="Latte" enabledByDefault="true"
 						 implementationClass="com.jantvrdik.intellij.latte.inspections.MacroVarInspection"/>
 
+		<localInspection language="Latte" shortName="LatteIterableType" id="LatteIterableType"
+						 displayName="Latte iterable types"
+						 groupName="Latte" enabledByDefault="true"
+						 implementationClass="com.jantvrdik.intellij.latte.inspections.LatteIterableTypeInspection"/>
+
 		<localInspection language="XML" shortName="LatteXmlFileInspection" id="LatteXmlFileInspection"
 						 displayName="Latte XML configuration files"
 						 groupName="Latte" enabledByDefault="true"

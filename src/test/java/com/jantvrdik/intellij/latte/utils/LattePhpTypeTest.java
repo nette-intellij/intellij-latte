@@ -124,7 +124,7 @@ public class LattePhpTypeTest {
 	}
 
 	public static void assertLattePhpType(String expected, String type) {
-		assertEquals(expected, LattePhpType.create(type).toReadableString());
+		assertEquals(expected, LattePhpType.create(type).toString());
 	}
 
 	public static void assertLattePhpTypeClasses(String[] expected, String type) {

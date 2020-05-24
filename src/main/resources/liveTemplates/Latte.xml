@@ -44,4 +44,14 @@
 			<option name="LATTE" value="true" />
 		</context>
 	</template>
+	<template name="{vi"
+			  value="{var &#36;$NAME$ = $END$}"
+			  description="{var $name = value}"
+			  toReformat="false"
+			  toShortenFQNames="true">
+		<variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
+		<context>
+			<option name="LATTE" value="true" />
+		</context>
+	</template>
 </templateSet>
