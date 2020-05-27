@@ -45,11 +45,11 @@
 		</context>
 	</template>
 	<template name="{vi"
-			  value="{var &#36;$NAME$ = $END$}"
+			  value="{var $NAME$ = $END$}"
 			  description="{var $name = value}"
 			  toReformat="false"
 			  toShortenFQNames="true">
-		<variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
+		<variable name="NAME" expression="" defaultValue="$" alwaysStopAt="true" />
 		<context>
 			<option name="LATTE" value="true" />
 		</context>
