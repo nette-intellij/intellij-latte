@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.jantvrdik.intellij.latte.ui.LatteSettingsForm">
   <grid id="27dc6" binding="panel1" default-binding="true" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
-      <xy x="20" y="20" width="700" height="346"/>
+      <xy x="20" y="20" width="753" height="346"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -67,7 +67,8 @@
                   <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="(need `reload from .xml files` after change and save)"/>
+                  <foreground color="-5804223"/>
+                  <text value="Need `reload from .xml files` after change and save"/>
                 </properties>
               </component>
               <component id="47e51" class="javax.swing.JButton" binding="moreInformationButton">
@@ -86,20 +87,37 @@
             </constraints>
             <properties/>
           </component>
-          <grid id="6801" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+          <grid id="6801" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
               <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties/>
-            <border type="none" title="General"/>
+            <border type="none" title="Sources (tags, filters...)"/>
             <children>
               <component id="55d54" class="javax.swing.JCheckBox" binding="enableNetteCheckBox" default-binding="true">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Enable Nette (tags, etc...)"/>
+                  <text value="Enable `nette/application` tags"/>
+                </properties>
+              </component>
+              <component id="844b6" class="javax.swing.JCheckBox" binding="enableNetteFormsTagsCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="Enable `nette/forms` tags"/>
+                </properties>
+              </component>
+              <component id="a0799" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <foreground color="-5804223"/>
+                  <text value="If you have XML with appropriate vendor in project, above checkboxes will be ignored"/>
                 </properties>
               </component>
             </children>

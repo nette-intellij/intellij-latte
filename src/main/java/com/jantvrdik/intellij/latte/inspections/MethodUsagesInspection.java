@@ -80,17 +80,17 @@ public class MethodUsagesInspection extends BaseLocalInspectionTool {
 		Collection<Function> existing = LattePhpUtil.getFunctionByName(element.getProject(), name);
 		if (existing.size() == 0) {
 			LocalQuickFix addFunctionFix = IntentionManager.getInstance().convertToFix(new AddCustomLatteFunction(name));
-			ProblemHighlightType type = ProblemHighlightType.GENERIC_ERROR_OR_WARNING;
-			String description = "Function '" + name + "' not found";
-			ProblemDescriptor problem = manager.createProblemDescriptor(
-					getElementToLook(element),
-					description,
-					true,
-					type,
-					isOnTheFly,
-					addFunctionFix
-			);
-			problems.add(problem);
+			addProblem(manager, problems, getElementToLook(element), "Function '" + name + "' not found", isOnTheFly, addFunctionFix);
+
+		} else {
+			for (Function function : existing) {
+				if (function.isDeprecated()) {
+					addDeprecated(manager, problems, getElementToLook(element), "Function '" + name + "' is deprecated", isOnTheFly);
+				}
+				if (function.isInternal()) {
+					addDeprecated(manager, problems, getElementToLook(element), "Function '" + name + "' is internal", isOnTheFly);
+				}
+			}
 		}
 	}
 

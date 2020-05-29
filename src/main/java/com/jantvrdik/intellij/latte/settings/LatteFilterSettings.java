@@ -22,8 +22,16 @@ public class LatteFilterSettings extends BaseLatteSettings implements Serializab
 		this(modifierName, "", "", "");
 	}
 
-	public LatteFilterSettings(String modifierName, String modifierDescription, String modifierHelp, String modifierInsert) {
-		this(modifierName, modifierDescription, modifierHelp, modifierInsert, LatteConfiguration.Vendor.OTHER, "");
+	public LatteFilterSettings(String modifierName, String description) {
+		this(modifierName, description, "", "");
+	}
+
+	public LatteFilterSettings(String modifierName, String description, String help) {
+		this(modifierName, description, help, "");
+	}
+
+	public LatteFilterSettings(String modifierName, String description, String modifierHelp, String insertColons) {
+		this(modifierName, description, modifierHelp, insertColons, LatteConfiguration.Vendor.OTHER, "");
 	}
 
 	public LatteFilterSettings(

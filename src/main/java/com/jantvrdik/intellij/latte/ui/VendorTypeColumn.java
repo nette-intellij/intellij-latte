@@ -1,7 +1,6 @@
 package com.jantvrdik.intellij.latte.ui;
 
 import com.intellij.ui.ColoredTableCellRenderer;
-import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.util.ui.ColumnInfo;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
@@ -28,14 +27,10 @@ abstract class VendorTypeColumn<T> extends ColumnInfo<T, LatteFileConfiguration.
 				}
 
 				LatteFileConfiguration.VendorResult vendor = (LatteFileConfiguration.VendorResult) value;
-				if (vendor.vendor == LatteConfiguration.Vendor.NETTE) {
-					append("Nette", new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.BLUE));
-				} else if (vendor.vendor == LatteConfiguration.Vendor.LATTE) {
-					append("Latte", new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.ORANGE));
-				} else if (vendor.vendor == LatteConfiguration.Vendor.OTHER) {
-					append(vendor.vendorName, new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.DARK_GRAY));
+				if (vendor.vendor == LatteConfiguration.Vendor.OTHER) {
+					append(vendor.vendorName, new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, vendor.vendor.getColor()));
 				} else {
-					append("Custom", new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.GRAY));
+					append(vendor.vendor.getName(), new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, vendor.vendor.getColor()));
 				}
 			}
 		};

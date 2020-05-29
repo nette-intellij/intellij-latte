@@ -22,7 +22,9 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -178,30 +180,40 @@ public class LattePsiImplUtil {
 		return variableModifier != null;
 	}
 
-	@Nullable
-	public static LattePhpType detectVariableTypeFromTemplateType(@NotNull PsiElement element, @NotNull String variableName)
-	{
+	public static List<Field> findPhpFiledListFromTemplateTypeTag(@NotNull PsiElement element, @NotNull String variableName) {
 		if (!(element.getContainingFile() instanceof LatteFile)) {
-			return null;
+			return Collections.emptyList();
 		}
 
 		LattePhpType templateType = LatteUtil.findFirstLatteTemplateType(element.getContainingFile());
 		if (templateType == null) {
-			return null;
+			return Collections.emptyList();
 		}
 
 		Collection<PhpClass> classes = templateType.getPhpClasses(element.getProject());
 		if (classes == null) {
-			return null;
+			return Collections.emptyList();
 		}
+
+		List<Field> out = new ArrayList<>();
 		for (PhpClass phpClass : classes) {
 			for (Field field : phpClass.getFields()) {
 				if (!field.isConstant() && field.getModifier().isPublic() && variableName.equals(field.getName())) {
-					return LattePhpType.create(field.getName(), field.getType().toString(), LattePhpUtil.isNullable(field.getType()));
+					out.add(field);
 				}
 			}
 		}
-		return null;
+		return out;
+	}
+
+	@Nullable
+	public static LattePhpType detectVariableTypeFromTemplateType(@NotNull PsiElement element, @NotNull String variableName) {
+		List<Field> fields = findPhpFiledListFromTemplateTypeTag(element, variableName);
+		if (fields.size() == 0) {
+			return null;
+		}
+		Field field = fields.get(0);
+		return LattePhpType.create(field.getName(), field.getType().toString(), LattePhpUtil.isNullable(field.getType()));
 	}
 
 	private static LattePhpType detectVariableType(@NotNull PsiElement element, @NotNull String variableName)

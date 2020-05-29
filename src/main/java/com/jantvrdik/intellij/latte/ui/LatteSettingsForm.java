@@ -25,8 +25,9 @@ public class LatteSettingsForm implements Configurable {
 	private JButton buttonReinitialize;
 	private JButton moreInformationButton;
 	private JCheckBox enableNetteCheckBox;
+    private JCheckBox enableNetteFormsTagsCheckBox;
 
-	private Project project;
+    private Project project;
 	private boolean changed = false;
 
 	public LatteSettingsForm(Project project) {
@@ -82,6 +83,15 @@ public class LatteSettingsForm implements Configurable {
 				LatteSettingsForm.this.changed = true;
 			}
 		});
+
+		enableNetteFormsTagsCheckBox.setSelected(getSettings().enableNetteForms);
+		enableNetteFormsTagsCheckBox.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				super.mouseClicked(e);
+				LatteSettingsForm.this.changed = true;
+			}
+		});
 	}
 
 	@Nls
@@ -111,6 +121,7 @@ public class LatteSettingsForm implements Configurable {
 	public void apply() throws ConfigurationException {
 		getSettings().enableXmlLoading = enableXmlLoadingCheckBox.isSelected();
 		getSettings().enableNette = enableNetteCheckBox.isSelected();
+		getSettings().enableNetteForms = enableNetteFormsTagsCheckBox.isSelected();
 
 		boolean success = LatteIndexUtil.reinitialize(project);
 		if (success) {

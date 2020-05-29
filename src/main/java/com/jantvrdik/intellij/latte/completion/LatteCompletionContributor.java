@@ -106,7 +106,7 @@ public class LatteCompletionContributor extends CompletionContributor {
 	 * Builds list of lookup elements for code completion of classic macros.
 	 */
 	private List<LookupElement> getClassicMacroCompletions(Map<String, LatteTagSettings> macros, boolean prefix) {
-		List<LookupElement> lookupElements = new ArrayList<LookupElement>(macros.size());
+		List<LookupElement> lookupElements = new ArrayList<>(macros.size());
 		for (LatteTagSettings macro : macros.values()) {
 			if (macro.getType() != LatteTagSettings.Type.ATTR_ONLY && (!prefix || macro.getType() == LatteTagSettings.Type.PAIR)) {
 				lookupElements.add(createBuilderForMacro(macro, prefix));
@@ -119,7 +119,7 @@ public class LatteCompletionContributor extends CompletionContributor {
 	 * Builds list of lookup elements for code completion of classic macros.
 	 */
 	private List<LookupElement> getClassicModifierCompletions(Map<String, LatteFilterSettings> modifiers) {
-		List<LookupElement> lookupElements = new ArrayList<LookupElement>(modifiers.size());
+		List<LookupElement> lookupElements = new ArrayList<>(modifiers.size());
 		for (LatteFilterSettings modifier : modifiers.values()) {
 			lookupElements.add(createBuilderWithHelp(modifier));
 		}
@@ -138,11 +138,23 @@ public class LatteCompletionContributor extends CompletionContributor {
 		return builder.withIcon(LatteIcons.MODIFIER);
 	}
 
-	private LookupElementBuilder createBuilderForMacro(LatteTagSettings macro, boolean prefix) {
-		LookupElementBuilder builder = LookupElementBuilder.create((prefix ? "/" : "") + macro.getMacroName());
-		builder = builder.withIcon(LatteIcons.MACRO);
+	private LookupElementBuilder createBuilderForMacro(LatteTagSettings tag, boolean prefix) {
+		String name = (prefix ? "/" : "") + tag.getMacroName();
+		LookupElementBuilder builder = LookupElementBuilder.create(name);
 		builder = builder.withInsertHandler(MacroInsertHandler.getInstance());
-		return builder.withTypeText(macro.getType().toString(), true);
+		String appendText = tag.getType() == LatteTagSettings.Type.PAIR ? (" … {/" + tag.getMacroName() + "}") : "";
+		String arguments = tag.getArguments().trim();
+		if (arguments.length() > 0) {
+			builder = builder.withTailText(" " + arguments + "}" + appendText);
+		} else {
+			builder = builder.withTailText("}" + appendText);
+		}
+
+		if (tag.isDeprecated()) {
+			builder = builder.withStrikeoutness(true);
+		}
+		builder = builder.withPresentableText("{" + name);
+		return builder.withIcon(LatteIcons.MACRO);
 	}
 
 	private LookupElementBuilder createBuilderForTag(String name) {
@@ -155,7 +167,7 @@ public class LatteCompletionContributor extends CompletionContributor {
 	 * Builds list of lookup elements for code completion of attribute macros.
 	 */
 	private List<LookupElement> getAttrMacroCompletions(Map<String, LatteTagSettings> macros) {
-		List<LookupElement> lookupElements = new ArrayList<LookupElement>(macros.size());
+		List<LookupElement> lookupElements = new ArrayList<>(macros.size());
 		for (LatteTagSettings macro : macros.values()) {
 			if (macro.getType() != LatteTagSettings.Type.UNPAIRED) {
 				lookupElements.add(createBuilderForTag("n:" + macro.getMacroName()));

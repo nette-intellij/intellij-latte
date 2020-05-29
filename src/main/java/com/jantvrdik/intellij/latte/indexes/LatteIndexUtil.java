@@ -47,7 +47,6 @@ public class LatteIndexUtil {
             }
         }
 
-        List<String> paths = new ArrayList<>();
         for (Project project : projects) {
             if (!reinitialize(project)) {
                 return;
@@ -56,12 +55,7 @@ public class LatteIndexUtil {
 
         notification.expire();
 
-        LatteIdeHelper.doNotify(
-                "Latte plugin settings",
-                "Configuration was loaded from files: " + String.join(", ", paths),
-                NotificationType.INFORMATION,
-                null
-        );
+        LatteIdeHelper.doNotify("Latte plugin settings", "Configuration was reloaded", NotificationType.INFORMATION, null);
     }
 
     public static Notification notifyReparseFiles(Project project) {

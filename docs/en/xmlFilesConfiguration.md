@@ -2,11 +2,13 @@
 
 XML configuration files for Latte plugin are files contains information about tags, filters, variables etc.
 
-- Plugin load all files named `latte-intellij.xml` in your project including `vendor` folder or something other folders.
-- You can use more `latte-intellij.xml` files. All will be loaded.
+- Plugin load all files named `latte-intellij.xml` in your project including `vendor` folder or something other folders except ignored folders.
+- You can use more `latte-intellij.xml` files. All will be loaded, but must have another value in vendor attribute.
 - If you are using `Nette < 3` you will probably need: [Default latte-intellij.xml for Nette < 3](https://github.com/nette-intellij/intellij-latte/blob/master/docs/bellowNette3.xml)
   - Copy it to `latte-intellij.xml` located somewhere in your Nette project
-- Tip: distribute latte-intellij.xml with your Composer package
+  - **But it is not necessary.** Plugin contains this basic tags, filters etc. But if you need rewrite it, you can use above file as template
+  - In newer version of Latte/Nette is `latte-intellij.xml` part of appropriate packages in vendor
+- **Tip:** distribute `latte-intellij.xml` with your Composer package
 
 This is example file content with sample values:
 
@@ -16,8 +18,8 @@ This is example file content with sample values:
 <?xml version="1.0" encoding="UTF-8"?>
 <latte version="1" vendor="myVendor/myPackage">
     <tags>
-        <tag name="myIf" type="PAIR" hasParameters="true" allowedModifiers="false" deprecated="false" deprecatedMessage="MyIf is deprecated, use xxx instead." />
-        <tag name="myFor" type="PAIR" hasParameters="true" allowedModifiers="false" multiLine="true" />
+        <tag name="myIf" type="PAIR" arguments="condition" deprecatedMessage="MyIf is deprecated, use {if ...} instead." />
+        <tag name="myFor" type="PAIR" arguments="initialization; condition; afterthought" allowedModifiers="true" multiLine="true" />
     </tags>
     <variables>
         <variable name="testVar" type="\Student" />
@@ -33,7 +35,7 @@ This is example file content with sample values:
 
 ## Allowed XML tags and attributes
 
-**If a mandatory parameter is missing or invalid item will be skipped.** 
+**If a required parameter is missing or invalid item will be skipped.** 
 
 ### &lt;tag&gt; in &lt;tags&gt;
 
@@ -41,10 +43,9 @@ This is example file content with sample values:
 |-------------------|----------|---------------|-----------------------------------------|--------------------------------------|
 | name              | yes      | none          | any string                              | Name for tag                         |
 | type              | yes      | none          | PAIR, UNPAIRED, ATTR_ONLY or AUTO_EMPTY | Type for tag                         |
-| hasParameters     | no       | false         | true, false                             | Used after code completion           |
+| arguments         | no       | ""            | any string                              | Used after code completion as help   |
 | allowedFilters    | no       | false         | true, false                             | Used for inspections and completions |
 | multiLine         | no       | false         | true, false                             | Used after code completion           |
-| deprecated        | no       | false         | true, false                             | Used for inspection                  |
 | deprecatedMessage | no       | ""            | any string                              | Message for deprecated tag           |
 
 ### &lt;filter&gt; in &lt;filters&gt;

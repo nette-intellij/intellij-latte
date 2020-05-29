@@ -15,6 +15,7 @@ import com.jantvrdik.intellij.latte.psi.LattePhpVariable;
 import com.jantvrdik.intellij.latte.psi.impl.LattePsiImplUtil;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import com.jantvrdik.intellij.latte.utils.PsiPositionedElement;
+import com.jetbrains.php.lang.psi.elements.Field;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class VariablesInspection extends LocalInspectionTool {
+public class VariablesInspection extends BaseLocalInspectionTool {
 
 	@NotNull
 	@Override
@@ -108,7 +109,25 @@ public class VariablesInspection extends LocalInspectionTool {
 
 					} else if (beforeElement.size() == 0) {
 						LatteVariableSettings defaultVariable = LatteConfiguration.getInstance(element.getProject()).getVariable(variableName);
-						if (defaultVariable == null && LattePsiImplUtil.detectVariableTypeFromTemplateType(element, variableName) == null) {
+						if (defaultVariable == null) {
+							List<Field> fields = LattePsiImplUtil.findPhpFiledListFromTemplateTypeTag(element, variableName);
+							if (fields.size() == 0) {
+								type = ProblemHighlightType.GENERIC_ERROR_OR_WARNING;
+								description = "Undefined variable '" + variableName + "'";
+								isUndefined = true;
+
+							} else {
+								for (Field field : fields) {
+									if (field.isDeprecated()) {
+										addDeprecated(manager, problems, element, "Variable '" + variableName + "' is deprecated", isOnTheFly);
+									}
+									if (field.isInternal()) {
+										addDeprecated(manager, problems, element, "Variable '" + variableName + "' is internal", isOnTheFly);
+									}
+								}
+							}
+						}
+						if (LattePsiImplUtil.detectVariableTypeFromTemplateType(element, variableName) == null) {
 							type = ProblemHighlightType.GENERIC_ERROR_OR_WARNING;
 							description = "Undefined variable '" + variableName + "'";
 							isUndefined = true;

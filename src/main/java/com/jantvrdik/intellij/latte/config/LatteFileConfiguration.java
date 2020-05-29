@@ -192,13 +192,10 @@ public class LatteFileConfiguration implements Serializable {
                     name.getValue(),
                     LatteTagSettings.Type.valueOf(type.getValue()),
                     isTrue(tag, "allowedFilters"),
-                    isTrue(tag, "hasParameters"),
-                    isTrue(tag, "multiLine")
+                    getTextValue(tag, "arguments"),
+                    isTrue(tag, "multiLine"),
+                    getTextValue(tag, "deprecatedMessage").trim()
             );
-            if (isTrue(tag, "deprecated")) {
-                macro.setDeprecated(true);
-                macro.setDeprecatedMessage(getTextValue(tag, "deprecatedMessage"));
-            }
 
             data.addTag(macro);
         }
@@ -284,7 +281,7 @@ public class LatteFileConfiguration implements Serializable {
             return null;
         }
 
-        String normalized = vendorText.toUpperCase();
+        String normalized = vendorText.toUpperCase().replace("/", "_");
         if (LatteConfiguration.isValidVendor(normalized)) {
             return new VendorResult(LatteConfiguration.Vendor.valueOf(normalized), vendorText);
         }

@@ -18,10 +18,10 @@ public class LatteCustomMacroSettingsDialog extends JDialog {
     private JTextField textVarName;
     private JComboBox<String> macroType;
     private JCheckBox checkBoxAllowedModifiers;
-    private JCheckBox checkBosHasParameters;
     private JCheckBox multiLineOnlyUsedCheckBox;
     private JCheckBox deprecatedCheckBox;
     private JTextField deprecatedMessageTextField;
+    private JTextField argumentsTextField;
     private LatteTagSettings latteTagSettings;
     private TableView<LatteTagSettings> tableView;
     private Project project;
@@ -64,11 +64,11 @@ public class LatteCustomMacroSettingsDialog extends JDialog {
     public LatteCustomMacroSettingsDialog(TableView<LatteTagSettings> tableView, Project project, LatteTagSettings latteTagSettings) {
         this(tableView, project);
 
+        this.latteTagSettings = latteTagSettings;
         this.textVarName.setText(latteTagSettings.getMacroName());
         this.macroType.getModel().setSelectedItem(latteTagSettings.getMacroType());
-        this.latteTagSettings = latteTagSettings;
+        this.argumentsTextField.setText(latteTagSettings.getArguments());
         this.checkBoxAllowedModifiers.setSelected(latteTagSettings.isAllowedModifiers());
-        this.checkBosHasParameters.setSelected(latteTagSettings.hasParameters());
         this.multiLineOnlyUsedCheckBox.setSelected(latteTagSettings.isMultiLine());
         this.deprecatedCheckBox.setSelected(latteTagSettings.isDeprecated());
         this.deprecatedMessageTextField.setText(latteTagSettings.getDeprecatedMessage());
@@ -107,8 +107,8 @@ public class LatteCustomMacroSettingsDialog extends JDialog {
             this.tableView.setRowSelectionInterval(row, row);
         }
 
+        settings.setArguments(this.argumentsTextField.getText());
         settings.setAllowedModifiers(this.checkBoxAllowedModifiers.isSelected());
-        settings.setHasParameters(this.checkBosHasParameters.isSelected());
         settings.setMultiLine(this.multiLineOnlyUsedCheckBox.isSelected());
         settings.setDeprecated(this.deprecatedCheckBox.isSelected());
         settings.setDeprecatedMessage(this.deprecatedMessageTextField.getText());

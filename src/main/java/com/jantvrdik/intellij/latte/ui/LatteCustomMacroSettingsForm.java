@@ -41,7 +41,7 @@ public class LatteCustomMacroSettingsForm implements Configurable {
 				new MacroNameColumn(),
 				new TypeColumn(),
 				new AllowedModifiersColumn(),
-				new HasParametersColumn(),
+				new ArgumentsColumn(),
 				new IsMultiLineColumn(),
 				new IsDeprecatedColumn(),
 				new VendorColumn()
@@ -200,16 +200,16 @@ public class LatteCustomMacroSettingsForm implements Configurable {
 		}
 	}
 
-	private static class HasParametersColumn extends ColumnInfo<LatteTagSettings, String> {
+	private static class ArgumentsColumn extends ColumnInfo<LatteTagSettings, String> {
 
-		public HasParametersColumn() {
-			super("Has parameters");
+		public ArgumentsColumn() {
+			super("Arguments");
 		}
 
 		@Nullable
 		@Override
 		public String valueOf(LatteTagSettings customMacroSettings) {
-			return customMacroSettings.hasParameters() ? "yes" : "no";
+			return customMacroSettings.getArguments();
 		}
 	}
 

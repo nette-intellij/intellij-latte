@@ -7,6 +7,7 @@ import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import com.intellij.util.xmlb.annotations.Tag;
+import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,6 +25,8 @@ public class LatteSettings implements PersistentStateComponent<LatteSettings> {
 	public boolean enableXmlLoading = true;
 
 	public boolean enableNette = true;
+
+	public boolean enableNetteForms = true;
 
 	public boolean enableDefaultVariables = true;
 
@@ -46,6 +49,15 @@ public class LatteSettings implements PersistentStateComponent<LatteSettings> {
 
 	public static LatteSettings getInstance(Project project) {
 		return ServiceManager.getService(project, LatteSettings.class);
+	}
+
+	public boolean isEnabledSourceVendor(LatteConfiguration.Vendor vendor) {
+		if (vendor == LatteConfiguration.Vendor.NETTE_APPLICATION) {
+			return enableNette;
+		} else if (vendor == LatteConfiguration.Vendor.NETTE_FORMS) {
+			return enableNetteForms;
+		}
+		return true;
 	}
 
 	@Nullable
