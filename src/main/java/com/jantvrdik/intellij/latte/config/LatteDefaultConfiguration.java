@@ -142,7 +142,6 @@ public class LatteDefaultConfiguration {
 			put("control", (new LatteVariableSettings("control", "\\Nette\\Application\\UI\\Control")).setVendor(Vendor.NETTE_APPLICATION));
 			put("basePath", (new LatteVariableSettings("basePath", "string")).setVendor(Vendor.NETTE_APPLICATION));
 			put("baseUrl", (new LatteVariableSettings("baseUrl", "string")).setVendor(Vendor.NETTE_APPLICATION));
-			put("baseUri", (new LatteVariableSettings("baseUri", "string")).setVendor(Vendor.NETTE_APPLICATION));
 			put("flashes", (new LatteVariableSettings("flashes", "mixed[]")).setVendor(Vendor.NETTE_APPLICATION));
 			put("presenter", (new LatteVariableSettings("presenter", "\\Nette\\Application\\UI\\Presenter")).setVendor(Vendor.NETTE_APPLICATION));
 			put("iterator", (new LatteVariableSettings("iterator", "\\Latte\\Runtime\\CachingIterator")).setVendor(Vendor.NETTE_APPLICATION));

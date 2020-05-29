@@ -112,7 +112,6 @@
         <variable name="control" type="\Nette\Application\UI\Control" />
         <variable name="basePath" type="string" />
         <variable name="baseUrl" type="string" />
-        <variable name="baseUri" type="string" />
         <variable name="flashes" type="mixed[]" />
         <variable name="presenter" type="\Nette\Application\UI\Presenter" />
         <variable name="iterator" type="\Latte\Runtime\CachingIterator" />

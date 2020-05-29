@@ -61,7 +61,7 @@ public class LatteVariableCompletionProvider extends BaseLatteCompletionProvider
 					if (!field.isConstant() && field.getModifier().isPublic()) {
 						LookupElementBuilder builder = LookupElementBuilder.create(field, "$" + field.getName());
 						builder = builder.withInsertHandler(PhpVariableInsertHandler.getInstance());
-						builder = builder.withTypeText(LattePhpType.create(field.getType()).toReadableString());
+						builder = builder.withTypeText(LattePhpType.create(field.getType()).toString());
 						builder = builder.withIcon(PhpIcons.VARIABLE);
 						if (field.isDeprecated() || field.isInternal()) {
 							builder = builder.withStrikeoutness(true);

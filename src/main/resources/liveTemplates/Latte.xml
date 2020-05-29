@@ -6,7 +6,6 @@
 			  toShortenFQNames="true">
 		<variable name="ITERABLE" expression="" defaultValue="" alwaysStopAt="true" />
 		<variable name="VAR_VALUE" expression="phpSuggestVariableName()" defaultValue="&quot;$item&quot;" alwaysStopAt="true" />
-		<variable name="VAR_VALUE" expression="phpSuggestVariableName()" defaultValue="&quot;$item&quot;" alwaysStopAt="true" />
 		<context>
 			<option name="LATTE" value="true" />
 		</context>
@@ -44,12 +43,12 @@
 			<option name="LATTE" value="true" />
 		</context>
 	</template>
-	<template name="{vi"
+	<template name="{va"
 			  value="{var $NAME$ = $END$}"
 			  description="{var $name = value}"
 			  toReformat="false"
 			  toShortenFQNames="true">
-		<variable name="NAME" expression="" defaultValue="$" alwaysStopAt="true" />
+		<variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
 		<context>
 			<option name="LATTE" value="true" />
 		</context>
