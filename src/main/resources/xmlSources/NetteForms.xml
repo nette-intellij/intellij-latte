@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<latte version="1" vendor="nette/forms">
+    <tags>
+        <tag name="form" type="PAIR" arguments="name | $name" multiLine="true" />
+        <tag name="formContainer" type="PAIR" arguments="name | $name" multiLine="true" />
+        <tag name="formPrint" type="UNPAIRED" arguments="name | $name" />
+        <tag name="input" type="UNPAIRED" arguments="name | $name | $control" />
+        <tag name="inputError" type="UNPAIRED" arguments="name | $name | $control" />
+        <tag name="label" type="AUTO_EMPTY" arguments="name | $name | $control" />
+        <tag name="name" type="ATTR_ONLY" arguments="name | $name | $control" />
+    </tags>
+</latte>

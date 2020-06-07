@@ -12,6 +12,7 @@ import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.config.LatteFileConfiguration;
 import com.jantvrdik.intellij.latte.settings.LatteFunctionSettings;
 import com.jantvrdik.intellij.latte.settings.LatteSettings;
+import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileData;
 import com.jantvrdik.intellij.latte.utils.LatteIdeHelper;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
@@ -207,7 +208,7 @@ public class LatteCustomFunctionSettingsForm implements Configurable {
 
 		@Nullable
 		@Override
-		public LatteFileConfiguration.VendorResult valueOf(LatteFunctionSettings customMacroSettings) {
+		public LatteXmlFileData.VendorResult valueOf(LatteFunctionSettings customMacroSettings) {
 			return LatteConfiguration.getInstance(project).getVendorForFunction(customMacroSettings.getFunctionName());
 		}
 	}

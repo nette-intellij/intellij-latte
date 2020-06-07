@@ -5,6 +5,7 @@ import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
+import com.jantvrdik.intellij.latte.config.LatteDefaultConfiguration;
 import com.jantvrdik.intellij.latte.config.LatteFileConfiguration;
 import com.jantvrdik.intellij.latte.icons.LatteIcons;
 import com.jantvrdik.intellij.latte.indexes.LatteIndexUtil;
@@ -23,11 +24,13 @@ public class LatteSettingsForm implements Configurable {
 	private JLabel logoLabel;
 	private JCheckBox enableXmlLoadingCheckBox;
 	private JButton buttonReinitialize;
+	private JButton buttonReinitializeDefault;
 	private JButton moreInformationButton;
 	private JCheckBox enableNetteCheckBox;
-    private JCheckBox enableNetteFormsTagsCheckBox;
+	private JCheckBox enableNetteFormsTagsCheckBox;
+	private JCheckBox enableLatteTagsAndCheckBox;
 
-    private Project project;
+	private Project project;
 	private boolean changed = false;
 
 	public LatteSettingsForm(Project project) {
@@ -48,6 +51,21 @@ public class LatteSettingsForm implements Configurable {
 			public void mouseClicked(MouseEvent e) {
 				super.mouseClicked(e);
 				LatteIdeHelper.openUrl(LatteConfiguration.LATTE_DOCS_XML_FILES_URL);
+			}
+		});
+
+		buttonReinitializeDefault.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				super.mouseClicked(e);
+				LatteDefaultConfiguration.getInstance(project).reinitialize();
+				LatteIdeHelper.doNotify(
+						"Latte plugin settings",
+						"Default configuration for plugin was refreshed.",
+						NotificationType.INFORMATION,
+						project
+				);
+				buttonReinitializeDefault.setBackground(null);
 			}
 		});
 
@@ -92,6 +110,8 @@ public class LatteSettingsForm implements Configurable {
 				LatteSettingsForm.this.changed = true;
 			}
 		});
+
+		enableLatteTagsAndCheckBox.setEnabled(false);
 	}
 
 	@Nls

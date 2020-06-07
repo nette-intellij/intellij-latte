@@ -11,6 +11,8 @@ import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.jantvrdik.intellij.latte.config.LatteFileConfiguration;
 import com.jantvrdik.intellij.latte.indexes.externalizer.ObjectStreamDataExternalizer;
+import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileData;
+import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileDataFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.coverage.gnu.trove.THashMap;
 
@@ -35,10 +37,12 @@ public class LatteIndexExtension extends FileBasedIndexExtension<String, LatteXm
 
             Project project = psiFile.getProject();
             Map<String, LatteXmlFileData> out = new THashMap<>();
-            LatteFileConfiguration.VendorResult vendor = LatteFileConfiguration.getVendor(((XmlFile) psiFile).getDocument());
+            LatteXmlFileData.VendorResult vendor = LatteXmlFileDataFactory.getVendor(((XmlFile) psiFile).getDocument());
             if (vendor != null) {
                 LatteXmlFileData xmlFileData = LatteFileConfiguration.getInstance(project).reinitialize((XmlFile) psiFile);
-                out.put(xmlFileData.getVendorResult().vendorName, xmlFileData);
+                if (xmlFileData != null) {
+                    out.put(xmlFileData.getVendorResult().vendorName, xmlFileData);
+                }
             }
 
             if (notification == null || notification.isExpired() || LatteIndexUtil.isNotificationOutdated(notification)) {

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<latte version="1" vendor="nette/application">
+    <tags>
+        <!-- nette/application tags -->
+        <tag name="cache" type="PAIR" arguments="if => expr, key, …" />
+        <tag name="control" type="UNPAIRED" arguments="name[:part], arg, …" />
+        <tag name="link" type="UNPAIRED" arguments="destination , [param, …]">
+            <arguments>
+                <argument name="file" types="DESTINATION,PHP_EXPRESSION" validType="string" required="true" />
+                <argument name="arguments" types="PHP_EXPRESSION,KEY_VALUE" repeatable="true" />
+            </arguments>
+        </tag>
+        <tag name="href" type="ATTR_ONLY" arguments="destination , [param, …]" />
+        <tag name="nonce" type="ATTR_ONLY" />
+        <tag name="plink" type="UNPAIRED" arguments="destination , [param, …]" />
+        <!-- @deprecated - nette/application -->
+        <tag name="ifCurrent" type="PAIR" arguments="destination , [param, …]" deprecated="true" deprecatedMessage="Tag {ifCurrent} is deprecated in Latte 2.6. Use custom function isLinkCurrent() instead." />
+    </tags>
+    <variables>
+        <variable name="control" type="\Nette\Application\UI\Control" />
+        <variable name="basePath" type="string" />
+        <variable name="baseUrl" type="string" />
+        <variable name="flashes" type="mixed[]" />
+        <variable name="presenter" type="\Nette\Application\UI\Presenter" />
+        <variable name="iterator" type="\Latte\Runtime\CachingIterator" />
+        <variable name="form" type="\Nette\Application\UI\Form" />
+        <variable name="user" type="\Nette\Security\User" />
+    </variables>
+    <functions>
+        <function name="isLinkCurrent" returnType="bool" arguments="(string $destination = null, $args = [])" />
+        <function name="isModuleCurrent" returnType="bool" arguments="(string $moduleName)" />
+    </functions>
+</latte>

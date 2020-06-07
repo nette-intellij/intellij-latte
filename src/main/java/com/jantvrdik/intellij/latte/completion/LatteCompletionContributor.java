@@ -97,19 +97,19 @@ public class LatteCompletionContributor extends CompletionContributor {
 		}
 	}
 
-	private void attachClassicMacrosCompletion(@NotNull Project project, @NotNull CompletionResultSet result, boolean prefix) {
+	private void attachClassicMacrosCompletion(@NotNull Project project, @NotNull CompletionResultSet result, boolean isEndTag) {
 		Map<String, LatteTagSettings> customMacros = LatteConfiguration.getInstance(project).getTags();
-		result.addAllElements(getClassicMacroCompletions(customMacros, prefix));
+		result.addAllElements(getClassicMacroCompletions(customMacros, isEndTag));
 	}
 
 	/**
 	 * Builds list of lookup elements for code completion of classic macros.
 	 */
-	private List<LookupElement> getClassicMacroCompletions(Map<String, LatteTagSettings> macros, boolean prefix) {
+	private List<LookupElement> getClassicMacroCompletions(Map<String, LatteTagSettings> macros, boolean isEndTag) {
 		List<LookupElement> lookupElements = new ArrayList<>(macros.size());
 		for (LatteTagSettings macro : macros.values()) {
-			if (macro.getType() != LatteTagSettings.Type.ATTR_ONLY && (!prefix || macro.getType() == LatteTagSettings.Type.PAIR)) {
-				lookupElements.add(createBuilderForMacro(macro, prefix));
+			if (macro.getType() != LatteTagSettings.Type.ATTR_ONLY && (!isEndTag || macro.getType() == LatteTagSettings.Type.PAIR)) {
+				lookupElements.add(createBuilderForMacro(macro, isEndTag));
 			}
 		}
 		return lookupElements;
@@ -138,16 +138,20 @@ public class LatteCompletionContributor extends CompletionContributor {
 		return builder.withIcon(LatteIcons.MODIFIER);
 	}
 
-	private LookupElementBuilder createBuilderForMacro(LatteTagSettings tag, boolean prefix) {
-		String name = (prefix ? "/" : "") + tag.getMacroName();
+	private LookupElementBuilder createBuilderForMacro(LatteTagSettings tag, boolean isEndTag) {
+		String name = (isEndTag ? "/" : "") + tag.getMacroName();
 		LookupElementBuilder builder = LookupElementBuilder.create(name);
 		builder = builder.withInsertHandler(MacroInsertHandler.getInstance());
-		String appendText = tag.getType() == LatteTagSettings.Type.PAIR ? (" … {/" + tag.getMacroName() + "}") : "";
-		String arguments = tag.getArguments().trim();
-		if (arguments.length() > 0) {
-			builder = builder.withTailText(" " + arguments + "}" + appendText);
+		if (!isEndTag) {
+			String appendText = tag.getType() == LatteTagSettings.Type.PAIR ? (" … {/" + tag.getMacroName() + "}") : "";
+			String arguments = tag.getArgumentsInfo();
+			if (arguments.length() > 0) {
+				builder = builder.withTailText(" " + arguments + "}" + appendText);
+			} else {
+				builder = builder.withTailText("}" + appendText);
+			}
 		} else {
-			builder = builder.withTailText("}" + appendText);
+			builder = builder.withTailText("}");
 		}
 
 		if (tag.isDeprecated()) {

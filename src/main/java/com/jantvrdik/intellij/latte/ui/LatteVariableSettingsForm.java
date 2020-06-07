@@ -9,9 +9,9 @@ import com.intellij.util.ui.ColumnInfo;
 import com.intellij.util.ui.ElementProducer;
 import com.intellij.util.ui.ListTableModel;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.config.LatteFileConfiguration;
 import com.jantvrdik.intellij.latte.settings.LatteSettings;
 import com.jantvrdik.intellij.latte.settings.LatteVariableSettings;
+import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileData;
 import com.jantvrdik.intellij.latte.utils.LatteIdeHelper;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
@@ -193,7 +193,7 @@ public class LatteVariableSettingsForm implements Configurable {
 
 		@Nullable
 		@Override
-		public LatteFileConfiguration.VendorResult valueOf(LatteVariableSettings customMacroSettings) {
+		public LatteXmlFileData.VendorResult valueOf(LatteVariableSettings customMacroSettings) {
 			return LatteConfiguration.getInstance(project).getVendorForVariable(customMacroSettings.getVarName());
 		}
 	}

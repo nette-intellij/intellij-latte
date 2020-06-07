@@ -1,6 +1,6 @@
-package com.jantvrdik.intellij.latte.indexes;
+package com.jantvrdik.intellij.latte.settings.xml;
 
-import com.jantvrdik.intellij.latte.config.LatteFileConfiguration;
+import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.settings.LatteFunctionSettings;
 import com.jantvrdik.intellij.latte.settings.LatteTagSettings;
 import com.jantvrdik.intellij.latte.settings.LatteFilterSettings;
@@ -14,18 +14,18 @@ import java.util.Map;
 import java.util.Objects;
 
 public class LatteXmlFileData implements Serializable {
-    final private LatteFileConfiguration.VendorResult vendorResult;
+    final private LatteXmlFileData.VendorResult vendorResult;
 
     private Map<String, LatteTagSettings> tags = new HashMap<>();
     private Map<String, LatteFilterSettings> filters = new HashMap<>();
     private Map<String, LatteVariableSettings> variables = new HashMap<>();
     private Map<String, LatteFunctionSettings> functions = new HashMap<>();
 
-    public LatteXmlFileData(LatteFileConfiguration.VendorResult vendorResult) {
+    public LatteXmlFileData(LatteXmlFileData.VendorResult vendorResult) {
         this.vendorResult = vendorResult;
     }
 
-    public LatteFileConfiguration.VendorResult getVendorResult() {
+    public LatteXmlFileData.VendorResult getVendorResult() {
         return vendorResult;
     }
 
@@ -119,5 +119,17 @@ public class LatteXmlFileData implements Serializable {
                 Objects.equals(((LatteXmlFileData) obj).filters, this.filters) &&
                 Objects.equals(((LatteXmlFileData) obj).variables, this.variables) &&
                 Objects.equals(((LatteXmlFileData) obj).functions, this.functions);
+    }
+
+    public static class VendorResult implements Serializable {
+        public static LatteXmlFileData.VendorResult CUSTOM = new LatteXmlFileData.VendorResult(LatteConfiguration.Vendor.CUSTOM, "");
+
+        public final String vendorName;
+        public final LatteConfiguration.Vendor vendor;
+
+        public VendorResult(LatteConfiguration.Vendor vendor, String vendorName) {
+            this.vendor = vendor;
+            this.vendorName = vendorName;
+        }
     }
 }

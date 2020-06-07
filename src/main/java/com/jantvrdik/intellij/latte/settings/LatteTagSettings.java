@@ -5,6 +5,9 @@ import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 public class LatteTagSettings extends BaseLatteSettings implements Serializable {
@@ -16,36 +19,17 @@ public class LatteTagSettings extends BaseLatteSettings implements Serializable 
 	private boolean multiLine;
 	private boolean deprecated;
 	private String deprecatedMessage;
+	private List<LatteArgumentSettings> argumentSettings = new ArrayList<>();
 	public LatteTagSettings() {
 		super();
 	}
 
 	public LatteTagSettings(String macroName, Type macroType) {
-		this(macroName, macroType, "");
+		this(macroName, macroType, false, "", false, LatteConfiguration.Vendor.OTHER, "", Collections.emptyList(), "");
 	}
 
-	public LatteTagSettings(String macroName, Type macroType, String arguments) {
-		this(macroName, macroType, false, arguments, false, "");
-	}
-
-	public LatteTagSettings(String macroName, Type macroType, String arguments, String deprecatedMessage) {
-		this(macroName, macroType, false, arguments, false, deprecatedMessage);
-	}
-
-	public LatteTagSettings(String macroName, Type macroType, String arguments, boolean multiLine) {
-		this(macroName, macroType, false, arguments, multiLine, "");
-	}
-
-	public LatteTagSettings(String macroName, Type macroType, boolean allowedFilters, String arguments) {
-		this(macroName, macroType, allowedFilters, arguments, false, "");
-	}
-
-	public LatteTagSettings(String macroName, Type macroType, boolean allowedFilters, String arguments, boolean multiLine) {
-		this(macroName, macroType, allowedFilters, arguments, multiLine, LatteConfiguration.Vendor.OTHER, "", "");
-	}
-
-	public LatteTagSettings(String macroName, Type macroType, boolean allowedFilters, String arguments, boolean multiLine, String deprecatedMessage) {
-		this(macroName, macroType, allowedFilters, arguments, multiLine, LatteConfiguration.Vendor.OTHER, "", deprecatedMessage);
+	public LatteTagSettings(String macroName, Type macroType, boolean allowedFilters, String arguments, boolean multiLine, String deprecatedMessage, List<LatteArgumentSettings> argumentSettings) {
+		this(macroName, macroType, allowedFilters, arguments, multiLine, LatteConfiguration.Vendor.OTHER, "", argumentSettings, deprecatedMessage);
 	}
 
 	private LatteTagSettings(
@@ -56,6 +40,7 @@ public class LatteTagSettings extends BaseLatteSettings implements Serializable 
 			boolean multiLine,
 			LatteConfiguration.Vendor vendor,
 			String vendorName,
+			List<LatteArgumentSettings> argumentSettings,
 			String deprecatedMessage
 	) {
 		super(vendor, vendorName);
@@ -64,6 +49,7 @@ public class LatteTagSettings extends BaseLatteSettings implements Serializable 
 		this.allowedModifiers = allowedModifiers;
 		this.arguments = arguments;
 		this.multiLine = multiLine;
+		this.argumentSettings = argumentSettings;
 		this.deprecated = deprecatedMessage.length() > 0;
 		this.deprecatedMessage = deprecatedMessage;
 	}
@@ -101,6 +87,10 @@ public class LatteTagSettings extends BaseLatteSettings implements Serializable 
 		this.allowedModifiers = allowedModifiers;
 	}
 
+	public void setArgumentSettings(List<LatteArgumentSettings> argumentSettings) {
+		this.argumentSettings = argumentSettings;
+	}
+
 	@Attribute("MacroName")
 	public String getMacroName() {
 		return macroName;
@@ -136,8 +126,24 @@ public class LatteTagSettings extends BaseLatteSettings implements Serializable 
 		return deprecatedMessage;
 	}
 
+	@Attribute("ArgumentSettings")
+	public List<LatteArgumentSettings> getArgumentSettings() {
+		return argumentSettings;
+	}
+
+	public String getArgumentsInfo() {
+		String args = arguments.trim();
+		if (args.length() > 0) {
+			return args;
+		}
+		if (argumentSettings.size() > 0) {
+			return "TODO: arguments";
+		}
+		return "";
+	}
+
 	public boolean hasParameters() {
-		return arguments != null && arguments.length() > 0;
+		return (arguments != null && arguments.length() > 0) || argumentSettings.size() > 0;
 	}
 
 	public Type getType() {
@@ -177,6 +183,7 @@ public class LatteTagSettings extends BaseLatteSettings implements Serializable 
 				.append(this.multiLine)
 				.append(this.deprecated)
 				.append(this.deprecatedMessage)
+				.append(this.argumentSettings)
 				.toHashCode();
 	}
 
@@ -189,7 +196,8 @@ public class LatteTagSettings extends BaseLatteSettings implements Serializable 
 				Objects.equals(((LatteTagSettings) obj).isAllowedModifiers(), this.isAllowedModifiers()) &&
 				Objects.equals(((LatteTagSettings) obj).isMultiLine(), this.isMultiLine()) &&
 				Objects.equals(((LatteTagSettings) obj).isDeprecated(), this.isDeprecated()) &&
-				Objects.equals(((LatteTagSettings) obj).getDeprecatedMessage(), this.getDeprecatedMessage());
+				Objects.equals(((LatteTagSettings) obj).getDeprecatedMessage(), this.getDeprecatedMessage()) &&
+				Objects.equals(((LatteTagSettings) obj).argumentSettings, this.argumentSettings);
 	}
 
 }

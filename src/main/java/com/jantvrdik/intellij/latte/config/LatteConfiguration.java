@@ -3,6 +3,7 @@ package com.jantvrdik.intellij.latte.config;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import com.jantvrdik.intellij.latte.settings.*;
+import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileData;
 import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,7 +17,7 @@ public class LatteConfiguration {
 	public static String FORUM_URL = "https://forum.nette.org/";
 
 	public enum Vendor {
-		OTHER("Other", JBColor.DARK_GRAY),
+		OTHER("Other", (JBColor) JBColor.GREEN.darker()),
 		NETTE_APPLICATION("nette/application", JBColor.BLUE),
 		NETTE_FORMS("nette/forms", JBColor.BLUE),
 		LATTE("Latte", JBColor.ORANGE),
@@ -130,9 +131,9 @@ public class LatteConfiguration {
 			}
 		}
 
-		for (Vendor vendor : LatteDefaultConfiguration.getVariableVendors()) {
+		for (Vendor vendor : LatteDefaultConfiguration.getInstance(project).getVendors()) {
 			if (settings.isEnabledSourceVendor(vendor) && !LatteFileConfiguration.getInstance(project).hasVendor(vendor)) {
-				for (LatteVariableSettings variableSetting : LatteDefaultConfiguration.getVariables(vendor).values()) {
+				for (LatteVariableSettings variableSetting : LatteDefaultConfiguration.getInstance(project).getVariables(vendor).values()) {
 					if (!variableSettings.containsKey(variableSetting.getVarName())) {
 						variableSettings.put(variableSetting.getVarName(), variableSetting);
 					}
@@ -164,9 +165,9 @@ public class LatteConfiguration {
 			}
 		}
 
-		for (Vendor vendor : LatteDefaultConfiguration.getFunctionVendors()) {
+		for (Vendor vendor : LatteDefaultConfiguration.getInstance(project).getVendors()) {
 			if (settings.isEnabledSourceVendor(vendor) && !LatteFileConfiguration.getInstance(project).hasVendor(vendor)) {
-				for (LatteFunctionSettings functionSetting : LatteDefaultConfiguration.getFunctions(vendor).values()) {
+				for (LatteFunctionSettings functionSetting : LatteDefaultConfiguration.getInstance(project).getFunctions(vendor).values()) {
 					if (!functionSettings.containsKey(functionSetting.getFunctionName())) {
 						functionSettings.put(functionSetting.getFunctionName(), functionSetting);
 					}
@@ -198,9 +199,9 @@ public class LatteConfiguration {
 			}
 		}
 
-		for (Vendor vendor : LatteDefaultConfiguration.getTagVendors()) {
+		for (Vendor vendor : LatteDefaultConfiguration.getInstance(project).getVendors()) {
 			if (settings.isEnabledSourceVendor(vendor) && !LatteFileConfiguration.getInstance(project).hasVendor(vendor)) {
-				for (LatteTagSettings tagSetting : LatteDefaultConfiguration.getTags(vendor).values()) {
+				for (LatteTagSettings tagSetting : LatteDefaultConfiguration.getInstance(project).getTags(vendor).values()) {
 					if (!projectTags.containsKey(tagSetting.getMacroName())) {
 						projectTags.put(tagSetting.getMacroName(), tagSetting);
 					}
@@ -231,9 +232,9 @@ public class LatteConfiguration {
 			}
 		}
 
-		for (Vendor vendor : LatteDefaultConfiguration.getFilterVendors()) {
+		for (Vendor vendor : LatteDefaultConfiguration.getInstance(project).getVendors()) {
 			if (settings.isEnabledSourceVendor(vendor) && !LatteFileConfiguration.getInstance(project).hasVendor(vendor)) {
-				for (LatteFilterSettings filterSetting : LatteDefaultConfiguration.getFilters(vendor).values()) {
+				for (LatteFilterSettings filterSetting : LatteDefaultConfiguration.getInstance(project).getFilters(vendor).values()) {
 					if (!projectFilters.containsKey(filterSetting.getModifierName())) {
 						projectFilters.put(filterSetting.getModifierName(), filterSetting);
 					}
@@ -244,30 +245,30 @@ public class LatteConfiguration {
 	}
 
 	@NotNull
-	public LatteFileConfiguration.VendorResult getVendorForTag(String name) {
+	public LatteXmlFileData.VendorResult getVendorForTag(String name) {
 		return getVendorForSettings(getTags(false).getOrDefault(name, null));
 	}
 
 	@NotNull
-	public LatteFileConfiguration.VendorResult getVendorForFilter(String name) {
+	public LatteXmlFileData.VendorResult getVendorForFilter(String name) {
 		return getVendorForSettings(getFilters(false).getOrDefault(name, null));
 	}
 
 	@NotNull
-	public LatteFileConfiguration.VendorResult getVendorForVariable(String name) {
+	public LatteXmlFileData.VendorResult getVendorForVariable(String name) {
 		return getVendorForSettings(getVariables(false).getOrDefault(name, null));
 	}
 
 	@NotNull
-	public LatteFileConfiguration.VendorResult getVendorForFunction(String name) {
+	public LatteXmlFileData.VendorResult getVendorForFunction(String name) {
 		return getVendorForSettings(getFunctions(false).getOrDefault(name, null));
 	}
 
-	private LatteFileConfiguration.VendorResult getVendorForSettings(BaseLatteSettings settings) {
+	private LatteXmlFileData.VendorResult getVendorForSettings(BaseLatteSettings settings) {
 		if (settings != null) {
-			return new LatteFileConfiguration.VendorResult(settings.getVendor(), settings.getVendorName());
+			return new LatteXmlFileData.VendorResult(settings.getVendor(), settings.getVendorName());
 		}
-		return LatteFileConfiguration.VendorResult.CUSTOM;
+		return LatteXmlFileData.VendorResult.CUSTOM;
 	}
 
 	public static boolean isValidVendor(String type) {

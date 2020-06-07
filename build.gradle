@@ -13,13 +13,13 @@ sourceSets {
     }
 }
 
-def Properties properties = new Properties()
+Properties properties = new Properties()
 properties.load(project.rootProject.file("local.properties").newDataInputStream())
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-version '1.2.0-rc1'
+version '1.1.0-rc4'
 group 'com.jantvrdik.intellij.latte'
 
 jar {

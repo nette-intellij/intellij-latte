@@ -350,6 +350,104 @@ public class LattePhpLexerTest {
 
 	@Test
 	@SuppressWarnings("unchecked")
+	public void testArrayItemsWithDoubleArrow() throws Exception {
+		Lexer lexer = new LatteHighlightingLexer(new LatteLexer());
+		lexer.start("{block test, te => $item, test . 1 => 123}{/block}");
+		assertTokens(lexer, new Pair[] {
+			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
+			Pair.create(T_MACRO_NAME, "block"),
+			Pair.create(T_WHITESPACE, " "),
+			Pair.create(T_PHP_IDENTIFIER, "test"),
+			Pair.create(T_MACRO_ARGS, ","),
+			Pair.create(T_WHITESPACE, " "),
+			Pair.create(T_PHP_IDENTIFIER, "te"),
+			Pair.create(T_WHITESPACE, " "),
+			Pair.create(T_MACRO_ARGS, "=>"), //todo: weird behavior, it must be T_PHP_DOUBLE_ARROW (it is because is workaround for "=>" in LatteParser.bnf)
+			Pair.create(T_WHITESPACE, " "),
+			Pair.create(T_MACRO_ARGS_VAR, "$item"),
+			Pair.create(T_MACRO_ARGS, ","),
+			Pair.create(T_WHITESPACE, " "),
+			Pair.create(T_PHP_IDENTIFIER, "test"),
+			Pair.create(T_WHITESPACE, " "),
+			Pair.create(T_PHP_CONCATENATION, "."),
+			Pair.create(T_WHITESPACE, " "),
+			Pair.create(T_MACRO_ARGS_NUMBER, "1"),
+			Pair.create(T_WHITESPACE, " "),
+			Pair.create(T_PHP_DOUBLE_ARROW, "=>"),
+			Pair.create(T_WHITESPACE, " "),
+			Pair.create(T_MACRO_ARGS_NUMBER, "123"),
+			Pair.create(T_MACRO_TAG_CLOSE, "}"),
+			Pair.create(T_MACRO_CLOSE_TAG_OPEN, "{/"),
+			Pair.create(T_MACRO_NAME, "block"),
+			Pair.create(T_MACRO_TAG_CLOSE, "}"),
+		});
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testBlockName() throws Exception {
+		Lexer lexer = new LatteHighlightingLexer(new LatteLexer());
+		lexer.start("{include #test}");
+		assertTokens(lexer, new Pair[] {
+			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
+			Pair.create(T_MACRO_NAME, "include"),
+			Pair.create(T_WHITESPACE, " "),
+			Pair.create(T_BLOCK_NAME, "#"),
+			Pair.create(T_BLOCK_NAME, "test"),
+			Pair.create(T_MACRO_TAG_CLOSE, "}"),
+		});
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testLinkDestination() throws Exception {
+		Lexer lexer = new LatteLookAheadLexer(new LatteLexer());
+		lexer.start("{link default}");
+		assertTokens(lexer, new Pair[] {
+			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
+			Pair.create(T_MACRO_NAME, "link"),
+			Pair.create(T_WHITESPACE, " "),
+			Pair.create(T_LINK_DESTINATION, "default"),
+			Pair.create(T_MACRO_TAG_CLOSE, "}"),
+		});
+
+		lexer.start("{link Presenter:default}");
+		assertTokens(lexer, new Pair[] {
+			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
+			Pair.create(T_MACRO_NAME, "link"),
+			Pair.create(T_WHITESPACE, " "),
+			Pair.create(T_LINK_DESTINATION, "Presenter"),
+			Pair.create(T_LINK_DESTINATION, ":"),
+			Pair.create(T_LINK_DESTINATION, "default"),
+			Pair.create(T_MACRO_TAG_CLOSE, "}"),
+		});
+
+		lexer.start("{link :Presenter:default}");
+		assertTokens(lexer, new Pair[] {
+			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
+			Pair.create(T_MACRO_NAME, "link"),
+			Pair.create(T_WHITESPACE, " "),
+			Pair.create(T_LINK_DESTINATION, ":"),
+			Pair.create(T_LINK_DESTINATION, "Presenter"),
+			Pair.create(T_LINK_DESTINATION, ":"),
+			Pair.create(T_LINK_DESTINATION, "default"),
+			Pair.create(T_MACRO_TAG_CLOSE, "}"),
+		});
+
+		lexer.start("<a n:href=\"default\"></a>");
+		assertTokens(lexer, new Pair[] {
+			Pair.create(T_TEXT, "<a "),
+			Pair.create(T_HTML_TAG_NATTR_NAME, "n:href"),
+			Pair.create(T_HTML_TAG_ATTR_EQUAL_SIGN, "="),
+			Pair.create(T_HTML_TAG_ATTR_DQ, "\""),
+			Pair.create(T_LINK_DESTINATION, "default"),
+			Pair.create(T_HTML_TAG_ATTR_DQ, "\""),
+			Pair.create(T_TEXT, "></a>"),
+		});
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
 	public void testModifiers() throws Exception {
 		Lexer lexer = new LatteLexer();
 		lexer.start("{$object|bytes}");

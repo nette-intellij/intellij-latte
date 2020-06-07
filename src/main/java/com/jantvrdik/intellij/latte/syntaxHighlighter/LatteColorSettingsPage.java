@@ -18,6 +18,8 @@ public class LatteColorSettingsPage implements ColorSettingsPage {
 		new AttributesDescriptor("Tag Filters", LatteSyntaxHighlighter.MACRO_MODIFIERS),
 		new AttributesDescriptor("Tag Delimiters", LatteSyntaxHighlighter.MACRO_DELIMITERS),
 		new AttributesDescriptor("Tag Comment", LatteSyntaxHighlighter.MACRO_COMMENT),
+		new AttributesDescriptor("Block name", LatteSyntaxHighlighter.MACRO_BLOCK_NAME),
+		new AttributesDescriptor("Destination link", LatteSyntaxHighlighter.MACRO_LINK_DESTINATION),
 		new AttributesDescriptor("Attribute n:tag Name", LatteSyntaxHighlighter.HTML_NATTR_NAME),
 		new AttributesDescriptor("Attribute n:tag Value", LatteSyntaxHighlighter.HTML_NATTR_VALUE),
 		new AttributesDescriptor("PHP Variable", LatteSyntaxHighlighter.MACRO_ARGS_VAR),
@@ -58,9 +60,11 @@ public class LatteColorSettingsPage implements ColorSettingsPage {
 			"<div class=\"perex\" n:if=\"$content\">\n" +
 			"    {$content|truncate:250}\n" +
 			"</div>\n\n" +
+			"{link :Presenter:default}\n\n" +
+			"<a n:href=\"default\">go</a>\n\n" +
 			"{varType \\Foo\\Bar|string|null $var}\n\n" +
 			"{var $bar = $object->getFoo()->entity}\n" +
-			"{var $bar = (string) $object}\n" +
+			"{var $fox = (string) $object}\n" +
 			"{$foo::$staticVariable::CONSTANT}\n\n" +
 			"{count($arr)}\n" +
 			"{foreach $data as $key => $value}\n" +

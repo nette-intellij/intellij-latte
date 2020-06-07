@@ -8,7 +8,6 @@ import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LattePhpArrayUsage;
 import com.jantvrdik.intellij.latte.psi.LattePhpForeach;
-import com.jantvrdik.intellij.latte.psi.LattePhpStatement;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
 import com.jantvrdik.intellij.latte.utils.LattePhpType;
 import com.jantvrdik.intellij.latte.utils.LattePhpVariableUtil;
@@ -47,18 +46,15 @@ public class LatteIterableTypeInspection extends BaseLocalInspectionTool {
 					}
 
 				} else if (element instanceof LattePhpForeach) {
-					LattePhpStatement statement = ((LattePhpForeach) element).getPhpStatement();
-					if (statement != null) {
-						LattePhpType type = statement.getPhpType();
-						if (!type.isMixed() && !type.isIterable(element.getProject())) {
-							addProblem(
-									manager,
-									problems,
-									statement,
-									"Invalid argument supplied to 'foreach'. Expected types: 'array' or 'object', '" + type.toString() + "' provided.",
-									isOnTheFly
-							);
-						}
+					LattePhpType type = ((LattePhpForeach) element).getPhpExpression().getPhpType();
+					if (!type.isMixed() && !type.isIterable(element.getProject())) {
+						addProblem(
+								manager,
+								problems,
+								((LattePhpForeach) element).getPhpExpression(),
+								"Invalid argument supplied to 'foreach'. Expected types: 'array' or 'object', '" + type.toString() + "' provided.",
+								isOnTheFly
+						);
 					}
 
 				} else {

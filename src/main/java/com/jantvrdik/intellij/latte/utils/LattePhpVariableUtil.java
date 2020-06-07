@@ -66,8 +66,8 @@ public class LattePhpVariableUtil {
                     IElementType type = nextElement != null ? nextElement.getNode().getElementType() : null;
                     if (type != T_PHP_DOUBLE_ARROW) {
                         LattePhpForeach phpForeach = PsiTreeUtil.getParentOfType(current, LattePhpForeach.class);
-                        if (phpForeach != null && phpForeach.getPhpStatement() != null) {
-                            return phpForeach.getPhpStatement().getPhpType().withDepth(startDepth + 1);
+                        if (phpForeach != null && phpForeach.getPhpExpression().getPhpStatementList().size() > 0) {
+                            return phpForeach.getPhpExpression().getPhpType().withDepth(startDepth + 1);
                         }
                     }
                 }

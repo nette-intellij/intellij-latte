@@ -11,11 +11,11 @@ import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.FileContentUtilCore;
 import com.jantvrdik.intellij.latte.LatteFileType;
+import com.jantvrdik.intellij.latte.config.LatteDefaultConfiguration;
 import com.jantvrdik.intellij.latte.config.LatteFileConfiguration;
 import com.jantvrdik.intellij.latte.utils.LatteIdeHelper;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -32,13 +32,13 @@ public class LatteIndexUtil {
                 new NotificationAction("Refresh Configuration") {
                     @Override
                     public void actionPerformed(@NotNull AnActionEvent e, @NotNull Notification notification) {
-                        tryPerform(projects, notification);
+                        tryPerform(projects.toArray(new Project[0]), notification);
                     }
                 }
         );
     }
 
-    private static void tryPerform(List<Project> projects, @NotNull Notification notification) {
+    private static void tryPerform(Project[] projects, @NotNull Notification notification) {
         for (Project project : projects) {
             if (ActionUtil.isDumbMode(project)) {
                 notification.expire();
@@ -58,6 +58,24 @@ public class LatteIndexUtil {
         LatteIdeHelper.doNotify("Latte plugin settings", "Configuration was reloaded", NotificationType.INFORMATION, null);
     }
 
+    private static void tryPerformReadLock(Project[] projects, @NotNull Notification notification) {
+        if (LatteIdeHelper.holdsReadLock()) {
+            notification.expire();
+            showWaring(projects);
+            return;
+        }
+
+        for (Project project : projects) {
+            if (!reinitializeDefaultConfig(project)) {
+                return;
+            }
+        }
+
+        notification.expire();
+
+        LatteIdeHelper.doNotify("Latte plugin settings", "Configuration was reloaded", NotificationType.INFORMATION, null);
+    }
+
     public static Notification notifyReparseFiles(Project project) {
         return LatteIdeHelper.doNotify(
                 "Latte configuration reloaded",
@@ -68,9 +86,23 @@ public class LatteIndexUtil {
                 new NotificationAction("Reparse Latte Files") {
                     @Override
                     public void actionPerformed(@NotNull AnActionEvent e, @NotNull Notification current) {
-                        tryPerform(new ArrayList<Project>(){{
-                            add(project);
-                        }}, current);
+                        tryPerform(new Project[]{project}, current);
+                    }
+                }
+        );
+    }
+
+    public static Notification notifyDefaultReparse(Project project) {
+        return LatteIdeHelper.doNotify(
+                "Latte configuration reloaded",
+                "Latte plugin installed configuration files to your .idea folder. It needs reparse files. (this should only happen if the first installation of new plugin version)",
+                NotificationType.WARNING,
+                project,
+                true,
+                new NotificationAction("Reparse Latte Files") {
+                    @Override
+                    public void actionPerformed(@NotNull AnActionEvent e, @NotNull Notification current) {
+                        tryPerformReadLock(new Project[]{project}, current);
                     }
                 }
         );
@@ -78,34 +110,48 @@ public class LatteIndexUtil {
 
     public static boolean reinitialize(Project project) {
         if (ActionUtil.isDumbMode(project)) {
-            showWaring(new ArrayList<Project>(){{
-                add(project);
-            }});
+            showWaring(new Project[]{project});
             return false;
         }
 
         LatteFileConfiguration.getInstance(project).reinitialize();
 
+        reparseFiles(project);
+        return true;
+    }
+
+    public static boolean reinitializeDefaultConfig(Project project) {
+        if (LatteIdeHelper.holdsReadLock()) {
+            showWaring(new Project[]{project});
+            return false;
+        }
+
+        LatteDefaultConfiguration.getInstance(project).reinitialize();
+
+        reparseFiles(project);
+        return true;
+    }
+
+    private static void reparseFiles(@NotNull Project project) {
         Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(LatteFileType.INSTANCE, GlobalSearchScope.allScope(project));
         FileContentUtilCore.reparseFiles(virtualFiles);
         //FileContentUtil.reparseFiles(project, virtualFiles, false);
-        return true;
     }
 
     public static boolean isNotificationOutdated(Notification notification) {
         return (notification.getTimestamp() + WAIT_MILIS_BETWEEN_NOTIFY) <= System.currentTimeMillis();
     }
 
-    private static void showWaring(List<Project> projects) {
-        if (projects.size() == 0) {
+    private static void showWaring(Project[] projects) {
+        if (projects.length == 0) {
             return;
         }
 
         LatteIdeHelper.doNotify(
                 "Latte plugin warning",
-                "Latte files can not be reparsed during indexing. Wait after indexing will be done.",
+                "Latte files can not be reparsed during indexing. Wait after all processes around indexing will be done.",
                 NotificationType.ERROR,
-                projects.get(0),
+                projects[0],
                 new NotificationAction("Refresh Configuration") {
                     @Override
                     public void actionPerformed(@NotNull AnActionEvent e, @NotNull Notification notification) {

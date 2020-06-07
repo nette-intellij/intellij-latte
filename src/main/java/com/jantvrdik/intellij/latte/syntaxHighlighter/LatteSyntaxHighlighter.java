@@ -9,7 +9,9 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.jantvrdik.intellij.latte.lexer.LatteHighlightingLexer;
 import com.jantvrdik.intellij.latte.lexer.LatteLexer;
+import com.jantvrdik.intellij.latte.lexer.LatteLookAheadLexer;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributesKey;
@@ -25,6 +27,8 @@ public class LatteSyntaxHighlighter extends SyntaxHighlighterBase {
 	public static final TextAttributesKey MACRO_ARGS_NUMBER = createTextAttributesKey("LATTE_MACRO_ARGS_NUMBER", DefaultLanguageHighlighterColors.NUMBER);
 	public static final TextAttributesKey MACRO_MODIFIERS = createTextAttributesKey("LATTE_MACRO_MODIFIERS", DefaultLanguageHighlighterColors.DOC_COMMENT);
 	public static final TextAttributesKey MACRO_COMMENT = createTextAttributesKey("LATTE_MACRO_COMMENT", DefaultLanguageHighlighterColors.BLOCK_COMMENT);
+	public static final TextAttributesKey MACRO_BLOCK_NAME = createTextAttributesKey("LATTE_MACRO_BLOCK_NAME", DefaultLanguageHighlighterColors.STATIC_METHOD);
+	public static final TextAttributesKey MACRO_LINK_DESTINATION = createTextAttributesKey("LATTE_MACRO_LINK_DESTINATION", DefaultLanguageHighlighterColors.STRING);
 	public static final TextAttributesKey PHP_KEYWORD = createTextAttributesKey("LATTE_PHP_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD);
 	public static final TextAttributesKey PHP_CLASS_NAME = createTextAttributesKey("LATTE_PHP_CLASS_NAME", DefaultLanguageHighlighterColors.CLASS_REFERENCE);
 	public static final TextAttributesKey PHP_METHOD = createTextAttributesKey("LATTE_PHP_METHOD", DefaultLanguageHighlighterColors.INSTANCE_METHOD);
@@ -41,7 +45,7 @@ public class LatteSyntaxHighlighter extends SyntaxHighlighterBase {
 	@NotNull
 	@Override
 	public Lexer getHighlightingLexer() {
-		return new LatteHighlightingLexer(new LatteLexer());
+		return new LatteHighlightingLexer(new LatteLookAheadLexer(new LatteLexer()));
 	}
 
 	@NotNull
@@ -121,8 +125,14 @@ public class LatteSyntaxHighlighter extends SyntaxHighlighterBase {
 		} else if (token == LatteTypes.T_MACRO_COMMENT) {
 			return pack(MACRO_COMMENT);
 
+		} else if (token == LatteTypes.T_BLOCK_NAME) {
+			return pack(MACRO_BLOCK_NAME);
+
+		} else if (token == LatteTypes.T_LINK_DESTINATION) {
+			return pack(MACRO_LINK_DESTINATION);
+
 		} else {
-			return EMPTY; // todo: after plugin will be for minimum 192.4147 replace with TextAttributesKey.EMPTY_ARRAY
+			return TextAttributesKey.EMPTY_ARRAY;
 		}
 	}
 }

@@ -142,7 +142,7 @@ public class LattePhpType {
             }
 
             if (typePart.isIterable()) {
-                this.iterable.add(typePart.depth);
+                this.iterable.add(typePart.depth - 1);
             }
             types.add(typePart.getPart());
 

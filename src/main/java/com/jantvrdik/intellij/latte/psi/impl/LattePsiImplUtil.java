@@ -8,6 +8,7 @@ import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
+import com.jantvrdik.intellij.latte.psi.elements.LattePhpExpressionElement;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpStatementPartElement;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpTypedPartElement;
 import com.jantvrdik.intellij.latte.settings.LatteFunctionSettings;
@@ -240,6 +241,14 @@ public class LattePsiImplUtil {
 	public static @NotNull LattePhpType getPhpType(@NotNull LattePhpTypedPartElement statement) {
 		LattePhpTypeElement typeElement = statement.getPhpTypeElement();
 		return typeElement == null ? LattePhpType.MIXED : typeElement.getPhpType();
+	}
+
+	public static @NotNull LattePhpType getPhpType(@NotNull LattePhpExpressionElement expression) {
+		List<LattePhpStatement> statements = expression.getPhpStatementList();
+		if (statements.size() > 0) {
+			return statements.get(0).getPhpType();
+		}
+		return LattePhpType.MIXED;
 	}
 
 	public static @Nullable BaseLattePhpElement getLastPhpElement(@NotNull LattePhpStatement statement) {

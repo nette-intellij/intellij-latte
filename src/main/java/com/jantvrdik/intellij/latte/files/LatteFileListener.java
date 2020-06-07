@@ -8,8 +8,9 @@ import com.intellij.openapi.vfs.newvfs.BulkFileListener;
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
 import com.intellij.psi.xml.XmlDocument;
 import com.intellij.psi.xml.XmlFile;
-import com.jantvrdik.intellij.latte.config.LatteFileConfiguration;
 import com.jantvrdik.intellij.latte.indexes.LatteIndexUtil;
+import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileData;
+import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileDataFactory;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class LatteFileListener implements BulkFileListener {
                 continue;
             }
 
-            LatteFileConfiguration.VendorResult vendorResult = LatteFileConfiguration.getVendor(document);
+            LatteXmlFileData.VendorResult vendorResult = LatteXmlFileDataFactory.getVendor(document);
             if (vendorResult == null) {
                 continue;
             }
