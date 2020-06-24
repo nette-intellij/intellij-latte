@@ -70,24 +70,101 @@ public class LatteArgumentSettings implements Serializable {
 		return types;
 	}
 
+	public String toReadableString() {
+		List<String> readableTypes = new ArrayList<>();
+		for (Type type : types) {
+			if (type.readableString == null) {
+				readableTypes.add(type.getPrefix() + name);
+			} else {
+				readableTypes.add(type.readableString);
+			}
+		}
+
+		String outString = String.join("|", readableTypes);
+		if (isRepeatable()) {
+			outString = outString + ", …";
+		}
+		if (!isRequired()) {
+			outString = "[" + outString + "]";
+		}
+		return outString;
+	}
+
 	public enum Type {
 		/** match with foo, bar, foo_123, ... */
 		PHP_IDENTIFIER,
 
 		/** match with $var, foo(), \Bar::, ... (-> | :: property|method|constant) */
-		PHP_EXPRESSION,
+		PHP_EXPRESSION("expression"),
 
-		/** match with $var and mark it as definition */
-		VARIABLE_DEFINITION,
+		/** match with PHP_EXPRESSION */
+		PHP_CONDITION("condition"),
 
-		/** match with [$foo, , $bar] and mark all variables as definition */
-		VARIABLE_DEFINITION_LIST,
+		/** match with class names \Foo, \Foo\Bar, ... */
+		PHP_CLASS_NAME("ClassName"),
 
-		/** match with [$foo, , $bar] and mark all variables as definition */
-		BLOCK,
+		/** match with `$var` */
+		VARIABLE("$", true),
+
+		/** match with `$var` and mark it as definition */
+		VARIABLE_DEFINITION("$", true),
+
+		/** match with [type] $variable = expr, and mark variable as definition */
+		VARIABLE_DEFINITION_EXPRESSION("[type] $variable = expr"),
+
+		/** match with [type] $var and mark all variables as definition */
+		VARIABLE_DEFINITION_ITEM("[type] $var"),
+
+		/** match with #block */
+		BLOCK("#block"),
+
+		/** match with PHP_IDENTIFIER */
+		BLOCK_USAGE("block"),
+
+		/** match with `none` */
+		NONE("none"),
+
+		/** match with php types definition eg.: \Foo|string|null */
+		PHP_TYPE,
+
+		/** match with content-type */
+		CONTENT_TYPE("content-type"),
+
+		/** match with default, Foo:detail, handleFoo!, ... */
+		LINK_DESTINATION("destination"),
+
+		/** match with PHP_EXPRESSION or KEY_VALUE */
+		LINK_PARAMETERS("param|name => param"),
+
+		/** match with VARIABLE */
+		CONTROL("$control"),
 
 		/** match with , var => value, … */
-		KEY_VALUE,
+		KEY_VALUE(", var => value");
+
+		private @Nullable String readableString = null;
+
+		private @Nullable String prefix = null;
+
+		Type() {
+
+		}
+
+		Type(@Nullable String readableString) {
+			this(readableString, false);
+		}
+
+		Type(@Nullable String prefix, boolean isPrefix) {
+			if (isPrefix) {
+				this.prefix = prefix;
+			} else {
+				this.readableString = prefix;
+			}
+		}
+
+		private String getPrefix() {
+			return prefix != null ? prefix : "";
+		}
 	}
 
 	@Nullable

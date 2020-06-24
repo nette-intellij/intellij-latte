@@ -118,7 +118,7 @@ public class LattePhpLexerTest {
 			Pair.create(T_MACRO_NAME, "varType"),
 			Pair.create(T_WHITESPACE, " "),
 			Pair.create(T_PHP_TYPE, "string"),
-			Pair.create(T_MACRO_ARGS, "|"),
+			Pair.create(T_PHP_OR_INCLUSIVE, "|"),
 			Pair.create(T_MACRO_ARGS_VAR, "$int"),
 			Pair.create(T_WHITESPACE, " "),
 			Pair.create(T_MACRO_ARGS_VAR, "$_var1"),
@@ -169,6 +169,20 @@ public class LattePhpLexerTest {
 			Pair.create(T_WHITESPACE, " "),
 			Pair.create(T_MACRO_ARGS_NUMBER, "123"),
 			Pair.create(T_MACRO_TAG_CLOSE, "}"),
+		});
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testTranslationTag() throws Exception {
+		Lexer lexer = new LatteLexer();
+		lexer.start("{_|test}");
+		assertTokens(lexer, new Pair[] {
+				Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
+				Pair.create(T_MACRO_SHORTNAME, "_"),
+				Pair.create(T_PHP_MACRO_SEPARATOR, "|"),
+				Pair.create(T_MACRO_FILTERS, "test"),
+				Pair.create(T_MACRO_TAG_CLOSE, "}"),
 		});
 	}
 

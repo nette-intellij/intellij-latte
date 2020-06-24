@@ -51,14 +51,11 @@ public class LatteFormattingModelBuilder extends AbstractXmlTemplateFormattingMo
 				.around(LatteTypes.T_PHP_RELATIONAL_OPERATOR)
 				.spaceIf(settings.getCommonSettings(LatteLanguage.INSTANCE.getID()).SPACE_AROUND_RELATIONAL_OPERATORS)
 
-				.around(TokenSet.create(LatteTypes.T_PHP_BITWISE_OPERATOR, LatteTypes.T_PHP_OR_INCLUSIVE))
+				.around(LatteTypes.T_PHP_BITWISE_OPERATOR)
 				.spaceIf(settings.getCommonSettings(LatteLanguage.INSTANCE.getID()).SPACE_AROUND_BITWISE_OPERATORS)
 
 				.around(LatteTypes.T_PHP_SHIFT_OPERATOR)
 				.spaceIf(settings.getCommonSettings(LatteLanguage.INSTANCE.getID()).SPACE_AROUND_SHIFT_OPERATORS)
-
-				.around(LatteTypes.T_PHP_ADDITIVE_OPERATOR)
-				.spaceIf(settings.getCommonSettings(LatteLanguage.INSTANCE.getID()).SPACE_AROUND_ADDITIVE_OPERATORS)
 
 				.around(LatteTypes.T_PHP_UNARY_OPERATOR)
 				.spaceIf(settings.getCommonSettings(LatteLanguage.INSTANCE.getID()).SPACE_AROUND_UNARY_OPERATOR)

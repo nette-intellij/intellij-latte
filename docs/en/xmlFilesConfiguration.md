@@ -20,6 +20,11 @@ This is example file content with sample values:
     <tags>
         <tag name="myIf" type="PAIR" arguments="condition" deprecatedMessage="MyIf is deprecated, use {if ...} instead." />
         <tag name="myFor" type="PAIR" arguments="initialization; condition; afterthought" allowedModifiers="true" multiLine="true" />
+        <tag name="block" type="PAIR" allowedFilters="true" multiLine="true">
+			<arguments>
+				<argument name="name" types="PHP_IDENTIFIER,VARIABLE,PHP_EXPRESSION" validType="string" required="true" />
+			</arguments>
+		</tag>
     </tags>
     <variables>
         <variable name="testVar" type="\Student" />
@@ -47,6 +52,44 @@ This is example file content with sample values:
 | allowedFilters    | no       | false         | true, false                             | Used for inspections and completions |
 | multiLine         | no       | false         | true, false                             | Used after code completion           |
 | deprecatedMessage | no       | ""            | any string                              | Message for deprecated tag           |
+
+#### Attribute `type` detail:
+
+- `PAIR` - it means pair tag like `{form}{/form}`
+- `UNPAIRED` - it means unpaired tag like `{varType}`
+- `ATTR_ONLY` - it means tag used only as n:attribute, like `n:class`
+- `AUTO_EMPTY` - it means pair tag which can be used as unpaired like `{label} | {label}{/label}`
+
+### &lt;argument&gt; in &lt;arguments&gt; in &lt;tag&gt;
+
+| attribute         | required | default value | possible values                         | Description                          |
+|-------------------|----------|---------------|-----------------------------------------|--------------------------------------|
+| name              | yes      | none          | any string                              | Name for tag argument                |
+| types             | yes      | none          | _Types are listed under this table_     | Argument  types separated by comma   |
+| validType         | no       | mixed         | PHP type definition                     | Expected return type for argument    |
+| required          | no       | false         | true, false                             | Used for inspections and completions |
+| repeatable        | no       | false         | true, false                             | Used for inspections and completions |
+
+#### Attribute `types` detail:
+
+- `PHP_IDENTIFIER` - match with `foo`, `bar`, `foo_123`, ...
+- `PHP_EXPRESSION` - match with `$var`, `foo()`, `\Bar::`, `... (-> | :: property|method|constant)`
+- `PHP_CONDITION` - match with `PHP_EXPRESSION` (only use `condition` as name for completion)
+- `PHP_CLASS_NAME` - match with class names `\Foo`, `\Foo\Bar`, ...
+- `VARIABLE` - match with `$var`
+- `VARIABLE_DEFINITION` - match with `$var` and mark it as definition
+- `VARIABLE_DEFINITION_EXPRESSION` - match with `[type] $variable = expr`, and mark variable as definition
+- `VARIABLE_DEFINITION_ITEM` - match with `[type] $var` and mark variable as definition
+- `BLOCK` - match with `#block`
+- `BLOCK_USAGE` - match with `PHP_IDENTIFIER` (only use `block` as name for completion)
+- `NONE` - match with string `none`
+- `PHP_TYPE` - match with php type like `string`, `string|null`, `\Foo\Bar`, ...
+- `CONTENT_TYPE` - match with content type like `application/json`, ...
+- `LINK_DESTINATION` - match with `default`, `Foo:detail`, `handleFoo!`, ...
+- `LINK_PARAMETERS` - match with `PHP_EXPRESSION` or `KEY_VALUE`
+- `KEY_VALUE` - match with `, [var =>] value`
+- `CONTROL` - match with `VARIABLE` (only use `$control` as name for completion)
+
 
 ### &lt;filter&gt; in &lt;filters&gt;
 

@@ -283,7 +283,7 @@ private
 phpArgument    ::= phpPrivateArgument | T_PHP_AS | T_PHP_DOUBLE_ARROW
 
 private
-phpPrivateArgument    ::=  phpString | phpArrayOfVariables | phpTypedArguments | phpTypeElement | phpStatement | T_MACRO_ARGS_NUMBER
+phpPrivateArgument    ::=  phpString | phpArrayOfVariables | phpTypedArguments | phpStatement | phpTypeElement | T_MACRO_ARGS_NUMBER
                     | phpArray | phpClassReference | phpDefinition
                     | phpStatic | phpMethod | phpInBrackets | phpVariable | T_PHP_NULL_MARK | T_PHP_CONTENT_TYPE | T_PHP_OBJECT_OPERATOR
                     | T_PHP_RELATIONAL_OPERATOR | T_PHP_ASSIGNMENT_OPERATOR | T_PHP_LOGIC_OPERATOR | T_PHP_OPERATOR

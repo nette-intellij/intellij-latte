@@ -101,8 +101,6 @@ public class LatteAnnotator implements Annotator {
 				macro != null
 				&& closeTag == null
 				&& ((element instanceof LattePairMacro && macro.getType() == LatteTagSettings.Type.AUTO_EMPTY) || macro.getType() == LatteTagSettings.Type.PAIR)
-				&& !openTagName.equals("block")
-				&& !openTagName.equals("_")
 		) {
 			holder.createErrorAnnotation(openTag, "Unclosed tag " + openTagName);
 		}

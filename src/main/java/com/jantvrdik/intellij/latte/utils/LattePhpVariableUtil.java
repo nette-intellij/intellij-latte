@@ -207,7 +207,9 @@ public class LattePhpVariableUtil {
             return null;
         }
         PsiElement phpTypeElement = PsiTreeUtil.skipWhitespacesBackward(statementPart.getPhpStatement());
-        return phpTypeElement instanceof LattePhpTypeElement ? ((LattePhpTypeElement) phpTypeElement).getPhpType() : null;
+        return phpTypeElement instanceof LattePhpTypeElement
+                ? ((LattePhpTypeElement) phpTypeElement).getPhpType()
+                : (phpTypeElement instanceof LattePhpStatement ? ((LattePhpStatement) phpTypeElement).getPhpType() : null);
     }
 
 }

@@ -48,6 +48,11 @@ public class LatteMacroContentLexerAdapterTest {
 				Pair.create(T_PHP_CONTENT, "$var|noescape"),
 		});
 
+		lexer.start("|test");
+		assertTokens(lexer, new Pair[]{
+				Pair.create(T_PHP_CONTENT, "|test"),
+		});
+
 		lexer.start(" function() { } ");
 		assertTokens(lexer, new Pair[]{
 				Pair.create(T_WHITESPACE, " "),

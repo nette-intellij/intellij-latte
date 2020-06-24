@@ -137,7 +137,11 @@ public class LatteTagSettings extends BaseLatteSettings implements Serializable 
 			return args;
 		}
 		if (argumentSettings.size() > 0) {
-			return "TODO: arguments";
+			List<String> builder = new ArrayList<>();
+			for (LatteArgumentSettings argumentSettings : argumentSettings) {
+				builder.add(argumentSettings.toReadableString());
+			}
+			return String.join(" ", builder);
 		}
 		return "";
 	}

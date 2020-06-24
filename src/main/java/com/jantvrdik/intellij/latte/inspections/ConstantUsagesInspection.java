@@ -2,7 +2,6 @@ package com.jantvrdik.intellij.latte.inspections;
 
 import com.intellij.codeInspection.InspectionManager;
 import com.intellij.codeInspection.ProblemDescriptor;
-import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
@@ -67,7 +66,7 @@ public class ConstantUsagesInspection extends BaseLocalInspectionTool {
 					}
 
 					if (!isFound) {
-						addError(manager, problems, element, "Constant '" + constantName + "' not found for type '" + phpType.toString() + "'", isOnTheFly);
+						addProblem(manager, problems, element, "Constant '" + constantName + "' not found for type '" + phpType.toString() + "'", isOnTheFly);
 					}
 
 				} else {

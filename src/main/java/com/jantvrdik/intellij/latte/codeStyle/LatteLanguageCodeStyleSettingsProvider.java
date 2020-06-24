@@ -26,7 +26,6 @@ public class LatteLanguageCodeStyleSettingsProvider extends LanguageCodeStyleSet
 			consumer.showStandardOptions("SPACE_AROUND_LOGICAL_OPERATORS");
 			consumer.showStandardOptions("SPACE_AROUND_RELATIONAL_OPERATORS");
 			consumer.showStandardOptions("SPACE_AROUND_BITWISE_OPERATORS");
-			consumer.showStandardOptions("SPACE_AROUND_ADDITIVE_OPERATORS");
 			consumer.showStandardOptions("SPACE_AROUND_MULTIPLICATIVE_OPERATORS");
 			consumer.showStandardOptions("SPACE_AROUND_BITWISE_OPERATORS");
 			consumer.showCustomOption(

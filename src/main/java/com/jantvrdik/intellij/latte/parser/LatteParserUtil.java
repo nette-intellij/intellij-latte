@@ -30,14 +30,6 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 		LatteTagSettings macro = getTag(builder);
 		if (macro != null && macro.getType() == LatteTagSettings.Type.AUTO_EMPTY) {
 			result = pair == isAutoEmptyPair(macroName, builder);
-		} else if (macroName.equals("_")) {
-			// hard coded rule for macro _ because of dg's poor design decision
-			// macro _ is pair only if it has empty arguments, otherwise it is unpaired
-			// see https://github.com/nette/nette/blob/v2.1.2/Nette/Latte/Macros/CoreMacros.php#L193
-			builder.advanceLexer();
-			result = ((builder.getTokenType() == T_MACRO_TAG_CLOSE) == pair);
-
-			// all other macros which respect rules
 		} else {
 			result = (macro != null ? (macro.getType() == (pair ? LatteTagSettings.Type.PAIR : LatteTagSettings.Type.UNPAIRED)) : !pair);
 		}
@@ -109,10 +101,6 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 
 		if (macro != null && macro.getType() == LatteTagSettings.Type.AUTO_EMPTY) {
 			return isAutoEmptyPair(macroName, builder);
-		}
-		if (macroName.equals("_")) {
-			builder.advanceLexer();
-			return builder.getTokenType() == T_MACRO_TAG_CLOSE;
 		}
 		return macro != null && macro.getType() == LatteTagSettings.Type.PAIR;
 	}

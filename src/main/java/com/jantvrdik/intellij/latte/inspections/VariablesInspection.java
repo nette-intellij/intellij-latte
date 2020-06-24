@@ -127,11 +127,6 @@ public class VariablesInspection extends BaseLocalInspectionTool {
 								}
 							}
 						}
-						if (LattePhpVariableUtil.detectVariableTypeFromTemplateType(element, variableName) == null) {
-							type = ProblemHighlightType.GENERIC_ERROR_OR_WARNING;
-							description = "Undefined variable '" + variableName + "'";
-							isUndefined = true;
-						}
 					}
 
 					if (type != null) {
@@ -152,6 +147,6 @@ public class VariablesInspection extends BaseLocalInspectionTool {
 			}
 		});
 
-		return problems.toArray(new ProblemDescriptor[problems.size()]);
+		return problems.toArray(new ProblemDescriptor[0]);
 	}
 }
