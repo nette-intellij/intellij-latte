@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <latte version="1" vendor="latte">
     <tags>
-        <tag name="_" type="PAIR" allowedFilters="true" arguments="expression" />
+        <tag name="_" type="AUTO_EMPTY" allowedFilters="true" arguments="expression" />
         <tag name="=" type="UNPAIRED" allowedFilters="true" arguments="expression" />
-        <tag name="block" type="PAIR" allowedFilters="true" multiLine="true" arguments="name | $name" />
+        <tag name="block" type="AUTO_EMPTY" allowedFilters="true" multiLine="true" arguments="name | $name" />
         <tag name="breakIf" type="UNPAIRED" arguments="condition" />
         <tag name="capture" type="PAIR" allowedFilters="true" multiLine="true" arguments="$variable" />
         <tag name="case" type="UNPAIRED" arguments="condition" />
