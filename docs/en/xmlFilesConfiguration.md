@@ -4,7 +4,7 @@ XML configuration files for Latte plugin are files contains information about ta
 
 - Plugin load all files named `latte-intellij.xml` in your project including `vendor` folder or something other folders except ignored folders.
 - You can use more `latte-intellij.xml` files. All will be loaded, but must have another value in vendor attribute.
-- If you are using `Nette < 3` you will probably need: [Default latte-intellij.xml for Nette < 3](https://github.com/nette-intellij/intellij-latte/blob/master/docs/bellowNette3.xml)
+- If you are using `Nette < 3` you will probably need: [Default latte-intellij.xml for Nette < 3](https://github.com/nette-intellij/intellij-latte/blob/master/docs/bellowNette3.xml) or [current plugin XML configuration](https://github.com/nette-intellij/intellij-latte/blob/master/src/main/resources/xmlSources)
   - Copy it to `latte-intellij.xml` located somewhere in your Nette project
   - **But it is not necessary.** Plugin contains this basic tags, filters etc. But if you need rewrite it, you can use above file as template
   - In newer version of Latte/Nette is `latte-intellij.xml` part of appropriate packages in vendor
@@ -21,10 +21,10 @@ This is example file content with sample values:
         <tag name="myIf" type="PAIR" arguments="condition" deprecatedMessage="MyIf is deprecated, use {if ...} instead." />
         <tag name="myFor" type="PAIR" arguments="initialization; condition; afterthought" allowedModifiers="true" multiLine="true" />
         <tag name="block" type="PAIR" allowedFilters="true" multiLine="true">
-			<arguments>
-				<argument name="name" types="PHP_IDENTIFIER,VARIABLE,PHP_EXPRESSION" validType="string" required="true" />
-			</arguments>
-		</tag>
+            <arguments>
+                <argument name="name" types="PHP_IDENTIFIER,VARIABLE,PHP_EXPRESSION" validType="string" required="true" />
+            </arguments>
+        </tag>
     </tags>
     <variables>
         <variable name="testVar" type="\Student" />
