@@ -5,7 +5,6 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.jantvrdik.intellij.latte.psi.LattePhpNamespaceReference;
 import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
-import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import com.jetbrains.php.lang.psi.elements.PhpNamespace;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,9 +30,9 @@ public class LatteNamespaceReference extends PsiReferenceBase<PsiElement> implem
             results.add(new PsiElementResolveResult(phpNamespace));
         }
 
-        for (LattePhpNamespaceReference namespaceReference : LatteUtil.findNamespaceReferences(project, namespaceName)) {
-            results.add(new PsiElementResolveResult(namespaceReference));
-        }
+        //for (LattePhpNamespaceReference namespaceReference : LatteUtil.findNamespaceReferences(project, namespaceName)) {
+        //    results.add(new PsiElementResolveResult(namespaceReference));
+        //}
 
         return results.toArray(new ResolveResult[0]);
     }

@@ -450,13 +450,17 @@ public class LattePhpLexerTest {
 
 		lexer.start("<a n:href=\"default\"></a>");
 		assertTokens(lexer, new Pair[] {
-			Pair.create(T_TEXT, "<a "),
+			Pair.create(T_HTML_OPEN_TAG_OPEN, "<"),
+			Pair.create(T_TEXT, "a "),
 			Pair.create(T_HTML_TAG_NATTR_NAME, "n:href"),
 			Pair.create(T_HTML_TAG_ATTR_EQUAL_SIGN, "="),
 			Pair.create(T_HTML_TAG_ATTR_DQ, "\""),
 			Pair.create(T_LINK_DESTINATION, "default"),
 			Pair.create(T_HTML_TAG_ATTR_DQ, "\""),
-			Pair.create(T_TEXT, "></a>"),
+			Pair.create(T_HTML_TAG_CLOSE, ">"),
+			Pair.create(T_HTML_CLOSE_TAG_OPEN, "</"),
+			Pair.create(T_TEXT, "a"),
+			Pair.create(T_HTML_TAG_CLOSE, ">"),
 		});
 	}
 

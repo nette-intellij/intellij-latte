@@ -5,6 +5,7 @@ import com.intellij.psi.tree.IElementType;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
 import com.jantvrdik.intellij.latte.settings.LatteTagSettings;
+import com.jantvrdik.intellij.latte.utils.LatteHtmlUtil;
 import org.jetbrains.annotations.NotNull;
 
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
@@ -33,6 +34,20 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 		} else {
 			result = (macro != null ? (macro.getType() == (pair ? LatteTagSettings.Type.PAIR : LatteTagSettings.Type.UNPAIRED)) : !pair);
 		}
+
+		marker.rollbackTo();
+		return result;
+	}
+
+	public static boolean checkPairHtmlTag(PsiBuilder builder, int level, Parser parser) {
+		boolean pair = parser == LatteParser.TRUE_parser_;
+		if (builder.getTokenType() != T_HTML_OPEN_TAG_OPEN) return false;
+
+		PsiBuilder.Marker marker = builder.mark();
+		String tagName = getHtmlTagName(builder);
+
+		boolean isVoidTag = LatteHtmlUtil.isVoidTag(tagName);
+		boolean result = (!isVoidTag && pair) || (isVoidTag && !pair);
 
 		marker.rollbackTo();
 		return result;
@@ -118,6 +133,23 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 
 		} else {
 			macroName = "=";
+		}
+		return macroName;
+	}
+
+	@NotNull
+	private static String getHtmlTagName(PsiBuilder builder) {
+		String macroName = "?";
+
+		consumeTokenFast(builder, T_HTML_OPEN_TAG_OPEN);
+		if (nextTokenIsFast(builder, T_TEXT)) {
+			macroName = builder.getTokenText();
+			if (macroName != null && macroName.length() > 0) {
+				macroName = macroName.split(" ")[0];
+
+			} else {
+				macroName = "?";
+			}
 		}
 		return macroName;
 	}
