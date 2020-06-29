@@ -1,9 +1,7 @@
 package com.jantvrdik.intellij.latte.inspections;
 
 import com.intellij.codeInspection.InspectionManager;
-import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ProblemDescriptor;
-import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
@@ -20,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class ConstantUsagesInspection extends LocalInspectionTool {
+public class ConstantUsagesInspection extends BaseLocalInspectionTool {
 
 	@NotNull
 	@Override
@@ -35,7 +33,7 @@ public class ConstantUsagesInspection extends LocalInspectionTool {
 			return null;
 		}
 
-		final List<ProblemDescriptor> problems = new ArrayList<ProblemDescriptor>();
+		final List<ProblemDescriptor> problems = new ArrayList<>();
 		file.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
 			@Override
 			public void visitElement(PsiElement element) {
@@ -55,9 +53,12 @@ public class ConstantUsagesInspection extends LocalInspectionTool {
 								PhpModifier modifier = field.getModifier();
 								if (modifier.isPrivate()) {
 									addProblem(manager, problems, element, "Used private constant '" + constantName + "'", isOnTheFly);
-
 								} else if (modifier.isProtected()) {
 									addProblem(manager, problems, element, "Used protected constant '" + constantName + "'", isOnTheFly);
+								} else if (field.isDeprecated()) {
+									addDeprecated(manager, problems, element, "Used constant '" + constantName + "' is marked as deprecated", isOnTheFly);
+								} else if (field.isInternal()) {
+									addDeprecated(manager, problems, element, "Used constant '" + constantName + "' is marked as internal", isOnTheFly);
 								}
 								isFound = true;
 							}
@@ -65,7 +66,7 @@ public class ConstantUsagesInspection extends LocalInspectionTool {
 					}
 
 					if (!isFound) {
-						addProblem(manager, problems, element, "Constant '" + constantName + "' not found", ProblemHighlightType.GENERIC_ERROR, isOnTheFly);
+						addProblem(manager, problems, element, "Constant '" + constantName + "' not found for type '" + phpType.toString() + "'", isOnTheFly);
 					}
 
 				} else {
@@ -74,28 +75,6 @@ public class ConstantUsagesInspection extends LocalInspectionTool {
 			}
 		});
 
-		return problems.toArray(new ProblemDescriptor[problems.size()]);
-	}
-
-	private void addProblem(
-			@NotNull final InspectionManager manager,
-			List<ProblemDescriptor> problems,
-			@NotNull PsiElement element,
-			@NotNull String description,
-			boolean isOnTheFly
-	) {
-		addProblem(manager, problems, element, description, ProblemHighlightType.GENERIC_ERROR_OR_WARNING, isOnTheFly);
-	}
-
-	private void addProblem(
-			@NotNull final InspectionManager manager,
-			List<ProblemDescriptor> problems,
-			@NotNull PsiElement element,
-			@NotNull String description,
-			@NotNull ProblemHighlightType type,
-			boolean isOnTheFly
-	) {
-		ProblemDescriptor problem = manager.createProblemDescriptor(element, description, true, type, isOnTheFly);
-		problems.add(problem);
+		return problems.toArray(new ProblemDescriptor[0]);
 	}
 }

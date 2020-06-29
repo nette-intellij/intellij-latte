@@ -10,10 +10,10 @@ import com.intellij.psi.MultiplePsiFilesPerDocumentFileViewProvider;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.impl.source.PsiFileImpl;
-import com.intellij.psi.templateLanguages.TemplateDataElementType;
 import com.intellij.psi.templateLanguages.TemplateLanguageFileViewProvider;
 import com.intellij.psi.tree.IElementType;
 import com.jantvrdik.intellij.latte.LatteLanguage;
+import com.jantvrdik.intellij.latte.utils.LatteHtmlUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +25,12 @@ public class LatteFileViewProvider extends MultiplePsiFilesPerDocumentFileViewPr
 
 	public static LatteElementType OUTER_LATTE = new LatteElementType("Outer latte");
 	private static Pattern xmlContentType = Pattern.compile("^\\{contentType [^}]*xml[^}]*}.*");
-	private static IElementType templateDataElement = new TemplateDataElementType("Outer HTML/XML in Latte", LatteLanguage.INSTANCE, LatteTypes.T_TEXT, OUTER_LATTE);
+	private static IElementType templateDataElement = new LatteTemplateDataElementType(
+			"Outer HTML/XML in Latte",
+			LatteLanguage.INSTANCE,
+			LatteHtmlUtil.HTML_TOKENS,
+			OUTER_LATTE
+	);
 
 	public LatteFileViewProvider(PsiManager manager, VirtualFile virtualFile, boolean eventSystemEnabled) {
 		super(manager, virtualFile, eventSystemEnabled);
@@ -39,7 +44,7 @@ public class LatteFileViewProvider extends MultiplePsiFilesPerDocumentFileViewPr
 
 	@NotNull
 	public Set<Language> getLanguages() {
-		Set<Language> languages = new HashSet<Language>(3);
+		Set<Language> languages = new HashSet<>(3);
 		languages.add(LatteLanguage.INSTANCE);
 		languages.add(getTemplateDataLanguage());
 

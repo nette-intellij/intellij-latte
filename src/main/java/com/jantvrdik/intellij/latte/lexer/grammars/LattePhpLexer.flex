@@ -15,6 +15,9 @@ import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
 %state SINGLE_QUOTED
 %state DOUBLE_QUOTED
 %state MACRO_FILTERS
+%state PHP_TYPE_PART
+%state CLASS_REFERENCE
+%state CLASS_REFERENCE_TYPE
 
 WHITE_SPACE=[ \t\r\n]+
 IDENTIFIER=[a-zA-Z_][a-zA-Z0-9_]*
@@ -34,8 +37,14 @@ AS="as"
         return T_MACRO_ARGS_VAR;
     }
 
-    {CLASS_NAME} {
-        return T_PHP_CLASS_NAME;
+    "\\" / {IDENTIFIER} {
+        yybegin(CLASS_REFERENCE);
+        return T_PHP_NAMESPACE_RESOLUTION;
+    }
+
+    {IDENTIFIER} / ("\\") {
+        yybegin(CLASS_REFERENCE);
+        return T_PHP_NAMESPACE_REFERENCE;
     }
 
     {CONTENT_TYPE} {
@@ -78,20 +87,60 @@ AS="as"
         return T_PHP_RIGHT_BRACKET;
     }
 
-    ("<=>" | "<>" | "<=" | ">=" | "<" | ">" | "==" | "===" | "\!=" | "\==") {
+    ("<>" | "==" | "===" | "\!==" | "\!=" | "\==") {
         return T_PHP_OPERATOR;
+    }
+
+    ("<=>" | "<=" | ">=" | "<" | ">") {
+        return T_PHP_RELATIONAL_OPERATOR;
     }
 
     ("(bool)" | "(boolean)" | "(array)" | "(real)" | "(double)" | "(float)" | "(int)" | "(integer)" | "(object)" | "(string)" | "(unset)") {
         return T_PHP_CAST;
     }
 
-    ("||" | "&&" | "**=" | "**" | ".=" | "^=" | "-=" | "+=" | "%=" | "*=" | "|=" | "&=" | "??" | "--" | "/=" | "..." | "++" | "<<<" | "<<=" | ">>=" | "<<" | ">>") {
+    ("<<" | ">>") {
+        return T_PHP_SHIFT_OPERATOR;
+    }
+
+    ("--" | "++") {
+        return T_PHP_UNARY_OPERATOR;
+    }
+
+    ("**=" | "??" | "..." | "<<<" | "<<=" | ">>=") {
         return T_PHP_EXPRESSION;
     }
 
-    ("+" | "-" | "?" | ":" | "&" | "." | "*" | "/") {
+    ("||" | "&&") {
+        return T_PHP_LOGIC_OPERATOR;
+    }
+
+    (".=" | "^=" | "-=" | "+=" | "%=" | "*=" | "|=" | "&=" | "/=") {
+        return T_PHP_ASSIGNMENT_OPERATOR;
+    }
+
+    ("+" | "-") {
+        return T_PHP_ADDITIVE_OPERATOR;
+    }
+
+    ("&" | "^") {
+        return T_PHP_BITWISE_OPERATOR;
+    }
+
+    "." {
+        return T_PHP_CONCATENATION;
+    }
+
+    ("**" | "/" | "*" | "%") {
+        return T_PHP_MULTIPLICATIVE_OPERATORS;
+    }
+
+    ":" {
         return T_PHP_EXPRESSION;
+    }
+
+    "?" {
+        return T_PHP_NULL_MARK;
     }
 
     "=" {
@@ -114,21 +163,26 @@ AS="as"
         return T_PHP_MIXED;
     }
 
+    "array" / {WHITE_SPACE}? "(" {
+        return T_PHP_ARRAY;
+    }
+
     {TYPES} {
         return T_PHP_TYPE;
     }
 
-    "|" / ({IDENTIFIER} | {CLASS_NAME}) {
-        yybegin(MACRO_FILTERS);
+    "|" / ({AS} | {KEYWORD} | {NULL} | {MIXED} | {TYPES} | {CLASS_NAME}) {
+        yybegin(PHP_TYPE_PART);
         return T_PHP_OR_INCLUSIVE;
+    }
+
+    "|" / {IDENTIFIER} {
+        yybegin(MACRO_FILTERS);
+        return T_PHP_MACRO_SEPARATOR;
     }
 
     "|" {
         return T_PHP_OR_INCLUSIVE;
-    }
-
-    {IDENTIFIER} / ("(") {
-        return T_PHP_METHOD;
     }
 
     {IDENTIFIER} {
@@ -159,10 +213,15 @@ AS="as"
 
 }
 
-<MACRO_FILTERS> {
-	{CLASS_NAME} {
-        pushState(YYINITIAL);
-        return T_PHP_CLASS_NAME;
+<PHP_TYPE_PART> {
+	"\\" / {IDENTIFIER} {
+        yybegin(CLASS_REFERENCE_TYPE);
+        return T_PHP_NAMESPACE_RESOLUTION;
+    }
+
+    {IDENTIFIER} / ("\\") {
+        yybegin(CLASS_REFERENCE_TYPE);
+        return T_PHP_NAMESPACE_REFERENCE;
     }
 
 	{AS} {
@@ -191,13 +250,49 @@ AS="as"
     }
 
     {IDENTIFIER} {
+        yybegin(CLASS_REFERENCE);
+        return T_PHP_IDENTIFIER;
+    }
+
+    "|" {
+        pushState(YYINITIAL);
+        return T_PHP_OR_INCLUSIVE;
+    }
+}
+
+<CLASS_REFERENCE> {
+    {IDENTIFIER} {
+        pushState(YYINITIAL);
+        return T_PHP_NAMESPACE_REFERENCE;
+    }
+
+    "\\" {
+        pushState(YYINITIAL);
+        return T_PHP_NAMESPACE_RESOLUTION;
+    }
+}
+
+<CLASS_REFERENCE_TYPE> {
+    {IDENTIFIER} {
+        pushState(YYINITIAL);
+        return T_PHP_NAMESPACE_REFERENCE;
+    }
+
+    "\\" {
+        pushState(YYINITIAL);
+        return T_PHP_NAMESPACE_RESOLUTION;
+    }
+}
+
+<MACRO_FILTERS> {
+    {IDENTIFIER} {
         pushState(YYINITIAL);
         return T_MACRO_FILTERS;
     }
 
     "|" {
         pushState(YYINITIAL);
-        return T_PHP_OR_INCLUSIVE;
+        return T_PHP_MACRO_SEPARATOR;
     }
 }
 

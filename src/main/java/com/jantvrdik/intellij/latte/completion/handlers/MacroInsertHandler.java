@@ -11,10 +11,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.TokenType;
 import com.jantvrdik.intellij.latte.LatteLanguage;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.config.LatteMacro;
 import com.jantvrdik.intellij.latte.psi.LatteMacroCloseTag;
 import com.jantvrdik.intellij.latte.psi.LatteMacroTag;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
+import com.jantvrdik.intellij.latte.settings.LatteTagSettings;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,25 +31,30 @@ public class MacroInsertHandler implements InsertHandler<LookupElement> {
 		if (element != null && element.getLanguage() == LatteLanguage.INSTANCE) {
 			PsiElement parent = element.getParent();
 
+			String spacesBefore = "";
 			boolean resolvePairMacro = false;
 			boolean lastError = parent.getLastChild().getNode().getElementType() == TokenType.ERROR_ELEMENT;
 			String macroName = null;
-			LatteMacro macro = null;
+			LatteTagSettings macro = null;
 			if (lastError && element.getNode().getElementType() == LatteTypes.T_MACRO_NAME) {
 				macroName = element.getText();
-				macro = LatteConfiguration.INSTANCE.getMacro(element.getProject(), macroName);
+				macro = LatteConfiguration.getInstance(element.getProject()).getTag(macroName);
 
 			} else if (parent instanceof LatteMacroTag) {
 				macroName = ((LatteMacroTag) parent).getMacroName();
-				macro = LatteConfiguration.INSTANCE.getMacro(element.getProject(), macroName);
+				macro = LatteConfiguration.getInstance(element.getProject()).getTag(macroName);
 			}
 
 			boolean isCloseTag = parent instanceof LatteMacroCloseTag;
-			if (!isCloseTag && macro != null && macro.type == LatteMacro.Type.PAIR) {
+			if (!isCloseTag && macro != null && macro.getType() == LatteTagSettings.Type.PAIR) {
 				resolvePairMacro = true;
 			}
 
 			if (macroName != null) {
+				if (resolvePairMacro && macro.isMultiLine()) {
+					spacesBefore += LatteUtil.getSpacesBeforeCaret(context.getEditor());
+				}
+
 				Editor editor = context.getEditor();
 				CaretModel caretModel = editor.getCaretModel();
 				String text = editor.getDocument().getText();
@@ -57,7 +62,7 @@ public class MacroInsertHandler implements InsertHandler<LookupElement> {
 				int spaceInserted = 0;
 				int offset = caretModel.getOffset();
 
-				if (macro != null && !isCloseTag && macro.hasParameters && !LatteUtil.isStringAtCaret(editor, " ")) {
+				if (macro != null && !isCloseTag && macro.hasParameters() && !LatteUtil.isStringAtCaret(editor, " ")) {
 					EditorModificationUtil.insertStringAtCaret(editor, " ");
 					spaceInserted = 1;
 				}
@@ -76,7 +81,11 @@ public class MacroInsertHandler implements InsertHandler<LookupElement> {
 				}
 
 				if (resolvePairMacro) {
-					String endTag = "{/" + macroName + "}";
+					String endTag = "";
+					if (macro.isMultiLine()) {
+						endTag += "\n\n" + spacesBefore;
+					}
+					endTag += "{/" + macroName + "}";
 
 					int endTagOffset = text.indexOf(endTag, offset);
 					if (endTagOffset == -1 || endTagOffset > endOfLineOffset) {

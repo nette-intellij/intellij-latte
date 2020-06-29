@@ -3,10 +3,10 @@ package com.jantvrdik.intellij.latte.documentation;
 import com.intellij.lang.documentation.AbstractDocumentationProvider;
 import com.intellij.psi.PsiElement;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.config.LatteModifier;
 import com.jantvrdik.intellij.latte.psi.LatteMacroModifier;
 import com.jantvrdik.intellij.latte.psi.LattePhpMethod;
-import com.jantvrdik.intellij.latte.settings.LatteCustomFunctionSettings;
+import com.jantvrdik.intellij.latte.settings.LatteFunctionSettings;
+import com.jantvrdik.intellij.latte.settings.LatteFilterSettings;
 import org.jetbrains.annotations.Nullable;
 
 public class LatteDocumentationProvider extends AbstractDocumentationProvider {
@@ -14,19 +14,18 @@ public class LatteDocumentationProvider extends AbstractDocumentationProvider {
 	@Override
 	public @Nullable String getQuickNavigateInfo(PsiElement element, PsiElement originalElement) {
 		if (element instanceof LatteMacroModifier) {
-			LatteModifier modifier = ((LatteMacroModifier) element).getMacroModifier();
+			LatteFilterSettings modifier = ((LatteMacroModifier) element).getMacroModifier();
 			if (modifier == null) {
 				return null;
 			}
-			return createHelpWithDescription(modifier.help, modifier.description);
+			return createHelpWithDescription(modifier.getModifierHelp(), modifier.getModifierDescription());
 
 		} else if (element instanceof LattePhpMethod) {
 			if (!((LattePhpMethod) element).isFunction()) {
 				return null;
 			}
 
-			LatteCustomFunctionSettings customFunction = LatteConfiguration.INSTANCE.getFunction(
-					element.getProject(),
+			LatteFunctionSettings customFunction = LatteConfiguration.getInstance(element.getProject()).getFunction(
 					((LattePhpMethod) element).getMethodName()
 			);
 			if (customFunction == null) {

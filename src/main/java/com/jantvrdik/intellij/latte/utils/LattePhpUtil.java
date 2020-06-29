@@ -77,15 +77,31 @@ public class LattePhpUtil {
     }
 
     public static boolean isReferenceFor(@NotNull String originalClass, @NotNull PhpClass targetClass) {
-        originalClass = normalizeClassName(originalClass);
-        if (originalClass.equals(targetClass.getFQN())) {
-            return true;
+        return isReferenceFor(new String[]{originalClass}, targetClass);
+    }
+
+    public static boolean isReferenceFor(@NotNull String[] originalClasses, @NotNull PhpClass targetClass) {
+        List<String> normalized = new ArrayList<>();
+        for (String originalClass : originalClasses) {
+            originalClass = normalizeClassName(originalClass);
+            normalized.add(originalClass);
+            if (originalClass.equals(targetClass.getFQN())) {
+                return true;
+            }
         }
+
 
         ExtendsList extendsList = targetClass.getExtendsList();
         for (ClassReference reference : extendsList.getReferenceElements()) {
-            if (reference.getFQN() != null && reference.getFQN().equals(originalClass)) {
-                return true;
+            String fqn = reference.getFQN();
+            if (fqn == null) {
+                continue;
+            }
+
+            for (String originalClass : normalized) {
+                if (fqn.equals(originalClass)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -147,6 +163,10 @@ public class LattePhpUtil {
         return getPhpIndex(project).getFunctionsByName(functionName);
     }
 
+    public static Collection<PhpNamespace> getNamespacesByName(Project project, String className) {
+        return getPhpIndex(project).getNamespacesByName(className);
+    }
+
     public static Collection<String> getAllExistingFunctionNames(Project project, PrefixMatcher prefixMatcher) {
         return getPhpIndex(project).getAllFunctionNames(prefixMatcher);
     }
@@ -176,6 +196,11 @@ public class LattePhpUtil {
     }
 
     public static String normalizeClassName(@Nullable String className) {
+        if (className != null && className.startsWith("#S")) {
+            // since 2019.2.3 phpstorm started to prefix _static_ class type with "#S"
+            className = className.substring(2);
+        }
+
         String normalized = className == null ? "" : (className.startsWith("\\") ? className : ("\\" + className));
         if (normalized.contains("|null")) {
             normalized = normalized.replace("|null", "");

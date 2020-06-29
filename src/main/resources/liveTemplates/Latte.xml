@@ -1,0 +1,56 @@
+<templateSet group="Latte">
+	<template name="{fore"
+			  value="{foreach $ITERABLE$ as $VAR_VALUE$}&#10;    $END$&#10;{/foreach}"
+			  description="{foreach iterable_expr as $value} …{\foreach}"
+			  toReformat="true"
+			  toShortenFQNames="true">
+		<variable name="ITERABLE" expression="" defaultValue="" alwaysStopAt="true" />
+		<variable name="VAR_VALUE" expression="phpSuggestVariableName()" defaultValue="&quot;$item&quot;" alwaysStopAt="true" />
+		<context>
+			<option name="LATTE" value="true" />
+		</context>
+	</template>
+	<template name="{forek"
+			  value="{foreach $ITERABLE$ as $VAR_KEY$ => $VAR_VALUE$}&#10;    $END$&#10;{/foreach}"
+			  description="{foreach iterable_expr as $key => $value} … {\foreach}"
+			  toReformat="true"
+			  toShortenFQNames="true">
+		<variable name="ITERABLE" expression="" defaultValue="" alwaysStopAt="true" />
+		<variable name="VAR_KEY" expression="phpSuggestVariableName()" defaultValue="&quot;$index&quot;" alwaysStopAt="true" />
+		<variable name="VAR_VALUE" expression="phpSuggestVariableName()" defaultValue="&quot;$item&quot;" alwaysStopAt="true" />
+		<context>
+			<option name="LATTE" value="true" />
+		</context>
+	</template>
+	<template name="{fori" value="{for $INDEX$ = 0; $INDEX$ &lt; $LIMIT$; $INDEX$++}&#10;    $END$&#10;{/for}"
+			  description="{for i = 0; i &lt; limit; i++} … {\for}"
+			  toReformat="true"
+			  toShortenFQNames="true">
+		<variable name="INDEX" expression="phpSuggestVariableName()" defaultValue="" alwaysStopAt="true" />
+		<variable name="LIMIT" expression="" defaultValue="" alwaysStopAt="true" />
+		<context>
+			<option name="LATTE" value="true" />
+		</context>
+	</template>
+	<template name="{ife"
+			  value="{if $CONDITION$}&#10;    $MIDDLE$&#10;{else}&#10;    $END$&#10;{/if}"
+			  description="{if condition} … {else} … {\if}"
+			  toReformat="true"
+			  toShortenFQNames="true">
+		<variable name="CONDITION" expression="" defaultValue="" alwaysStopAt="true" />
+		<variable name="MIDDLE" expression="" defaultValue="" alwaysStopAt="true" />
+		<context>
+			<option name="LATTE" value="true" />
+		</context>
+	</template>
+	<template name="{va"
+			  value="{var $NAME$ = $END$}"
+			  description="{var $name = value}"
+			  toReformat="false"
+			  toShortenFQNames="true">
+		<variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
+		<context>
+			<option name="LATTE" value="true" />
+		</context>
+	</template>
+</templateSet>

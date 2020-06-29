@@ -6,11 +6,12 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializerUtil;
+import com.intellij.util.xmlb.annotations.Tag;
+import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @State(
@@ -21,7 +22,11 @@ import java.util.List;
 )
 public class LatteSettings implements PersistentStateComponent<LatteSettings> {
 
-	public boolean wasFirstInitialized = false;
+	public boolean enableXmlLoading = true;
+
+	public boolean enableNette = true;
+
+	public boolean enableNetteForms = true;
 
 	public boolean enableDefaultVariables = true;
 
@@ -31,41 +36,34 @@ public class LatteSettings implements PersistentStateComponent<LatteSettings> {
 
 	public boolean enableCustomFunctions = true;
 
-	public boolean codeCompletionEnabled = true;
-
 	public List<LatteVariableSettings> variableSettings = new ArrayList<>();
 
-	public List<LatteCustomMacroSettings> customMacroSettings = new ArrayList<>();
+	@Tag("customMacroSettings")
+	public List<LatteTagSettings> tagSettings = new ArrayList<>();
 
-	public List<LatteCustomModifierSettings> customModifierSettings = new ArrayList<>();
+	@Tag("customModifierSettings")
+	public List<LatteFilterSettings> filterSettings = new ArrayList<>();
 
-	public List<LatteCustomFunctionSettings> customFunctionSettings = new ArrayList<>();
+	@Tag("customFunctionSettings")
+	public List<LatteFunctionSettings> functionSettings = new ArrayList<>();
 
 	public static LatteSettings getInstance(Project project) {
 		return ServiceManager.getService(project, LatteSettings.class);
 	}
 
+	public boolean isEnabledSourceVendor(LatteConfiguration.Vendor vendor) {
+		if (vendor == LatteConfiguration.Vendor.NETTE_APPLICATION) {
+			return enableNette;
+		} else if (vendor == LatteConfiguration.Vendor.NETTE_FORMS) {
+			return enableNetteForms;
+		}
+		return true;
+	}
+
 	@Nullable
 	@Override
 	public LatteSettings getState() {
-		if (!wasFirstInitialized) {
-			if (variableSettings == null) {
-				variableSettings = new ArrayList<>();
-			}
-			variableSettings.addAll(Arrays.asList(DefaultSettings.getDefaultVariables()));
-
-			if (customFunctionSettings == null) {
-				customFunctionSettings = new ArrayList<>();
-			}
-			customFunctionSettings.addAll(Arrays.asList(DefaultSettings.getDefaultCustomFunctions()));
-
-			if (customMacroSettings == null) {
-				customMacroSettings = new ArrayList<>();
-			}
-			customMacroSettings.addAll(Arrays.asList(DefaultSettings.getDefaultMacros()));
-
-			wasFirstInitialized = true;
-		}
+		// add initializing here if needed
 		return this;
 	}
 

@@ -2,7 +2,9 @@ package com.jantvrdik.intellij.latte.ui;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.table.TableView;
-import com.jantvrdik.intellij.latte.settings.LatteCustomFunctionSettings;
+import com.jantvrdik.intellij.latte.config.LatteConfiguration;
+import com.jantvrdik.intellij.latte.indexes.LatteIndexUtil;
+import com.jantvrdik.intellij.latte.settings.LatteFunctionSettings;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -11,9 +13,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-/**
- * @author Daniel Espendiller <daniel@espendiller.net>
- */
 public class LatteCustomFunctionSettingsDialog extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
@@ -22,11 +21,13 @@ public class LatteCustomFunctionSettingsDialog extends JDialog {
     private JTextField textHelp;
     private JTextField textReturnType;
     private JTextArea textDescription;
-    private LatteCustomFunctionSettings latteCustomFunctionSettings;
-    private TableView<LatteCustomFunctionSettings> tableView;
+    private LatteFunctionSettings latteFunctionSettings;
+    private TableView<LatteFunctionSettings> tableView;
+    private Project project;
 
-    public LatteCustomFunctionSettingsDialog(Project project, TableView<LatteCustomFunctionSettings> tableView) {
+    public LatteCustomFunctionSettingsDialog(TableView<LatteFunctionSettings> tableView, Project project) {
         this.tableView = tableView;
+        this.project = project;
 
         setContentPane(contentPane);
         setModal(true);
@@ -51,25 +52,26 @@ public class LatteCustomFunctionSettingsDialog extends JDialog {
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    public LatteCustomFunctionSettingsDialog(Project project, TableView<LatteCustomFunctionSettings> tableView, LatteCustomFunctionSettings latteCustomFunctionSettings) {
-        this(project, tableView);
+    public LatteCustomFunctionSettingsDialog(TableView<LatteFunctionSettings> tableView, Project project, LatteFunctionSettings latteFunctionSettings) {
+        this(tableView, project);
 
-        this.textName.setText(latteCustomFunctionSettings.getFunctionName());
-        this.textReturnType.setText(latteCustomFunctionSettings.getFunctionReturnType());
-        this.textHelp.setText(latteCustomFunctionSettings.getFunctionHelp());
-        this.textDescription.setText(latteCustomFunctionSettings.getFunctionDescription());
-        this.latteCustomFunctionSettings = latteCustomFunctionSettings;
+        this.textName.setText(latteFunctionSettings.getFunctionName());
+        this.textReturnType.setText(latteFunctionSettings.getFunctionReturnType());
+        this.textHelp.setText(latteFunctionSettings.getFunctionHelp());
+        this.textDescription.setText(latteFunctionSettings.getFunctionDescription());
+        this.latteFunctionSettings = latteFunctionSettings;
     }
 
     private void onOK() {
-        LatteCustomFunctionSettings settings = new LatteCustomFunctionSettings(
+        LatteFunctionSettings settings = new LatteFunctionSettings(
                 this.textName.getText(),
                 this.textReturnType.getText(),
                 this.textHelp.getText(),
                 this.textDescription.getText()
         );
+        settings.setVendor(LatteConfiguration.Vendor.CUSTOM);
 
-        if (this.latteCustomFunctionSettings != null) {
+        if (this.latteFunctionSettings != null) {
             int row = this.tableView.getSelectedRows()[0];
             this.tableView.getListTableModel().removeRow(row);
             this.tableView.getListTableModel().insertRow(row, settings);
@@ -80,7 +82,9 @@ public class LatteCustomFunctionSettingsDialog extends JDialog {
             this.tableView.setRowSelectionInterval(row, row);
         }
 
-        dispose();
+        if (LatteIndexUtil.reinitialize(project)) {
+            dispose();
+        }
     }
 
     private void setOkState() {

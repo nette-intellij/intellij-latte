@@ -5,10 +5,10 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.config.LatteModifier;
 import com.jantvrdik.intellij.latte.icons.LatteIcons;
 import com.jantvrdik.intellij.latte.psi.LatteMacroContent;
 import com.jantvrdik.intellij.latte.psi.elements.LatteMacroModifierElement;
+import com.jantvrdik.intellij.latte.settings.LatteFilterSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,13 +26,13 @@ public abstract class LatteMacroModifierElementImpl extends ASTWrapperPsiElement
 	}
 
 	@Nullable
-	public LatteModifier getMacroModifier() {
-		return LatteConfiguration.INSTANCE.getModifier(getProject(), getModifierName());
+	public LatteFilterSettings getMacroModifier() {
+		return LatteConfiguration.getInstance(getProject()).getFilter(getModifierName());
 	}
 
 	@Override
 	public @Nullable Icon getIcon(int flags) {
-		return LatteIcons.MACRO;
+		return LatteIcons.MODIFIER;
 	}
 
 	@Nullable

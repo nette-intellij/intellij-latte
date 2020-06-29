@@ -10,13 +10,14 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
 import com.jantvrdik.intellij.latte.LatteLanguage;
 import com.jantvrdik.intellij.latte.completion.handlers.AttrMacroInsertHandler;
+import com.jantvrdik.intellij.latte.completion.handlers.FilterInsertHandler;
 import com.jantvrdik.intellij.latte.completion.handlers.MacroInsertHandler;
 import com.jantvrdik.intellij.latte.completion.providers.LattePhpCompletionProvider;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.config.LatteMacro;
-import com.jantvrdik.intellij.latte.config.LatteModifier;
 import com.jantvrdik.intellij.latte.icons.LatteIcons;
 import com.jantvrdik.intellij.latte.psi.*;
+import com.jantvrdik.intellij.latte.settings.LatteTagSettings;
+import com.jantvrdik.intellij.latte.settings.LatteFilterSettings;
 import com.jantvrdik.intellij.latte.utils.LatteMimeTypes;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import org.jetbrains.annotations.NotNull;
@@ -28,21 +29,7 @@ import java.util.*;
  */
 public class LatteCompletionContributor extends CompletionContributor {
 
-	/** cached lookup elements for standard classic macros */
-	private List<LookupElement> classicMacrosCompletions;
-
-	/** cached lookup elements for standard classic macros */
-	private List<LookupElement> classicPrefixedMacrosCompletions;
-
-	/** cached lookup elements for standard attribute macros */
-	private List<LookupElement> attrMacrosCompletions;
-
-	/** cached lookup elements for standard attribute macros */
-	private List<LookupElement> classicModifiersCompletions;
-
 	public LatteCompletionContributor() {
-		initStandardMacrosCompletions();
-		initStandardModifiersCompletions();
 
 		extend(CompletionType.BASIC, PlatformPatterns.psiElement(LatteTypes.T_MACRO_NAME).withLanguage(LatteLanguage.INSTANCE), new CompletionProvider<CompletionParameters>() {
 			@Override
@@ -57,8 +44,7 @@ public class LatteCompletionContributor extends CompletionContributor {
 			@Override
 			protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
 				Project project = parameters.getOriginalFile().getProject();
-				Map<String, LatteMacro> customMacros = LatteConfiguration.INSTANCE.getCustomMacros(project);
-				result.addAllElements(attrMacrosCompletions);
+				Map<String, LatteTagSettings> customMacros = LatteConfiguration.getInstance(project).getTags();
 				result.addAllElements(getAttrMacroCompletions(customMacros));
 			}
 		});
@@ -87,14 +73,13 @@ public class LatteCompletionContributor extends CompletionContributor {
 				}
 
 				if (!((LatteMacroModifier) element).isVariableModifier()) {
-					LatteMacro macro = LatteConfiguration.INSTANCE.getMacro(element.getProject(), macroClassic.getOpenTag().getMacroName());
-					if (macro == null || !macro.allowedModifiers) {
+					LatteTagSettings macro = LatteConfiguration.getInstance(element.getProject()).getTag(macroClassic.getOpenTag().getMacroName());
+					if (macro == null || !macro.isAllowedModifiers()) {
 						return;
 					}
 				}
 
-				Map<String, LatteModifier> customModifiers = LatteConfiguration.INSTANCE.getCustomModifiers(element.getProject());
-				result.addAllElements(classicModifiersCompletions);
+				Map<String, LatteFilterSettings> customModifiers = LatteConfiguration.getInstance(element.getProject()).getFilters();
 				result.addAllElements(getClassicModifierCompletions(customModifiers));
 			}
 		});
@@ -106,44 +91,25 @@ public class LatteCompletionContributor extends CompletionContributor {
 		);
 	}
 
-	/**
-	 * Prepares lists of lookup elements for both classic and attribute standard macros.
-	 */
-	private void initStandardMacrosCompletions() {
-		Map<String, LatteMacro> macros = LatteConfiguration.INSTANCE.getStandardMacros();
-		classicMacrosCompletions = getClassicMacroCompletions(macros, false);
-		classicPrefixedMacrosCompletions = getClassicMacroCompletions(macros, true);
-		attrMacrosCompletions = getAttrMacroCompletions(macros);
-	}
-
-	/**
-	 * Prepares lists of lookup elements for both classic and attribute standard macros.
-	 */
-	private void initStandardModifiersCompletions() {
-		Map<String, LatteModifier> modifiers = LatteConfiguration.INSTANCE.getStandardModifiers();
-		classicModifiersCompletions = getClassicModifierCompletions(modifiers);
-	}
-
 	private void attachContentTypes(@NotNull CompletionResultSet result) {
 		for (String contentType : LatteMimeTypes.getDefaultMimeTypes()) {
 			result.addElement(LookupElementBuilder.create(contentType));
 		}
 	}
 
-	private void attachClassicMacrosCompletion(@NotNull Project project, @NotNull CompletionResultSet result, boolean prefix) {
-		result.addAllElements(prefix ? classicPrefixedMacrosCompletions : classicMacrosCompletions);
-		Map<String, LatteMacro> customMacros = LatteConfiguration.INSTANCE.getCustomMacros(project);
-		result.addAllElements(getClassicMacroCompletions(customMacros, prefix));
+	private void attachClassicMacrosCompletion(@NotNull Project project, @NotNull CompletionResultSet result, boolean isEndTag) {
+		Map<String, LatteTagSettings> customMacros = LatteConfiguration.getInstance(project).getTags();
+		result.addAllElements(getClassicMacroCompletions(customMacros, isEndTag));
 	}
 
 	/**
 	 * Builds list of lookup elements for code completion of classic macros.
 	 */
-	private List<LookupElement> getClassicMacroCompletions(Map<String, LatteMacro> macros, boolean prefix) {
-		List<LookupElement> lookupElements = new ArrayList<LookupElement>(macros.size());
-		for (LatteMacro macro : macros.values()) {
-			if (macro.type != LatteMacro.Type.ATTR_ONLY && (!prefix || macro.type == LatteMacro.Type.PAIR)) {
-				lookupElements.add(createBuilderForMacro(macro, prefix));
+	private List<LookupElement> getClassicMacroCompletions(Map<String, LatteTagSettings> macros, boolean isEndTag) {
+		List<LookupElement> lookupElements = new ArrayList<>(macros.size());
+		for (LatteTagSettings macro : macros.values()) {
+			if (macro.getType() != LatteTagSettings.Type.ATTR_ONLY && (!isEndTag || macro.getType() == LatteTagSettings.Type.PAIR)) {
+				lookupElements.add(createBuilderForMacro(macro, isEndTag));
 			}
 		}
 		return lookupElements;
@@ -152,30 +118,47 @@ public class LatteCompletionContributor extends CompletionContributor {
 	/**
 	 * Builds list of lookup elements for code completion of classic macros.
 	 */
-	private List<LookupElement> getClassicModifierCompletions(Map<String, LatteModifier> modifiers) {
-		List<LookupElement> lookupElements = new ArrayList<LookupElement>(modifiers.size());
-		for (LatteModifier modifier : modifiers.values()) {
+	private List<LookupElement> getClassicModifierCompletions(Map<String, LatteFilterSettings> modifiers) {
+		List<LookupElement> lookupElements = new ArrayList<>(modifiers.size());
+		for (LatteFilterSettings modifier : modifiers.values()) {
 			lookupElements.add(createBuilderWithHelp(modifier));
 		}
 		return lookupElements;
 	}
 
-	private LookupElementBuilder createBuilderWithHelp(LatteModifier modifier) {
-		LookupElementBuilder builder = LookupElementBuilder.create(modifier.name);
-		if (modifier.description.trim().length() > 0) {
-			builder = builder.withTypeText(modifier.description);
+	private LookupElementBuilder createBuilderWithHelp(LatteFilterSettings modifier) {
+		LookupElementBuilder builder = LookupElementBuilder.create(modifier.getModifierName());
+		if (modifier.getModifierDescription().trim().length() > 0) {
+			builder = builder.withTypeText(modifier.getModifierDescription());
 		}
-		if (modifier.help.trim().length() > 0) {
-			builder = builder.withTailText(modifier.help);
+		if (modifier.getModifierHelp().trim().length() > 0) {
+			builder = builder.withTailText(modifier.getModifierHelp());
 		}
+		builder = builder.withInsertHandler(FilterInsertHandler.getInstance());
 		return builder.withIcon(LatteIcons.MODIFIER);
 	}
 
-	private LookupElementBuilder createBuilderForMacro(LatteMacro macro, boolean prefix) {
-		LookupElementBuilder builder = LookupElementBuilder.create((prefix ? "/" : "") + macro.name);
-		builder = builder.withIcon(LatteIcons.MACRO);
+	private LookupElementBuilder createBuilderForMacro(LatteTagSettings tag, boolean isEndTag) {
+		String name = (isEndTag ? "/" : "") + tag.getMacroName();
+		LookupElementBuilder builder = LookupElementBuilder.create(name);
 		builder = builder.withInsertHandler(MacroInsertHandler.getInstance());
-		return builder.withTypeText(macro.type.toString(), true);
+		if (!isEndTag) {
+			String appendText = tag.getType() == LatteTagSettings.Type.PAIR ? (" … {/" + tag.getMacroName() + "}") : "";
+			String arguments = tag.getArgumentsInfo();
+			if (arguments.length() > 0) {
+				builder = builder.withTailText(" " + arguments + "}" + appendText);
+			} else {
+				builder = builder.withTailText("}" + appendText);
+			}
+		} else {
+			builder = builder.withTailText("}");
+		}
+
+		if (tag.isDeprecated()) {
+			builder = builder.withStrikeoutness(true);
+		}
+		builder = builder.withPresentableText("{" + name);
+		return builder.withIcon(LatteIcons.MACRO);
 	}
 
 	private LookupElementBuilder createBuilderForTag(String name) {
@@ -187,14 +170,14 @@ public class LatteCompletionContributor extends CompletionContributor {
 	/**
 	 * Builds list of lookup elements for code completion of attribute macros.
 	 */
-	private List<LookupElement> getAttrMacroCompletions(Map<String, LatteMacro> macros) {
-		List<LookupElement> lookupElements = new ArrayList<LookupElement>(macros.size());
-		for (LatteMacro macro : macros.values()) {
-			if (macro.type != LatteMacro.Type.UNPAIRED) {
-				lookupElements.add(createBuilderForTag("n:" + macro.name));
-				if (macro.type == LatteMacro.Type.PAIR || macro.type == LatteMacro.Type.AUTO_EMPTY) {
-					lookupElements.add(createBuilderForTag("n:tag-" + macro.name));
-					lookupElements.add(createBuilderForTag("n:inner-" + macro.name));
+	private List<LookupElement> getAttrMacroCompletions(Map<String, LatteTagSettings> macros) {
+		List<LookupElement> lookupElements = new ArrayList<>(macros.size());
+		for (LatteTagSettings macro : macros.values()) {
+			if (macro.getType() != LatteTagSettings.Type.UNPAIRED) {
+				lookupElements.add(createBuilderForTag("n:" + macro.getMacroName()));
+				if (macro.getType() == LatteTagSettings.Type.PAIR || macro.getType() == LatteTagSettings.Type.AUTO_EMPTY) {
+					lookupElements.add(createBuilderForTag("n:tag-" + macro.getMacroName()));
+					lookupElements.add(createBuilderForTag("n:inner-" + macro.getMacroName()));
 				}
 			}
 		}

@@ -2,6 +2,8 @@ package com.jantvrdik.intellij.latte.ui;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.table.TableView;
+import com.jantvrdik.intellij.latte.config.LatteConfiguration;
+import com.jantvrdik.intellij.latte.indexes.LatteIndexUtil;
 import com.jantvrdik.intellij.latte.settings.LatteVariableSettings;
 
 import javax.swing.*;
@@ -11,9 +13,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-/**
- * @author Daniel Espendiller <daniel@espendiller.net>
- */
 public class LatteVariableSettingsDialog extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
@@ -22,9 +21,11 @@ public class LatteVariableSettingsDialog extends JDialog {
     private JTextField textVarType;
     private LatteVariableSettings latteVariableSettings;
     private TableView<LatteVariableSettings> tableView;
+    private Project project;
 
-    public LatteVariableSettingsDialog(Project project, TableView<LatteVariableSettings> tableView) {
+    public LatteVariableSettingsDialog(TableView<LatteVariableSettings> tableView, Project project) {
         this.tableView = tableView;
+        this.project = project;
 
         setContentPane(contentPane);
         setModal(true);
@@ -47,8 +48,8 @@ public class LatteVariableSettingsDialog extends JDialog {
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    public LatteVariableSettingsDialog(Project project, TableView<LatteVariableSettings> tableView, LatteVariableSettings latteVariableSettings) {
-        this(project, tableView);
+    public LatteVariableSettingsDialog(TableView<LatteVariableSettings> tableView, Project project, LatteVariableSettings latteVariableSettings) {
+        this(tableView, project);
 
         this.textVarName.setText(latteVariableSettings.getVarName());
         this.textVarType.setText(latteVariableSettings.getVarType());
@@ -58,6 +59,7 @@ public class LatteVariableSettingsDialog extends JDialog {
 
     private void onOK() {
         LatteVariableSettings settings = new LatteVariableSettings(this.textVarName.getText(), this.textVarType.getText());
+        settings.setVendor(LatteConfiguration.Vendor.CUSTOM);
 
         // re-add old item to not use public setter wor twigpaths
         // update ?
@@ -72,7 +74,9 @@ public class LatteVariableSettingsDialog extends JDialog {
             this.tableView.setRowSelectionInterval(row, row);
         }
 
-        dispose();
+        if (LatteIndexUtil.reinitialize(project)) {
+            dispose();
+        }
     }
 
     private void setOkState() {

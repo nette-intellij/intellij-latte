@@ -31,7 +31,7 @@ abstract class PhpTypeColumn<T> extends ColumnInfo<T, String> {
 					return;
 				}
 
-				LattePhpType type = new LattePhpType((String) value);
+				LattePhpType type = LattePhpType.create((String) value);
 				if (type.hasUndefinedClass(project)) {
 					append((String) value, new SimpleTextAttributes(Font.PLAIN, JBColor.RED));
 				} else {

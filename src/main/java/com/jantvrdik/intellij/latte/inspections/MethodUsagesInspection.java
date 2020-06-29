@@ -12,7 +12,7 @@ import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.intentions.AddCustomLatteFunction;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LattePhpMethod;
-import com.jantvrdik.intellij.latte.settings.LatteCustomFunctionSettings;
+import com.jantvrdik.intellij.latte.settings.LatteFunctionSettings;
 import com.jantvrdik.intellij.latte.utils.LattePhpType;
 import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
 import com.jetbrains.php.lang.psi.elements.Function;
@@ -40,7 +40,7 @@ public class MethodUsagesInspection extends BaseLocalInspectionTool {
 			return null;
 		}
 
-		final List<ProblemDescriptor> problems = new ArrayList<ProblemDescriptor>();
+		final List<ProblemDescriptor> problems = new ArrayList<>();
 		file.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
 			@Override
 			public void visitElement(PsiElement element) {
@@ -58,7 +58,7 @@ public class MethodUsagesInspection extends BaseLocalInspectionTool {
 			}
 		});
 
-		return problems.toArray(new ProblemDescriptor[problems.size()]);
+		return problems.toArray(new ProblemDescriptor[0]);
 	}
 
 	private void processFunction(
@@ -68,7 +68,11 @@ public class MethodUsagesInspection extends BaseLocalInspectionTool {
 			final boolean isOnTheFly
 	) {
 		String name = element.getMethodName();
-		LatteCustomFunctionSettings customFunction = LatteConfiguration.INSTANCE.getFunction(element.getProject(), name);
+		if (name == null) {
+			return;
+		}
+
+		LatteFunctionSettings customFunction = LatteConfiguration.getInstance(element.getProject()).getFunction(name);
 		if (customFunction != null) {
 			return;
 		}
@@ -76,10 +80,17 @@ public class MethodUsagesInspection extends BaseLocalInspectionTool {
 		Collection<Function> existing = LattePhpUtil.getFunctionByName(element.getProject(), name);
 		if (existing.size() == 0) {
 			LocalQuickFix addFunctionFix = IntentionManager.getInstance().convertToFix(new AddCustomLatteFunction(name));
-			ProblemHighlightType type = ProblemHighlightType.GENERIC_ERROR_OR_WARNING;
-			String description = "Function '" + name + "' not found";
-			ProblemDescriptor problem = manager.createProblemDescriptor(element, description, true, type, isOnTheFly, addFunctionFix);
-			problems.add(problem);
+			addProblem(manager, problems, getElementToLook(element), "Function '" + name + "' not found", isOnTheFly, addFunctionFix);
+
+		} else {
+			for (Function function : existing) {
+				if (function.isDeprecated()) {
+					addDeprecated(manager, problems, getElementToLook(element), "Function '" + name + "' is deprecated", isOnTheFly);
+				}
+				if (function.isInternal()) {
+					addDeprecated(manager, problems, getElementToLook(element), "Function '" + name + "' is internal", isOnTheFly);
+				}
+			}
 		}
 	}
 
@@ -99,21 +110,24 @@ public class MethodUsagesInspection extends BaseLocalInspectionTool {
 				for (Method method : phpClass.getMethods()) {
 					if (method.getName().equals(methodName)) {
 						if (method.getModifier().isPrivate()) {
-							addProblem(manager, problems, element, "Used private method '" + methodName + "'", isOnTheFly);
-
+							addProblem(manager, problems, getElementToLook(element), "Used private method '" + methodName + "'", isOnTheFly);
 						} else if (method.getModifier().isProtected()) {
-							addProblem(manager, problems, element, "Used protected method '" + methodName + "'", isOnTheFly);
+							addProblem(manager, problems, getElementToLook(element), "Used protected method '" + methodName + "'", isOnTheFly);
+						} else if (method.isDeprecated()) {
+							addDeprecated(manager, problems, getElementToLook(element), "Used method '" + methodName + "' is marked as deprecated", isOnTheFly);
+						} else if (method.isInternal()) {
+							addDeprecated(manager, problems, getElementToLook(element), "Used method '" + methodName + "' is marked as internal", isOnTheFly);
 						}
 
 						String description;
-						boolean isStatic = ((LattePhpMethod) element).isStatic();
+						boolean isStatic = element.isStatic();
 						if (isStatic && !method.getModifier().isStatic()) {
 							description = "Method '" + methodName + "' is not static but called statically";
-							addProblem(manager, problems, element, description, isOnTheFly);
+							addProblem(manager, problems, getElementToLook(element), description, isOnTheFly);
 
 						} else if (!isStatic && method.getModifier().isStatic()) {
 							description = "Method '" + methodName + "' is static but called non statically";
-							addProblem(manager, problems, element, description, isOnTheFly);
+							addProblem(manager, problems, getElementToLook(element), description, isOnTheFly);
 						}
 						isFound = true;
 					}
@@ -122,7 +136,12 @@ public class MethodUsagesInspection extends BaseLocalInspectionTool {
 		}
 
 		if (!isFound) {
-			addProblem(manager, problems, element, "Method '" + methodName + "' not found", ProblemHighlightType.GENERIC_ERROR_OR_WARNING, isOnTheFly);
+			addProblem(manager, problems, getElementToLook(element), "Method '" + methodName + "' not found for type '" + phpType.toString() + "'", isOnTheFly);
 		}
+	}
+
+	private PsiElement getElementToLook(LattePhpMethod method) {
+		PsiElement nameIdentifier = method.getNameIdentifier();
+		return nameIdentifier != null ? nameIdentifier : method;
 	}
 }

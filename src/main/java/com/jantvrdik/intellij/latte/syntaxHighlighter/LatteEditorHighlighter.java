@@ -13,13 +13,20 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.tree.IElementType;
+import com.jantvrdik.intellij.latte.lexer.LatteHtmlHighlightingLexer;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class LatteEditorHighlighter extends LayeredLexerEditorHighlighter {
 	public LatteEditorHighlighter(@Nullable Project project, @Nullable VirtualFile virtualFile, @NotNull EditorColorsScheme colors) {
-		super(new LatteSyntaxHighlighter(), colors);
+		super(new LatteSyntaxHighlighter() {
+			@Override
+			public @NotNull Lexer getHighlightingLexer() {
+				return new LatteHtmlHighlightingLexer(super.getHighlightingLexer());
+			}
+		}, colors);
+
 		final SyntaxHighlighter highlighter = getHighlighter(project, virtualFile);
 		this.registerLayer(LatteTypes.T_TEXT, new LayerDescriptor(new SyntaxHighlighter() {
 			@NotNull

@@ -2,7 +2,6 @@ package com.jantvrdik.intellij.latte.codeStyle;
 
 import com.intellij.application.options.IndentOptionsEditor;
 import com.jantvrdik.intellij.latte.LatteLanguage;
-import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 
 import com.intellij.lang.Language;
@@ -23,9 +22,25 @@ public class LatteLanguageCodeStyleSettingsProvider extends LanguageCodeStyleSet
 	public void customizeSettings(@NotNull CodeStyleSettingsCustomizable consumer, @NotNull SettingsType settingsType) {
 		if (settingsType == SettingsType.SPACING_SETTINGS) {
 			consumer.showStandardOptions("SPACE_AROUND_ASSIGNMENT_OPERATORS");
-			consumer.renameStandardOption("SPACE_AROUND_ASSIGNMENT_OPERATORS", "Separator");
+			consumer.showStandardOptions("SPACE_AROUND_EQUALITY_OPERATORS");
+			consumer.showStandardOptions("SPACE_AROUND_LOGICAL_OPERATORS");
+			consumer.showStandardOptions("SPACE_AROUND_RELATIONAL_OPERATORS");
+			consumer.showStandardOptions("SPACE_AROUND_BITWISE_OPERATORS");
+			consumer.showStandardOptions("SPACE_AROUND_MULTIPLICATIVE_OPERATORS");
+			consumer.showStandardOptions("SPACE_AROUND_BITWISE_OPERATORS");
+			consumer.showCustomOption(
+					LatteCodeStyleSettings.class,
+					"SPACE_AROUND_CONCATENATION",
+					"Around concatenation (.)",
+					"Others",
+					LatteCodeStyleSettings.SPACE_AROUND_CONCATENATION
+			);
+			consumer.showStandardOptions("SPACE_AROUND_UNARY_OPERATOR");
+			consumer.renameStandardOption("SPACE_AROUND_UNARY_OPERATOR", "Unary operators (++, --)");
+
 		} else if (settingsType == SettingsType.BLANK_LINES_SETTINGS) {
 			consumer.showStandardOptions("KEEP_BLANK_LINES_IN_CODE");
+
 		} else if (settingsType == SettingsType.INDENT_SETTINGS) {
 			consumer.showStandardOptions("USE_TAB_CHARACTER");
 			consumer.showStandardOptions("INDENT_SIZE");
@@ -53,6 +68,14 @@ public class LatteLanguageCodeStyleSettingsProvider extends LanguageCodeStyleSet
 				"{var $string = \"abc\", $number = 123}\n\n" +
 				"{foreach $data as $key => $value}\n" +
 				"    {$key} {$value}\n" +
-				"{/foreach}";
+				"{/foreach}\n\n" +
+				"{var $y = 25 - 46}\n\n" +
+				"{for $x = 0; $x <= count($foo); $x++}\n" +
+				"    {$x | $y}\n" +
+				"{/foreach}\n\n" +
+				"{var $text = 'text' . 'suffix'}\n\n" +
+				"{if $var !== 25 && $val <= 'foo' || $y % 2 === 0}\n" +
+				"    {$value|noescape}\n" +
+				"{/if}";
 	}
 }

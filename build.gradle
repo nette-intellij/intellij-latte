@@ -1,8 +1,8 @@
 import org.jetbrains.grammarkit.tasks.*
 
 plugins {
-    id 'org.jetbrains.intellij' version "0.4.11"
-    id "org.jetbrains.grammarkit" version "2019.3"
+    id 'org.jetbrains.intellij' version "0.4.20"
+    id "org.jetbrains.grammarkit" version "2020.1"
 }
 
 sourceSets {
@@ -13,12 +13,28 @@ sourceSets {
     }
 }
 
+Properties properties = new Properties()
+properties.load(project.rootProject.file("local.properties").newDataInputStream())
+
 sourceCompatibility = 1.8
-version '1.0.3'
+targetCompatibility = 1.8
+
+version '1.1.0-rc4'
+group 'com.jantvrdik.intellij.latte'
 
 jar {
     archiveName 'intellij-latte-' + version + '.jar'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
+runIde {
+    ideDirectory "${properties.getProperty('runIdeDirectory')}"
+}
+
+def htmlFixer = { htmlFile -> file(htmlFile).text.replace('<html>', '').replace('</html>', '') }
+
+patchPluginXml {
+    changeNotes = htmlFixer('src/main/resources/META-INF/change-notes.html')
 }
 
 apply plugin: 'org.jetbrains.intellij'

@@ -23,19 +23,19 @@ public class LatteMacroModifierReference extends PsiReferenceBase<PsiElement> im
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
-        List<ResolveResult> results = new ArrayList<ResolveResult>();
+        List<ResolveResult> results = new ArrayList<>();
         final Collection<LatteMacroModifier> modifiers = LatteUtil.findModifiers(getElement().getProject(), modifierName);
         for (LatteMacroModifier modifier : modifiers) {
             results.add(new PsiElementResolveResult(modifier));
         }
-        return results.toArray(new ResolveResult[results.size()]);
+        return results.toArray(new ResolveResult[0]);
     }
 
     @Nullable
     @Override
     public PsiElement resolve() {
         ResolveResult[] resolveResults = multiResolve(false);
-        return resolveResults.length > 0 ? resolveResults[0].getElement() : null;
+        return resolveResults.length == 1 ? resolveResults[0].getElement() : null;
     }
 
     @NotNull

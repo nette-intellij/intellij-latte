@@ -12,7 +12,8 @@ class LatteRenamePsiElementProcessor extends RenamePsiElementProcessor {
 	@Override
 	public boolean canProcessElement(@NotNull PsiElement psiElement) {
 		return psiElement instanceof LattePhpMethod
-				|| psiElement instanceof LattePhpClass
+				|| psiElement instanceof LattePhpClassUsage
+				// || psiElement instanceof LattePhpNamespaceReference todo: temporarily disabled (weird PHPStorm behavior for PhpIndex.getNamespaceByName)
 				|| psiElement instanceof LattePhpConstant
 				|| psiElement instanceof LattePhpStaticVariable
 				|| psiElement instanceof LattePhpProperty

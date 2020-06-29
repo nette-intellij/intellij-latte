@@ -101,6 +101,14 @@ public class LatteMacroLexerAdapterTest {
 			Pair.create(T_MACRO_TAG_CLOSE, "}"),
 		});
 
+		lexer.start("{_|test}");
+		assertTokens(lexer, new Pair[] {
+				Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
+				Pair.create(T_MACRO_SHORTNAME, "_"),
+				Pair.create(T_MACRO_CONTENT, "|test"),
+				Pair.create(T_MACRO_TAG_CLOSE, "}"),
+		});
+
 		lexer.start("{$var|truncate:10|upper}");
 		assertTokens(lexer, new Pair[] {
 			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),

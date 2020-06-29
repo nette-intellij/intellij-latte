@@ -21,7 +21,7 @@ root             ::= (structureToken)* autoClosedBlock?
 private
 //macro            ::= macroComment | macroClassic
 macro            ::= macroComment | (
-                                          <<checkPairMacro true>> (<<checkEmptyMacro>> emptyMacro | pairMacro)
+                                          <<checkPairMacro true>> (<<checkEmptyMacro>> emptyMacro | <<checkAutoClosedMacro>> autoEmptyMacro | pairMacro)
                                         | <<checkPairMacro false>> unpairedMacro
                                     )
 
@@ -39,6 +39,10 @@ pairMacro        ::= macroOpenTag structureToken* macroCloseTag { //incomplete p
                         }
 
 emptyMacro       ::= emptyMacroTag {
+                            extends=macroClassic
+                        }
+
+autoEmptyMacro       ::= macroOpenTag structureToken* (<<checkAutoClosedEndTag>> macroCloseTag)? {
                             extends=macroClassic
                         }
 
@@ -109,46 +113,108 @@ netteAttrValue   ::= T_HTML_TAG_ATTR_SQ macroContent? T_HTML_TAG_ATTR_SQ
                    | T_HTML_TAG_ATTR_DQ macroContent? T_HTML_TAG_ATTR_DQ
                    | macroContent?
 
-outerHtml ::= T_TEXT;
+// HTML tokens
+outerHtml ::= htmlTag | T_TEXT | T_HTML_CLOSE_TAG_OPEN | T_HTML_OPEN_TAG_OPEN | T_HTML_OPEN_TAG_CLOSE | T_HTML_TAG_CLOSE;
+
+private
+htmlTag            ::= <<checkPairHtmlTag true>> (htmlOpenTag htmlTagContainer htmlCloseTag) | <<checkPairHtmlTag false>> htmlEmptyTag
+
+htmlTagContainer     ::= (htmlTag | T_TEXT | macro | (pairMacro | unpairedMacro))*
+
+htmlTagContent         ::= (netteAttr | macro | T_TEXT| (pairMacro | unpairedMacro))*
+
+htmlOpenTag     ::= T_HTML_OPEN_TAG_OPEN htmlTagContent T_HTML_TAG_CLOSE {
+                        pin=1
+                     }
+
+htmlCloseTag    ::= T_HTML_CLOSE_TAG_OPEN htmlTagContent T_HTML_TAG_CLOSE {
+                     pin=1
+                  }
+
+htmlEmptyTag    ::= T_HTML_OPEN_TAG_OPEN htmlTagContent (T_HTML_OPEN_TAG_CLOSE | T_HTML_TAG_CLOSE) {
+                        pin=1
+                     }
 
 // PHP tokens
-phpContent       ::= (phpForeach | phpFor | phpExpression)+
+phpContent       ::= (phpForeach | phpFor | phpArrayOfVariables | phpArray | phpKeyArrayItem | blockName | linkDestination | phpInternalExpression)+
 
-phpVariable        ::= T_MACRO_ARGS_VAR {
+blockName        ::= "#" T_PHP_IDENTIFIER
+
+linkDestination    ::= T_LINK_DESTINATION T_LINK_DESTINATION*
+
+phpVariable        ::= T_MACRO_ARGS_VAR phpArrayUsage* {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpVariableElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpVariableElement"
-                        methods=[getName setName getNameIdentifier getTextElement getVariableName isDefinition isDefinitionInFor isDefinitionInForeach getPhpType isVarTypeDefinition]
+                        methods=[
+                            getName setName getNameIdentifier getTextElement getVariableName isDefinition
+                            getPhpArrayLevel isDefinitionInFor isDefinitionInForeach getReturnType getPhpType
+                            isCaptureDefinition isBlockDefineVarDefinition isVarTypeDefinition isVarDefinition
+                            isPhpArrayVarDefinition getPhpStatementPart
+                        ]
                     }
 
-phpStaticVariable  ::= T_MACRO_ARGS_VAR {
+phpStaticVariable  ::= T_MACRO_ARGS_VAR phpArrayUsage* {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpStaticVariableElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpStaticVariableElement"
-                        methods=[getName setName getNameIdentifier getTextElement getVariableName getPhpType getPropertyType]
+                        methods=[
+                            getName setName getNameIdentifier getTextElement getVariableName getPhpType getPhpArrayLevel
+                            getReturnType getPhpStatementPart
+                        ]
                     }
 
-phpMethod        ::= T_PHP_METHOD {
+phpMethod        ::= (T_PHP_IDENTIFIER | phpVariable) T_WHITESPACE? phpArgumentList T_WHITESPACE? phpArrayUsage* {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpMethodElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpMethodElement"
-                        methods=[getName setName getNameIdentifier getTextElement getMethodName getPhpType getReturnType isStatic isFunction]
+                        methods=[
+                            getName setName getNameIdentifier getTextElement getMethodName getPhpType getPhpArrayLevel
+                            getReturnType isStatic isFunction getPhpStatementPart
+                        ]
                     }
 
-phpConstant        ::= T_PHP_IDENTIFIER {
+phpConstant        ::= T_PHP_IDENTIFIER phpArrayUsage* {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpConstantElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpConstantElement"
-                        methods=[getName setName getNameIdentifier getTextElement getConstantName getPhpType getConstantType]
+                        methods=[
+                            getName setName getNameIdentifier getTextElement getConstantName getPhpType getPhpArrayLevel
+                            getReturnType getPhpStatementPart
+                        ]
                     }
 
-phpProperty        ::= T_PHP_IDENTIFIER {
+phpProperty        ::= T_PHP_IDENTIFIER phpArrayUsage* {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpPropertyElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpPropertyElement"
-                        methods=[getName setName getNameIdentifier getTextElement getPropertyName getPhpType getPropertyType isStatic]
+                        methods=[
+                            getName setName getNameIdentifier getTextElement getPropertyName getPhpType getPhpArrayLevel
+                            getReturnType isStatic getPhpStatementPart
+                        ]
                     }
 
-phpClass        ::= T_PHP_CLASS_NAME {
-                        mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpClassElementImpl"
-                        implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpClassElement"
-                        methods=[getName setName getNameIdentifier getTextElement getClassName getPhpType isTemplateType]
-                    }
+phpClassReference    ::= (T_PHP_NAMESPACE_RESOLUTION? <<isNamespace>> phpNamespaceReference)? (T_PHP_NAMESPACE_RESOLUTION <<isNamespace>> phpNamespaceReference)* phpClassUsage {
+                    mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpClassReferenceElementImpl"
+                    implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpClassReferenceElement"
+                    methods = [
+                        getName setName getNameIdentifier getClassName getReturnType getTextElement getPhpArrayLevel
+                        getPhpArrayUsageList getPhpType getPhpStatementPart
+                    ]
+                }
+
+phpClassUsage       ::= T_PHP_NAMESPACE_RESOLUTION (T_PHP_IDENTIFIER | T_PHP_NAMESPACE_REFERENCE)? {
+                    mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpClassUsageElementImpl"
+                    implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpClassUsageElement"
+                    methods = [
+                        getName setName getNameIdentifier getTextElement getClassName getReturnType getPhpType getPhpArrayLevel
+                        getPhpArrayUsageList isTemplateType getPhpStatementPart
+                    ]
+                }
+
+phpNamespaceReference    ::= T_PHP_NAMESPACE_REFERENCE {
+                     mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpNamespaceReferenceElementImpl"
+                     implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpNamespaceReferenceElement"
+                     methods = [
+                         getName setName getNameIdentifier getTextElement getNamespaceName getReturnType getPhpArrayLevel
+                         getPhpArrayUsageList getPhpType getPhpStatementPart
+                     ]
+                 }
 
 macroModifier    ::= T_MACRO_FILTERS {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LatteMacroModifierElementImpl"
@@ -156,14 +222,73 @@ macroModifier    ::= T_MACRO_FILTERS {
                         methods=[getName setName getNameIdentifier getTextElement getModifierName isVariableModifier]
                     }
 
+phpStatement       ::= phpStatementFirstPart phpStatementPart* {
+                methods=[getPhpType isPhpVariableOnly isPhpClassReferenceOnly getLastPhpElement]
+                }
+
+phpStatementFirstPart    ::= phpVariable | phpClassReference | phpMethod {
+                    methods=[getPhpType getPhpStatement getPrevPhpStatementPart getPhpElement]
+                    implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpStatementPartElement"
+                }
+
+phpStatementPart    ::= phpDefinition | phpStatic {
+                    methods=[getPhpType getPhpStatement getPrevPhpStatementPart getPhpElement]
+                    implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpStatementPartElement"
+                 }
+
+phpTypeElement       ::= T_PHP_NULL_MARK? phpTypePart (T_PHP_OR_INCLUSIVE phpTypePart)* {
+                    methods=[getPhpType]
+                }
+
+phpTypePart       ::= (T_PHP_TYPE | T_PHP_NULL | T_PHP_MIXED | phpClassReference) phpTypeIterable*
+
+phpTypeIterable       ::= T_PHP_LEFT_BRACKET T_PHP_RIGHT_BRACKET
+
+phpTypedArguments       ::= phpFirstTypedVariable | (phpTypedVariable "," phpTypedVariable ("," phpTypedVariable)*)
+
+phpFirstTypedVariable       ::= phpTypeElement phpVariable {
+                         methods=[getPhpType]
+                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpTypedPartElement"
+                     }
+
+phpTypedVariable       ::= phpTypeElement? phpVariable {
+                         methods=[getPhpType]
+                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpTypedPartElement"
+                     }
+
+phpKeyArrayItem   ::= phpArrayKey (T_PHP_DOUBLE_ARROW | "=>") phpArrayValue
+
+phpArrayKey   ::= phpPrivateArgument* {
+                    methods=[getPhpType]
+                    implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpExpressionElement"
+                }
+
+phpArrayValue   ::= phpPrivateArgument* {
+                   methods=[getPhpType]
+                   implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpExpressionElement"
+               }
+
 phpForeach       ::= T_WHITESPACE? phpExpression T_WHITESPACE? T_PHP_AS T_WHITESPACE? (phpVariable | phpArrayOfVariables) (T_WHITESPACE? T_PHP_DOUBLE_ARROW T_WHITESPACE? (phpVariable | phpArrayOfVariables))?
 
-phpFor          ::= T_WHITESPACE? phpExpression* T_WHITESPACE? ";" T_WHITESPACE? phpExpression* T_WHITESPACE? ";" T_WHITESPACE? phpExpression* T_WHITESPACE?
+phpFor          ::= T_WHITESPACE? phpInternalExpression* T_WHITESPACE? ";" T_WHITESPACE? phpInternalExpression* T_WHITESPACE? ";" T_WHITESPACE? phpInternalExpression* T_WHITESPACE?
 
-phpArrayOfVariables        ::= T_WHITESPACE? T_PHP_LEFT_BRACKET T_WHITESPACE? phpVariable ( T_WHITESPACE? "," T_WHITESPACE? phpVariable )* ","? T_WHITESPACE? T_PHP_RIGHT_BRACKET T_WHITESPACE?
+phpArrayOfVariables        ::= T_WHITESPACE? T_PHP_LEFT_BRACKET T_WHITESPACE? phpVariable? ( T_WHITESPACE? "," T_WHITESPACE? phpVariable? )* ","? T_WHITESPACE? T_PHP_RIGHT_BRACKET T_WHITESPACE?
+
+phpArray        ::= T_PHP_LEFT_BRACKET phpArrayDefinitionContent T_PHP_RIGHT_BRACKET | T_PHP_ARRAY T_PHP_LEFT_NORMAL_BRACE phpArrayDefinitionContent T_PHP_RIGHT_NORMAL_BRACE
+
+phpArrayUsage     ::= phpArrayUsageItem
 
 private
-phpMethodDefinition       ::= T_WHITESPACE? (T_PHP_DOUBLE_COLON | T_PHP_OBJECT_OPERATOR) T_WHITESPACE? phpMethod T_WHITESPACE? phpArgumentList T_WHITESPACE?
+phpArrayUsageItem     ::= T_PHP_LEFT_BRACKET phpArrayContent T_PHP_RIGHT_BRACKET
+
+phpArrayContent    ::= (T_WHITESPACE? (phpArgument | T_MACRO_ARGS) T_WHITESPACE?)*
+
+phpArrayDefinitionContent    ::= phpArrayItem ("," phpArrayItem)* ","?
+
+phpArrayItem   ::= (phpArrayKey (T_PHP_DOUBLE_ARROW | "=>"))? phpArrayValue
+
+private
+phpMethodDefinition       ::= T_WHITESPACE? (T_PHP_DOUBLE_COLON | T_PHP_OBJECT_OPERATOR) T_WHITESPACE? phpMethod
 
 private
 phpArgumentList       ::= (T_PHP_LEFT_NORMAL_BRACE T_WHITESPACE? T_PHP_RIGHT_NORMAL_BRACE) | (T_PHP_LEFT_NORMAL_BRACE phpMethodArgs T_PHP_RIGHT_NORMAL_BRACE)
@@ -175,18 +300,31 @@ phpMethodArgs       ::= T_WHITESPACE? phpArgument+ ( T_WHITESPACE? "," T_WHITESP
 phpString    ::=  phpSingleQuotedString | phpDoubleQuotedString | T_MACRO_ARGS_STRING
 
 private
-phpArgument    ::=  phpString | T_MACRO_ARGS_NUMBER | phpArrayOfVariables | phpClass | phpDefinition
-                    | phpStatic | phpFunctionCall | phpInBrackets | phpVariable | T_PHP_CONTENT_TYPE | T_PHP_OBJECT_OPERATOR
-                    | T_PHP_OPERATOR | T_PHP_DOUBLE_COLON | T_PHP_DOUBLE_ARROW | T_PHP_METHOD | T_PHP_TYPE | T_PHP_KEYWORD
-                    | T_PHP_CLASS | T_PHP_AS | T_PHP_CAST | T_PHP_EXPRESSION | T_PHP_LEFT_BRACKET | T_PHP_RIGHT_BRACKET | T_PHP_NULL
-                    | T_PHP_MIXED | T_PHP_LEFT_CURLY_BRACE | T_PHP_RIGHT_CURLY_BRACE | macroModifier | T_PHP_IDENTIFIER | T_PHP_OR_INCLUSIVE
-                    | T_PHP_DEFINITION_OPERATOR
+phpArgument    ::= phpPrivateArgument | T_PHP_AS | T_PHP_DOUBLE_ARROW
 
 private
-phpFunctionCall    ::= (phpMethod | phpVariable) T_WHITESPACE? phpArgumentList T_WHITESPACE?
+phpPrivateArgument    ::=  phpString | phpArrayOfVariables | phpTypedArguments | phpStatement | phpTypeElement | T_MACRO_ARGS_NUMBER
+                    | phpArray | phpClassReference | phpDefinition
+                    | phpStatic | phpMethod | phpInBrackets | phpVariable | T_PHP_NULL_MARK | T_PHP_CONTENT_TYPE | T_PHP_OBJECT_OPERATOR
+                    | T_PHP_RELATIONAL_OPERATOR | T_PHP_ASSIGNMENT_OPERATOR | T_PHP_LOGIC_OPERATOR | T_PHP_OPERATOR
+                    | T_PHP_ADDITIVE_OPERATOR | T_PHP_BITWISE_OPERATOR | T_PHP_SHIFT_OPERATOR
+                    | T_PHP_DOUBLE_COLON | T_PHP_METHOD | T_PHP_TYPE | T_PHP_KEYWORD
+                    | T_PHP_CAST | T_PHP_NAMESPACE_RESOLUTION | T_BLOCK_NAME | T_PHP_COLON
+                    | T_PHP_CONCATENATION | T_PHP_MULTIPLICATIVE_OPERATORS | T_PHP_UNARY_OPERATOR
+                    | T_PHP_EXPRESSION | T_PHP_NULL | T_PHP_MIXED | T_PHP_LEFT_CURLY_BRACE | T_PHP_RIGHT_CURLY_BRACE
+                    | macroModifier | T_PHP_IDENTIFIER | T_PHP_MACRO_SEPARATOR | T_PHP_OR_INCLUSIVE | T_PHP_DEFINITION_OPERATOR
+
+phpExpression    ::= (expression | T_MACRO_ARGS)* {
+                           methods=[getPhpType]
+                           implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpExpressionElement"
+                       }
 
 private
-phpExpression    ::= T_MACRO_ARGS | T_PHP_OR_INCLUSIVE | phpArgument | T_PHP_LEFT_NORMAL_BRACE | T_PHP_RIGHT_NORMAL_BRACE
+phpInternalExpression    ::= expression | T_PHP_AS | T_PHP_DOUBLE_ARROW | T_MACRO_ARGS
+
+private
+expression    ::= T_PHP_OR_INCLUSIVE | T_PHP_MACRO_SEPARATOR | phpPrivateArgument
+                    | T_PHP_LEFT_NORMAL_BRACE | T_PHP_RIGHT_NORMAL_BRACE | T_PHP_LEFT_BRACKET | T_PHP_RIGHT_BRACKET
 
 private
 phpDefinition    ::= phpMethodDefinition | phpConstantDefinition | phpPropertyDefinition
@@ -214,4 +352,4 @@ structureToken   ::= outerHtml | macro | netteAttr
 
 
 private
-topLevelTokens   ::= T_MACRO_CLASSIC T_MACRO_CONTENT T_PHP_CONTENT topLevelTokens
+topLevelTokens   ::= T_MACRO_CLASSIC T_MACRO_CONTENT T_PHP_CONTENT T_PHP_METHOD topLevelTokens

@@ -1,10 +1,14 @@
 package com.jantvrdik.intellij.latte.ui;
 
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
+import com.jantvrdik.intellij.latte.config.LatteDefaultConfiguration;
+import com.jantvrdik.intellij.latte.config.LatteFileConfiguration;
 import com.jantvrdik.intellij.latte.icons.LatteIcons;
+import com.jantvrdik.intellij.latte.indexes.LatteIndexUtil;
 import com.jantvrdik.intellij.latte.settings.LatteSettings;
 import com.jantvrdik.intellij.latte.utils.LatteIdeHelper;
 import org.jetbrains.annotations.Nls;
@@ -18,6 +22,13 @@ public class LatteSettingsForm implements Configurable {
 	private JPanel panel1;
 	private JButton buttonHelp;
 	private JLabel logoLabel;
+	private JCheckBox enableXmlLoadingCheckBox;
+	private JButton buttonReinitialize;
+	private JButton buttonReinitializeDefault;
+	private JButton moreInformationButton;
+	private JCheckBox enableNetteCheckBox;
+	private JCheckBox enableNetteFormsTagsCheckBox;
+	private JCheckBox enableLatteTagsAndCheckBox;
 
 	private Project project;
 	private boolean changed = false;
@@ -34,33 +45,75 @@ public class LatteSettingsForm implements Configurable {
 				LatteIdeHelper.openUrl(LatteConfiguration.LATTE_HELP_URL + "en/");
 			}
 		});
+
+		moreInformationButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				super.mouseClicked(e);
+				LatteIdeHelper.openUrl(LatteConfiguration.LATTE_DOCS_XML_FILES_URL);
+			}
+		});
+
+		buttonReinitializeDefault.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				super.mouseClicked(e);
+				LatteDefaultConfiguration.getInstance(project).reinitialize();
+				LatteIdeHelper.doNotify(
+						"Latte plugin settings",
+						"Default configuration for plugin was refreshed.",
+						NotificationType.INFORMATION,
+						project
+				);
+				buttonReinitializeDefault.setBackground(null);
+			}
+		});
+
+		buttonReinitialize.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				super.mouseClicked(e);
+				LatteFileConfiguration.getInstance(project).reinitialize();
+				LatteIdeHelper.doNotify(
+						"Latte plugin settings",
+						"Configuration from .xml files was refreshed.",
+						NotificationType.INFORMATION,
+						project
+				);
+				buttonReinitialize.setBackground(null);
+			}
+		});
+
+		enableXmlLoadingCheckBox.setSelected(getSettings().enableXmlLoading);
+		enableXmlLoadingCheckBox.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				super.mouseClicked(e);
+				LatteSettingsForm.this.changed = true;
+			}
+		});
+
+		enableNetteCheckBox.setSelected(getSettings().enableNette);
+		enableNetteCheckBox.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				super.mouseClicked(e);
+				LatteSettingsForm.this.changed = true;
+			}
+		});
+
+		enableNetteFormsTagsCheckBox.setSelected(getSettings().enableNetteForms);
+		enableNetteFormsTagsCheckBox.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				super.mouseClicked(e);
+				LatteSettingsForm.this.changed = true;
+			}
+		});
+
+		enableLatteTagsAndCheckBox.setEnabled(false);
 	}
-	/*
-        private void setupPathComponent(final JPanel panel) {
-            SeparatorWithText separatorWithText = new SeparatorWithText();
-            separatorWithText.setCaption("Useful links");
-            separatorWithText.setCaptionCentered(false);
-            panel.add(separatorWithText, BorderLayout.BEFORE_FIRST_LINE);
 
-            separatorWithText.add(createHyperLink(), BorderLayout.AFTER_LINE_ENDS);
-
-            HighlightableComponent label = new HighlightableComponent();
-            label.setText("Test text");
-            label.setIcon(LatteIcons.FILE);
-            panel.add(label);
-
-
-
-            //ContextHelpLabel contextLabel = ContextHelpLabel.create("test help", "with description");
-            //panel.add(contextLabel);
-        }
-
-        private HyperlinkLabel createHyperLink() {
-            final HyperlinkLabel settingsLink = new HyperlinkLabel("Documentation x");
-            settingsLink.setHyperlinkTarget("https://latte.nette.org/en/guide");
-            return settingsLink;
-        }
-    */
 	@Nls
 	@Override
 	public String getDisplayName() {
@@ -86,9 +139,14 @@ public class LatteSettingsForm implements Configurable {
 
 	@Override
 	public void apply() throws ConfigurationException {
-		//getSettings().codeCompletionEnabled = codeCompletionEnabled.isSelected();
+		getSettings().enableXmlLoading = enableXmlLoadingCheckBox.isSelected();
+		getSettings().enableNette = enableNetteCheckBox.isSelected();
+		getSettings().enableNetteForms = enableNetteFormsTagsCheckBox.isSelected();
 
-		this.changed = false;
+		boolean success = LatteIndexUtil.reinitialize(project);
+		if (success) {
+			this.changed = false;
+		}
 	}
 
 	private LatteSettings getSettings() {

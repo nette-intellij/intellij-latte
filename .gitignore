@@ -1,5 +1,6 @@
 .DS_Store
 *.iml
+local.properties
 
 /src/main/gen
 /src/main/java/src/com/jantvrdik/intellij/latte/parser/_LatteLexer.flex

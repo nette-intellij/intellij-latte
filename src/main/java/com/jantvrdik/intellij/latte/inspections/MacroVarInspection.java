@@ -1,13 +1,11 @@
 package com.jantvrdik.intellij.latte.inspections;
 
 import com.intellij.codeInspection.InspectionManager;
-import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ProblemDescriptor;
-import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
-import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.utils.LatteTypesUtil;
@@ -17,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MacroVarInspection extends LocalInspectionTool {
+public class MacroVarInspection extends BaseLocalInspectionTool {
 
 	@NotNull
 	@Override
@@ -32,7 +30,7 @@ public class MacroVarInspection extends LocalInspectionTool {
 			return null;
 		}
 
-		final List<ProblemDescriptor> problems = new ArrayList<ProblemDescriptor>();
+		final List<ProblemDescriptor> problems = new ArrayList<>();
 		file.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
 			@Override
 			public void visitElement(PsiElement element) {
@@ -42,38 +40,36 @@ public class MacroVarInspection extends LocalInspectionTool {
 						List<LattePhpContent> phpContent = new ArrayList<>(macroContent.getPhpContentList());
 
 						if (phpContent.size() == 0) {
-							addError("Tag {var} must have php content.", problems, element, manager, isOnTheFly);
+							addError(manager, problems, element, "Tag {var} must have php content.", isOnTheFly);
 
 						} else {
-							Result result = new Result();
-							for (LattePhpContent content : phpContent) {
-								content.accept(new PsiRecursiveElementWalkingVisitor() {
-									@Override
-									public void visitElement(PsiElement element) {
-										IElementType type = element.getNode().getElementType();
-										if (LatteTypesUtil.getAllTypeHintTokens().contains(type)) {
-
-										} else if (type == LatteTypes.PHP_VARIABLE) {
-											result.hasValidVariable = true;
-
-										} else {
-											super.visitElement(element);
-											if (type != LatteTypes.PHP_CONTENT && !element.getText().equals("|")) {
-												if (!result.hasValidVariable) {
-													result.beforeVarCount++;
-												}
-											}
-										}
+							LattePhpContent content = phpContent.get(0);
+							List<PsiElement> children = new ArrayList<>();
+							content.acceptChildren(new PsiElementVisitor() {
+								@Override
+								public void visitElement(PsiElement element) {
+									if (!LatteTypesUtil.whitespaceTokens.contains(element.getNode().getElementType())) {
+										children.add(element);
 									}
-								});
-							}
+								}
+							});
 
-							if (!result.hasValidVariable) {
-								addError("Tag {var} must contains valid variable.", problems, element, manager, isOnTheFly);
-							}
+							if (children.size() == 0) {
+								addError(manager, problems, element, "Tag {var} must contain valid variable definition.", isOnTheFly);
 
-							if (result.beforeVarCount > 0) {
-								addError("Invalid content in {var} tag.", problems, element, manager, isOnTheFly);
+							} else {
+								if (
+										!(children.get(0) instanceof LattePhpTypedArguments)
+												&& (!(children.get(0) instanceof LattePhpStatement) || !((LattePhpStatement) children.get(0)).isPhpVariableOnly())
+								) {
+									addError(manager, problems, element, "Tag {var} must contain valid variable definition.", isOnTheFly);
+
+								} else if (children.size() < 2 || children.get(1).getNode().getElementType() != LatteTypes.T_PHP_DEFINITION_OPERATOR) {
+									addError(manager, problems, element, "Tag {var} must contain definition operator (=).", isOnTheFly);
+
+								} else if (children.size() < 3) {
+									addError(manager, problems, element, "Tag {var} must contain variable content after =.", isOnTheFly);
+								}
 							}
 						}
 					}
@@ -83,23 +79,6 @@ public class MacroVarInspection extends LocalInspectionTool {
 				}
 			}
 		});
-
-		return problems.toArray(new ProblemDescriptor[problems.size()]);
-	}
-
-	private void addError(String message, List<ProblemDescriptor> problems, @NotNull PsiElement element, @NotNull final InspectionManager manager, final boolean isOnTheFly) {
-		ProblemDescriptor problem = manager.createProblemDescriptor(
-				element,
-				message,
-				true,
-				ProblemHighlightType.GENERIC_ERROR,
-				isOnTheFly
-		);
-		problems.add(problem);
-	}
-
-	private static class Result {
-		boolean hasValidVariable = false;
-		int beforeVarCount = 0;
+		return problems.toArray(new ProblemDescriptor[0]);
 	}
 }

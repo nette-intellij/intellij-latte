@@ -3,8 +3,9 @@ package com.jantvrdik.intellij.latte.parser;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.psi.tree.IElementType;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.config.LatteMacro;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
+import com.jantvrdik.intellij.latte.settings.LatteTagSettings;
+import com.jantvrdik.intellij.latte.utils.LatteHtmlUtil;
 import org.jetbrains.annotations.NotNull;
 
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
@@ -13,6 +14,7 @@ import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
  * External rules for LatteParser.
  */
 public class LatteParserUtil extends GeneratedParserUtilBase {
+	private static LatteTagSettings lastMacro = null;
 
 	/**
 	 * Looks for a classic macro a returns true if it finds the macro a and it is pair or unpaired (based on pair parameter).
@@ -26,22 +28,58 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 
 		boolean result;
 
-		LatteMacro macro = LatteConfiguration.INSTANCE.getMacro(builder.getProject(), macroName);
-		if (macro != null && macro.type == LatteMacro.Type.AUTO_EMPTY) {
+		LatteTagSettings macro = getTag(builder);
+		if (macro != null && macro.getType() == LatteTagSettings.Type.AUTO_EMPTY) {
 			result = pair == isAutoEmptyPair(macroName, builder);
-		} else if (macroName.equals("_")) {
-			// hard coded rule for macro _ because of dg's poor design decision
-			// macro _ is pair only if it has empty arguments, otherwise it is unpaired
-			// see https://github.com/nette/nette/blob/v2.1.2/Nette/Latte/Macros/CoreMacros.php#L193
-			builder.advanceLexer();
-			result = ((builder.getTokenType() == T_MACRO_TAG_CLOSE) == pair);
-
-			// all other macros which respect rules
 		} else {
-			result = (macro != null ? (macro.type == (pair ? LatteMacro.Type.PAIR : LatteMacro.Type.UNPAIRED)) : !pair);
+			result = (macro != null ? (macro.getType() == (pair ? LatteTagSettings.Type.PAIR : LatteTagSettings.Type.UNPAIRED)) : !pair);
 		}
 
 		marker.rollbackTo();
+		return result;
+	}
+
+	public static boolean checkPairHtmlTag(PsiBuilder builder, int level, Parser parser) {
+		boolean pair = parser == LatteParser.TRUE_parser_;
+		if (builder.getTokenType() != T_HTML_OPEN_TAG_OPEN) return false;
+
+		PsiBuilder.Marker marker = builder.mark();
+		String tagName = getHtmlTagName(builder);
+
+		boolean isVoidTag = LatteHtmlUtil.isVoidTag(tagName);
+		boolean result = (!isVoidTag && pair) || (isVoidTag && !pair);
+
+		marker.rollbackTo();
+		return result;
+	}
+
+	public static boolean checkAutoClosedMacro(PsiBuilder builder, int level) {
+		PsiBuilder.Marker marker = builder.mark();
+
+		LatteTagSettings macro = getTag(builder);
+
+		marker.rollbackTo();
+
+		if (macro != null && macro.getType() == LatteTagSettings.Type.AUTO_EMPTY) {
+			lastMacro = macro;
+			return true;
+		}
+		return false;
+	}
+
+	public static boolean checkAutoClosedEndTag(PsiBuilder builder, int level) {
+		PsiBuilder.Marker marker = builder.mark();
+
+		String macroName = getMacroName(builder);
+
+		marker.rollbackTo();
+
+		boolean result = false;
+		if (lastMacro != null && lastMacro.getMacroName().equals(macroName)) {
+			result = true;
+		}
+		lastMacro = null;
+
 		return result;
 	}
 
@@ -74,16 +112,12 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 			return false;
 		}
 		marker.rollbackTo();
-		LatteMacro macro = LatteConfiguration.INSTANCE.getMacro(builder.getProject(), macroName);
+		LatteTagSettings macro = LatteConfiguration.getInstance(builder.getProject()).getTag(macroName);
 
-		if (macro != null && macro.type == LatteMacro.Type.AUTO_EMPTY) {
+		if (macro != null && macro.getType() == LatteTagSettings.Type.AUTO_EMPTY) {
 			return isAutoEmptyPair(macroName, builder);
 		}
-		if (macroName.equals("_")) {
-			builder.advanceLexer();
-			return builder.getTokenType() == T_MACRO_TAG_CLOSE;
-		}
-		return macro != null && macro.type == LatteMacro.Type.PAIR;
+		return macro != null && macro.getType() == LatteTagSettings.Type.PAIR;
 	}
 
 	@NotNull
@@ -99,6 +133,23 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 
 		} else {
 			macroName = "=";
+		}
+		return macroName;
+	}
+
+	@NotNull
+	private static String getHtmlTagName(PsiBuilder builder) {
+		String macroName = "?";
+
+		consumeTokenFast(builder, T_HTML_OPEN_TAG_OPEN);
+		if (nextTokenIsFast(builder, T_TEXT)) {
+			macroName = builder.getTokenText();
+			if (macroName != null && macroName.length() > 0) {
+				macroName = macroName.split(" ")[0];
+
+			} else {
+				macroName = "?";
+			}
 		}
 		return macroName;
 	}
@@ -149,6 +200,26 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 			type = builder.getTokenType();
 		}
 		return false;
+	}
+
+	public static boolean isNamespace(PsiBuilder builder, int level) {
+		PsiBuilder.Marker marker = builder.mark();
+
+		boolean result = false;
+
+		IElementType type = builder.getTokenType();
+		IElementType nextToken = builder.lookAhead(1);
+		if (type == LatteTypes.T_PHP_NAMESPACE_REFERENCE && nextToken == LatteTypes.T_PHP_NAMESPACE_RESOLUTION) {
+			result = true;
+		}
+
+		marker.rollbackTo();
+
+		return result;
+	}
+
+	private static LatteTagSettings getTag(PsiBuilder builder) {
+		return LatteConfiguration.getInstance(builder.getProject()).getTag(getMacroName(builder));
 	}
 
 }

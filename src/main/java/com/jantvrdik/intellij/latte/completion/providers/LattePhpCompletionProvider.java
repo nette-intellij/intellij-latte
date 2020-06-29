@@ -48,10 +48,10 @@ public class LattePhpCompletionProvider extends BaseLatteCompletionProvider {
 				element instanceof LattePhpStaticVariable
 						|| element instanceof LattePhpConstant
 						|| (element instanceof LattePhpMethod && ((LattePhpMethod) element).isStatic())) {
-			attachPhpCompletions(result, (BaseLattePhpElement) element, true);
+			attachPhpCompletions(parameters, context, result, (BaseLattePhpElement) element, true);
 
 		} else if (element instanceof LattePhpProperty || (element instanceof LattePhpMethod && !((LattePhpMethod) element).isStatic())) {
-			attachPhpCompletions(result, (BaseLattePhpElement) element, false);
+			attachPhpCompletions(parameters, context, result, (BaseLattePhpElement) element, false);
 
 		} else if (!(element instanceof LatteMacroModifier) && !(element instanceof LattePhpString)) {
 			classCompletionProvider.addCompletions(parameters, context, result);
@@ -59,11 +59,10 @@ public class LattePhpCompletionProvider extends BaseLatteCompletionProvider {
 
 			if (LatteUtil.matchParentMacroName(element, "varType") || LatteUtil.matchParentMacroName(element, "var")) {
 				attachVarTypes(result);
-
-			} else {
-				variableCompletionProvider.addCompletions(parameters, context, result);
-				functionCompletionProvider.addCompletions(parameters, context, result);
 			}
+
+			variableCompletionProvider.addCompletions(parameters, context, result);
+			functionCompletionProvider.addCompletions(parameters, context, result);
 		}
 	}
 
@@ -73,11 +72,20 @@ public class LattePhpCompletionProvider extends BaseLatteCompletionProvider {
 		}
 	}
 
-	private void attachPhpCompletions(@NotNull CompletionResultSet result, @NotNull BaseLattePhpElement psiElement, boolean isStatic) {
+	private void attachPhpCompletions(
+			@NotNull CompletionParameters parameters,
+			ProcessingContext context,
+			@NotNull CompletionResultSet result,
+			@NotNull BaseLattePhpElement psiElement,
+			boolean isStatic
+	) {
 		LattePhpType type = psiElement.getPhpType();
 
 		Collection<PhpClass> phpClasses = type.getPhpClasses(psiElement.getProject());
-		if (phpClasses == null) {
+		if (phpClasses == null || phpClasses.size() == 0) {
+			if (psiElement instanceof LattePhpMethod) {
+				functionCompletionProvider.addCompletions(parameters, context, result);
+			}
 			return;
 		}
 

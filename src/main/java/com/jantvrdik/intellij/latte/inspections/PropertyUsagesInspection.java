@@ -2,7 +2,6 @@ package com.jantvrdik.intellij.latte.inspections;
 
 import com.intellij.codeInspection.InspectionManager;
 import com.intellij.codeInspection.ProblemDescriptor;
-import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
@@ -35,7 +34,7 @@ public class PropertyUsagesInspection extends BaseLocalInspectionTool {
 			return null;
 		}
 
-		final List<ProblemDescriptor> problems = new ArrayList<ProblemDescriptor>();
+		final List<ProblemDescriptor> problems = new ArrayList<>();
 		file.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
 			@Override
 			public void visitElement(PsiElement element) {
@@ -55,9 +54,12 @@ public class PropertyUsagesInspection extends BaseLocalInspectionTool {
 								PhpModifier modifier = field.getModifier();
 								if (modifier.isPrivate()) {
 									addProblem(manager, problems, element, "Used private property '" + variableName + "'", isOnTheFly);
-
 								} else if (modifier.isProtected()) {
 									addProblem(manager, problems, element, "Used protected property '" + variableName + "'", isOnTheFly);
+								} else if (field.isDeprecated()) {
+									addDeprecated(manager, problems, element, "Used property '" + variableName + "' is marked as deprecated", isOnTheFly);
+								} else if (field.isInternal()) {
+									addDeprecated(manager, problems, element, "Used property '" + variableName + "' is marked as internal", isOnTheFly);
 								}
 
 								if (modifier.isStatic()) {
@@ -71,7 +73,7 @@ public class PropertyUsagesInspection extends BaseLocalInspectionTool {
 					}
 
 					if (!isFound) {
-						addProblem(manager, problems, element, "Property '" + variableName + "' not found", ProblemHighlightType.GENERIC_ERROR_OR_WARNING, isOnTheFly);
+						addProblem(manager, problems, element, "Property '" + variableName + "' not found for type '" + phpType.toString() + "'", isOnTheFly);
 					}
 
 				} else {
@@ -80,6 +82,6 @@ public class PropertyUsagesInspection extends BaseLocalInspectionTool {
 			}
 		});
 
-		return problems.toArray(new ProblemDescriptor[problems.size()]);
+		return problems.toArray(new ProblemDescriptor[0]);
 	}
 }

@@ -9,9 +9,9 @@ import com.intellij.util.ui.ColumnInfo;
 import com.intellij.util.ui.ElementProducer;
 import com.intellij.util.ui.ListTableModel;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.settings.DefaultSettings;
 import com.jantvrdik.intellij.latte.settings.LatteSettings;
 import com.jantvrdik.intellij.latte.settings.LatteVariableSettings;
+import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileData;
 import com.jantvrdik.intellij.latte.utils.LatteIdeHelper;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
@@ -21,14 +21,12 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.List;
 
 public class LatteVariableSettingsForm implements Configurable {
 	private JPanel panel1;
 	private JPanel panelConfigTableView;
 	private JCheckBox enableCustomSignatureTypesCheckBox;
 	private JButton buttonHelp;
-	private JButton resetToDefaultsButton;
 
 	private TableView<LatteVariableSettings> tableView;
 	private Project project;
@@ -38,11 +36,11 @@ public class LatteVariableSettingsForm implements Configurable {
 	public LatteVariableSettingsForm(Project project) {
 		this.project = project;
 
-		this.tableView = new TableView<LatteVariableSettings>();
-		this.modelList = new ListTableModel<LatteVariableSettings>(
+		this.tableView = new TableView<>();
+		this.modelList = new ListTableModel<>(
 				new VarNameColumn(),
 				new VarTypeColumn(),
-				new SourceColumn()
+				new VendorColumn()
 		);
 
 		this.attachItems();
@@ -55,14 +53,6 @@ public class LatteVariableSettingsForm implements Configurable {
 			public void mouseClicked(MouseEvent e) {
 				super.mouseClicked(e);
 				LatteIdeHelper.openUrl(LatteConfiguration.LATTE_HELP_URL + "en/guide");
-			}
-		});
-
-		resetToDefaultsButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				super.mouseClicked(e);
-				resetToDefaults();
 			}
 		});
 
@@ -164,32 +154,6 @@ public class LatteVariableSettingsForm implements Configurable {
 		this.changed = false;
 	}
 
-	public void resetToDefaults() {
-		java.util.List<String> foundVariables = new ArrayList<String>();
-		List<LatteVariableSettings> newSettings = new ArrayList<LatteVariableSettings>();
-		for (LatteVariableSettings functionSettings : this.modelList.getItems()) {
-			LatteVariableSettings defaultFunction = DefaultSettings.getDefaultVariable(functionSettings.getVarName());
-			if (defaultFunction != null) {
-				newSettings.add(defaultFunction);
-				foundVariables.add(functionSettings.getVarName());
-			} else {
-				newSettings.add(functionSettings);
-			}
-		}
-
-		for (LatteVariableSettings customVariable : DefaultSettings.getDefaultVariables()) {
-			if (!foundVariables.contains(customVariable.getVarName())) {
-				newSettings.add(customVariable);
-			}
-		}
-
-		this.resetList();
-
-		for (LatteVariableSettings customVariable : newSettings) {
-			this.modelList.addRow(customVariable);
-		}
-	}
-
 	@Override
 	public void disposeUIResources() {
 
@@ -221,25 +185,25 @@ public class LatteVariableSettingsForm implements Configurable {
 		}
 	}
 
-	private static class SourceColumn extends SourceTypeColumn<LatteVariableSettings> {
+	private class VendorColumn extends VendorTypeColumn<LatteVariableSettings> {
 
-		public SourceColumn() {
-			super("Source");
+		public VendorColumn() {
+			super("Vendor");
 		}
 
 		@Nullable
 		@Override
-		public Type valueOf(LatteVariableSettings methodParameterSetting) {
-			return DefaultSettings.isDefaultVariable(methodParameterSetting.getVarName()) ? Type.NETTE : Type.CUSTOM;
+		public LatteXmlFileData.VendorResult valueOf(LatteVariableSettings customMacroSettings) {
+			return LatteConfiguration.getInstance(project).getVendorForVariable(customMacroSettings.getVarName());
 		}
 	}
 
 	private void openVariablePathDialog(@Nullable LatteVariableSettings variableSettings) {
 		LatteVariableSettingsDialog latteVariableDialog;
 		if(variableSettings == null) {
-			latteVariableDialog = new LatteVariableSettingsDialog(project, this.tableView);
+			latteVariableDialog = new LatteVariableSettingsDialog(tableView, project);
 		} else {
-			latteVariableDialog = new LatteVariableSettingsDialog(project, this.tableView, variableSettings);
+			latteVariableDialog = new LatteVariableSettingsDialog(tableView, project, variableSettings);
 		}
 
 		Dimension dim = new Dimension();

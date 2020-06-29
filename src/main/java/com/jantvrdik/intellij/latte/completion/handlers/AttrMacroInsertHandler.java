@@ -9,8 +9,8 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.jantvrdik.intellij.latte.LatteLanguage;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.config.LatteMacro;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
+import com.jantvrdik.intellij.latte.settings.LatteTagSettings;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,8 +38,8 @@ public class AttrMacroInsertHandler implements InsertHandler<LookupElement> {
 			}
 
 			String attrName = LatteUtil.normalizeNAttrNameModifier(element.getText());
-			LatteMacro macro = LatteConfiguration.INSTANCE.getMacro(element.getProject(), attrName);
-			if (macro != null && !macro.hasParameters) {
+			LatteTagSettings macro = LatteConfiguration.getInstance(element.getProject()).getTag(attrName);
+			if (macro != null && !macro.hasParameters()) {
 				return;
 			}
 

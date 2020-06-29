@@ -4,8 +4,10 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
 import com.intellij.util.ProcessingContext;
+import com.jantvrdik.intellij.latte.LatteLanguage;
 import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.reference.references.*;
+import com.jantvrdik.intellij.latte.reference.references.LattePhpClassReference;
 import org.jetbrains.annotations.NotNull;
 
 public class LatteReferenceContributor extends PsiReferenceContributor {
@@ -41,10 +43,10 @@ public class LatteReferenceContributor extends PsiReferenceContributor {
                             return PsiReference.EMPTY_ARRAY;
                         }
 
-                        PsiElement value = ((LattePhpMethod) element).getTextElement();
-                        if (value != null && value.getTextLength() > 0) {
+                        String methodName = ((LattePhpMethod) element).getMethodName();
+                        if (methodName != null && methodName.length() > 0) {
                             return new PsiReference[]{
-                                    new LattePhpMethodReference((LattePhpMethod) element, new TextRange(0, value.getTextLength()))
+                                    new LattePhpMethodReference((LattePhpMethod) element, new TextRange(0, methodName.length()))
                             };
                         }
 
@@ -116,20 +118,41 @@ public class LatteReferenceContributor extends PsiReferenceContributor {
                 });
 
         registrar.registerReferenceProvider(
-                PlatformPatterns.psiElement(LatteTypes.PHP_CLASS),
+                PlatformPatterns.psiElement(LatteTypes.PHP_CLASS_USAGE),
                 new PsiReferenceProvider() {
                     @NotNull
                     @Override
                     public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
-                        if (!(element instanceof LattePhpClass)) {
+                        if (!(element instanceof LattePhpClassUsage)) {
                             return PsiReference.EMPTY_ARRAY;
                         }
 
-                        PsiElement value = ((LattePhpClass) element).getTextElement();
-                        if (value != null && value.getTextLength() > 0) {
-                            return new PsiReference[]{new LattePhpClassReference((LattePhpClass) element, new TextRange(0, value.getTextLength()))};
+                        if (element.getTextLength() > 0) {
+                            String name = element.getText();
+                            TextRange range = new TextRange(name.startsWith("\\") && name.length() > 1 ? 1 : 0, name.length());
+                            return new PsiReference[]{new LattePhpClassReference((LattePhpClassUsage) element, range)};
                         }
 
+                        return PsiReference.EMPTY_ARRAY;
+                    }
+                });
+
+        registrar.registerReferenceProvider(
+                PlatformPatterns.psiElement(LattePhpNamespaceReference.class).withLanguage(LatteLanguage.INSTANCE),
+                new PsiReferenceProvider() {
+                    @NotNull
+                    @Override
+                    public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
+                        if (!(element instanceof LattePhpNamespaceReference)) {
+                            return PsiReference.EMPTY_ARRAY;
+                        }
+
+                        String name = element.getText();
+                        if (name != null && name.length() > 0) {
+                            return new PsiReference[]{
+                                    new LatteNamespaceReference((LattePhpNamespaceReference) element, new TextRange(0, name.length()))
+                            };
+                        }
                         return PsiReference.EMPTY_ARRAY;
                     }
                 });

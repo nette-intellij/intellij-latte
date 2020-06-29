@@ -64,12 +64,12 @@ MACRO_STRING_UQ = [^'\"{}]
 
 	"<" / [a-zA-Z0-9:] {
 		pushState(HTML_OPEN_TAG_OPEN);
-		return T_TEXT;
+		return T_HTML_OPEN_TAG_OPEN;
 	}
 
 	"</" / [a-zA-Z0-9:]  {
 		pushState(HTML_CLOSE_TAG_OPEN);
-		return T_TEXT;
+		return T_HTML_CLOSE_TAG_OPEN;
 	}
 
 	[^<{]+ {
@@ -160,13 +160,13 @@ MACRO_STRING_UQ = [^'\"{}]
 	"/>" {
 		popState(HTML_OPEN_TAG_OPEN, HTML_CLOSE_TAG_OPEN);
 		popState(HTML_TEXT);
-		return T_TEXT;
+		return T_HTML_OPEN_TAG_CLOSE;
 	}
 
 	">" {
 		popState(HTML_OPEN_TAG_OPEN, HTML_CLOSE_TAG_OPEN);
 		popState(HTML_TEXT);
-		return T_TEXT;
+		return T_HTML_TAG_CLOSE;
 	}
 }
 

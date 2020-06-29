@@ -17,7 +17,6 @@ import com.jantvrdik.intellij.latte.utils.LattePhpType;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import com.jantvrdik.intellij.latte.utils.PsiPositionedElement;
 import com.jetbrains.php.PhpIcons;
-import com.jetbrains.php.completion.PhpLookupElement;
 import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +40,7 @@ public class LatteVariableCompletionProvider extends BaseLatteCompletionProvider
 			return;
 		}
 
-		List<LookupElement> elements = attachPhpVariableCompletions(result, element, parameters.getOriginalFile().getVirtualFile());
+		List<LookupElement> elements = attachPhpVariableCompletions(element, parameters.getOriginalFile().getVirtualFile());
 		result.addAllElements(elements);
 
 		if (parameters.getOriginalFile() instanceof LatteFile) {
@@ -60,19 +59,23 @@ public class LatteVariableCompletionProvider extends BaseLatteCompletionProvider
 			for (PhpClass phpClass : phpClasses) {
 				for (Field field : phpClass.getFields()) {
 					if (!field.isConstant() && field.getModifier().isPublic()) {
-						PhpLookupElement lookupItem = getPhpLookupElement(field, "$" + field.getName());
-						lookupItem.handler = PhpVariableInsertHandler.getInstance();
-						lookupItem.bold = true;
-						result.addElement(lookupItem);
+						LookupElementBuilder builder = LookupElementBuilder.create(field, "$" + field.getName());
+						builder = builder.withInsertHandler(PhpVariableInsertHandler.getInstance());
+						builder = builder.withTypeText(LattePhpType.create(field.getType()).toString());
+						builder = builder.withIcon(PhpIcons.VARIABLE);
+						if (field.isDeprecated() || field.isInternal()) {
+							builder = builder.withStrikeoutness(true);
+						}
+						result.addElement(builder);
 					}
 				}
 			}
 		}
 	}
 
-	private List<LookupElement> attachPhpVariableCompletions(@NotNull CompletionResultSet result, @NotNull PsiElement psiElement, @NotNull VirtualFile virtualFile) {
-		List<LookupElement> lookupElements = new ArrayList<LookupElement>();
-		List<String> foundVariables = new ArrayList<String>();
+	private List<LookupElement> attachPhpVariableCompletions(@NotNull PsiElement psiElement, @NotNull VirtualFile virtualFile) {
+		List<LookupElement> lookupElements = new ArrayList<>();
+		List<String> foundVariables = new ArrayList<>();
 
 		for (PsiPositionedElement element : LatteUtil.findVariablesDefinitionsInFileBeforeElement(psiElement, virtualFile)) {
 			if (!(element.getElement() instanceof LattePhpVariable)) {
@@ -86,7 +89,7 @@ public class LatteVariableCompletionProvider extends BaseLatteCompletionProvider
 
 			LookupElementBuilder builder = LookupElementBuilder.create(element.getElement(), "$" + variableName);
 			builder = builder.withInsertHandler(PhpVariableInsertHandler.getInstance());
-			builder = builder.withTypeText(((LattePhpVariable) element.getElement()).getPhpType().toReadableString());
+			builder = builder.withTypeText(((LattePhpVariable) element.getElement()).getPhpType().toString());
 			builder = builder.withIcon(PhpIcons.VARIABLE);
 			builder = builder.withBoldness(true);
 			lookupElements.add(builder);
@@ -94,10 +97,7 @@ public class LatteVariableCompletionProvider extends BaseLatteCompletionProvider
 			foundVariables.add(variableName);
 		}
 
-		List<LatteVariableSettings> defaultVariables = LatteConfiguration.INSTANCE.getVariables(psiElement.getProject());
-		if (defaultVariables == null) {
-			return lookupElements;
-		}
+		Collection<LatteVariableSettings> defaultVariables = LatteConfiguration.getInstance(psiElement.getProject()).getVariables();
 
 		for (LatteVariableSettings variable : defaultVariables) {
 			String variableName = variable.getVarName();
@@ -107,7 +107,7 @@ public class LatteVariableCompletionProvider extends BaseLatteCompletionProvider
 
 			LookupElementBuilder builder = LookupElementBuilder.create("$" + variableName);
 			builder = builder.withInsertHandler(PhpVariableInsertHandler.getInstance());
-			builder = builder.withTypeText(variable.toPhpType().toReadableString());
+			builder = builder.withTypeText(variable.toPhpType().toString());
 			builder = builder.withIcon(PhpIcons.VARIABLE_READ_ACCESS);
 			builder = builder.withBoldness(false);
 			lookupElements.add(builder);
