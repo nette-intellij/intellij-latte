@@ -2,10 +2,10 @@ package com.jantvrdik.intellij.latte.reference.references;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
+import com.jantvrdik.intellij.latte.indexes.LatteIndexUtil;
 import com.jantvrdik.intellij.latte.psi.LattePhpMethod;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
 import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
-import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import com.jetbrains.php.lang.psi.elements.Function;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
@@ -39,10 +39,12 @@ public class LattePhpMethodReference extends PsiReferenceBase<PsiElement> implem
 
     @NotNull
     public ResolveResult[] multiResolveMethod() {
-        List<ResolveResult> results = new ArrayList<ResolveResult>();
-        final Collection<LattePhpMethod> methods = LatteUtil.findMethods(getElement().getProject(), methodName, phpClasses);
-        for (BaseLattePhpElement method : methods) {
-            results.add(new PsiElementResolveResult(method));
+        List<ResolveResult> results = new ArrayList<>();
+        final Collection<LattePhpMethod> methods = LatteIndexUtil.findMethodsByName(getElement().getProject(), methodName);
+        for (LattePhpMethod method : methods) {
+            if (method.getPhpType().hasClass(phpClasses)) {
+                results.add(new PsiElementResolveResult(method));
+            }
         }
 
         List<Method> phpMethods = LattePhpUtil.getMethodsForPhpElement((LattePhpMethod) getElement());
@@ -53,16 +55,18 @@ public class LattePhpMethodReference extends PsiReferenceBase<PsiElement> implem
             }
         }
 
-        return results.toArray(new ResolveResult[results.size()]);
+        return results.toArray(new ResolveResult[0]);
     }
 
     @NotNull
     public ResolveResult[] multiResolveFunction() {
-        List<ResolveResult> results = new ArrayList<ResolveResult>();
+        List<ResolveResult> results = new ArrayList<>();
 
-        final Collection<BaseLattePhpElement> functions = LatteUtil.findFunctions(getElement().getProject(), methodName);
-        for (BaseLattePhpElement function : functions) {
-            results.add(new PsiElementResolveResult(function));
+        final Collection<LattePhpMethod> methods = LatteIndexUtil.findMethodsByName(getElement().getProject(), methodName);
+        for (LattePhpMethod method : methods) {
+            if (method.isFunction()) {
+                results.add(new PsiElementResolveResult(method));
+            }
         }
 
         Collection<Function> phpFunctions = LattePhpUtil.getFunctionByName(getElement().getProject(), methodName);
@@ -72,7 +76,7 @@ public class LattePhpMethodReference extends PsiReferenceBase<PsiElement> implem
             }
         }
 
-        return results.toArray(new ResolveResult[results.size()]);
+        return results.toArray(new ResolveResult[0]);
     }
 
     @Nullable

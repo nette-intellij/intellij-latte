@@ -1,17 +1,23 @@
 package com.jantvrdik.intellij.latte.psi.impl.elements;
 
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
+import com.intellij.psi.stubs.IStubElementType;
+import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpClassStub;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpClassReferenceElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class LattePhpClassReferenceElementImpl extends ASTWrapperPsiElement implements LattePhpClassReferenceElement {
+public abstract class LattePhpClassReferenceElementImpl extends StubBasedPsiElementBase<LattePhpClassStub> implements LattePhpClassReferenceElement {
 
 	public LattePhpClassReferenceElementImpl(@NotNull ASTNode node) {
 		super(node);
+	}
+
+	public LattePhpClassReferenceElementImpl(final LattePhpClassStub stub, final IStubElementType nodeType) {
+		super(stub, nodeType);
 	}
 
 	@Override

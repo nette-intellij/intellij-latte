@@ -11,7 +11,6 @@ import com.jantvrdik.intellij.latte.lexer.LatteHighlightingLexer;
 import com.jantvrdik.intellij.latte.lexer.LatteLexer;
 import com.jantvrdik.intellij.latte.lexer.LatteLookAheadLexer;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributesKey;
@@ -77,7 +76,7 @@ public class LatteSyntaxHighlighter extends SyntaxHighlighterBase {
 		} else if (token == LatteTypes.T_PHP_KEYWORD || token == LatteTypes.T_PHP_AS) {
 			return pack(PHP_KEYWORD);
 
-		} else if (TokenSet.create(LatteTypes.T_PHP_NAMESPACE_REFERENCE, LatteTypes.T_PHP_NAMESPACE_RESOLUTION, LatteTypes.T_PHP_NAMESPACE_REFERENCE).contains(token)) {
+		} else if (TokenSet.create(LatteTypes.T_PHP_NAMESPACE_RESOLUTION, LatteTypes.T_PHP_NAMESPACE_REFERENCE).contains(token)) {
 			return pack(PHP_CLASS_NAME);
 
 		} else if (token == LatteTypes.T_PHP_METHOD) {

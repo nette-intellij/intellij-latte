@@ -44,6 +44,10 @@ public class LattePhpUtil {
         return name.startsWith("$") ? name.substring(1) : name;
     }
 
+    public static String normalizeMethodName(String name) {
+        return name.trim().toLowerCase();
+    }
+
     public static boolean isReferenceTo(@NotNull PhpClass originalClass, @NotNull ResolveResult[] results, @NotNull PsiElement element, @NotNull String name) {
         for (ResolveResult result : results) {
             if (!(result.getElement() instanceof BaseLattePhpElement)) {

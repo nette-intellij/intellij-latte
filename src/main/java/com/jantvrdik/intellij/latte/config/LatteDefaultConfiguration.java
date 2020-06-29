@@ -3,7 +3,7 @@ package com.jantvrdik.intellij.latte.config;
 import com.intellij.notification.Notification;
 import com.intellij.openapi.project.Project;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration.Vendor;
-import com.jantvrdik.intellij.latte.indexes.LatteIndexUtil;
+import com.jantvrdik.intellij.latte.utils.LatteReparseFilesUtil;
 import com.jantvrdik.intellij.latte.settings.*;
 import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileData;
 import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileDataFactory;
@@ -50,8 +50,8 @@ public class LatteDefaultConfiguration {
 				xmlData.put(vendorResult.vendor, data);
 
 			} else if (LatteIdeHelper.holdsReadLock()) {
-				if (notification == null || notification.isExpired() || LatteIndexUtil.isNotificationOutdated(notification)) {
-					notification = LatteIndexUtil.notifyDefaultReparse(project);
+				if (notification == null || notification.isExpired() || LatteReparseFilesUtil.isNotificationOutdated(notification)) {
+					notification = LatteReparseFilesUtil.notifyDefaultReparse(project);
 				}
 			}
 		}

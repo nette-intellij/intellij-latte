@@ -50,6 +50,11 @@
 
 		<fileBasedIndex implementation="com.jantvrdik.intellij.latte.indexes.LatteIndexExtension"/>
 
+		<!-- <stubElementTypeHolder class="com.jantvrdik.intellij.latte.parser.LatteElementTypes"/> -->
+		<stubElementTypeHolder class="com.jantvrdik.intellij.latte.psi.LatteTypes"/>
+		<stubIndex implementation="com.jantvrdik.intellij.latte.indexes.extensions.LattePhpClassIndex"/>
+		<stubIndex implementation="com.jantvrdik.intellij.latte.indexes.extensions.LattePhpMethodIndex"/>
+
  		<codeStyleSettingsProvider implementation="com.jantvrdik.intellij.latte.codeStyle.LatteCodeStyleSettingsProvider"/>
 		<langCodeStyleSettingsProvider implementation="com.jantvrdik.intellij.latte.codeStyle.LatteLanguageCodeStyleSettingsProvider"/>
 

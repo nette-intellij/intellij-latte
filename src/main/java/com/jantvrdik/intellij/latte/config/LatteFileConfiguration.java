@@ -7,7 +7,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jantvrdik.intellij.latte.indexes.LatteIndexExtension;
-import com.jantvrdik.intellij.latte.indexes.LatteIndexUtil;
+import com.jantvrdik.intellij.latte.utils.LatteReparseFilesUtil;
 import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileData;
 import com.jantvrdik.intellij.latte.settings.*;
 import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileDataFactory;
@@ -53,8 +53,8 @@ public class LatteFileConfiguration implements Serializable {
         }
 
         if (ActionUtil.isDumbMode(project)) {
-            if (notification == null || notification.isExpired() || LatteIndexUtil.isNotificationOutdated(notification)) {
-                notification = LatteIndexUtil.notifyReparseFiles(project);
+            if (notification == null || notification.isExpired() || LatteReparseFilesUtil.isNotificationOutdated(notification)) {
+                notification = LatteReparseFilesUtil.notifyReparseFiles(project);
             }
             return;
         }

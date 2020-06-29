@@ -7,6 +7,8 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
+import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpClassStub;
+import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpMethodStub;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpExpressionElement;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpStatementPartElement;
@@ -104,7 +106,12 @@ public class LattePsiImplUtil {
 	}
 
 	public static String getMethodName(@NotNull LattePhpMethod element) {
-		PsiElement found = findFirstChildWithType(element, T_PHP_IDENTIFIER);
+		final LattePhpMethodStub stub = element.getStub();
+		if (stub != null) {
+			return stub.getMethodName();
+		}
+
+		final PsiElement found = findFirstChildWithType(element, T_PHP_IDENTIFIER);
 		return found != null ? found.getText() : null;
 	}
 
@@ -114,6 +121,10 @@ public class LattePsiImplUtil {
 	}
 
 	public static String getClassName(LattePhpClassReference classReference) {
+		final LattePhpClassStub stub = classReference.getStub();
+		if (stub != null) {
+			return stub.getClassName();
+		}
 		return classReference.getPhpClassUsage().getClassName();
 	}
 

@@ -165,6 +165,7 @@ phpStaticVariable  ::= T_MACRO_ARGS_VAR phpArrayUsage* {
 phpMethod        ::= (T_PHP_IDENTIFIER | phpVariable) T_WHITESPACE? phpArgumentList T_WHITESPACE? phpArrayUsage* {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpMethodElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpMethodElement"
+                        elementTypeClass="com.jantvrdik.intellij.latte.indexes.stubs.types.LattePhpMethodStubType"
                         methods=[
                             getName setName getNameIdentifier getTextElement getMethodName getPhpType getPhpArrayLevel
                             getReturnType isStatic isFunction getPhpStatementPart
@@ -192,6 +193,7 @@ phpProperty        ::= T_PHP_IDENTIFIER phpArrayUsage* {
 phpClassReference    ::= (T_PHP_NAMESPACE_RESOLUTION? <<isNamespace>> phpNamespaceReference)? (T_PHP_NAMESPACE_RESOLUTION <<isNamespace>> phpNamespaceReference)* phpClassUsage {
                     mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpClassReferenceElementImpl"
                     implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpClassReferenceElement"
+                    elementTypeClass="com.jantvrdik.intellij.latte.indexes.stubs.types.LattePhpClassStubType"
                     methods = [
                         getName setName getNameIdentifier getClassName getReturnType getTextElement getPhpArrayLevel
                         getPhpArrayUsageList getPhpType getPhpStatementPart

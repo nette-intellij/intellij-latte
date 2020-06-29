@@ -53,7 +53,7 @@ public class LatteUtil {
         List<PsiPositionedElement> result = null;
         LatteFile simpleFile = (LatteFile) PsiManager.getInstance(project).findFile(file);
         if (simpleFile != null) {
-            List<PsiPositionedElement> properties = new ArrayList<PsiPositionedElement>();
+            List<PsiPositionedElement> properties = new ArrayList<>();
             for (PsiElement element : simpleFile.getChildren()) {
                 findLattePhpVariables(properties, element);
             }
@@ -66,23 +66,13 @@ public class LatteUtil {
                 String varName = ((LattePhpVariable) variable.getElement()).getVariableName();
                 if (key == null || key.equals(varName)) {
                     if (result == null) {
-                        result = new ArrayList<PsiPositionedElement>();
+                        result = new ArrayList<>();
                     }
                     result.add(variable);
                 }
             }
         }
-        return result != null ? result : Collections.<PsiPositionedElement>emptyList();
-    }
-
-    public static Collection<LattePhpMethod> findMethods(Project project, String key, @Nullable Collection<PhpClass> phpClasses) {
-        return findElementsInAllFiles(project, key, LattePhpMethod.class, phpClasses);
-    }
-
-    public static Collection<BaseLattePhpElement> findFunctions(Project project, String key) {
-        return findMethods(project, key, null).stream()
-                .filter(LattePhpMethod::isFunction)
-                .collect(Collectors.toList());
+        return result != null ? result : Collections.emptyList();
     }
 
     public static Collection<LattePhpProperty> findProperties(Project project, String key, @NotNull Collection<PhpClass> phpClass) {
@@ -93,26 +83,18 @@ public class LatteUtil {
         return findElementsInAllFiles(project, key, LattePhpConstant.class, phpClass);
     }
 
-    public static Collection<LattePhpClassUsage> findClasses(Project project, String key) {
-        return findElementsInAllFiles(project, key, LattePhpClassUsage.class, null);
-    }
-
-    public static Collection<LattePhpNamespaceReference> findNamespaceReferences(Project project, String key) {
-        return findElementsInAllFiles(project, key, LattePhpNamespaceReference.class, null);
-    }
-
     public static Collection<LattePhpStaticVariable> findStaticVariables(Project project, String key, @NotNull Collection<PhpClass> phpClass) {
         return findElementsInAllFiles(project, key, LattePhpStaticVariable.class, phpClass);
     }
 
     public static Collection<LatteMacroModifier> findModifiers(Project project, String key) {
-        List<LatteMacroModifier> result = new ArrayList<LatteMacroModifier>();
+        List<LatteMacroModifier> result = new ArrayList<>();
         Collection<VirtualFile> virtualFiles =
                 FileTypeIndex.getFiles(LatteFileType.INSTANCE, GlobalSearchScope.allScope(project));
         for (VirtualFile virtualFile : virtualFiles) {
             LatteFile simpleFile = (LatteFile) PsiManager.getInstance(project).findFile(virtualFile);
             if (simpleFile != null) {
-                List<PsiElement> elements = new ArrayList<PsiElement>();
+                List<PsiElement> elements = new ArrayList<>();
                 for (PsiElement element : simpleFile.getChildren()) {
                     findFileItem(elements, element, LatteMacroModifier.class);
                 }
@@ -167,13 +149,13 @@ public class LatteUtil {
     }
 
     private static <T extends BaseLattePhpElement> Collection<T> findElementsInAllFiles(Project project, String key, Class<T> className, @Nullable Collection<PhpClass> phpClass) {
-        List<T> result = new ArrayList<T>();
+        List<T> result = new ArrayList<>();
         Collection<VirtualFile> virtualFiles =
                 FileTypeIndex.getFiles(LatteFileType.INSTANCE, GlobalSearchScope.allScope(project));
         for (VirtualFile virtualFile : virtualFiles) {
             LatteFile simpleFile = (LatteFile) PsiManager.getInstance(project).findFile(virtualFile);
             if (simpleFile != null) {
-                List<PsiElement> elements = new ArrayList<PsiElement>();
+                List<PsiElement> elements = new ArrayList<>();
                 for (PsiElement element : simpleFile.getChildren()) {
                     findFileItem(elements, element, className);
                 }
@@ -230,7 +212,7 @@ public class LatteUtil {
 
     @Nullable
     public static LattePhpType findFirstLatteTemplateType(PsiElement element) {
-        List<LattePhpClassUsage> out = new ArrayList<LattePhpClassUsage>();
+        List<LattePhpClassUsage> out = new ArrayList<>();
         findLatteTemplateType(out, element);
         return out.isEmpty() ? null : out.get(0).getPhpType();
     }
