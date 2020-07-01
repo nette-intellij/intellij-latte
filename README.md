@@ -33,9 +33,7 @@ Latte plugin for IntelliJ is downloadable from the JetBrains plugin repository d
 Donate
 ------
 
-You can now sponsor this open-source project through [Patreon](https://www.patreon.com/mesour).
-
-Does Nette plugins save you development time? Send a couple of 💸 a month my way too. Thank you!
+Does GitHub already have your 💳? Does Nette plugins save you development time? [Send a couple of 💸 a month my way too.](https://github.com/sponsors/mesour) Thank you!
 
 One-time donations through [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=GSDRZW9YGPE5G&source=url) are also accepted. To request an invoice, [contact me](mailto:matous.nemec@mesour.com) through e-mail.
 

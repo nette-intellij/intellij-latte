@@ -1,7 +1,11 @@
 package com.jantvrdik.intellij.latte.reference.references;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.pom.PomTargetPsiElement;
 import com.intellij.psi.*;
+import com.intellij.psi.xml.XmlAttributeValue;
+import com.jantvrdik.intellij.latte.config.LatteFileConfiguration;
 import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
 import com.jantvrdik.intellij.latte.utils.LattePhpType;
@@ -17,10 +21,12 @@ import java.util.*;
 public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
 
     private String variableName;
+    private boolean definition;
 
     public LattePhpVariableReference(@NotNull LattePhpVariable element, TextRange textRange) {
         super(element, textRange);
         variableName = element.getVariableName();
+        definition = element.isDefinition();
     }
 
     @NotNull
@@ -30,11 +36,16 @@ public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> impl
             return new ResolveResult[0];
         }
 
-        List<ResolveResult> results = new ArrayList<ResolveResult>();
+        Project project = getElement().getProject();
+        List<ResolveResult> results = new ArrayList<>();
+        for (XmlAttributeValue attributeValue : LatteFileConfiguration.getAllMatchedXmlAttributeValues(project, "variable", variableName)) {
+            results.add(new PsiElementResolveResult(attributeValue));
+        }
+
         LattePhpType fields = LatteUtil.findFirstLatteTemplateType(getElement().getContainingFile());
         String name = ((BaseLattePhpElement) getElement()).getPhpElementName();
         if (fields != null) {
-            for (PhpClass phpClass : fields.getPhpClasses(getElement().getProject())) {
+            for (PhpClass phpClass : fields.getPhpClasses(project)) {
                 for (Field field : phpClass.getFields()) {
                     if (!field.isConstant() && field.getName().equals(name)) {
                         results.add(new PsiElementResolveResult(field));
@@ -58,16 +69,25 @@ public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> impl
         }*/
 
         for (PsiPositionedElement variable : variables) {
+            PsiElement var = variable.getElement();
+            if (!(var instanceof LattePhpVariable) || !((LattePhpVariable) var).isDefinition()) {
+                continue;
+            }
             results.add(new PsiElementResolveResult(variable.getElement()));
         }
-        return results.toArray(new ResolveResult[results.size()]);
+        return results.toArray(new ResolveResult[0]);
     }
 
     @Nullable
     @Override
     public PsiElement resolve() {
         ResolveResult[] resolveResults = multiResolve(false);
-        return resolveResults.length > 0 ? resolveResults[0].getElement() : null;
+        return resolveResults.length == 1 ? resolveResults[0].getElement() : null;
+    }
+
+    @Override
+    public boolean isSoft() {
+        return true;
     }
 
     @NotNull
@@ -90,4 +110,23 @@ public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> impl
         return getElement();
     }
 
+    @Override
+    public boolean isReferenceTo(@NotNull PsiElement element) {
+        if (element instanceof LattePhpVariable) {
+            return (!definition || !((LattePhpVariable) element).isDefinition())
+                    && ((LattePhpVariable) element).getVariableName().equals(variableName);
+        }
+
+        PsiElement currentElement = element;
+        if (element instanceof PomTargetPsiElement) {
+            currentElement = LatteFileConfiguration.getPsiElementFromDomTarget("variable", element);
+            if (currentElement == null) {
+                currentElement = element;
+            }
+        }
+        if (currentElement instanceof XmlAttributeValue && LatteFileConfiguration.hasParentXmlTagName(currentElement, "variable")) {
+            return ((XmlAttributeValue) currentElement).getValue().equals(variableName);
+        }
+        return super.isReferenceTo(element);
+    }
 }

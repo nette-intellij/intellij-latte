@@ -32,7 +32,7 @@ public class LatteIndexExtension extends FileBasedIndexExtension<String, LatteXm
     public DataIndexer<String, LatteXmlFileData, FileContent> getIndexer() {
         return fileContent -> {
             PsiFile psiFile = fileContent.getPsiFile();
-            if (!(psiFile instanceof XmlFile) || !psiFile.getName().equals(LatteFileConfiguration.FILE_NAME)) {
+            if (!LatteFileConfiguration.isXmlConfigurationFile(psiFile)) {
                 return Collections.emptyMap();
             }
 

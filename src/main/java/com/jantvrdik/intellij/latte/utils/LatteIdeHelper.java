@@ -8,8 +8,13 @@ import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.*;
 import com.intellij.openapi.application.ex.ApplicationEx;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.pom.Navigatable;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.xml.XmlFile;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -129,6 +134,34 @@ public class LatteIdeHelper {
         } catch (IOException e) {
             return null;
         }
+    }
+
+    @Nullable
+    public static Path getPathToProjectTemp(Project project, String setupFile) {
+        try {
+            Path tempDir = getTempPath(project);
+            if (!Files.isDirectory(tempDir)) {
+                Files.createDirectory(tempDir);
+            }
+
+            return Paths.get(tempDir.toString(), setupFile);
+
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    public static XmlFile getXmlFileForPath(Project project, Path path) {
+        PsiFile psiFile = getPsiFileForPath(project, path);
+        return psiFile instanceof XmlFile ? (XmlFile) psiFile : null;
+    }
+
+    public static PsiFile getPsiFileForPath(Project project, Path path) {
+        VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(path.toString());
+        if (virtualFile == null) {
+            return null;
+        }
+        return PsiManager.getInstance(project).findFile(virtualFile);
     }
 
     private static Path getTempPath(Project project) {

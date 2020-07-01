@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE latte PUBLIC "-//LATTE//Latte plugin configuration XML V0.0.1//EN" "Latte.dtd">
 <latte version="1" vendor="nette/forms">
     <tags>
         <tag name="form" type="PAIR" multiLine="true">

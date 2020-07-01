@@ -51,7 +51,7 @@ public class LatteUtil {
 
     public static List<PsiPositionedElement> findVariablesInFile(@NotNull Project project, @NotNull VirtualFile file, @Nullable String key) {
         List<PsiPositionedElement> result = null;
-        LatteFile simpleFile = (LatteFile) PsiManager.getInstance(project).findFile(file);
+        PsiFile simpleFile = PsiManager.getInstance(project).findFile(file);
         if (simpleFile != null) {
             List<PsiPositionedElement> properties = new ArrayList<>();
             for (PsiElement element : simpleFile.getChildren()) {
@@ -85,6 +85,10 @@ public class LatteUtil {
 
     public static Collection<LattePhpStaticVariable> findStaticVariables(Project project, String key, @NotNull Collection<PhpClass> phpClass) {
         return findElementsInAllFiles(project, key, LattePhpStaticVariable.class, phpClass);
+    }
+
+    public static Collection<LattePhpVariable> findVariables(Project project, String key) {
+        return findElementsInAllFiles(project, key, LattePhpVariable.class, null);
     }
 
     public static Collection<LatteMacroModifier> findModifiers(Project project, String key) {

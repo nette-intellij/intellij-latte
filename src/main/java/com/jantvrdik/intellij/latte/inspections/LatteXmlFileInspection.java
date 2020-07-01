@@ -26,7 +26,7 @@ public class LatteXmlFileInspection extends BaseLocalInspectionTool {
 	@Nullable
 	@Override
 	public ProblemDescriptor[] checkFile(@NotNull PsiFile file, @NotNull final InspectionManager manager, final boolean isOnTheFly) {
-		if (!(file instanceof XmlFile) || file.getLanguage() != XMLLanguage.INSTANCE || !file.getName().equals(LatteFileConfiguration.FILE_NAME)) {
+		if (file.getLanguage() != XMLLanguage.INSTANCE || !LatteFileConfiguration.isXmlConfigurationFile(file)) {
 			return null;
 		}
 

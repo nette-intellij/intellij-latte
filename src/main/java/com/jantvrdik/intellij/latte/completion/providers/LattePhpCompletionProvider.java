@@ -95,7 +95,7 @@ public class LattePhpCompletionProvider extends BaseLatteCompletionProvider {
 				PhpModifier modifier = method.getModifier();
 				if (modifier.isPublic() && canShowCompletionElement(isStatic, modifier)) {
 					String name = method.getName();
-					if (!isMagicPrefixed && LatteTypesUtil.isExcludedCompletion(name)) {
+					if (!isMagicPrefixed && parameters.getInvocationCount() <= 1 && LatteTypesUtil.isExcludedCompletion(name)) {
 						continue;
 					}
 					PhpLookupElement lookupItem = getPhpLookupElement(method, name);

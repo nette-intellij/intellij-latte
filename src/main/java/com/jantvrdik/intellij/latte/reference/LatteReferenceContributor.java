@@ -2,13 +2,17 @@ package com.jantvrdik.intellij.latte.reference;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.patterns.PlatformPatterns;
+import com.intellij.patterns.XmlPatterns;
 import com.intellij.psi.*;
+import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.util.ProcessingContext;
 import com.jantvrdik.intellij.latte.LatteLanguage;
+import com.jantvrdik.intellij.latte.config.LatteFileConfiguration;
 import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.reference.references.*;
 import com.jantvrdik.intellij.latte.reference.references.LattePhpClassReference;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class LatteReferenceContributor extends PsiReferenceContributor {
     public void registerReferenceProviders(@NotNull PsiReferenceRegistrar registrar) {
@@ -194,10 +198,51 @@ public class LatteReferenceContributor extends PsiReferenceContributor {
                         LatteMacroModifier constantElement = (LatteMacroModifier) element;
                         PsiElement textElement = ((LatteMacroModifier) element).getTextElement();
                         if (textElement != null && textElement.getTextLength() > 0) {
-                            return new PsiReference[]{new LatteMacroModifierReference(constantElement, new TextRange(0, textElement.getTextLength()))};
+                            return new PsiReference[]{new LatteFilterReference(constantElement, new TextRange(0, textElement.getTextLength()))};
                         }
                         return PsiReference.EMPTY_ARRAY;
                     }
                 });
+
+        registrar.registerReferenceProvider(
+                PlatformPatterns.or(
+                        XmlPatterns.xmlAttributeValue("name")
+                ),
+                new PsiReferenceProvider() {
+                    @NotNull
+                    @Override
+                    public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
+                        for (String tag : LatteFileConfiguration.REFERENCED_TAGS) {
+                            if (!LatteFileConfiguration.hasParentXmlTagName(element, tag)) {
+                                continue;
+                            }
+
+                            PsiReferenceBase<PsiElement> reference = getXmlReferenceByTag(tag, (XmlAttributeValue) element);
+                            if (reference != null) {
+                                return new PsiReference[]{reference};
+                            }
+                        }
+                        return PsiReference.EMPTY_ARRAY;
+                    }
+                });
+    }
+
+    @Nullable
+    private PsiReferenceBase<PsiElement> getXmlReferenceByTag(@NotNull String tag, XmlAttributeValue element) {
+        String text = element.getValue();
+        if (text.length() == 0) {
+            return null;
+        }
+
+        TextRange range = new TextRange(1, text.length() + 1);
+        switch (tag) {
+            case "filter":
+                return new LatteXmlFilterDeclarationReference(element, range);
+            case "variable":
+                return new LatteXmlVariableDeclarationReference(element, range);
+            case "function":
+                return new LatteXmlFunctionDeclarationReference(element, range);
+        }
+        return null;
     }
 }

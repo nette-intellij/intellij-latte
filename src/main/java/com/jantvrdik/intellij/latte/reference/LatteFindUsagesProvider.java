@@ -23,6 +23,7 @@ public class LatteFindUsagesProvider implements FindUsagesProvider {
 
     @Override
     public boolean canFindUsagesFor(@NotNull PsiElement psiElement) {
+        boolean out = psiElement instanceof LattePhpVariable && ((LattePhpVariable) psiElement).isDefinition();
         return psiElement instanceof LattePhpVariable && ((LattePhpVariable) psiElement).isDefinition();
     }
 

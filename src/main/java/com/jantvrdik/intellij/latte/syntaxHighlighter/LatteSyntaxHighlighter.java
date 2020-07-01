@@ -24,7 +24,7 @@ public class LatteSyntaxHighlighter extends SyntaxHighlighterBase {
 	public static final TextAttributesKey MACRO_ARGS_VAR = createTextAttributesKey("LATTE_MACRO_ARGS_VAR", DefaultLanguageHighlighterColors.INSTANCE_FIELD);
 	public static final TextAttributesKey MACRO_ARGS_STRING = createTextAttributesKey("LATTE_MACRO_ARGS_STRING", DefaultLanguageHighlighterColors.STRING);
 	public static final TextAttributesKey MACRO_ARGS_NUMBER = createTextAttributesKey("LATTE_MACRO_ARGS_NUMBER", DefaultLanguageHighlighterColors.NUMBER);
-	public static final TextAttributesKey MACRO_MODIFIERS = createTextAttributesKey("LATTE_MACRO_MODIFIERS", DefaultLanguageHighlighterColors.DOC_COMMENT);
+	public static final TextAttributesKey MACRO_MODIFIERS = createTextAttributesKey("LATTE_MACRO_MODIFIERS", DefaultLanguageHighlighterColors.METADATA);
 	public static final TextAttributesKey MACRO_COMMENT = createTextAttributesKey("LATTE_MACRO_COMMENT", DefaultLanguageHighlighterColors.BLOCK_COMMENT);
 	public static final TextAttributesKey MACRO_BLOCK_NAME = createTextAttributesKey("LATTE_MACRO_BLOCK_NAME", DefaultLanguageHighlighterColors.STATIC_METHOD);
 	public static final TextAttributesKey MACRO_LINK_DESTINATION = createTextAttributesKey("LATTE_MACRO_LINK_DESTINATION", DefaultLanguageHighlighterColors.STRING);

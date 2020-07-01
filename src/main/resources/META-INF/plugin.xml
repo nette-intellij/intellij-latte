@@ -43,12 +43,15 @@
 		<highlightErrorFilter implementation="com.jantvrdik.intellij.latte.psi.ErrorFilter"/>
 		<indexPatternBuilder implementation="com.jantvrdik.intellij.latte.psi.LatteIndexPatternBuilder"/>
 		<lang.psiStructureViewFactory language="Latte" implementationClass="com.jantvrdik.intellij.latte.editor.LatteStructureViewFactory"/>
+		<lang.findUsagesProvider language="XML" implementationClass="com.jantvrdik.intellij.latte.reference.LatteXmlFindUsagesProvider"/>
 		<lang.findUsagesProvider language="Latte" implementationClass="com.jantvrdik.intellij.latte.reference.LatteFindUsagesProvider"/>
 		<lang.braceMatcher language="Latte" implementationClass="com.jantvrdik.intellij.latte.reference.LatteBraceMatcher"/>
 		<renamePsiElementProcessor implementation="com.jantvrdik.intellij.latte.refactoring.LatteRenamePsiElementProcessor"/>
 		<lang.documentationProvider language="Latte" implementationClass="com.jantvrdik.intellij.latte.documentation.LatteDocumentationProvider"/>
 
 		<fileBasedIndex implementation="com.jantvrdik.intellij.latte.indexes.LatteIndexExtension"/>
+
+		<dom.fileMetaData implementation="com.jantvrdik.intellij.latte.settings.xml.LatteDomFileDescription" rootTagName="latte" />
 
 		<!-- <stubElementTypeHolder class="com.jantvrdik.intellij.latte.parser.LatteElementTypes"/> -->
 		<stubElementTypeHolder class="com.jantvrdik.intellij.latte.psi.LatteTypes"/>

@@ -18,7 +18,11 @@ import java.util.Map;
 
 public class LatteDefaultConfiguration {
 
-	private static String[] sourceFiles = new String[] {"Latte.xml", "NetteApplication.xml", "NetteForms.xml"};
+	public static Map<String, Vendor> sourceFiles = new HashMap<String, Vendor>(){{
+		put("Latte.xml", Vendor.LATTE);
+		put("NetteApplication.xml", Vendor.NETTE_APPLICATION);
+		put("NetteForms.xml", Vendor.NETTE_FORMS);
+	}};
 
 	private static Map<Project, LatteDefaultConfiguration> instances = new HashMap<>();
 
@@ -37,7 +41,8 @@ public class LatteDefaultConfiguration {
 
 	public void reinitialize() {
 		xmlData = new HashMap<>();
-		for (String sourceFile : sourceFiles) {
+		LatteIdeHelper.saveFileToProjectTemp(project, "xmlSources/Latte.dtd");
+		for (String sourceFile : sourceFiles.keySet()) {
 			Path path = LatteIdeHelper.saveFileToProjectTemp(project, "xmlSources/" + sourceFile);
 			if (path == null) {
 				continue;
