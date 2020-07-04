@@ -83,7 +83,7 @@ public class LattePhpCompletionProvider extends BaseLatteCompletionProvider {
 
 		Collection<PhpClass> phpClasses = type.getPhpClasses(psiElement.getProject());
 		if (phpClasses == null || phpClasses.size() == 0) {
-			if (psiElement instanceof LattePhpMethod) {
+			if (psiElement instanceof LattePhpMethod && (psiElement.getPhpStatementPart() == null || psiElement.getPhpStatementPart().getPrevPhpStatementPart() == null)) {
 				functionCompletionProvider.addCompletions(parameters, context, result);
 			}
 			return;

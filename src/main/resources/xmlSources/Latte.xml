@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE latte PUBLIC "-//LATTE//Latte plugin XML V0.0.1//EN" "Latte.dtd">
 <latte vendor="latte" version="1">
 	<tags>
 		<tag name="_" type="AUTO_EMPTY" allowedFilters="true">

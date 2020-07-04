@@ -53,10 +53,15 @@
 
 		<dom.fileMetaData implementation="com.jantvrdik.intellij.latte.settings.xml.LatteDomFileDescription" rootTagName="latte" />
 
-		<!-- <stubElementTypeHolder class="com.jantvrdik.intellij.latte.parser.LatteElementTypes"/> -->
 		<stubElementTypeHolder class="com.jantvrdik.intellij.latte.psi.LatteTypes"/>
+		<stubIndex implementation="com.jantvrdik.intellij.latte.indexes.extensions.LatteFilterIndex"/>
 		<stubIndex implementation="com.jantvrdik.intellij.latte.indexes.extensions.LattePhpClassIndex"/>
+		<stubIndex implementation="com.jantvrdik.intellij.latte.indexes.extensions.LattePhpConstantIndex"/>
 		<stubIndex implementation="com.jantvrdik.intellij.latte.indexes.extensions.LattePhpMethodIndex"/>
+		<stubIndex implementation="com.jantvrdik.intellij.latte.indexes.extensions.LattePhpNamespaceIndex"/>
+		<stubIndex implementation="com.jantvrdik.intellij.latte.indexes.extensions.LattePhpPropertyIndex"/>
+		<stubIndex implementation="com.jantvrdik.intellij.latte.indexes.extensions.LattePhpStaticVariableIndex"/>
+		<stubIndex implementation="com.jantvrdik.intellij.latte.indexes.extensions.LattePhpVariableIndex"/>
 
  		<codeStyleSettingsProvider implementation="com.jantvrdik.intellij.latte.codeStyle.LatteCodeStyleSettingsProvider"/>
 		<langCodeStyleSettingsProvider implementation="com.jantvrdik.intellij.latte.codeStyle.LatteLanguageCodeStyleSettingsProvider"/>

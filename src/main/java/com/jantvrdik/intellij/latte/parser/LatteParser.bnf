@@ -145,6 +145,7 @@ linkDestination    ::= T_LINK_DESTINATION T_LINK_DESTINATION*
 phpVariable        ::= T_MACRO_ARGS_VAR phpArrayUsage* {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpVariableElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpVariableElement"
+                        elementTypeClass="com.jantvrdik.intellij.latte.indexes.stubs.types.LattePhpVariableStubType"
                         methods=[
                             getName setName getNameIdentifier getTextElement getVariableName isDefinition
                             getPhpArrayLevel isDefinitionInFor isDefinitionInForeach getReturnType getPhpType
@@ -156,6 +157,7 @@ phpVariable        ::= T_MACRO_ARGS_VAR phpArrayUsage* {
 phpStaticVariable  ::= T_MACRO_ARGS_VAR phpArrayUsage* {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpStaticVariableElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpStaticVariableElement"
+                        elementTypeClass="com.jantvrdik.intellij.latte.indexes.stubs.types.LattePhpStaticVariableStubType"
                         methods=[
                             getName setName getNameIdentifier getTextElement getVariableName getPhpType getPhpArrayLevel
                             getReturnType getPhpStatementPart
@@ -175,6 +177,7 @@ phpMethod        ::= (T_PHP_IDENTIFIER | phpVariable) T_WHITESPACE? phpArgumentL
 phpConstant        ::= T_PHP_IDENTIFIER phpArrayUsage* {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpConstantElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpConstantElement"
+                        elementTypeClass="com.jantvrdik.intellij.latte.indexes.stubs.types.LattePhpConstantStubType"
                         methods=[
                             getName setName getNameIdentifier getTextElement getConstantName getPhpType getPhpArrayLevel
                             getReturnType getPhpStatementPart
@@ -184,6 +187,7 @@ phpConstant        ::= T_PHP_IDENTIFIER phpArrayUsage* {
 phpProperty        ::= T_PHP_IDENTIFIER phpArrayUsage* {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpPropertyElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpPropertyElement"
+                        elementTypeClass="com.jantvrdik.intellij.latte.indexes.stubs.types.LattePhpPropertyStubType"
                         methods=[
                             getName setName getNameIdentifier getTextElement getPropertyName getPhpType getPhpArrayLevel
                             getReturnType isStatic getPhpStatementPart
@@ -212,6 +216,7 @@ phpClassUsage       ::= T_PHP_NAMESPACE_RESOLUTION (T_PHP_IDENTIFIER | T_PHP_NAM
 phpNamespaceReference    ::= T_PHP_NAMESPACE_REFERENCE {
                      mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpNamespaceReferenceElementImpl"
                      implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpNamespaceReferenceElement"
+                     elementTypeClass="com.jantvrdik.intellij.latte.indexes.stubs.types.LattePhpNamespaceStubType"
                      methods = [
                          getName setName getNameIdentifier getTextElement getNamespaceName getReturnType getPhpArrayLevel
                          getPhpArrayUsageList getPhpType getPhpStatementPart
@@ -221,6 +226,7 @@ phpNamespaceReference    ::= T_PHP_NAMESPACE_REFERENCE {
 macroModifier    ::= T_MACRO_FILTERS {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LatteMacroModifierElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LatteMacroModifierElement"
+                        elementTypeClass="com.jantvrdik.intellij.latte.indexes.stubs.types.LatteFilterStubType"
                         methods=[getName setName getNameIdentifier getTextElement getModifierName isVariableModifier]
                     }
 

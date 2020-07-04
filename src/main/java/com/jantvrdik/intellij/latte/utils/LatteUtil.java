@@ -75,49 +75,6 @@ public class LatteUtil {
         return result != null ? result : Collections.emptyList();
     }
 
-    public static Collection<LattePhpProperty> findProperties(Project project, String key, @NotNull Collection<PhpClass> phpClass) {
-        return findElementsInAllFiles(project, key, LattePhpProperty.class, phpClass);
-    }
-
-    public static Collection<LattePhpConstant> findConstants(Project project, String key, @NotNull Collection<PhpClass> phpClass) {
-        return findElementsInAllFiles(project, key, LattePhpConstant.class, phpClass);
-    }
-
-    public static Collection<LattePhpStaticVariable> findStaticVariables(Project project, String key, @NotNull Collection<PhpClass> phpClass) {
-        return findElementsInAllFiles(project, key, LattePhpStaticVariable.class, phpClass);
-    }
-
-    public static Collection<LattePhpVariable> findVariables(Project project, String key) {
-        return findElementsInAllFiles(project, key, LattePhpVariable.class, null);
-    }
-
-    public static Collection<LatteMacroModifier> findModifiers(Project project, String key) {
-        List<LatteMacroModifier> result = new ArrayList<>();
-        Collection<VirtualFile> virtualFiles =
-                FileTypeIndex.getFiles(LatteFileType.INSTANCE, GlobalSearchScope.allScope(project));
-        for (VirtualFile virtualFile : virtualFiles) {
-            LatteFile simpleFile = (LatteFile) PsiManager.getInstance(project).findFile(virtualFile);
-            if (simpleFile != null) {
-                List<PsiElement> elements = new ArrayList<>();
-                for (PsiElement element : simpleFile.getChildren()) {
-                    findFileItem(elements, element, LatteMacroModifier.class);
-                }
-
-                for (PsiElement element : elements) {
-                    if (!(element instanceof LatteMacroModifier)) {
-                        continue;
-                    }
-
-                    String varName = ((LatteMacroModifier) element).getModifierName();
-                    if (key.equals(varName)) {
-                        result.add((LatteMacroModifier) element);
-                    }
-                }
-            }
-        }
-        return result;
-    }
-
     public static boolean matchParentMacroName(@NotNull PsiElement element, @NotNull String name) {
         LatteMacroClassic macroClassic = PsiTreeUtil.getParentOfType(element, LatteMacroClassic.class);
         if (macroClassic == null) {

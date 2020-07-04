@@ -7,8 +7,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpClassStub;
-import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpMethodStub;
+import com.jantvrdik.intellij.latte.indexes.stubs.*;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpExpressionElement;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpStatementPartElement;
@@ -88,6 +87,11 @@ public class LattePsiImplUtil {
 	}
 
 	public static String getVariableName(@NotNull LattePhpStaticVariable element) {
+		final LattePhpStaticVariableStub stub = element.getStub();
+		if (stub != null) {
+			return stub.getVariableName();
+		}
+
 		PsiElement found = getTextElement(element);
 		return found != null ? LattePhpUtil.normalizePhpVariable(found.getText()) : null;
 	}
@@ -101,6 +105,11 @@ public class LattePsiImplUtil {
 	}
 
 	public static String getConstantName(@NotNull LattePhpConstant element) {
+		final LattePhpConstantStub stub = element.getStub();
+		if (stub != null) {
+			return stub.getConstantName();
+		}
+
 		PsiElement found = getTextElement(element);
 		return found != null ? found.getText() : null;
 	}
@@ -116,6 +125,11 @@ public class LattePsiImplUtil {
 	}
 
 	public static String getPropertyName(@NotNull LattePhpProperty element) {
+		final LattePhpPropertyStub stub = element.getStub();
+		if (stub != null) {
+			return stub.getPropertyName();
+		}
+
 		PsiElement found = getTextElement(element);
 		return found != null ? found.getText() : null;
 	}
@@ -169,6 +183,11 @@ public class LattePsiImplUtil {
 	}
 
 	public static String getModifierName(@NotNull LatteMacroModifier element) {
+		final LatteFilterStub stub = element.getStub();
+		if (stub != null) {
+			return stub.getModifierName();
+		}
+
 		PsiElement found = getTextElement(element);
 		return found != null ? LatteUtil.normalizeMacroModifier(found.getText()) : null;
 	}
@@ -372,6 +391,11 @@ public class LattePsiImplUtil {
 	}
 
 	public static @NotNull String getNamespaceName(LattePhpNamespaceReference namespaceReference) {
+		final LattePhpNamespaceStub stub = namespaceReference.getStub();
+		if (stub != null) {
+			return stub.getNamespaceName();
+		}
+
 		StringBuilder out = new StringBuilder();
 		for (PsiElement element : namespaceReference.getParent().getChildren()) {
 			if (element instanceof LattePhpNamespaceReference) {

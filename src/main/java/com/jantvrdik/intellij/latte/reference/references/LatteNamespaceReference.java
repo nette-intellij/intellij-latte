@@ -30,7 +30,7 @@ public class LatteNamespaceReference extends PsiReferenceBase<PsiElement> implem
             results.add(new PsiElementResolveResult(phpNamespace));
         }
 
-        //for (LattePhpNamespaceReference namespaceReference : LatteUtil.findNamespaceReferences(project, namespaceName)) {
+        //for (LattePhpNamespaceReference namespaceReference : LatteIndexUtil.findNamespacesByFqn(project, namespaceName)) {
         //    results.add(new PsiElementResolveResult(namespaceReference));
         //}
 

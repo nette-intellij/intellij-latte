@@ -31,7 +31,7 @@ public class LatteFilterReference extends PsiReferenceBase<PsiElement> implement
             results.add(new PsiElementResolveResult(attributeValue));
         }
 
-        //final Collection<LatteMacroModifier> modifiers = LatteUtil.findModifiers(getElement().getProject(), modifierName);
+        //final Collection<LatteMacroModifier> modifiers = LatteIndexUtil.findFiltersByName(getElement().getProject(), modifierName);
         //for (LatteMacroModifier modifier : modifiers) {
         //    results.add(new PsiElementResolveResult(modifier));
         //}
