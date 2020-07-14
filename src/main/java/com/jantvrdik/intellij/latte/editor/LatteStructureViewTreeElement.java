@@ -26,7 +26,7 @@ public class LatteStructureViewTreeElement extends PsiTreeElementBase<PsiElement
 	@NotNull
 	@Override
 	public Collection<StructureViewTreeElement> getChildrenBase() {
-		Collection<StructureViewTreeElement> elements = new ArrayList<StructureViewTreeElement>();
+		Collection<StructureViewTreeElement> elements = new ArrayList<>();
 		if (getElement() == null) {
 			return elements;
 		}

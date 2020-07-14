@@ -13,6 +13,7 @@ import com.jantvrdik.intellij.latte.config.LatteFileConfiguration;
 import com.jantvrdik.intellij.latte.indexes.externalizer.ObjectStreamDataExternalizer;
 import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileData;
 import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileDataFactory;
+import com.jantvrdik.intellij.latte.utils.LatteReparseFilesUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.coverage.gnu.trove.THashMap;
 
@@ -31,7 +32,7 @@ public class LatteIndexExtension extends FileBasedIndexExtension<String, LatteXm
     public DataIndexer<String, LatteXmlFileData, FileContent> getIndexer() {
         return fileContent -> {
             PsiFile psiFile = fileContent.getPsiFile();
-            if (!(psiFile instanceof XmlFile) || !psiFile.getName().equals(LatteFileConfiguration.FILE_NAME)) {
+            if (!LatteFileConfiguration.isXmlConfigurationFile(psiFile)) {
                 return Collections.emptyMap();
             }
 
@@ -45,8 +46,8 @@ public class LatteIndexExtension extends FileBasedIndexExtension<String, LatteXm
                 }
             }
 
-            if (notification == null || notification.isExpired() || LatteIndexUtil.isNotificationOutdated(notification)) {
-                notification = LatteIndexUtil.notifyReparseFiles(project);
+            if (notification == null || notification.isExpired() || LatteReparseFilesUtil.isNotificationOutdated(notification)) {
+                notification = LatteReparseFilesUtil.notifyReparseFiles(project);
             }
 
             return out;

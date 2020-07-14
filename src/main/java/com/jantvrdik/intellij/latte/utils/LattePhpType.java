@@ -314,6 +314,10 @@ public class LattePhpType {
         return String.join("|", types);
     }
 
+    public List<String> getTypes() {
+        return Collections.unmodifiableList(types);
+    }
+
     private static class TypePart {
         int depth = 0;
 

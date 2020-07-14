@@ -50,12 +50,12 @@ public class LatteFunctionSettings extends BaseLatteSettings implements Serializ
 		return this;
 	}
 
-	public void setFunctionName(String modifierName) {
-		this.functionName = modifierName;
+	public void setFunctionName(String functionName) {
+		this.functionName = functionName;
 	}
 
-	public void setFunctionReturnType(String modifierReturnType) {
-		this.functionReturnType = modifierReturnType;
+	public void setFunctionReturnType(String returnType) {
+		this.functionReturnType = returnType;
 	}
 
 	public void setFunctionHelp(String functionHelp) {

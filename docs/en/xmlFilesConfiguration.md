@@ -16,10 +16,11 @@ This is example file content with sample values:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE latte PUBLIC "-//LATTE//Latte plugin XML V0.0.1//EN" ".idea/intellij-latte/xmlSources/Latte.dtd">
 <latte version="1" vendor="myVendor/myPackage">
     <tags>
         <tag name="myIf" type="PAIR" arguments="condition" deprecatedMessage="MyIf is deprecated, use {if ...} instead." />
-        <tag name="myFor" type="PAIR" arguments="initialization; condition; afterthought" allowedModifiers="true" multiLine="true" />
+        <tag name="myFor" type="PAIR" arguments="initialization; condition; afterthought" allowedFilters="true" multiLine="true" />
         <tag name="block" type="PAIR" allowedFilters="true" multiLine="true">
             <arguments>
                 <argument name="name" types="PHP_IDENTIFIER,VARIABLE,PHP_EXPRESSION" validType="string" required="true" />
@@ -59,6 +60,14 @@ This is example file content with sample values:
 - `UNPAIRED` - it means unpaired tag like `{varType}`
 - `ATTR_ONLY` - it means tag used only as n:attribute, like `n:class`
 - `AUTO_EMPTY` - it means pair tag which can be used as unpaired like `{label} | {label}{/label}`
+
+#### Attribute `arguments` detail:
+
+- Attribute `arguments` can contains string which will be shown as help after code completion
+- If attribute `arguments` is not provided, it means "tag without arguments"
+- Instead of attribute `argumnets` you can define arguments as tag which is child of `<arguments>` in `<tag>` 
+- If you use argument settings via: `<argument>` tags, help for code completion will be generated automatically
+- But you can still use argument `arguments` if using `<argument>` tags, then this value will rewrite automatically generated help after code completion
 
 ### &lt;argument&gt; in &lt;arguments&gt; in &lt;tag&gt;
 

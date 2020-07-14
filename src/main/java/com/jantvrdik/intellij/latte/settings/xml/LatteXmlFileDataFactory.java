@@ -1,16 +1,10 @@
 package com.jantvrdik.intellij.latte.settings.xml;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
-import com.intellij.psi.xml.XmlAttribute;
-import com.intellij.psi.xml.XmlDocument;
-import com.intellij.psi.xml.XmlFile;
-import com.intellij.psi.xml.XmlTag;
+import com.intellij.psi.xml.*;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.settings.*;
+import com.jantvrdik.intellij.latte.utils.LatteIdeHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
@@ -21,16 +15,8 @@ import java.util.List;
 public class LatteXmlFileDataFactory {
     @Nullable
     public static LatteXmlFileData parse(Project project, Path path) {
-        VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(path.toString());
-        if (virtualFile == null) {
-            return null;
-        }
-
-        PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
-        if (!(psiFile instanceof XmlFile)) {
-            return null;
-        }
-        return parse((XmlFile) psiFile);
+        XmlFile xmlFile = LatteIdeHelper.getXmlFileForPath(project, path);
+        return xmlFile != null ? parse(xmlFile) : null;
     }
 
     @Nullable

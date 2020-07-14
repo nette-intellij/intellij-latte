@@ -20,7 +20,7 @@ public class LatteFoldingBuilder extends FoldingBuilderEx {
 	@NotNull
 	@Override
 	public FoldingDescriptor[] buildFoldRegions(@NotNull PsiElement root, @NotNull Document document, boolean quick) {
-		List<FoldingDescriptor> descriptors = new ArrayList<FoldingDescriptor>();
+		List<FoldingDescriptor> descriptors = new ArrayList<>();
 
 		if (!quick) {
 			Collection<LatteMacroClassic> nodes = PsiTreeUtil.findChildrenOfAnyType(root, LatteMacroClassic.class);
@@ -40,7 +40,7 @@ public class LatteFoldingBuilder extends FoldingBuilderEx {
 			}
 		}
 
-		return descriptors.toArray(new FoldingDescriptor[descriptors.size()]);
+		return descriptors.toArray(new FoldingDescriptor[0]);
 	}
 
 	@Nullable

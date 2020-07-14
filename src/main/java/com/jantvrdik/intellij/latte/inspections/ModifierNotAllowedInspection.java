@@ -68,7 +68,7 @@ public class ModifierNotAllowedInspection extends LocalInspectionTool {
 			@Override
 			public void visitElement(PsiElement element) {
 				if (element instanceof LatteMacroModifier && !((LatteMacroModifier) element).isVariableModifier()) {
-					String description = "Modifiers are not allowed here";
+					String description = "Filters are not allowed here";
 					ProblemDescriptor problem = manager.createProblemDescriptor(element, description, true, ProblemHighlightType.GENERIC_ERROR, isOnTheFly);
 					problems.add(problem);
 

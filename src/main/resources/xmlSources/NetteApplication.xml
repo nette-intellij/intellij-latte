@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE latte PUBLIC "-//LATTE//Latte plugin configuration XML V0.0.1//EN" "Latte.dtd">
 <latte version="1" vendor="nette/application">
     <tags>
         <!-- nette/application tags -->
@@ -34,7 +35,7 @@
             </arguments>
         </tag>
         <!-- @deprecated - nette/application -->
-        <tag name="ifCurrent" type="PAIR" deprecated="true" deprecatedMessage="Tag {ifCurrent} is deprecated in Latte 2.6. Use custom function isLinkCurrent() instead.">
+        <tag name="ifCurrent" type="PAIR" deprecatedMessage="Tag {ifCurrent} is deprecated in Latte 2.6. Use custom function isLinkCurrent() instead.">
             <arguments>
                 <argument name="destination" types="LINK_DESTINATION,PHP_EXPRESSION" validType="string" required="true" />
                 <argument name="arguments" types="LINK_PARAMETERS" repeatable="true" />

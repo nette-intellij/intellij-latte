@@ -11,7 +11,6 @@ import com.jantvrdik.intellij.latte.lexer.LatteHighlightingLexer;
 import com.jantvrdik.intellij.latte.lexer.LatteLexer;
 import com.jantvrdik.intellij.latte.lexer.LatteLookAheadLexer;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributesKey;
@@ -25,7 +24,7 @@ public class LatteSyntaxHighlighter extends SyntaxHighlighterBase {
 	public static final TextAttributesKey MACRO_ARGS_VAR = createTextAttributesKey("LATTE_MACRO_ARGS_VAR", DefaultLanguageHighlighterColors.INSTANCE_FIELD);
 	public static final TextAttributesKey MACRO_ARGS_STRING = createTextAttributesKey("LATTE_MACRO_ARGS_STRING", DefaultLanguageHighlighterColors.STRING);
 	public static final TextAttributesKey MACRO_ARGS_NUMBER = createTextAttributesKey("LATTE_MACRO_ARGS_NUMBER", DefaultLanguageHighlighterColors.NUMBER);
-	public static final TextAttributesKey MACRO_MODIFIERS = createTextAttributesKey("LATTE_MACRO_MODIFIERS", DefaultLanguageHighlighterColors.DOC_COMMENT);
+	public static final TextAttributesKey MACRO_MODIFIERS = createTextAttributesKey("LATTE_MACRO_MODIFIERS", DefaultLanguageHighlighterColors.METADATA);
 	public static final TextAttributesKey MACRO_COMMENT = createTextAttributesKey("LATTE_MACRO_COMMENT", DefaultLanguageHighlighterColors.BLOCK_COMMENT);
 	public static final TextAttributesKey MACRO_BLOCK_NAME = createTextAttributesKey("LATTE_MACRO_BLOCK_NAME", DefaultLanguageHighlighterColors.STATIC_METHOD);
 	public static final TextAttributesKey MACRO_LINK_DESTINATION = createTextAttributesKey("LATTE_MACRO_LINK_DESTINATION", DefaultLanguageHighlighterColors.STRING);
@@ -77,7 +76,7 @@ public class LatteSyntaxHighlighter extends SyntaxHighlighterBase {
 		} else if (token == LatteTypes.T_PHP_KEYWORD || token == LatteTypes.T_PHP_AS) {
 			return pack(PHP_KEYWORD);
 
-		} else if (TokenSet.create(LatteTypes.T_PHP_NAMESPACE_REFERENCE, LatteTypes.T_PHP_NAMESPACE_RESOLUTION, LatteTypes.T_PHP_NAMESPACE_REFERENCE).contains(token)) {
+		} else if (TokenSet.create(LatteTypes.T_PHP_NAMESPACE_RESOLUTION, LatteTypes.T_PHP_NAMESPACE_REFERENCE).contains(token)) {
 			return pack(PHP_CLASS_NAME);
 
 		} else if (token == LatteTypes.T_PHP_METHOD) {

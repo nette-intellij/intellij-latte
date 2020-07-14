@@ -1,10 +1,12 @@
 package com.jantvrdik.intellij.latte.reference.references;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
+import com.jantvrdik.intellij.latte.indexes.LatteIndexUtil;
+import com.jantvrdik.intellij.latte.indexes.extensions.LattePhpClassIndex;
 import com.jantvrdik.intellij.latte.psi.LattePhpClassUsage;
 import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
-import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpNamespace;
 import org.jetbrains.annotations.NotNull;
@@ -31,15 +33,18 @@ public class LattePhpClassReference extends PsiReferenceBase<PsiElement> impleme
             return new ResolveResult[0];
         }
 
+        Project project = getElement().getProject();
         List<ResolveResult> results = new ArrayList<>();
-        for (PhpClass phpClass : ((LattePhpClassUsage) getElement()).getPhpType().getPhpClasses(getElement().getProject())) {
+        for (PhpClass phpClass : ((LattePhpClassUsage) getElement()).getPhpType().getPhpClasses(project)) {
             if (LattePhpUtil.isReferenceFor(className, phpClass)) {
                 results.add(new PsiElementResolveResult(phpClass));
             }
         }
 
-        for (LattePhpClassUsage method : LatteUtil.findClasses(getElement().getProject(), className)) {
-            results.add(new PsiElementResolveResult(method));
+        Collection<String> keys = LattePhpClassIndex.getInstance().getAllKeys(project);
+
+        for (com.jantvrdik.intellij.latte.psi.LattePhpClassReference classReference : LatteIndexUtil.getClassesByFqn(project, className)) {
+            results.add(new PsiElementResolveResult(classReference.getPhpClassUsage()));
         }
 
         return results.toArray(new ResolveResult[0]);

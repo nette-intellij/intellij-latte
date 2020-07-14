@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<latte version="1" vendor="latte">
+<!DOCTYPE latte PUBLIC "-//LATTE//Latte plugin XML V0.0.1//EN" "Latte.dtd">
+<latte vendor="latte" version="1">
 	<tags>
 		<tag name="_" type="AUTO_EMPTY" allowedFilters="true">
 			<arguments>
@@ -205,7 +206,7 @@
 		</tag>
 		<!-- @deprecated - latte -->
 		<tag name="assign" type="UNPAIRED" arguments="$variable = expr" />
-		<tag name="?" type="UNPAIRED" arguments="expression" deprecated="true" deprecatedMessage="Tag {? ...} is deprecated in Latte 2.4. For variable definitions use {var ...} or {php ...} in other cases." />
+		<tag name="truncate" type="UNPAIRED" arguments="expression" deprecatedMessage="Tag {? ...} is deprecated in Latte 2.4. For variable definitions use {var ...} or {php ...} in other cases." />
 	</tags>
 	<filters>
 		<filter name="truncate" arguments=":(length, append = '…')" description="shortens the length preserving whole words" insertColons=":" />

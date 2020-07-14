@@ -2,10 +2,10 @@ package com.jantvrdik.intellij.latte.reference.references;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
+import com.jantvrdik.intellij.latte.indexes.LatteIndexUtil;
 import com.jantvrdik.intellij.latte.psi.LattePhpProperty;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
 import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
-import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.NotNull;
@@ -32,10 +32,12 @@ public class LattePhpPropertyReference extends PsiReferenceBase<PsiElement> impl
             return new ResolveResult[0];
         }
 
-        final Collection<LattePhpProperty> methods = LatteUtil.findProperties(getElement().getProject(), key, phpClasses);
-        List<ResolveResult> results = new ArrayList<ResolveResult>();
+        final Collection<LattePhpProperty> methods = LatteIndexUtil.findPropertiesByName(getElement().getProject(), key);
+        List<ResolveResult> results = new ArrayList<>();
         for (BaseLattePhpElement method : methods) {
-            results.add(new PsiElementResolveResult(method));
+            if (method.getPhpType().hasClass(phpClasses)) {
+                results.add(new PsiElementResolveResult(method));
+            }
         }
 
         List<Field> fields = LattePhpUtil.getFieldsForPhpElement((BaseLattePhpElement) getElement());
@@ -46,7 +48,7 @@ public class LattePhpPropertyReference extends PsiReferenceBase<PsiElement> impl
             }
         }
 
-        return results.toArray(new ResolveResult[results.size()]);
+        return results.toArray(new ResolveResult[0]);
     }
 
     @Nullable

@@ -3,7 +3,7 @@ package com.jantvrdik.intellij.latte.config;
 import com.intellij.notification.Notification;
 import com.intellij.openapi.project.Project;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration.Vendor;
-import com.jantvrdik.intellij.latte.indexes.LatteIndexUtil;
+import com.jantvrdik.intellij.latte.utils.LatteReparseFilesUtil;
 import com.jantvrdik.intellij.latte.settings.*;
 import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileData;
 import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileDataFactory;
@@ -18,7 +18,11 @@ import java.util.Map;
 
 public class LatteDefaultConfiguration {
 
-	private static String[] sourceFiles = new String[] {"Latte.xml", "NetteApplication.xml", "NetteForms.xml"};
+	public static Map<String, Vendor> sourceFiles = new HashMap<String, Vendor>(){{
+		put("Latte.xml", Vendor.LATTE);
+		put("NetteApplication.xml", Vendor.NETTE_APPLICATION);
+		put("NetteForms.xml", Vendor.NETTE_FORMS);
+	}};
 
 	private static Map<Project, LatteDefaultConfiguration> instances = new HashMap<>();
 
@@ -37,7 +41,8 @@ public class LatteDefaultConfiguration {
 
 	public void reinitialize() {
 		xmlData = new HashMap<>();
-		for (String sourceFile : sourceFiles) {
+		LatteIdeHelper.saveFileToProjectTemp(project, "xmlSources/Latte.dtd");
+		for (String sourceFile : sourceFiles.keySet()) {
 			Path path = LatteIdeHelper.saveFileToProjectTemp(project, "xmlSources/" + sourceFile);
 			if (path == null) {
 				continue;
@@ -50,8 +55,8 @@ public class LatteDefaultConfiguration {
 				xmlData.put(vendorResult.vendor, data);
 
 			} else if (LatteIdeHelper.holdsReadLock()) {
-				if (notification == null || notification.isExpired() || LatteIndexUtil.isNotificationOutdated(notification)) {
-					notification = LatteIndexUtil.notifyDefaultReparse(project);
+				if (notification == null || notification.isExpired() || LatteReparseFilesUtil.isNotificationOutdated(notification)) {
+					notification = LatteReparseFilesUtil.notifyDefaultReparse(project);
 				}
 			}
 		}

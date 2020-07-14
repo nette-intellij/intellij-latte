@@ -1,6 +1,9 @@
 package com.jantvrdik.intellij.latte.psi.elements;
 
-public interface LattePhpVariableElement extends BaseLattePhpElement {
+import com.intellij.psi.StubBasedPsiElement;
+import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpVariableStub;
+
+public interface LattePhpVariableElement extends BaseLattePhpElement, StubBasedPsiElement<LattePhpVariableStub> {
 
 	public abstract String getVariableName();
 
