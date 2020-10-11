@@ -187,7 +187,10 @@
 	</project-components>
 
 	<actions>
-		<!-- Add your actions here -->
+		<group id="NewLatte" text="Latte">
+			<action id="NewLatteFile" class="com.jantvrdik.intellij.latte.ide.CreateLatteFileAction"/>
+			<add-to-group group-id="NewGroup" anchor="after" relative-to-action="FileTemplateSeparatorGroup"/>
+		</group>
 	</actions>
 
 </idea-plugin>

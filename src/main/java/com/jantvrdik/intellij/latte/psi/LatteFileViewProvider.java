@@ -16,7 +16,6 @@ import com.jantvrdik.intellij.latte.LatteLanguage;
 import com.jantvrdik.intellij.latte.utils.LatteHtmlUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -59,6 +58,7 @@ public class LatteFileViewProvider extends MultiplePsiFilesPerDocumentFileViewPr
 	@NotNull
 	@Override
 	public Language getTemplateDataLanguage() {
+//		return LatteLanguage.INSTANCE;
 		return isXml() ? XMLLanguage.INSTANCE : HTMLLanguage.INSTANCE;
 	}
 
