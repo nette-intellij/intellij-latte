@@ -136,7 +136,7 @@ public class LattePhpVariableUtil {
         List<PsiElement> otherParts = new ArrayList<>();
         phpContent.acceptChildren(new PsiElementVisitor() {
             @Override
-            public void visitElement(PsiElement element) {
+            public void visitElement(@NotNull PsiElement element) {
                 if (
                         element instanceof LattePhpStatement && ((LattePhpStatement) element).isPhpVariableOnly()
                                 || element instanceof LattePhpArrayOfVariables

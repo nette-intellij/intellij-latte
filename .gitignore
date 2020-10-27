@@ -3,7 +3,7 @@
 local.properties
 
 /src/main/gen
-/src/main/java/src/com/jantvrdik/intellij/latte/parser/_LatteLexer.flex
+/src/main/java/com/jantvrdik/intellij/latte/parser/_LatteLexer.flex
 
 /.idea
 /.gradle
