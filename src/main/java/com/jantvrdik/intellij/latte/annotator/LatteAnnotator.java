@@ -1,10 +1,10 @@
 package com.jantvrdik.intellij.latte.annotator;
 
-import com.intellij.lang.annotation.Annotation;
-import com.intellij.lang.annotation.AnnotationHolder;
-import com.intellij.lang.annotation.Annotator;
+import com.intellij.lang.annotation.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiErrorElement;
+import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.intentions.*;
 import com.jantvrdik.intellij.latte.psi.*;
@@ -23,15 +23,12 @@ public class LatteAnnotator implements Annotator {
 		} else if (element instanceof LatteNetteAttr) {
 			checkNetteAttr((LatteNetteAttr) element, holder);
 
-		}/* else if (element instanceof LeafPsiElement && element.getParent().getLastChild() instanceof PsiErrorElement) {
+		} else if (element instanceof LeafPsiElement && element.getParent().getLastChild() instanceof PsiErrorElement) {
 			LeafPsiElement leaf = (LeafPsiElement) element;
-			if (leaf.getElementType() == LatteTypes.T_PHP_DOUBLE_QUOTE_LEFT
-					|| leaf.getElementType() == LatteTypes.T_PHP_SINGLE_QUOTE_LEFT) {
-				holder.createErrorAnnotation(element, "Unclosed string");
-			} else if (leaf.getElementType() == LatteTypes.T_MACRO_OPEN_TAG_OPEN || leaf.getElementType() == LatteTypes.T_MACRO_CLOSE_TAG_OPEN) {
-				holder.createErrorAnnotation(element.getParent(), "Malformed tag. Missing closing }");
+			if (leaf.getElementType() == LatteTypes.T_MACRO_OPEN_TAG_OPEN || leaf.getElementType() == LatteTypes.T_MACRO_CLOSE_TAG_OPEN) {
+				createErrorAnnotation(holder, "Malformed tag. Missing closing }");
 			}
-		}*/
+		}
 	}
 
 	private void checkNetteAttr(@NotNull LatteNetteAttr element, @NotNull AnnotationHolder holder) {
@@ -52,12 +49,16 @@ public class LatteAnnotator implements Annotator {
 		Project project = element.getProject();
 		LatteTagSettings macro = LatteConfiguration.getInstance(project).getTag(tagName);
 		if (macro == null || macro.getType() == LatteTagSettings.Type.UNPAIRED) {
-			Annotation annotation = holder.createErrorAnnotation(attrName, "Unknown attribute tag " + attrName.getText());
-			annotation.registerFix(new AddCustomPairMacro(tagName));
-			if (!prefixed) annotation.registerFix(new AddCustomAttrOnlyMacro(tagName));
+			AnnotationBuilder builder = holder.newAnnotation(HighlightSeverity.ERROR, "Unknown attribute tag " + attrName.getText())
+					.range(attrName)
+					.withFix(new AddCustomPairMacro(tagName));
+			if (!prefixed) {
+				builder.withFix(new AddCustomAttrOnlyMacro(tagName));
+			}
+			builder.create();
 
 		} else if (prefixed && macro.getType() != LatteTagSettings.Type.PAIR && macro.getType() != LatteTagSettings.Type.AUTO_EMPTY) {
-			holder.createErrorAnnotation(attrName, "Attribute tag n:" + tagName + " can not be used with prefix.");
+			createErrorAnnotation(holder, attrName, "Attribute tag n:" + tagName + " can not be used with prefix.");
 		}
 	}
 
@@ -79,22 +80,23 @@ public class LatteAnnotator implements Annotator {
 
 			if (!isOk) {
 				if (macro != null) {
-					holder.createErrorAnnotation(openTag, "Can not use n:" + openTagName + " attribute as normal tag");
+					createErrorAnnotation(holder, openTag, "Can not use n:" + openTagName + " attribute as normal tag");
 					if (closeTag != null) {
-						holder.createErrorAnnotation(closeTag, "Tag n:" + openTagName + " can not be used as pair tag");
+						createErrorAnnotation(holder, closeTag, "Tag n:" + openTagName + " can not be used as pair tag");
 					}
 
 				} else {
-					Annotation annotation = holder.createErrorAnnotation(openTag, "Unknown tag {" + openTagName + "}");
-					annotation.registerFix(new AddCustomPairMacro(openTagName));
-					annotation.registerFix(new AddCustomUnpairedMacro(openTagName));
+					AnnotationBuilder annotation = holder.newAnnotation(HighlightSeverity.ERROR, "Unknown tag {" + openTagName + "}").range(openTag);
+					annotation = annotation.withFix(new AddCustomPairMacro(openTagName));
+					annotation = annotation.withFix(new AddCustomUnpairedMacro(openTagName));
+					annotation.create();
 				}
 			}
 		}
 
 		String closeTagName = closeTag != null ? closeTag.getMacroName() : null;
 		if (closeTagName != null && !closeTagName.isEmpty() && !closeTagName.equals(openTagName)) {
-			holder.createErrorAnnotation(closeTag, "Unexpected {/" + closeTagName + "}, expected {/" + openTagName + "}");
+			createErrorAnnotation(holder, closeTag, "Unexpected {/" + closeTagName + "}, expected {/" + openTagName + "}");
 		}
 
 		if (
@@ -102,7 +104,19 @@ public class LatteAnnotator implements Annotator {
 				&& closeTag == null
 				&& ((element instanceof LattePairMacro && macro.getType() == LatteTagSettings.Type.AUTO_EMPTY) || macro.getType() == LatteTagSettings.Type.PAIR)
 		) {
-			holder.createErrorAnnotation(openTag, "Unclosed tag " + openTagName);
+			createErrorAnnotation(holder, openTag, "Unclosed tag " + openTagName);
 		}
+	}
+
+	private void createErrorAnnotation(final @NotNull AnnotationHolder holder, final @NotNull String message) {
+		holder.newAnnotation(HighlightSeverity.ERROR, message).create();
+	}
+
+	private void createErrorAnnotation(
+			final @NotNull AnnotationHolder holder,
+			final @NotNull PsiElement element,
+			final @NotNull String message
+	) {
+		holder.newAnnotation(HighlightSeverity.ERROR, message).range(element).create();
 	}
 }

@@ -164,6 +164,7 @@ public class LatteTagSettings extends BaseLatteSettings implements Serializable 
 		/** macro is available only as unpaired classic macro, e.g. 'var' or 'link' */
 		UNPAIRED,
 
+		/** macro is available as pair or unpaired classic macro, e.g. 'block' or 'label' */
 		AUTO_EMPTY,
 	}
 

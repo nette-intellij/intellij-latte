@@ -20,13 +20,24 @@ import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
 %state CLASS_REFERENCE_TYPE
 
 WHITE_SPACE=[ \t\r\n]+
+
+// numbers
+BIN_NUMBER = [+-]?0[bB][01]+*
+OCT_NUMBER = [+-]?0[oO][1-7][0-7]*
+HEX_NUMBER = [+-]?0[xX][0-9a-fA-F]+
+NUMBER = [+-]?[0-9]+(\.[0-9]+)?([Ee][+-]?[0-9]+)?
+
+// identifiers
 IDENTIFIER=[a-zA-Z_][a-zA-Z0-9_]*
 CLASS_NAME=\\?[a-zA-Z_][a-zA-Z0-9_]*\\[a-zA-Z_][a-zA-Z0-9_\\]* | \\[a-zA-Z_][a-zA-Z0-9_]*
 CONTENT_TYPE=[a-zA-Z\-][a-zA-Z0-9\-]*\/[a-zA-Z\-][a-zA-Z0-9\-\.]*
+
+// keywords
 TYPES=("string" | "int" | "bool" | "object" | "float" | "array" | "callable" | "iterable" | "void")
-KEYWORD=(class | "false" | "true" | "break" | "continue" | "case" | "default" | "die" | "exit" | "do" | "while" | "foreach" | "for" | "function" | "echo" | "print" | "catch" | "finally" | "try" | "instanceof" | "if" | "else" | "elseif" | "endif" | "endforeach" | "endfor" | "endwhile" | "endswitch" | "isset" | "or" | "new" | "switch" | "use")
+KEYWORD=(class | "false" | "true" | "break" | "continue" | "case" | "default" | "die" | "exit" | "do" | "while" | "foreach" | "for" | "function" | "echo" | "print" | "catch" | "finally" | "try" | "instanceof" | "if" | "else" | "elseif" | "endif" | "endforeach" | "endfor" | "endwhile" | "endswitch" | "isset" | "or" | "switch" | "use")
 NULL="null"
 MIXED="mixed"
+NEW="new"
 AS="as"
 
 %%
@@ -163,6 +174,10 @@ AS="as"
         return T_PHP_MIXED;
     }
 
+    {NEW} {
+        return T_PHP_NEW;
+    }
+
     "array" / {WHITE_SPACE}? "(" {
         return T_PHP_ARRAY;
     }
@@ -199,7 +214,7 @@ AS="as"
         return T_PHP_DOUBLE_QUOTE_LEFT;
     }
 
-	[0-9]+ {
+	{NUMBER} | {BIN_NUMBER} | {HEX_NUMBER} | {OCT_NUMBER} {
 		return T_MACRO_ARGS_NUMBER;
 	}
 

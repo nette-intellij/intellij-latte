@@ -120,7 +120,10 @@ public class LattePsiImplUtil {
 			return stub.getMethodName();
 		}
 
-		final PsiElement found = findFirstChildWithType(element, T_PHP_IDENTIFIER);
+		PsiElement found = findFirstChildWithType(element, T_PHP_IDENTIFIER);
+		if (found == null) {
+			found = findFirstChildWithType(element, T_PHP_NAMESPACE_REFERENCE);
+		}
 		return found != null ? found.getText() : null;
 	}
 
@@ -459,20 +462,6 @@ public class LattePsiImplUtil {
 	}
 
 	public static boolean isDefinitionInFor(@NotNull LattePhpVariable element) {
-		LatteNetteAttrValue parentAttr = PsiTreeUtil.getParentOfType(element, LatteNetteAttrValue.class);
-		if (parentAttr != null) {
-			PsiElement nextElement = PsiTreeUtil.skipWhitespacesForward(element);
-			if (nextElement == null || nextElement.getNode().getElementType() != LatteTypes.T_PHP_DEFINITION_OPERATOR) {
-				return false;
-			}
-			PsiElement prevElement = PsiTreeUtil.skipWhitespacesBackward(parentAttr);
-			if (prevElement == null || prevElement.getNode().getElementType() != LatteTypes.T_PHP_DEFINITION_OPERATOR) {
-				return false;
-			}
-
-			prevElement = PsiTreeUtil.skipWhitespacesBackward(prevElement);
-			return prevElement != null && prevElement.getText().equals("n:for");
-		}
 		return LatteUtil.matchParentMacroName(element, "for") && LattePhpVariableUtil.isNextDefinitionOperator(element);
 	}
 

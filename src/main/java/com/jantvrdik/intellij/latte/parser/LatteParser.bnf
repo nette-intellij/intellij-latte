@@ -121,7 +121,7 @@ htmlTag            ::= <<checkPairHtmlTag true>> (htmlOpenTag htmlTagContainer h
 
 htmlTagContainer     ::= (htmlTag | T_TEXT | macro | (pairMacro | unpairedMacro))*
 
-htmlTagContent         ::= (netteAttr | macro | T_TEXT| (pairMacro | unpairedMacro))*
+htmlTagContent         ::= (netteAttr | macro | T_TEXT | (pairMacro | unpairedMacro))*
 
 htmlOpenTag     ::= T_HTML_OPEN_TAG_OPEN htmlTagContent T_HTML_TAG_CLOSE {
                         pin=1
@@ -164,7 +164,7 @@ phpStaticVariable  ::= T_MACRO_ARGS_VAR phpArrayUsage* {
                         ]
                     }
 
-phpMethod        ::= (T_PHP_IDENTIFIER | phpVariable) T_WHITESPACE? phpArgumentList T_WHITESPACE? phpArrayUsage* {
+phpMethod        ::= (T_PHP_IDENTIFIER | phpVariable | (T_PHP_NAMESPACE_RESOLUTION T_PHP_NAMESPACE_REFERENCE)) T_WHITESPACE? phpArgumentList T_WHITESPACE? phpArrayUsage* {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpMethodElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpMethodElement"
                         elementTypeClass="com.jantvrdik.intellij.latte.indexes.stubs.types.LattePhpMethodStubType"
@@ -234,7 +234,7 @@ phpStatement       ::= phpStatementFirstPart phpStatementPart* {
                 methods=[getPhpType isPhpVariableOnly isPhpClassReferenceOnly getLastPhpElement]
                 }
 
-phpStatementFirstPart    ::= phpVariable | phpClassReference | phpMethod {
+phpStatementFirstPart    ::= phpVariable | phpMethod | phpClassReference {
                     methods=[getPhpType getPhpStatement getPrevPhpStatementPart getPhpElement]
                     implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpStatementPartElement"
                 }
@@ -312,14 +312,14 @@ phpArgument    ::= phpPrivateArgument | T_PHP_AS | T_PHP_DOUBLE_ARROW
 
 private
 phpPrivateArgument    ::=  phpString | phpArrayOfVariables | phpTypedArguments | phpStatement | phpTypeElement | T_MACRO_ARGS_NUMBER
-                    | phpArray | phpClassReference | phpDefinition
-                    | phpStatic | phpMethod | phpInBrackets | phpVariable | T_PHP_NULL_MARK | T_PHP_CONTENT_TYPE | T_PHP_OBJECT_OPERATOR
+                    | phpArray | phpDefinition | phpMethod | phpClassReference
+                    | phpStatic | phpInBrackets | phpVariable | T_PHP_NULL_MARK | T_PHP_CONTENT_TYPE | T_PHP_OBJECT_OPERATOR
                     | T_PHP_RELATIONAL_OPERATOR | T_PHP_ASSIGNMENT_OPERATOR | T_PHP_LOGIC_OPERATOR | T_PHP_OPERATOR
                     | T_PHP_ADDITIVE_OPERATOR | T_PHP_BITWISE_OPERATOR | T_PHP_SHIFT_OPERATOR
                     | T_PHP_DOUBLE_COLON | T_PHP_METHOD | T_PHP_TYPE | T_PHP_KEYWORD
                     | T_PHP_CAST | T_PHP_NAMESPACE_RESOLUTION | T_BLOCK_NAME | T_PHP_COLON
                     | T_PHP_CONCATENATION | T_PHP_MULTIPLICATIVE_OPERATORS | T_PHP_UNARY_OPERATOR
-                    | T_PHP_EXPRESSION | T_PHP_NULL | T_PHP_MIXED | T_PHP_LEFT_CURLY_BRACE | T_PHP_RIGHT_CURLY_BRACE
+                    | T_PHP_EXPRESSION | T_PHP_NEW | T_PHP_NULL | T_PHP_MIXED | T_PHP_LEFT_CURLY_BRACE | T_PHP_RIGHT_CURLY_BRACE
                     | macroModifier | T_PHP_IDENTIFIER | T_PHP_MACRO_SEPARATOR | T_PHP_OR_INCLUSIVE | T_PHP_DEFINITION_OPERATOR
 
 phpExpression    ::= (expression | T_MACRO_ARGS)* {

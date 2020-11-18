@@ -15,6 +15,7 @@ import com.jantvrdik.intellij.latte.parser.LatteElementTypes;
 import com.jantvrdik.intellij.latte.psi.LattePhpMethod;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
 import com.jantvrdik.intellij.latte.psi.impl.LattePhpMethodImpl;
+import com.jantvrdik.intellij.latte.utils.LatteTypesUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -83,7 +84,7 @@ public class LattePhpMethodStubType extends LattePhpTypeStub<LattePhpMethodStub,
     @NotNull
     @Override
     public LattePhpMethodStub createStub(@NotNull LighterAST tree, @NotNull LighterASTNode node, @NotNull StubElement parentStub) {
-        LighterASTNode keyNode = LightTreeUtil.firstChildOfType(tree, node, TokenSet.create(LatteTypes.T_PHP_IDENTIFIER));
+        LighterASTNode keyNode = LightTreeUtil.firstChildOfType(tree, node, LatteTypesUtil.methodTokens);
         String key = intern(tree.getCharTable(), keyNode);
         return new LattePhpMethodStubImpl(parentStub, key);
     }

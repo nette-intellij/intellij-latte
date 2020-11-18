@@ -37,10 +37,8 @@ public class LatteLookAheadLexer extends LookAheadLexer {
 		}
 
 		super.addToken(endOffset, type);
-		if (!WHITESPACES.contains(type)) {
-			if (!TAG_TAGS.contains(type)) {
-				lastLinkMacro = wasLinkDestination || ((type == LatteTypes.T_MACRO_NAME || type == LatteTypes.T_HTML_TAG_NATTR_NAME) && isLinkMacro(lexer));
-			}
+		if (!TAG_TAGS.contains(type)) {
+			lastLinkMacro = wasLinkDestination || ((type == LatteTypes.T_MACRO_NAME || type == LatteTypes.T_HTML_TAG_NATTR_NAME) && isLinkMacro(lexer));
 		}
 	}
 

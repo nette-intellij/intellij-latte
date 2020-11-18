@@ -49,11 +49,11 @@ public class LatteReferenceContributor extends PsiReferenceContributor {
 
                         String methodName = ((LattePhpMethod) element).getMethodName();
                         if (methodName != null && methodName.length() > 0) {
+                            int addition = element.getFirstChild().getNode().getElementType() == LatteTypes.T_PHP_NAMESPACE_RESOLUTION ? 1 : 0;
                             return new PsiReference[]{
-                                    new LattePhpMethodReference((LattePhpMethod) element, new TextRange(0, methodName.length()))
+                                    new LattePhpMethodReference((LattePhpMethod) element, new TextRange(0 + addition, methodName.length() + addition))
                             };
                         }
-
                         return PsiReference.EMPTY_ARRAY;
                     }
                 });
