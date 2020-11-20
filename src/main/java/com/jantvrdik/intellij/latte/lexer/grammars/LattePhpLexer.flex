@@ -327,7 +327,7 @@ AS="as"
 		return T_PHP_DOUBLE_QUOTE_RIGHT;
 	}
 
-	("\\" [^] | [^\"\\$]) {
+	("\\" [^] | [^\"\\$])+ {
 		return T_MACRO_ARGS_STRING;
 	}
 

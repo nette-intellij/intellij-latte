@@ -20,7 +20,8 @@ public class LatteLookAheadLexer extends LookAheadLexer {
 	private static final TokenSet TAG_TAGS = TokenSet.create(LatteTypes.T_HTML_TAG_ATTR_EQUAL_SIGN, LatteTypes.T_HTML_TAG_ATTR_DQ);
 	private static final List<String> LINK_TAGS = Arrays.asList("link", "plink", "n:href");
 
-	private boolean lastLinkMacro = false;
+	private boolean lastLink = false;
+	private boolean replaceAsLink = false;
 	private Lexer lexer;
 
 	public LatteLookAheadLexer(Lexer baseLexer) {
@@ -31,14 +32,18 @@ public class LatteLookAheadLexer extends LookAheadLexer {
 	@Override
 	protected void addToken(int endOffset, IElementType type) {
 		boolean wasLinkDestination = false;
-		if ((type == LatteTypes.T_PHP_IDENTIFIER || type == LatteTypes.T_PHP_KEYWORD || (type == LatteTypes.T_MACRO_ARGS && isCharacterAtCurrentPosition(lexer, '#', ':'))) && lastLinkMacro) {
+		if ((type == LatteTypes.T_PHP_IDENTIFIER || type == LatteTypes.T_PHP_KEYWORD || (type == LatteTypes.T_MACRO_ARGS && isCharacterAtCurrentPosition(lexer, '#', ':'))) && replaceAsLink) {
 			type = LatteTypes.T_LINK_DESTINATION;
 			wasLinkDestination = true;
 		}
 
 		super.addToken(endOffset, type);
 		if (!TAG_TAGS.contains(type)) {
-			lastLinkMacro = wasLinkDestination || ((type == LatteTypes.T_MACRO_NAME || type == LatteTypes.T_HTML_TAG_NATTR_NAME) && isLinkMacro(lexer));
+			boolean current = (type == LatteTypes.T_MACRO_NAME || type == LatteTypes.T_HTML_TAG_NATTR_NAME) && isLinkMacro(lexer);
+			replaceAsLink = (wasLinkDestination && !WHITESPACES.contains(type))
+					|| (!wasLinkDestination && lastLink && WHITESPACES.contains(type))
+					|| current;
+			lastLink = current;
 		}
 	}
 

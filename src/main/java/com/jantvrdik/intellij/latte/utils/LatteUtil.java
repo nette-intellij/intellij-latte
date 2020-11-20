@@ -81,7 +81,11 @@ public class LatteUtil {
             return macroClassic.getOpenTag().getMacroName().equals(name);
         }
         LatteNetteAttr netteAttr = PsiTreeUtil.getParentOfType(element, LatteNetteAttr.class);
-        return netteAttr != null && netteAttr.getAttrName().getText().equals("n:" + name);
+        if (netteAttr == null) {
+            return false;
+        }
+        String attributeName = netteAttr.getAttrName().getText();
+        return attributeName.equals("n:" + name) || attributeName.equals("n:tag-" + name) || attributeName.equals("n:inner-" + name);
     }
 
     public static String getSpacesBeforeCaret(@NotNull Editor editor) {

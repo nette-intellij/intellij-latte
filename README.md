@@ -6,18 +6,29 @@ Provides support for [Latte](https://github.com/nette/latte) – a template engi
 - Plugin page: [IntelliJ plugin Latte](https://plugins.jetbrains.com/plugin/7457-latte)
 - Forum: [Nette forum](https://forum.nette.org/en/32907-upgrades-in-latte-plugin-for-phpstorm)
 
+
+Installation
+------------
+
+Settings → Plugins → Browse repositories → Find "Latte" → Install Plugin → Restart IDE
+
+
+Sponsors
+------
+
+<a href="https://www.futurerockstars.cz/"><img src="https://i.imgur.com/uqdF6OJ.png" alt="FutureRockstars" width="188" height="86"></a>
+
+Does GitHub already have your 💳? Does Nette plugins save you development time? [Send a couple of 💸 a month my way too.](https://github.com/sponsors/mesour) Thank you!
+
+One-time donations through [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=GSDRZW9YGPE5G&source=url) are also accepted. To request an invoice, [contact me](mailto:matous.nemec@mesour.com) through e-mail.
+
+
 Supported Features
 ------------------
 
 * Syntax highlighting
 * Code completion for PHP, classic HTML, attribute tags and more
 * Registering custom tags, filters and custom functions
-
-
-Installation
-------------
-
-Settings → Plugins → Browse repositories → Find "Latte" → Install Plugin → Restart IDE
 
 
 Testing EAP versions
@@ -28,14 +39,6 @@ Latte plugin for IntelliJ is downloadable from the JetBrains plugin repository d
 - Here is, how to set up custom release channels in PHPStorm: [Custom release channels](https://plugins.jetbrains.com/docs/marketplace/custom-release-channels.html)
 - You have to add this link: `https://plugins.jetbrains.com/plugins/eap/list` to your Custom plugin repositories
 - After you add the link above, you can refresh your plugins Marketplace and you will see RC versions for Latte plugin
-
-
-Donate
-------
-
-Does GitHub already have your 💳? Does Nette plugins save you development time? [Send a couple of 💸 a month my way too.](https://github.com/sponsors/mesour) Thank you!
-
-One-time donations through [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=GSDRZW9YGPE5G&source=url) are also accepted. To request an invoice, [contact me](mailto:matous.nemec@mesour.com) through e-mail.
 
 
 Building
