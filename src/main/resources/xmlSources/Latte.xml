@@ -29,7 +29,7 @@
 		</tag>
 		<tag name="case" type="UNPAIRED">
 			<arguments>
-				<argument name="condition" types="PHP_CONDITION" validType="bool" required="true" />
+				<argument name="condition" types="PHP_CONDITION" required="true" repeatable="true" />
 			</arguments>
 		</tag>
 		<tag name="catch" type="UNPAIRED">
@@ -150,12 +150,12 @@
 		</tag>
 		<tag name="sep" type="PAIR">
 			<arguments>
-				<argument name="width" types="PHP_IDENTIFIER,PHP_EXPRESSION" validType="int" required="true" />
+				<argument name="width" types="PHP_IDENTIFIER,PHP_EXPRESSION" validType="int" />
 			</arguments>
 		</tag>
 		<tag name="snippet" type="PAIR" multiLine="true">
 			<arguments>
-				<argument name="name" types="PHP_IDENTIFIER,VARIABLE,PHP_EXPRESSION" validType="string" required="true" />
+				<argument name="name" types="PHP_IDENTIFIER,VARIABLE,PHP_EXPRESSION" validType="string" />
 			</arguments>
 		</tag>
 		<tag name="snippetArea" type="PAIR" multiLine="true">
@@ -181,6 +181,17 @@
 			</arguments>
 		</tag>
 		<tag name="try" type="PAIR" />
+		<tag name="rollback" type="UNPAIRED" />
+		<tag name="ifchanged" type="PAIR">
+			<arguments>
+				<argument name="expression" types="PHP_EXPRESSION" required="true" repeatable="true" />
+			</arguments>
+		</tag>
+		<tag name="skipIf" type="UNPAIRED">
+			<arguments>
+				<argument name="condition" types="PHP_CONDITION" validType="bool" required="true" />
+			</arguments>
+		</tag>
 		<tag name="var" type="UNPAIRED">
 			<arguments>
 				<argument name="variable" types="VARIABLE_DEFINITION_EXPRESSION" required="true" repeatable="true" />
@@ -198,7 +209,7 @@
 				<argument name="condition" types="PHP_CONDITION" validType="bool" required="true" />
 			</arguments>
 		</tag>
-		<tag name="widget" type="PAIR">
+		<tag name="embed" type="PAIR" multiLine="true">
 			<arguments>
 				<argument name="file" types="BLOCK_USAGE,PHP_IDENTIFIER,VARIABLE,PHP_EXPRESSION" validType="string" required="true" />
 				<argument name="key-value" types="KEY_VALUE" repeatable="true" />
@@ -225,7 +236,11 @@
 		<filter name="breaklines" description="inserts HTML line breaks before all newlines" />
 		<filter name="reverse" description="reverse an UTF-8 string or array" />
 		<filter name="length" description="returns length of a string or array" />
+		<filter name="sort" description="simply sorts array" />
+		<filter name="reverse" description="array sorted in reverse order (used with |sort)" />
 		<filter name="batch" arguments=":(array, length [, item])" description="returns length of a string or array" insertColons="::" />
+
+		<filter name="clamp" description="returns value clamped to the inclusive range of min and max." insertColons="::" />
 
 		<filter name="lower" description="makes a string lower case" />
 		<filter name="upper" description="makes a string upper case" />
@@ -243,4 +258,7 @@
 		<filter name="nocheck" description="prevents automatic URL sanitization" />
 		<filter name="checkurl" description="sanitizes string for use inside href attribute" />
 	</filters>
+	<functions>
+		<function name="clamp" returnType="int|float" arguments="(int|float $value, int|float $min, int|float $max)" description="clamps value to the inclusive range of min and max" />
+	</functions>
 </latte>
