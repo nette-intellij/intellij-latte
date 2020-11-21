@@ -4,12 +4,18 @@ import com.intellij.lang.annotation.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiErrorElement;
+import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.intentions.*;
 import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.settings.LatteTagSettings;
+import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
 
 /**
  * Annotator is mostly used to check semantic rules which can not be easily checked during parsing.
@@ -104,7 +110,28 @@ public class LatteAnnotator implements Annotator {
 				&& closeTag == null
 				&& ((element instanceof LattePairMacro && macro.getType() == LatteTagSettings.Type.AUTO_EMPTY) || macro.getType() == LatteTagSettings.Type.PAIR)
 		) {
-			createErrorAnnotation(holder, openTag, "Unclosed tag " + openTagName);
+			//if (!macro.isTagBlock() || element.getContainingFile().getLastChild() == openTag.getParent()) {
+			final int[] unclosed = {0};
+			openTag.getParent().acceptChildren(new PsiRecursiveElementWalkingVisitor() {
+				@Override
+				public void visitElement(PsiElement element) {
+					if (element instanceof LattePairMacro) {
+						LatteMacroTag tag = ((LattePairMacro) element).getOpenTag();
+						if (tag.getMacroName().equals("block") && ((LattePairMacro) element).getCloseTag() == null) {
+							unclosed[0]++;
+						} else {
+							super.visitElement(element);
+						}
+
+					} else {
+						super.visitElement(element);
+					}
+				}
+			});
+			PsiElement el = PsiTreeUtil.getChildOfAnyType(openTag.getParent(), LattePairMacro.class);
+			if (!macro.isTagBlock() || unclosed[0] > 0) {
+				createErrorAnnotation(holder, openTag, "Unclosed tag " + openTagName);
+			}
 		}
 	}
 

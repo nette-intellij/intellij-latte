@@ -12,7 +12,7 @@
 				<argument name="expression" types="PHP_EXPRESSION" validType="string" required="true" />
 			</arguments>
 		</tag>
-		<tag name="block" type="AUTO_EMPTY" allowedFilters="true" multiLine="true">
+		<tag name="block" type="PAIR" allowedFilters="true" multiLine="true">
 			<arguments>
 				<argument name="name" types="PHP_IDENTIFIER,VARIABLE,PHP_EXPRESSION" validType="string" required="true" />
 			</arguments>
@@ -73,7 +73,7 @@
 				<argument name="expression" types="PHP_EXPRESSION" required="true" />
 			</arguments>
 		</tag>
-		<tag name="else" type="UNPAIRED" />
+		<tag name="else" type="UNPAIRED_ATTR" />
 		<tag name="elseif" type="UNPAIRED">
 			<arguments>
 				<argument name="condition" types="PHP_CONDITION" validType="bool" required="true" />

@@ -34,7 +34,7 @@ macroClassic     ::= macroTag macroTag?{
                      	]
                      }
 
-pairMacro        ::= macroOpenTag structureToken* macroCloseTag { //incomplete pair macro is handled in a annotator
+pairMacro        ::= macroOpenTag structureToken* macroCloseTag? { //incomplete pair macro is handled in a annotator
                             extends=macroClassic
                         }
 
@@ -93,7 +93,8 @@ private
 macroArgs        ::= phpContent
 
 // autoClosedBlock
-autoClosedBlock  ::= &("{block" macroArgs? T_MACRO_MODIFIERS? "}") macroOpenTag structureToken*
+//autoClosedBlock  ::= &("{block" macroContent? "}") macroOpenTag structureToken*
+autoClosedBlock  ::= macroOpenTag structureToken*
 
 
 
@@ -352,7 +353,7 @@ phpDoubleQuotedString ::= T_PHP_DOUBLE_QUOTE_LEFT (T_MACRO_ARGS_STRING | phpVari
 // tokens sets
 private
 structureToken   ::= outerHtml | macro | netteAttr
-                        | (pairMacro | unpairedMacro) // this two (pair | unpaired) are here only for error resolve in annotator
+                          | pairMacro | unpairedMacro // this two (pair | unpaired) are here only for error resolve in annotator
 
 
 private

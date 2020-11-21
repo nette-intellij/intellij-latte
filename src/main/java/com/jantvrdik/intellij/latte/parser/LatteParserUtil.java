@@ -8,13 +8,14 @@ import com.jantvrdik.intellij.latte.settings.LatteTagSettings;
 import com.jantvrdik.intellij.latte.utils.LatteHtmlUtil;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.EnumSet;
+
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
 
 /**
  * External rules for LatteParser.
  */
 public class LatteParserUtil extends GeneratedParserUtilBase {
-
 	/**
 	 * Looks for a classic macro a returns true if it finds the macro a and it is pair or unpaired (based on pair parameter).
 	 */
@@ -44,7 +45,7 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 
 			// all other macros which respect rules
 		} else {
-			result = (tag != null ? (tag.getType() == (pair ? LatteTagSettings.Type.PAIR : LatteTagSettings.Type.UNPAIRED)) : !pair);
+			result = (tag != null ? (pair ? (LatteTagSettings.Type.PAIR == tag.getType()) : LatteTagSettings.Type.unpairedSet.contains(tag.getType())) : !pair);
 		}
 
 		marker.rollbackTo();
