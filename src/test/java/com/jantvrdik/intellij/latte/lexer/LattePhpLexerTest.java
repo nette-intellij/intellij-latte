@@ -128,17 +128,16 @@ public class LattePhpLexerTest {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void testString() throws Exception {
+	public void testSingleQuotedString() throws Exception {
 		Lexer lexer = new LatteLexer();
-		lexer.start("{= \"te\"}");
+		lexer.start("{= 'te$var'}");
 		assertTokens(lexer, new Pair[] {
 			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
 			Pair.create(T_MACRO_SHORTNAME, "="),
 			Pair.create(T_WHITESPACE, " "),
-			Pair.create(T_PHP_DOUBLE_QUOTE_LEFT, "\""),
-			Pair.create(T_MACRO_ARGS_STRING, "t"),
-			Pair.create(T_MACRO_ARGS_STRING, "e"),
-			Pair.create(T_PHP_DOUBLE_QUOTE_RIGHT, "\""),
+			Pair.create(T_PHP_SINGLE_QUOTE_LEFT, "'"),
+			Pair.create(T_MACRO_ARGS_STRING, "te$var"),
+			Pair.create(T_PHP_SINGLE_QUOTE_RIGHT, "'"),
 			Pair.create(T_MACRO_TAG_CLOSE, "}"),
 		});
 
@@ -151,6 +150,35 @@ public class LattePhpLexerTest {
 			Pair.create(T_MACRO_ARGS_STRING, "t e"),
 			Pair.create(T_PHP_SINGLE_QUOTE_RIGHT, "'"),
 			Pair.create(T_MACRO_TAG_CLOSE, "}"),
+		});
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testDoubleQuotedString() throws Exception {
+		Lexer lexer = new LatteLexer();
+		lexer.start("{include \"some\"}");
+		assertTokens(lexer, new Pair[] {
+				Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
+				Pair.create(T_MACRO_NAME, "include"),
+				Pair.create(T_WHITESPACE, " "),
+				Pair.create(T_PHP_DOUBLE_QUOTE_LEFT, "\""),
+				Pair.create(T_MACRO_ARGS_STRING, "some"),
+				Pair.create(T_PHP_DOUBLE_QUOTE_RIGHT, "\""),
+				Pair.create(T_MACRO_TAG_CLOSE, "}"),
+		});
+
+		lexer.start("{include \"some$var text\"}");
+		assertTokens(lexer, new Pair[] {
+				Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
+				Pair.create(T_MACRO_NAME, "include"),
+				Pair.create(T_WHITESPACE, " "),
+				Pair.create(T_PHP_DOUBLE_QUOTE_LEFT, "\""),
+				Pair.create(T_MACRO_ARGS_STRING, "some"),
+				Pair.create(T_MACRO_ARGS_VAR, "$var"),
+				Pair.create(T_MACRO_ARGS_STRING, " text"),
+				Pair.create(T_PHP_DOUBLE_QUOTE_RIGHT, "\""),
+				Pair.create(T_MACRO_TAG_CLOSE, "}"),
 		});
 	}
 
@@ -461,6 +489,21 @@ public class LattePhpLexerTest {
 			Pair.create(T_HTML_CLOSE_TAG_OPEN, "</"),
 			Pair.create(T_TEXT, "a"),
 			Pair.create(T_HTML_TAG_CLOSE, ">"),
+		});
+
+		lexer.start("{link default id => 123}");
+		assertTokens(lexer, new Pair[] {
+			Pair.create(T_MACRO_OPEN_TAG_OPEN, "{"),
+			Pair.create(T_MACRO_NAME, "link"),
+			Pair.create(T_WHITESPACE, " "),
+			Pair.create(T_LINK_DESTINATION, "default"),
+			Pair.create(T_WHITESPACE, " "),
+			Pair.create(T_PHP_IDENTIFIER, "id"),
+			Pair.create(T_WHITESPACE, " "),
+			Pair.create(T_MACRO_ARGS, "=>"),
+			Pair.create(T_WHITESPACE, " "),
+			Pair.create(T_MACRO_ARGS_NUMBER, "123"),
+			Pair.create(T_MACRO_TAG_CLOSE, "}"),
 		});
 	}
 

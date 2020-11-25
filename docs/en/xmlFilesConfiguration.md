@@ -45,21 +45,21 @@ This is example file content with sample values:
 
 ### &lt;tag&gt; in &lt;tags&gt;
 
-| attribute         | required | default value | possible values                         | Description                          |
-|-------------------|----------|---------------|-----------------------------------------|--------------------------------------|
-| name              | yes      | none          | any string                              | Name for tag                         |
-| type              | yes      | none          | PAIR, UNPAIRED, ATTR_ONLY or AUTO_EMPTY | Type for tag                         |
-| arguments         | no       | ""            | any string                              | Used after code completion as help   |
-| allowedFilters    | no       | false         | true, false                             | Used for inspections and completions |
-| multiLine         | no       | false         | true, false                             | Used after code completion           |
-| deprecatedMessage | no       | ""            | any string                              | Message for deprecated tag           |
+| attribute         | required | default value | possible values                            | Description                          |
+|-------------------|----------|---------------|--------------------------------------------|--------------------------------------|
+| name              | yes      | none          | any string                                 | Name for tag                         |
+| type              | yes      | none          | PAIR, UNPAIRED, UNPAIRED_ATTR or ATTR_ONLY | Type for tag                         |
+| arguments         | no       | ""            | any string                                 | Used after code completion as help   |
+| allowedFilters    | no       | false         | true, false                                | Used for inspections and completions |
+| multiLine         | no       | false         | true, false                                | Used after code completion           |
+| deprecatedMessage | no       | ""            | any string                                 | Message for deprecated tag           |
 
 #### Attribute `type` detail:
 
 - `PAIR` - it means pair tag like `{form}{/form}`
 - `UNPAIRED` - it means unpaired tag like `{varType}`
+- `UNPAIRED_ATTR` - it means tag used only as unpaired tag like `{varType}` or n:attribute, like `n:else`
 - `ATTR_ONLY` - it means tag used only as n:attribute, like `n:class`
-- `AUTO_EMPTY` - it means pair tag which can be used as unpaired like `{label} | {label}{/label}`
 
 #### Attribute `arguments` detail:
 

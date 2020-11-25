@@ -16,7 +16,7 @@ public abstract class LattePhpMethodElementImpl extends StubBasedPsiElementBase<
 		super(node);
 	}
 
-	public LattePhpMethodElementImpl(final LattePhpMethodStub stub, final IStubElementType nodeType) {
+	public LattePhpMethodElementImpl(final @NotNull LattePhpMethodStub stub, final IStubElementType nodeType) {
 		super(stub, nodeType);
 	}
 

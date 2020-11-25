@@ -24,7 +24,7 @@
 	</template>
 	<template name="{fori" value="{for $INDEX$ = 0; $INDEX$ &lt; $LIMIT$; $INDEX$++}&#10;    $END$&#10;{/for}"
 			  description="{for i = 0; i &lt; limit; i++} … {/for}"
-			  toReformat="true"
+			  toReformat="false"
 			  toShortenFQNames="true">
 		<variable name="INDEX" expression="phpSuggestVariableName()" defaultValue="" alwaysStopAt="true" />
 		<variable name="LIMIT" expression="" defaultValue="" alwaysStopAt="true" />

@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class LattePhpType {
-    private static Map<String, LattePhpType> instances = new HashMap<>();
+    private static final Map<String, LattePhpType> instances = new HashMap<>();
 
     final public static LattePhpType MIXED = new LattePhpType("mixed");
     final public static LattePhpType STRING = new LattePhpType("string");
@@ -43,8 +43,8 @@ public class LattePhpType {
     private final List<Integer> mixed = new ArrayList<>();
     private final List<Integer> iterable = new ArrayList<>();
     private final List<Integer> natives = new ArrayList<>();
-    private Map<Integer, List<String>> classes = new HashMap<>();
-    private Map<Integer, LattePhpType> forDepth = new HashMap<>();
+    private final Map<Integer, List<String>> classes = new HashMap<>();
+    private final Map<Integer, LattePhpType> forDepth = new HashMap<>();
 
     @NotNull
     public static LattePhpType create(String type, boolean nullable) {
@@ -321,7 +321,7 @@ public class LattePhpType {
     private static class TypePart {
         int depth = 0;
 
-        private String part;
+        private final String part;
         private boolean isNative = false;
         private boolean isNull = false;
         private boolean isMixed = false;

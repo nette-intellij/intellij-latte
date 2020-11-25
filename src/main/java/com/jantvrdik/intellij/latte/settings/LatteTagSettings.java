@@ -5,10 +5,7 @@ import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class LatteTagSettings extends BaseLatteSettings implements Serializable {
 
@@ -121,6 +118,10 @@ public class LatteTagSettings extends BaseLatteSettings implements Serializable 
 		return deprecated;
 	}
 
+	public boolean isTagBlock() {
+		return getMacroName().equals("block");
+	}
+
 	@Attribute("DeprecatedMessage")
 	public String getDeprecatedMessage() {
 		return deprecatedMessage;
@@ -164,7 +165,13 @@ public class LatteTagSettings extends BaseLatteSettings implements Serializable 
 		/** macro is available only as unpaired classic macro, e.g. 'var' or 'link' */
 		UNPAIRED,
 
-		AUTO_EMPTY,
+		/** macro is available only as unpaired classic macro, e.g. 'var' or 'link' and as attribute macro without any prefix, e.g. 'n:href' or 'n:class' */
+		UNPAIRED_ATTR,
+
+		/** macro is available as pair or unpaired classic macro, e.g. 'block' or 'label' */
+		AUTO_EMPTY;
+
+		final public static EnumSet<Type> unpairedSet = java.util.EnumSet.of(UNPAIRED, UNPAIRED_ATTR);
 	}
 
 	public static boolean isValidType(String type) {
