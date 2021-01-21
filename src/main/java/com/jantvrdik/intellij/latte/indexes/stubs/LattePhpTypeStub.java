@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public abstract class LattePhpTypeStub<S extends StubElement, P extends PsiElement> extends ILightStubElementType<S, P> {
+abstract public class LattePhpTypeStub<S extends StubElement<?>, P extends PsiElement> extends ILightStubElementType<S, P> {
     public LattePhpTypeStub(@NotNull String debugName, @Nullable Language language) {
         super(debugName, language);
     }
