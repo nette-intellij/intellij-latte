@@ -21,7 +21,7 @@ root             ::= (structureToken)* autoClosedBlock?
 private
 //macro            ::= macroComment | macroClassic
 macro            ::= macroComment | (
-                                          <<checkPairMacro true>> (pairMacro | emptyMacro)
+                                         <<checkPairMacro true>> (<<checkEmptyMacro>> emptyMacro | pairMacro)
                                         | <<checkPairMacro false>> unpairedMacro
                                     )
 

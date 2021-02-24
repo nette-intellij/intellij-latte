@@ -2,6 +2,8 @@ package com.jantvrdik.intellij.latte.config;
 
 import com.intellij.notification.Notification;
 import com.intellij.openapi.actionSystem.ex.ActionUtil;
+import com.intellij.openapi.project.DumbService;
+import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.pom.PomTarget;
@@ -44,18 +46,28 @@ public class LatteFileConfiguration implements Serializable {
 
     private List<LatteConfiguration.Vendor> vendors = new ArrayList<>();
 
-    private Project project;
+    final private Project project;
+
+    final private Collection<LatteXmlFileData> xmlFileData;
 
     private Notification notification = null;
 
-    public LatteFileConfiguration(Project project) {
+    public LatteFileConfiguration(final Project project, final @Nullable Collection<LatteXmlFileData> xmlFileData) {
         this.project = project;
+        this.xmlFileData = xmlFileData;
         initialize();
     }
 
-    public static LatteFileConfiguration getInstance(Project project) {
+    public static LatteFileConfiguration getInstance(final @NotNull Project project) {
+        return getInstance(project, null);
+    }
+
+    public static LatteFileConfiguration getInstance(
+            final @NotNull Project project,
+            final @Nullable Collection<LatteXmlFileData> xmlFileData
+    ) {
         if (!instances.containsKey(project)) {
-            instances.put(project, new LatteFileConfiguration(project));
+            instances.put(project, new LatteFileConfiguration(project, xmlFileData));
         }
         return instances.get(project);
     }
@@ -65,26 +77,45 @@ public class LatteFileConfiguration implements Serializable {
             return;
         }
 
-        if (ActionUtil.isDumbMode(project)) {
+        if (xmlFileData != null) {
+            initializeFromXmlData(xmlFileData);
+        } else {
+            initializeFromFileIndex();
+        }
+    }
+
+    private void initializeFromXmlData(@NotNull Collection<LatteXmlFileData> xmlData) {
+        for (LatteXmlFileData data : xmlData) {
+            if (data == null) {
+                continue;
+            }
+            applyXmlData(data);
+        }
+    }
+
+    private void initializeFromFileIndex() {
+        if (false && ActionUtil.isDumbMode(project)) {
             if (notification == null || notification.isExpired() || LatteReparseFilesUtil.isNotificationOutdated(notification)) {
                 notification = LatteReparseFilesUtil.notifyReparseFiles(project);
             }
             return;
         }
 
-        Collection<String> val = FileBasedIndex.getInstance().getAllKeys(LatteIndexExtension.KEY, project);
-        for (String key : val) {
-            Collection<LatteXmlFileData> xmlFileData = FileBasedIndex.getInstance().getValues(
-                    LatteIndexExtension.KEY,
-                    key,
-                    GlobalSearchScope.allScope(project)
-            );
-            for (LatteXmlFileData data : xmlFileData) {
-                if (data == null) {
-                    continue;
+        try {
+            Collection<String> val = FileBasedIndex.getInstance().getAllKeys(LatteIndexExtension.KEY, project);
+            for (String key : val) {
+                Collection<LatteXmlFileData> xmlData = FileBasedIndex.getInstance().getValues(
+                        LatteIndexExtension.KEY,
+                        key,
+                        GlobalSearchScope.allScope(project)
+                );
+                if (xmlData != null) {
+                    initializeFromXmlData(xmlData);
                 }
-                applyXmlData(data);
             }
+
+        } catch (IndexNotReadyException e) {
+            notification = LatteReparseFilesUtil.notifyReparseFiles(project);
         }
         //PsiFile[] files = FilenameIndex.getFilesByName(project, FILE_NAME, GlobalSearchScope.allScope(project));
     }

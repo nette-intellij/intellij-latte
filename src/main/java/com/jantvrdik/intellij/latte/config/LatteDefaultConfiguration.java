@@ -31,16 +31,23 @@ public class LatteDefaultConfiguration {
 	@NotNull
 	private final Project project;
 
+	private final boolean disableLoading;
+
 	@Nullable
 	private Notification notification = null;
 
-	public LatteDefaultConfiguration(@NotNull Project project) {
+	public LatteDefaultConfiguration(@NotNull Project project, boolean disableLoading) {
 		this.project = project;
+		this.disableLoading = disableLoading;
 		reinitialize();
 	}
 
 	public void reinitialize() {
 		xmlData = new HashMap<>();
+		if (disableLoading) {
+			return;
+		}
+
 		LatteIdeHelper.saveFileToProjectTemp(project, "xmlSources/Latte.dtd");
 		for (String sourceFile : sourceFiles.keySet()) {
 			Path path = LatteIdeHelper.saveFileToProjectTemp(project, "xmlSources/" + sourceFile);
@@ -63,8 +70,12 @@ public class LatteDefaultConfiguration {
 	}
 
 	public static LatteDefaultConfiguration getInstance(@NotNull Project project) {
+		return getInstance(project, false);
+	}
+
+	public static LatteDefaultConfiguration getInstance(@NotNull Project project, boolean disableLoading) {
 		if (!instances.containsKey(project)) {
-			instances.put(project, new LatteDefaultConfiguration(project));
+			instances.put(project, new LatteDefaultConfiguration(project, disableLoading));
 		}
 		return instances.get(project);
 	}

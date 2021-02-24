@@ -5,12 +5,13 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
 import com.intellij.psi.stubs.IStubElementType;
+import com.jantvrdik.intellij.latte.indexes.LatteStubBasedPsiElement;
 import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpVariableStub;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpVariableElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class LattePhpVariableElementImpl extends StubBasedPsiElementBase<LattePhpVariableStub> implements LattePhpVariableElement {
+public abstract class LattePhpVariableElementImpl extends LatteStubBasedPsiElement<LattePhpVariableStub> implements LattePhpVariableElement {
 
 	public LattePhpVariableElementImpl(@NotNull ASTNode node) {
 		super(node);

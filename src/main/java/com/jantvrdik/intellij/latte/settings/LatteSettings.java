@@ -17,7 +17,7 @@ import java.util.List;
 @State(
 		name = "LattePluginSettings",
 		storages = {
-				@Storage("/latte.xml")
+				@Storage("latte.xml")
 		}
 )
 public class LatteSettings implements PersistentStateComponent<LatteSettings> {
