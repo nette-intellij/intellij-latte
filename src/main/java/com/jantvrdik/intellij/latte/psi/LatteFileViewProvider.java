@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 
 public class LatteFileViewProvider extends MultiplePsiFilesPerDocumentFileViewProvider implements TemplateLanguageFileViewProvider {
 
-	public static LatteElementType OUTER_LATTE = new LatteElementType("Outer latte");
+	public static LatteOuterElementType OUTER_LATTE = new LatteOuterElementType("Outer latte");
 	private static Pattern xmlContentType = Pattern.compile("^\\{contentType [^}]*xml[^}]*}.*");
 	private static IElementType templateDataElement = new LatteTemplateDataElementType(
 			"Outer HTML/XML in Latte",

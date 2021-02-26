@@ -10,6 +10,7 @@ import com.intellij.psi.PsiElement;
 import com.jantvrdik.intellij.latte.psi.LattePhpClassUsage;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
 import com.jetbrains.php.completion.insert.PhpReferenceInsertHandler;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.NotNull;
 
 public class PhpClassInsertHandler extends PhpReferenceInsertHandler {
@@ -21,28 +22,34 @@ public class PhpClassInsertHandler extends PhpReferenceInsertHandler {
 	}
 
 	public void handleInsert(@NotNull InsertionContext context, @NotNull LookupElement lookupElement) {
-		// for removing first `\` (because class completion is triggered if prev element is `\` and PHP completion adding `\` before)
-		super.handleInsert(context, lookupElement);
+		final Object object = lookupElement.getObject();
+		final String classNamespace = object instanceof PhpClass ? ((PhpClass) object).getNamespaceName() : "";
 
-		PsiElement prev = context.getFile().findElementAt(context.getStartOffset() - 1);
-		PsiElement element = context.getFile().findElementAt(context.getStartOffset());
-		String prevText = prev != null ? prev.getText() : null;
-		String text = element != null ? element.getText() : null;
-		if (prevText == null || text == null || (prevText.startsWith("\\") && !text.startsWith("\\"))) {
-			return;
-		}
-		LattePhpClassUsage classUsage = element.getParent() instanceof LattePhpClassUsage ? (LattePhpClassUsage) element.getParent() : null;
-		String[] className = (classUsage != null ? classUsage.getClassName() : "").split("\\\\");
+		if (!classNamespace.isEmpty()) {
+			int startOffset = context.getEditor().getCaretModel().getOffset();
+			String fileText = context.getEditor().getDocument().getText();
+			String current = fileText.substring(0, startOffset);
+			int lastSpace = current.lastIndexOf(" ");
+			current = current.substring(lastSpace + 1);
+			int index = current.lastIndexOf("\\");
+			String existingNamespace = "";
+			if (index > 0 && current.length() >= index) {
+				existingNamespace = current.substring(0, index) + "\\";
+			}
 
-		if ((prevText.length() > 0 || className.length > 1) && element.getNode().getElementType() == LatteTypes.T_PHP_NAMESPACE_RESOLUTION) {
-			Editor editor = context.getEditor();
-			CaretModel caretModel = editor.getCaretModel();
-			int offset = caretModel.getOffset();
-			caretModel.moveToOffset(element.getTextOffset());
-			editor.getSelectionModel().setSelection(element.getTextOffset(), element.getTextOffset() + 1);
-			EditorModificationUtil.deleteSelectedText(editor);
-			caretModel.moveToOffset(offset - 1);
-			PsiDocumentManager.getInstance(context.getProject()).commitDocument(editor.getDocument());
+			String fqn = classNamespace;
+			if (!classNamespace.equals("\\") && !existingNamespace.startsWith("\\") && fqn.startsWith("\\")) {
+				fqn = fqn.substring(1);
+			} else if (classNamespace.equals("\\") && existingNamespace.length() == 0) {
+				fqn = "\\";
+			}
+
+			if (existingNamespace.length() > 0 && fqn.contains(existingNamespace)) {
+				fqn = fqn.replace(existingNamespace, "");
+			}
+
+			context.getDocument().insertString(context.getStartOffset(), fqn);
+			PsiDocumentManager.getInstance(context.getProject()).commitDocument(context.getDocument());
 		}
 	}
 

@@ -29,7 +29,7 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 		boolean result;
 
 		LatteTagSettings tag = getTag(builder);
-		if (tag != null && tag.getType() == LatteTagSettings.Type.AUTO_EMPTY) {
+		if (tag == null || tag.getType() == LatteTagSettings.Type.AUTO_EMPTY) {
 			result = pair == isPair(macroName, builder);
 		} else if (macroName.equals("_")) {
 			// hard coded rule for macro _ because of dg's poor design decision
@@ -63,6 +63,27 @@ public class LatteParserUtil extends GeneratedParserUtilBase {
 		boolean result = (!isVoidTag && pair) || (isVoidTag && !pair);
 
 		marker.rollbackTo();
+		return result;
+	}
+
+	public static boolean checkEmptyMacro(PsiBuilder builder, int level)
+	{
+		PsiBuilder.Marker marker = builder.mark();
+		boolean result = false;
+		while (true) {
+			IElementType token = builder.getTokenType();
+			if (token == null) {
+				break;
+			} else if (token == LatteTypes.T_MACRO_TAG_CLOSE) {
+				break;
+			} else if (token == LatteTypes.T_MACRO_TAG_CLOSE_EMPTY) {
+				result = true;
+				break;
+			}
+			builder.advanceLexer();
+		}
+		marker.rollbackTo();
+
 		return result;
 	}
 

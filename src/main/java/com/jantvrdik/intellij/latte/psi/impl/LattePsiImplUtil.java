@@ -1,6 +1,7 @@
 package com.jantvrdik.intellij.latte.psi.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.notification.NotificationType;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecursiveElementVisitor;
 import com.intellij.psi.tree.IElementType;

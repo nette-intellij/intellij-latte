@@ -41,7 +41,7 @@ public class LattePhpUtil {
     }
 
     public static String normalizePhpVariable(String name) {
-        return name.startsWith("$") ? name.substring(1) : name;
+        return name == null ? null : (name.startsWith("$") ? name.substring(1) : name);
     }
 
     public static String normalizeMethodName(String name) {
