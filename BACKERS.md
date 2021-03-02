@@ -6,6 +6,10 @@ You can become one of them by [becoming a Sponsor](https://github.com/sponsors/m
 Check out all the tiers - higher ones include additional goodies like placing
 the logo of your company in Latte IntelliJ README.
 
+# $75 and more
+
+<a href="https://www.futurerockstars.cz/"><img src="https://i.imgur.com/lUsFO7X.png" alt="FutureRockstars" width="188" height="86"></a>
+
 # $25
 
 -
@@ -13,7 +17,6 @@ the logo of your company in Latte IntelliJ README.
 # $5
 
 * [David Šolc](https://solc.dev/)
-* Tomáš Kozák
-* Tomáš Reinert
-* Štěpán Kocourek
-* czPechy
+* [Štěpán Kocourek](https://github.com/stpnkcrk)
+* [Tomáš Reinert](https://github.com/ReinertTomas)
+* [czPechy](https://github.com/czPechy)
