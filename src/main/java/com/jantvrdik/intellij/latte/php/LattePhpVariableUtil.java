@@ -1,4 +1,4 @@
-package com.jantvrdik.intellij.latte.utils;
+package com.jantvrdik.intellij.latte.php;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
@@ -9,6 +9,9 @@ import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpStatementPartElement;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpTypedPartElement;
 import com.jantvrdik.intellij.latte.settings.LatteVariableSettings;
+import com.jantvrdik.intellij.latte.utils.LatteTypesUtil;
+import com.jantvrdik.intellij.latte.utils.LatteUtil;
+import com.jantvrdik.intellij.latte.utils.PsiPositionedElement;
 import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +26,7 @@ import java.util.stream.Collectors;
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
 
 public class LattePhpVariableUtil {
-    public static LattePhpType detectVariableType(@NotNull LattePhpVariable element) {
+    public static NettePhpType detectVariableType(@NotNull LattePhpVariable element) {
         String variableName = element.getVariableName();
         List<PsiPositionedElement> all = LatteUtil.findVariablesInFileBeforeElement(
                 element,
@@ -53,7 +56,7 @@ public class LattePhpVariableUtil {
             ) {
                 int startDepth = 0;
                 if (!(current.getParent() instanceof LattePhpArrayOfVariables)) {
-                    LattePhpType prevPhpType = findPrevPhpType((LattePhpVariable) current);
+                    NettePhpType prevPhpType = findPrevPhpType((LattePhpVariable) current);
                     if (prevPhpType != null) {
                         return prevPhpType;
                     }
@@ -77,11 +80,11 @@ public class LattePhpVariableUtil {
                 if (phpContent != null && statementPart != mainStatementPart) {
                     return detectVariableType(phpContent, startDepth);
                 }
-                return LattePhpType.MIXED;
+                return NettePhpType.MIXED;
             }
         }
 
-        LattePhpType templateType = detectVariableTypeFromTemplateType(element, variableName);
+        NettePhpType templateType = detectVariableTypeFromTemplateType(element, variableName);
         if (templateType != null) {
             return templateType;
         }
@@ -91,7 +94,7 @@ public class LattePhpVariableUtil {
             return defaultVariable.toPhpType();
         }
 
-        return LattePhpType.MIXED;
+        return NettePhpType.MIXED;
     }
 
     public static List<Field> findPhpFiledListFromTemplateTypeTag(@NotNull PsiElement element, @NotNull String variableName) {
@@ -99,16 +102,12 @@ public class LattePhpVariableUtil {
             return Collections.emptyList();
         }
 
-        LattePhpType templateType = LatteUtil.findFirstLatteTemplateType(element.getContainingFile());
+        NettePhpType templateType = LatteUtil.findFirstLatteTemplateType(element.getContainingFile());
         if (templateType == null) {
             return Collections.emptyList();
         }
 
         Collection<PhpClass> classes = templateType.getPhpClasses(element.getProject());
-        if (classes == null) {
-            return Collections.emptyList();
-        }
-
         List<Field> out = new ArrayList<>();
         for (PhpClass phpClass : classes) {
             for (Field field : phpClass.getFields()) {
@@ -121,16 +120,16 @@ public class LattePhpVariableUtil {
     }
 
     @Nullable
-    public static LattePhpType detectVariableTypeFromTemplateType(@NotNull PsiElement element, @NotNull String variableName) {
+    public static NettePhpType detectVariableTypeFromTemplateType(@NotNull PsiElement element, @NotNull String variableName) {
         List<Field> fields = findPhpFiledListFromTemplateTypeTag(element, variableName);
         if (fields.size() == 0) {
             return null;
         }
         Field field = fields.get(0);
-        return LattePhpType.create(field.getName(), field.getType().toString(), LattePhpUtil.isNullable(field.getType()));
+        return NettePhpType.create(field.getName(), field.getType().toString(), LattePhpUtil.isNullable(field.getType()));
     }
 
-    private static LattePhpType detectVariableType(@NotNull LattePhpContent phpContent, int startDepth) {
+    private static NettePhpType detectVariableType(@NotNull LattePhpContent phpContent, int startDepth) {
         final PsiElement[] varDefinition = {null};
         final boolean[] varDefinitionOperator = {false};
         List<PsiElement> otherParts = new ArrayList<>();
@@ -161,22 +160,22 @@ public class LattePhpVariableUtil {
         }
 
         if (startDepth > 0) {
-            return LattePhpType.MIXED;
+            return NettePhpType.MIXED;
 
         } else if (
                 otherParts.stream().anyMatch(element -> element instanceof LattePhpString
                         || element.getNode().getElementType() == T_PHP_CONCATENATION)
         ) {
-            return LattePhpType.STRING;
+            return NettePhpType.STRING;
 
         } else if (otherParts.stream().anyMatch(element -> element.getNode().getElementType() == T_MACRO_ARGS_NUMBER)) {
-            return LattePhpType.INT;
+            return NettePhpType.INT;
 
         } else if (otherParts.stream().anyMatch(element -> element instanceof LattePhpArray || element instanceof LattePhpArrayOfVariables)) {
-            return LattePhpType.ARRAY;
+            return NettePhpType.ARRAY;
         }
 
-        return LattePhpType.MIXED;
+        return NettePhpType.MIXED;
     }
 
     public static boolean isNextDefinitionOperator(@NotNull PsiElement element) {
@@ -197,7 +196,7 @@ public class LattePhpVariableUtil {
     }
 
     @Nullable
-    private static LattePhpType findPrevPhpType(LattePhpVariable element) {
+    private static NettePhpType findPrevPhpType(LattePhpVariable element) {
         LattePhpTypedPartElement typedElement = PsiTreeUtil.getParentOfType(element, LattePhpTypedPartElement.class);
         if (typedElement != null) {
             return typedElement.getPhpType();

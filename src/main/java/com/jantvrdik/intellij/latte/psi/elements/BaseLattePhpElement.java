@@ -2,8 +2,8 @@ package com.jantvrdik.intellij.latte.psi.elements;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
+import com.jantvrdik.intellij.latte.php.NettePhpType;
 import com.jantvrdik.intellij.latte.psi.LattePhpArrayUsage;
-import com.jantvrdik.intellij.latte.utils.LattePhpType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,9 +14,9 @@ public interface BaseLattePhpElement extends PsiNameIdentifierOwner {
 	@NotNull
 	List<LattePhpArrayUsage> getPhpArrayUsageList();
 
-	public abstract LattePhpType getPhpType();
+	public abstract NettePhpType getPhpType();
 
-	public abstract LattePhpType getReturnType();
+	public abstract NettePhpType getReturnType();
 
 	public abstract String getPhpElementName();
 

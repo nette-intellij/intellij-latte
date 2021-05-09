@@ -10,10 +10,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.jantvrdik.intellij.latte.completion.handlers.PhpVariableInsertHandler;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
+import com.jantvrdik.intellij.latte.php.NettePhpType;
 import com.jantvrdik.intellij.latte.settings.LatteVariableSettings;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LattePhpVariable;
-import com.jantvrdik.intellij.latte.utils.LattePhpType;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import com.jantvrdik.intellij.latte.utils.PsiPositionedElement;
 import com.jetbrains.php.PhpIcons;
@@ -49,25 +49,23 @@ public class LatteVariableCompletionProvider extends BaseLatteCompletionProvider
 	}
 
 	private void attachTemplateTypeCompletions(@NotNull CompletionResultSet result, @NotNull Project project, @NotNull LatteFile file) {
-		LattePhpType type = LatteUtil.findFirstLatteTemplateType(file);
+		NettePhpType type = LatteUtil.findFirstLatteTemplateType(file);
 		if (type == null) {
 			return;
 		}
 
 		Collection<PhpClass> phpClasses = type.getPhpClasses(project);
-		if (phpClasses != null) {
-			for (PhpClass phpClass : phpClasses) {
-				for (Field field : phpClass.getFields()) {
-					if (!field.isConstant() && field.getModifier().isPublic()) {
-						LookupElementBuilder builder = LookupElementBuilder.create(field, "$" + field.getName());
-						builder = builder.withInsertHandler(PhpVariableInsertHandler.getInstance());
-						builder = builder.withTypeText(LattePhpType.create(field.getType()).toString());
-						builder = builder.withIcon(PhpIcons.VARIABLE);
-						if (field.isDeprecated() || field.isInternal()) {
-							builder = builder.withStrikeoutness(true);
-						}
-						result.addElement(builder);
+		for (PhpClass phpClass : phpClasses) {
+			for (Field field : phpClass.getFields()) {
+				if (!field.isConstant() && field.getModifier().isPublic()) {
+					LookupElementBuilder builder = LookupElementBuilder.create(field, "$" + field.getName());
+					builder = builder.withInsertHandler(PhpVariableInsertHandler.getInstance());
+					builder = builder.withTypeText(NettePhpType.create(field.getType()).toString());
+					builder = builder.withIcon(PhpIcons.VARIABLE);
+					if (field.isDeprecated() || field.isInternal()) {
+						builder = builder.withStrikeoutness(true);
 					}
+					result.addElement(builder);
 				}
 			}
 		}

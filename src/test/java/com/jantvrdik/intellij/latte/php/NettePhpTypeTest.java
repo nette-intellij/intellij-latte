@@ -1,13 +1,12 @@
-package com.jantvrdik.intellij.latte.utils;
+package com.jantvrdik.intellij.latte.php;
 
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class LattePhpTypeTest {
+public class NettePhpTypeTest {
 	@Test
-	@SuppressWarnings("unchecked")
-	public void testReadableString() throws Exception {
+	public void testReadableString() {
 		assertLattePhpType("string", "string");
 		assertLattePhpType("int", "Int");
 		assertLattePhpType("callable", "callable");
@@ -22,8 +21,7 @@ public class LattePhpTypeTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
-	public void testClassNames() throws Exception {
+	public void testClassNames() {
 		assertLattePhpTypeClasses(new String[]{}, "string");
 		assertLattePhpTypeClasses(new String[]{}, "Int");
 		assertLattePhpTypeClasses(new String[]{}, "callable");
@@ -38,8 +36,7 @@ public class LattePhpTypeTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
-	public void testClassNamesForDepth() throws Exception {
+	public void testClassNamesForDepth() {
 		assertLattePhpTypeClasses(1, new String[]{}, "Iterable|NULL");
 		assertLattePhpTypeClasses(1, new String[]{}, "Iterable[]|null");
 		assertLattePhpTypeClasses(1, new String[]{}, "\\Foo\\Bar\\TestClass");
@@ -50,8 +47,7 @@ public class LattePhpTypeTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
-	public void testIsNullable() throws Exception {
+	public void testIsNullable() {
 		assertIsNullable(false, "string");
 		assertIsNullable(false, "Int");
 		assertIsNullable(false, "callable");
@@ -71,8 +67,7 @@ public class LattePhpTypeTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
-	public void testIsNative() throws Exception {
+	public void testIsNative() {
 		assertIsNative(true, "string");
 		assertIsNative(true, "Int");
 		assertIsNative(true, "callable");
@@ -90,8 +85,7 @@ public class LattePhpTypeTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
-	public void testIsMixed() throws Exception {
+	public void testIsMixed() {
 		assertIsMixed(true, "mixed");
 		assertIsMixed(false, "mixed[]");
 		assertIsMixed(false, "Int");
@@ -107,8 +101,23 @@ public class LattePhpTypeTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
-	public void testHasClass() throws Exception {
+	public void testIsIterable() {
+		assertIsIterable(false, "mixed");
+		assertIsIterable(true, "mixed[]");
+		assertIsIterable(false, "Int");
+		assertIsIterable(false, "callable");
+		assertIsIterable(true, "Iterable[]|null");
+		assertIsIterable(false, "\\Foo\\Bar\\TestClass");
+		assertIsIterable(false, "Foo\\Bar\\TestClass|\\Bar\\TestClass");
+		assertIsIterable(true, "Foo\\Bar\\TestClass[][]|String|null");
+
+		assertIsIterable(1, false, "Iterable[]");
+		assertIsIterable(2, true, "mixed[][][]");
+		assertIsIterable(5, false, "string[][]");
+	}
+
+	@Test
+	public void testHasClass() {
 		assertHasClass("\\Foo\\Bar", "string", false);
 		assertHasClass("Foo\\Bar", "Int", false);
 		assertHasClass("Int", "Int", false);
@@ -123,16 +132,37 @@ public class LattePhpTypeTest {
 		assertHasClass("\\Unknown", "Unknown|String|NULL", true);
 	}
 
+	@Test
+	public void testWithDepth() {
+		NettePhpType phpType = NettePhpType.create("Foo\\TestClass[][]|String|null");
+		assertEquals("\\Foo\\TestClass[][]|string|null", phpType.toString());
+		assertTrue(phpType.isIterable());
+		assertTrue("Must be nullable", phpType.isNullable());
+
+		NettePhpType firstDepth = phpType.withDepth(1);
+		assertEquals("\\Foo\\TestClass[]", firstDepth.toString());
+		assertTrue(firstDepth.isIterable());
+		assertFalse(firstDepth.isNullable());
+		assertFalse(firstDepth.containsClasses());
+
+		NettePhpType secondDepth = firstDepth.withDepth(1);
+		assertEquals(secondDepth.toString(), phpType.withDepth(2).toString());
+		assertEquals("\\Foo\\TestClass", secondDepth.toString());
+		assertFalse(secondDepth.isIterable());
+		assertFalse(secondDepth.isNullable());
+		assertTrue(secondDepth.containsClasses());
+	}
+
 	public static void assertLattePhpType(String expected, String type) {
-		assertEquals(expected, LattePhpType.create(type).toString());
+		assertEquals(expected, NettePhpType.create(type).toString());
 	}
 
 	public static void assertLattePhpTypeClasses(String[] expected, String type) {
-		assertArrayEquals(expected, LattePhpType.create(type).findClasses());
+		assertArrayEquals(expected, NettePhpType.create(type).findClasses());
 	}
 
 	public static void assertLattePhpTypeClasses(int depth, String[] expected, String type) {
-		assertArrayEquals(expected, LattePhpType.create(type).findClasses(depth));
+		assertArrayEquals(expected, NettePhpType.create(type).findClasses(depth));
 	}
 
 	public static void assertIsNullable(boolean nullable, String type) {
@@ -141,9 +171,9 @@ public class LattePhpTypeTest {
 
 	public static void assertIsNullable(int depth, boolean nullable, String type) {
 		if (nullable) {
-			assertTrue(LattePhpType.create(type).isNullable(depth));
+			assertTrue(NettePhpType.create(type).isNullable(depth));
 		} else {
-			assertFalse(LattePhpType.create(type).isNullable(depth));
+			assertFalse(NettePhpType.create(type).isNullable(depth));
 		}
 	}
 
@@ -153,9 +183,9 @@ public class LattePhpTypeTest {
 
 	public static void assertIsNative(int depth, boolean isNative, String type) {
 		if (isNative) {
-			assertTrue(LattePhpType.create(type).isNative(depth));
+			assertTrue(NettePhpType.create(type).isNative(depth));
 		} else {
-			assertFalse(LattePhpType.create(type).isNative(depth));
+			assertFalse(NettePhpType.create(type).isNative(depth));
 		}
 	}
 
@@ -165,17 +195,29 @@ public class LattePhpTypeTest {
 
 	public static void assertIsMixed(int depth, boolean isMixed, String type) {
 		if (isMixed) {
-			assertTrue(LattePhpType.create(type).isMixed(depth));
+			assertTrue(NettePhpType.create(type).isMixed(depth));
 		} else {
-			assertFalse(LattePhpType.create(type).isMixed(depth));
+			assertFalse(NettePhpType.create(type).isMixed(depth));
+		}
+	}
+
+	public static void assertIsIterable(boolean isIterable, String type) {
+		assertIsIterable(0, isIterable, type);
+	}
+
+	public static void assertIsIterable(int depth, boolean isIterable, String type) {
+		if (isIterable) {
+			assertTrue(NettePhpType.create(type).isIterable(depth));
+		} else {
+			assertFalse(NettePhpType.create(type).isIterable(depth));
 		}
 	}
 
 	public static void assertHasClass(String expected, String type, boolean has) {
 		if (has) {
-			assertTrue(LattePhpType.create(type).hasClass(expected));
+			assertTrue(NettePhpType.create(type).hasClass(expected));
 		} else {
-			assertFalse(LattePhpType.create(type).hasClass(expected));
+			assertFalse(NettePhpType.create(type).hasClass(expected));
 		}
 	}
 }

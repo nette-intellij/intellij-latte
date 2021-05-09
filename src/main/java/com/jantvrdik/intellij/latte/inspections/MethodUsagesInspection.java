@@ -4,17 +4,16 @@ import com.intellij.codeInsight.intention.IntentionManager;
 import com.intellij.codeInspection.InspectionManager;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
-import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.intentions.AddCustomLatteFunction;
+import com.jantvrdik.intellij.latte.php.NettePhpType;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LattePhpMethod;
 import com.jantvrdik.intellij.latte.settings.LatteFunctionSettings;
-import com.jantvrdik.intellij.latte.utils.LattePhpType;
-import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
+import com.jantvrdik.intellij.latte.php.LattePhpUtil;
 import com.jetbrains.php.lang.psi.elements.Function;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
@@ -100,37 +99,35 @@ public class MethodUsagesInspection extends BaseLocalInspectionTool {
 			@NotNull final InspectionManager manager,
 			final boolean isOnTheFly
 	) {
-		LattePhpType phpType = element.getPhpType();
+		NettePhpType phpType = element.getPhpType();
 
 		boolean isFound = false;
 		Collection<PhpClass> phpClasses = phpType.getPhpClasses(element.getProject());
 		String methodName = element.getMethodName();
-		if (phpClasses != null) {
-			for (PhpClass phpClass : phpClasses) {
-				for (Method method : phpClass.getMethods()) {
-					if (method.getName().equals(methodName)) {
-						if (method.getModifier().isPrivate()) {
-							addProblem(manager, problems, getElementToLook(element), "Used private method '" + methodName + "'", isOnTheFly);
-						} else if (method.getModifier().isProtected()) {
-							addProblem(manager, problems, getElementToLook(element), "Used protected method '" + methodName + "'", isOnTheFly);
-						} else if (method.isDeprecated()) {
-							addDeprecated(manager, problems, getElementToLook(element), "Used method '" + methodName + "' is marked as deprecated", isOnTheFly);
-						} else if (method.isInternal()) {
-							addDeprecated(manager, problems, getElementToLook(element), "Used method '" + methodName + "' is marked as internal", isOnTheFly);
-						}
-
-						String description;
-						boolean isStatic = element.isStatic();
-						if (isStatic && !method.getModifier().isStatic()) {
-							description = "Method '" + methodName + "' is not static but called statically";
-							addProblem(manager, problems, getElementToLook(element), description, isOnTheFly);
-
-						} else if (!isStatic && method.getModifier().isStatic()) {
-							description = "Method '" + methodName + "' is static but called non statically";
-							addProblem(manager, problems, getElementToLook(element), description, isOnTheFly);
-						}
-						isFound = true;
+		for (PhpClass phpClass : phpClasses) {
+			for (Method method : phpClass.getMethods()) {
+				if (method.getName().equals(methodName)) {
+					if (method.getModifier().isPrivate()) {
+						addProblem(manager, problems, getElementToLook(element), "Used private method '" + methodName + "'", isOnTheFly);
+					} else if (method.getModifier().isProtected()) {
+						addProblem(manager, problems, getElementToLook(element), "Used protected method '" + methodName + "'", isOnTheFly);
+					} else if (method.isDeprecated()) {
+						addDeprecated(manager, problems, getElementToLook(element), "Used method '" + methodName + "' is marked as deprecated", isOnTheFly);
+					} else if (method.isInternal()) {
+						addDeprecated(manager, problems, getElementToLook(element), "Used method '" + methodName + "' is marked as internal", isOnTheFly);
 					}
+
+					String description;
+					boolean isStatic = element.isStatic();
+					if (isStatic && !method.getModifier().isStatic()) {
+						description = "Method '" + methodName + "' is not static but called statically";
+						addProblem(manager, problems, getElementToLook(element), description, isOnTheFly);
+
+					} else if (!isStatic && method.getModifier().isStatic()) {
+						description = "Method '" + methodName + "' is static but called non statically";
+						addProblem(manager, problems, getElementToLook(element), description, isOnTheFly);
+					}
+					isFound = true;
 				}
 			}
 		}

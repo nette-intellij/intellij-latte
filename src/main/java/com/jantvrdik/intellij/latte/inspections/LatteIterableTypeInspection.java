@@ -5,12 +5,12 @@ import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
+import com.jantvrdik.intellij.latte.php.NettePhpType;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LattePhpArrayUsage;
 import com.jantvrdik.intellij.latte.psi.LattePhpForeach;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
-import com.jantvrdik.intellij.latte.utils.LattePhpType;
-import com.jantvrdik.intellij.latte.utils.LattePhpVariableUtil;
+import com.jantvrdik.intellij.latte.php.LattePhpVariableUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,7 +46,7 @@ public class LatteIterableTypeInspection extends BaseLocalInspectionTool {
 					}
 
 				} else if (element instanceof LattePhpForeach) {
-					LattePhpType type = ((LattePhpForeach) element).getPhpExpression().getPhpType();
+					NettePhpType type = ((LattePhpForeach) element).getPhpExpression().getPhpType();
 					if (!type.isMixed() && !type.isIterable(element.getProject())) {
 						addProblem(
 								manager,

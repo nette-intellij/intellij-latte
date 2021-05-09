@@ -4,7 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.jantvrdik.intellij.latte.indexes.extensions.*;
 import com.jantvrdik.intellij.latte.psi.*;
-import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
+import com.jantvrdik.intellij.latte.php.LattePhpUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;

@@ -28,7 +28,7 @@ public class LatteReparseFilesUtil {
                 "File latte-intellij.xml was removed. You can refresh configurations.",
                 NotificationType.INFORMATION,
                 null,
-                new NotificationAction("Refresh Configuration") {
+                new NotificationAction("Refresh configuration") {
                     @Override
                     public void actionPerformed(@NotNull AnActionEvent e, @NotNull Notification notification) {
                         tryPerform(projects.toArray(new Project[0]), notification);
@@ -82,7 +82,7 @@ public class LatteReparseFilesUtil {
                 NotificationType.WARNING,
                 project,
                 true,
-                new NotificationAction("Reparse Latte Files") {
+                new NotificationAction("Reparse latte files") {
                     @Override
                     public void actionPerformed(@NotNull AnActionEvent e, @NotNull Notification current) {
                         tryPerform(new Project[]{project}, current);
@@ -98,7 +98,7 @@ public class LatteReparseFilesUtil {
                 NotificationType.WARNING,
                 project,
                 true,
-                new NotificationAction("Reparse Latte Files") {
+                new NotificationAction("Reparse latte files") {
                     @Override
                     public void actionPerformed(@NotNull AnActionEvent e, @NotNull Notification current) {
                         tryPerformReadLock(new Project[]{project}, current);
@@ -151,7 +151,7 @@ public class LatteReparseFilesUtil {
                 "Latte files can not be reparsed during indexing. Wait after all processes around indexing will be done.",
                 NotificationType.ERROR,
                 projects[0],
-                new NotificationAction("Refresh Configuration") {
+                new NotificationAction("Refresh configuration") {
                     @Override
                     public void actionPerformed(@NotNull AnActionEvent e, @NotNull Notification notification) {
                         tryPerform(projects, notification);

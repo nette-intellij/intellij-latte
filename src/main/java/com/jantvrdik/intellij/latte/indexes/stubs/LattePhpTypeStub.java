@@ -3,7 +3,7 @@ package com.jantvrdik.intellij.latte.indexes.stubs;
 import com.intellij.lang.Language;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.*;
-import com.jantvrdik.intellij.latte.utils.LattePhpType;
+import com.jantvrdik.intellij.latte.php.NettePhpType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,7 +17,7 @@ abstract public class LattePhpTypeStub<S extends StubElement<?>, P extends PsiEl
         super(debugName, language);
     }
 
-    protected static void writePhpType(StubOutputStream dataStream, @NotNull LattePhpType type) throws IOException {
+    protected static void writePhpType(StubOutputStream dataStream, @NotNull NettePhpType type) throws IOException {
         Collection<String> types = type.getTypes();
         dataStream.writeVarInt(types.size());
         for (String s : types) {
@@ -26,7 +26,7 @@ abstract public class LattePhpTypeStub<S extends StubElement<?>, P extends PsiEl
     }
 
     @NotNull
-    protected static LattePhpType readPhpType(StubInputStream dataStream) throws IOException {
+    protected static NettePhpType readPhpType(StubInputStream dataStream) throws IOException {
         int i = dataStream.readVarInt();
 
         List<String> types = new ArrayList<>();
@@ -36,6 +36,6 @@ abstract public class LattePhpTypeStub<S extends StubElement<?>, P extends PsiEl
                 types.add(s);
             }
         }
-        return LattePhpType.create(String.join("|", types));
+        return NettePhpType.create(String.join("|", types));
     }
 }

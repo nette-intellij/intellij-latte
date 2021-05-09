@@ -6,10 +6,10 @@ import com.intellij.pom.PomTargetPsiElement;
 import com.intellij.psi.*;
 import com.intellij.psi.xml.XmlAttributeValue;
 import com.jantvrdik.intellij.latte.config.LatteFileConfiguration;
+import com.jantvrdik.intellij.latte.php.NettePhpType;
 import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
-import com.jantvrdik.intellij.latte.utils.LattePhpType;
-import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
+import com.jantvrdik.intellij.latte.php.LattePhpUtil;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import com.jantvrdik.intellij.latte.utils.PsiPositionedElement;
 import com.jetbrains.php.lang.psi.elements.Field;
@@ -20,8 +20,8 @@ import java.util.*;
 
 public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
 
-    private String variableName;
-    private boolean definition;
+    private final String variableName;
+    private final boolean definition;
 
     public LattePhpVariableReference(@NotNull LattePhpVariable element, TextRange textRange) {
         super(element, textRange);
@@ -42,7 +42,7 @@ public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> impl
             results.add(new PsiElementResolveResult(attributeValue));
         }
 
-        LattePhpType fields = LatteUtil.findFirstLatteTemplateType(getElement().getContainingFile());
+        NettePhpType fields = LatteUtil.findFirstLatteTemplateType(getElement().getContainingFile());
         String name = ((BaseLattePhpElement) getElement()).getPhpElementName();
         if (fields != null) {
             for (PhpClass phpClass : fields.getPhpClasses(project)) {

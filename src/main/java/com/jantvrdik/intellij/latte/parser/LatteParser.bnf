@@ -320,7 +320,7 @@ phpPrivateArgument    ::=  phpString | phpArrayOfVariables | phpTypedArguments |
                     | macroModifier | T_PHP_IDENTIFIER | T_PHP_MACRO_SEPARATOR | T_PHP_OR_INCLUSIVE | T_PHP_DEFINITION_OPERATOR
 
 phpExpression    ::= (expression | T_MACRO_ARGS)* {
-                           methods=[getPhpType]
+                           methods=[getPhpType getPhpArrayLevel]
                            implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpExpressionElement"
                        }
 

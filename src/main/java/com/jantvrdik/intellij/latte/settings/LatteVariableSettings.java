@@ -2,7 +2,7 @@ package com.jantvrdik.intellij.latte.settings;
 
 import com.intellij.util.xmlb.annotations.Attribute;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.utils.LattePhpType;
+import com.jantvrdik.intellij.latte.php.NettePhpType;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import java.io.Serializable;
@@ -35,8 +35,8 @@ public class LatteVariableSettings extends BaseLatteSettings implements Serializ
 		this.varType = varType;
 	}
 
-	public LattePhpType toPhpType() {
-		return LattePhpType.create(varName, varType);
+	public NettePhpType toPhpType() {
+		return NettePhpType.create(varName, varType);
 	}
 
 	@Attribute("VarName")

@@ -21,7 +21,19 @@ public class LatteTypesUtil {
 
     final public static TokenSet whitespaceTokens = TokenSet.create(LatteTypes.T_WHITESPACE, TokenType.WHITE_SPACE);
 
-    final public static TokenSet methodTokens = TokenSet.create(LatteTypes.T_PHP_IDENTIFIER, LatteTypes.T_PHP_NAMESPACE_REFERENCE);
+    final public static TokenSet methodTokens = TokenSet.create(LatteTypes.T_PHP_IDENTIFIER, LatteTypes.T_PHP_NAMESPACE_REFERENCE, LatteTypes.PHP_VARIABLE);
+
+    final public static TokenSet phpTypeTokens = TokenSet.create(
+        LatteTypes.T_PHP_TYPE,
+        LatteTypes.T_PHP_NULL,
+        LatteTypes.T_PHP_MIXED,
+        LatteTypes.T_PHP_NAMESPACE_RESOLUTION,
+        LatteTypes.T_PHP_NAMESPACE_REFERENCE,
+        LatteTypes.T_PHP_IDENTIFIER,
+        LatteTypes.T_PHP_OR_INCLUSIVE,
+        LatteTypes.T_PHP_LEFT_BRACKET,
+        LatteTypes.T_PHP_RIGHT_BRACKET
+    );
 
     public static String[] getNativeClassConstants() {
         return nativeClassConstants;

@@ -8,14 +8,14 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.*;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.util.Processor;
+import com.jantvrdik.intellij.latte.php.NettePhpType;
 import com.jantvrdik.intellij.latte.psi.LattePhpClassUsage;
 import com.jantvrdik.intellij.latte.psi.LattePhpStaticVariable;
 import com.jantvrdik.intellij.latte.psi.LattePhpVariable;
 import com.jantvrdik.intellij.latte.reference.references.LattePhpClassReference;
 import com.jantvrdik.intellij.latte.reference.references.LattePhpStaticVariableReference;
 import com.jantvrdik.intellij.latte.reference.references.LattePhpVariableReference;
-import com.jantvrdik.intellij.latte.utils.LattePhpType;
-import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
+import com.jantvrdik.intellij.latte.php.LattePhpUtil;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
@@ -39,6 +39,11 @@ public class LatteReferenceSearch extends QueryExecutorBase<PsiReference, Refere
         ApplicationManager.getApplication().runReadAction(() -> {
             String fieldName = phpClass.getFQN();
 
+            String searchString = fieldName.startsWith("\\") ? fieldName.substring(1) : fieldName;
+            if (searchString.length() == 0) {
+                return;
+            }
+
             PsiSearchHelper.getInstance(phpClass.getProject())
                     .processElementsWithWord(new TextOccurenceProcessor() {
                         @Override
@@ -47,11 +52,10 @@ public class LatteReferenceSearch extends QueryExecutorBase<PsiReference, Refere
                             if (currentClass instanceof LattePhpClassUsage) {
                                 String value = ((LattePhpClassUsage) currentClass).getClassName();
                                 processor.process(new LattePhpClassReference((LattePhpClassUsage) currentClass, new TextRange(0, value.length())));
-
                             }
                             return true;
                         }
-                    }, searchScope, fieldName.startsWith("\\") ? fieldName.substring(1) : fieldName, UsageSearchContext.IN_CODE, true);
+                    }, searchScope, searchString, UsageSearchContext.IN_CODE, true);
         });
     }
 
@@ -72,16 +76,12 @@ public class LatteReferenceSearch extends QueryExecutorBase<PsiReference, Refere
                                 processor.process(new LattePhpStaticVariableReference((LattePhpStaticVariable) currentMethod, new TextRange(0, value.length() + 1)));
 
                             } else if (currentMethod instanceof LattePhpVariable && field.getContainingClass() != null) {
-                                LattePhpType type = LatteUtil.findFirstLatteTemplateType(currentMethod.getContainingFile());
+                                NettePhpType type = LatteUtil.findFirstLatteTemplateType(currentMethod.getContainingFile());
                                 if (type == null) {
                                     return true;
                                 }
 
                                 Collection<PhpClass> classes = type.getPhpClasses(psiElement.getProject());
-                                if (classes == null) {
-                                    return true;
-                                }
-
                                 for (PhpClass phpClass : classes) {
                                     if (LattePhpUtil.isReferenceFor(field.getContainingClass(), phpClass)) {
                                         String value = ((LattePhpVariable) currentMethod).getVariableName();

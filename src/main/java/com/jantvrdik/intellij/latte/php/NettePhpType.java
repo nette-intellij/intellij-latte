@@ -1,4 +1,4 @@
-package com.jantvrdik.intellij.latte.utils;
+package com.jantvrdik.intellij.latte.php;
 
 import com.intellij.openapi.project.Project;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
@@ -9,34 +9,44 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class LattePhpType {
-    private static final Map<String, LattePhpType> instances = new HashMap<>();
+public class NettePhpType {
+    private static final Map<String, NettePhpType> instances = new HashMap<>();
 
-    final public static LattePhpType MIXED = new LattePhpType("mixed");
-    final public static LattePhpType STRING = new LattePhpType("string");
-    final public static LattePhpType INT = new LattePhpType("int");
-    final public static LattePhpType BOOL = new LattePhpType("bool");
-    final public static LattePhpType OBJECT = new LattePhpType("object");
-    final public static LattePhpType FLOAT = new LattePhpType("float");
-    final public static LattePhpType ARRAY = new LattePhpType("array");
-    final public static LattePhpType NULL = new LattePhpType("null");
-    final public static LattePhpType CALLABLE = new LattePhpType("callable");
-    final public static LattePhpType ITERABLE = new LattePhpType("iterable");
+    final private static String[] nativeClassConstants = new String[]{"class"};
 
-    final private static Map<String, LattePhpType[]> nativeTypes = new HashMap<String, LattePhpType[]>() {{
-        put("string", new LattePhpType[]{STRING, new LattePhpType("mixed|null"), new LattePhpType("mixed[]")});
-        put("int", new LattePhpType[]{INT, new LattePhpType("int|null"), new LattePhpType("int[]")});
-        put("bool", new LattePhpType[]{BOOL, new LattePhpType("bool|null"), new LattePhpType("bool[]")});
-        put("object", new LattePhpType[]{OBJECT, new LattePhpType("object|null"), new LattePhpType("object[]")});
-        put("float", new LattePhpType[]{FLOAT, new LattePhpType("float|null"), new LattePhpType("float[]")});
-        put("array", new LattePhpType[]{ARRAY, new LattePhpType("array|null"), new LattePhpType("array[]")});
-        put("mixed", new LattePhpType[]{MIXED, new LattePhpType("mixed|null"), new LattePhpType("mixed[]")});
-        put("null", new LattePhpType[]{NULL, new LattePhpType("null"), new LattePhpType("null[]")});
-        put("callable", new LattePhpType[]{CALLABLE, new LattePhpType("callable|null"), new LattePhpType("callable[]")});
-        put("iterable", new LattePhpType[]{ITERABLE, new LattePhpType("iterable|null"), new LattePhpType("iterable[]")});
+    final private static String[] nativeTypeHints = new String[]{"string", "int", "bool", "object", "float", "array", "mixed", "null", "callable", "iterable"};
+
+    final private static String[] iterableTypes = new String[]{"\\Iterator", "\\Generator"};
+
+    final private static String[] nativeIterableTypeHints = new String[]{"array", "iterable"};
+
+    final private static String[] magicMethods = new String[]{"__construct", "__callstatic", "__call", "__get", "__isset", "__clone", "__set", "__unset"};
+
+    final public static NettePhpType MIXED = new NettePhpType("mixed");
+    final public static NettePhpType STRING = new NettePhpType("string");
+    final public static NettePhpType INT = new NettePhpType("int");
+    final public static NettePhpType BOOL = new NettePhpType("bool");
+    final public static NettePhpType OBJECT = new NettePhpType("object");
+    final public static NettePhpType FLOAT = new NettePhpType("float");
+    final public static NettePhpType ARRAY = new NettePhpType("array");
+    final public static NettePhpType NULL = new NettePhpType("null");
+    final public static NettePhpType CALLABLE = new NettePhpType("callable");
+    final public static NettePhpType ITERABLE = new NettePhpType("iterable");
+
+    final private static Map<String, NettePhpType[]> nativeTypes = new HashMap<String, NettePhpType[]>() {{
+        put("string", new NettePhpType[]{STRING, new NettePhpType("mixed|null"), new NettePhpType("mixed[]")});
+        put("int", new NettePhpType[]{INT, new NettePhpType("int|null"), new NettePhpType("int[]")});
+        put("bool", new NettePhpType[]{BOOL, new NettePhpType("bool|null"), new NettePhpType("bool[]")});
+        put("object", new NettePhpType[]{OBJECT, new NettePhpType("object|null"), new NettePhpType("object[]")});
+        put("float", new NettePhpType[]{FLOAT, new NettePhpType("float|null"), new NettePhpType("float[]")});
+        put("array", new NettePhpType[]{ARRAY, new NettePhpType("array|null"), new NettePhpType("array[]")});
+        put("mixed", new NettePhpType[]{MIXED, new NettePhpType("mixed|null"), new NettePhpType("mixed[]")});
+        put("null", new NettePhpType[]{NULL, new NettePhpType("null"), new NettePhpType("null[]")});
+        put("callable", new NettePhpType[]{CALLABLE, new NettePhpType("callable|null"), new NettePhpType("callable[]")});
+        put("iterable", new NettePhpType[]{ITERABLE, new NettePhpType("iterable|null"), new NettePhpType("iterable[]")});
     }};
 
-    private final String name;
+    private final @Nullable String name;
     private final List<String> types = new ArrayList<>();
     private final Map<Integer, List<String>> wholeTypes = new HashMap<>();
     private final List<Integer> nullable = new ArrayList<>();
@@ -44,30 +54,30 @@ public class LattePhpType {
     private final List<Integer> iterable = new ArrayList<>();
     private final List<Integer> natives = new ArrayList<>();
     private final Map<Integer, List<String>> classes = new HashMap<>();
-    private final Map<Integer, LattePhpType> forDepth = new HashMap<>();
+    private final Map<Integer, NettePhpType> forDepth = new HashMap<>();
 
     @NotNull
-    public static LattePhpType create(String type, boolean nullable) {
+    public static NettePhpType create(final @Nullable String type, boolean nullable) {
         return create(null, type, nullable);
     }
 
     @NotNull
-    public static LattePhpType create(String name, String type) {
+    public static NettePhpType create(final @Nullable String name, final @Nullable String type) {
         return create(name, type, false);
     }
 
     @NotNull
-    public static LattePhpType create(String type) {
+    public static NettePhpType create(final @Nullable String type) {
         return create(null, type, false);
     }
 
     @NotNull
-    public static LattePhpType create(PhpType phpType) {
+    public static NettePhpType create(final @NotNull PhpType phpType) {
         return create(null, String.join("|", phpType.getTypes()), LattePhpUtil.isNullable(phpType));
     }
 
     @NotNull
-    public static LattePhpType create(List<PhpType> phpTypes) {
+    public static NettePhpType create(final @NotNull List<PhpType> phpTypes) {
         List<String> typesStrings = new ArrayList<>();
         for (PhpType type : phpTypes) {
             typesStrings.add(type.toString());
@@ -79,41 +89,41 @@ public class LattePhpType {
     }
 
     @NotNull
-    public static LattePhpType create(String name, String type, boolean nullable) {
+    public static NettePhpType create(final @Nullable String name, final @Nullable String type, final boolean nullable) {
         if (type == null || type.trim().length() == 0) {
-            return LattePhpType.MIXED;
+            return NettePhpType.MIXED;
         }
 
         String trimmed = type.trim().toLowerCase();
-        if (LatteTypesUtil.isNativeTypeHint(trimmed)) {
-            return nativeTypes.get(LatteTypesUtil.normalizeTypeHint(trimmed))[0];
+        if (isNativeTypeHint(trimmed)) {
+            return nativeTypes.get(normalizeTypeHint(trimmed))[0];
 
         } else if (trimmed.endsWith("[]")) {
             String typeHint = trimmed.substring(0, trimmed.length() - 2);
-            if (LatteTypesUtil.isNativeTypeHint(typeHint)) {
-                return nativeTypes.get(LatteTypesUtil.normalizeTypeHint(typeHint))[2];
+            if (isNativeTypeHint(typeHint)) {
+                return nativeTypes.get(normalizeTypeHint(typeHint))[2];
             }
 
         }
 
         if (trimmed.endsWith("|null") || trimmed.startsWith("null|")) {
             String typeHint = trimmed.startsWith("null|") ? trimmed.substring(6) : trimmed.substring(0, trimmed.length() - 5);
-            if (LatteTypesUtil.isNativeTypeHint(typeHint)) {
-                return nativeTypes.get(LatteTypesUtil.normalizeTypeHint(typeHint))[1];
+            if (isNativeTypeHint(typeHint)) {
+                return nativeTypes.get(normalizeTypeHint(typeHint))[1];
             }
         }
 
         if (!instances.containsKey(type)) {
-            instances.put(type, new LattePhpType(name, type, nullable));
+            instances.put(type, new NettePhpType(name, type, nullable));
         }
         return instances.get(type);
     }
 
-    private LattePhpType(@NotNull String type) {
+    private NettePhpType(@NotNull String type) {
         this(null, type, false);
     }
 
-    private LattePhpType(String name, @NotNull String typeString, boolean nullable) {
+    private NettePhpType(final @Nullable String name, final @NotNull String typeString, final boolean nullable) {
         String[] parts = typeString.split("\\|");
         for (String part : parts) {
             part = part.trim();
@@ -121,7 +131,7 @@ public class LattePhpType {
                 continue;
             }
 
-            TypePart typePart = new TypePart(part);
+            NettePhpType.TypePart typePart = new NettePhpType.TypePart(part);
             if (typePart.isClass()) {
                 if (!this.classes.containsKey(typePart.depth)) {
                     this.classes.put(typePart.depth, new ArrayList<>());
@@ -142,12 +152,15 @@ public class LattePhpType {
             }
 
             if (typePart.isIterable()) {
-                this.iterable.add(typePart.depth - 1);
+                for (int i = typePart.depth - 1; i >= 0; i--) {
+                    this.iterable.add(i);
+                }
             }
-            types.add(typePart.getPart());
 
             wholeTypes.putIfAbsent(typePart.depth, new ArrayList<>());
             wholeTypes.get(typePart.depth).add(typePart.getWholePart());
+
+            types.add(typePart.getPart());
         }
         this.name = name == null ? null : LattePhpUtil.normalizePhpVariable(name);
 
@@ -156,6 +169,7 @@ public class LattePhpType {
         }
     }
 
+    @Nullable
     public String getName() {
         return name;
     }
@@ -164,7 +178,7 @@ public class LattePhpType {
         return this.classes.containsKey(0);
     }
 
-    public boolean hasUndefinedClass(@NotNull Project project) {
+    public boolean hasUndefinedClass(final @NotNull Project project) {
         if (!containsClasses()) {
             return false;
         }
@@ -177,7 +191,7 @@ public class LattePhpType {
         return false;
     }
 
-    public boolean hasClass(String className) {
+    public boolean hasClass(final @NotNull String className) {
         if (!containsClasses()) {
             return false;
         }
@@ -185,7 +199,7 @@ public class LattePhpType {
         return classes.containsKey(0) && classes.get(0).contains(normalizedName);
     }
 
-    public boolean hasClass(Collection<PhpClass> phpClasses) {
+    public boolean hasClass(final @NotNull Collection<PhpClass> phpClasses) {
         if (!containsClasses()) {
             return false;
         }
@@ -209,7 +223,7 @@ public class LattePhpType {
         return isNative(0);
     }
 
-    public boolean isNative(int depth) {
+    public boolean isNative(final int depth) {
         return natives.contains(depth);
     }
 
@@ -217,33 +231,43 @@ public class LattePhpType {
         return isMixed(0);
     }
 
-    public boolean isMixed(int depth) {
+    public boolean isMixed(final int depth) {
         return mixed.contains(depth);
     }
 
-    public boolean isIterable(Project project) {
+    public boolean isIterable(final @NotNull Project project) {
         return isIterable(project, 0);
     }
 
-    public boolean isIterable(Project project, int depth) {
+    public boolean isIterable(final @NotNull Project project, final int depth) {
         if (iterable.contains(depth)) {
             return true;
         }
 
         Collection<PhpClass> classes = getPhpClasses(project, depth);
         for (PhpClass phpClass : classes) {
-            if (LattePhpUtil.isReferenceFor(LatteTypesUtil.getIterableInterfaces(), phpClass)) {
+            if (LattePhpUtil.isReferenceFor(getIterableTypes(), phpClass)) {
                 return true;
             }
         }
         return false;
     }
 
-    public Collection<PhpClass> getPhpClasses(Project project) {
+    boolean isIterable(final int depth) {
+        return iterable.contains(depth);
+    }
+
+    boolean isIterable() {
+        return isIterable(0);
+    }
+
+    @NotNull
+    public Collection<PhpClass> getPhpClasses(final @NotNull Project project) {
         return getPhpClasses(project, 0);
     }
 
-    public Collection<PhpClass> getPhpClasses(Project project, int depth) {
+    @NotNull
+    public Collection<PhpClass> getPhpClasses(final @NotNull Project project, final int depth) {
         List<PhpClass> output = new ArrayList<>();
         for (String wholeType : findClasses(depth)) {
             output.addAll(LattePhpUtil.getClassesByFQN(project, wholeType));
@@ -251,37 +275,41 @@ public class LattePhpType {
         return output;
     }
 
+    @NotNull
     String[] findClasses() {
         return findClasses(0);
     }
 
-    String[] findClasses(int depth) {
+    @NotNull
+    String[] findClasses(final int depth) {
         if (!this.classes.containsKey(depth)) {
             return new String[0];
         }
         return this.classes.get(depth).toArray(new String[0]);
     }
 
-    public LattePhpType withDepth(int depth) {
+    @NotNull
+    public NettePhpType withDepth(final int depth) {
         if (depth == 0) {
             return this;
         }
 
-        LattePhpType found = forDepth.get(depth);
+        NettePhpType found = forDepth.get(depth);
         if (found != null) {
             return found;
         }
 
         List<String> depthTypes = getTypesForDepth(depth);
         if (depthTypes.size() > 0) {
-            found = new LattePhpType(String.join("|", depthTypes));
+            found = new NettePhpType(String.join("|", depthTypes));
         }
-        found = found == null ? LattePhpType.MIXED : found;
+        found = found == null ? NettePhpType.MIXED : found;
         forDepth.put(depth, found);
         return found;
     }
 
-    private List<String> getTypesForDepth(int depth) {
+    @NotNull
+    private List<String> getTypesForDepth(final int depth) {
         if (depth == 0) {
             return types;
         }
@@ -297,7 +325,7 @@ public class LattePhpType {
         return depthTypes;
     }
 
-    private void getTypesForDepth(List<String> depthTypes, int depth, int subDepth) {
+    private void getTypesForDepth(final @NotNull List<String> depthTypes, final int depth, final int subDepth) {
         List<String> currentTypes = wholeTypes.get(depth + subDepth);
         if (currentTypes == null) {
             return;
@@ -310,10 +338,12 @@ public class LattePhpType {
     }
 
     @Override
+    @NotNull
     public String toString() {
         return String.join("|", types);
     }
 
+    @NotNull
     public List<String> getTypes() {
         return Collections.unmodifiableList(types);
     }
@@ -326,7 +356,8 @@ public class LattePhpType {
         private boolean isNull = false;
         private boolean isMixed = false;
         private boolean isClass = false;
-        private @Nullable TypePart arrayOf = null;
+        private @Nullable
+        NettePhpType.TypePart arrayOf = null;
 
         TypePart(@NotNull String part) {
             if (part.endsWith("[]")) {
@@ -339,14 +370,14 @@ public class LattePhpType {
                 }
                 loadArrayOf(type, depth);
 
-            } else if (LatteTypesUtil.isNativeTypeHint(part)) {
+            } else if (NettePhpType.isNativeTypeHint(part)) {
                 part = part.toLowerCase();
 
-                if (LatteTypesUtil.isIterable(part)) {
+                if (NettePhpType.isIterable(part)) {
                     loadArrayOf("mixed", depth);
-                } else if (LatteTypesUtil.isNull(part)) {
+                } else if (NettePhpType.isNull(part)) {
                     this.isNull = true;
-                } else if (LatteTypesUtil.isMixed(part)) {
+                } else if (NettePhpType.isMixed(part)) {
                     this.isMixed = true;
                 }
                 this.isNative = true;
@@ -358,9 +389,9 @@ public class LattePhpType {
             this.part = part;
         }
 
-        private void loadArrayOf(@NotNull String type, int depth) {
+        private void loadArrayOf(final @NotNull String type, final int depth) {
             this.depth = depth;
-            this.arrayOf = new TypePart(type);
+            this.arrayOf = new NettePhpType.TypePart(type);
         }
 
         boolean isIterable() {
@@ -383,15 +414,58 @@ public class LattePhpType {
             return isNull || (arrayOf != null && arrayOf.isNullable());
         }
 
+        @NotNull
         String getPart() {
             return arrayOf == null || isNative
                     ? part
                     : (arrayOf.getPart() + String.join("", Collections.nCopies(depth, "[]")));
         }
 
+        @NotNull
         String getWholePart() {
             return arrayOf == null || isNative ? part : arrayOf.getWholePart();
         }
+    }
+
+    @NotNull
+    public static String[] getNativeClassConstants() {
+        return nativeClassConstants;
+    }
+
+    @NotNull
+    public static String[] getNativeTypeHints() {
+        return nativeTypeHints;
+    }
+
+    @NotNull
+    public static String[] getIterableTypes() {
+        return iterableTypes;
+    }
+
+    public static boolean isNativeTypeHint(final @NotNull String value) {
+        return Arrays.asList(nativeTypeHints).contains(normalizeTypeHint(value));
+    }
+
+    public static boolean isIterable(final @NotNull String value) {
+        return Arrays.asList(nativeIterableTypeHints).contains(normalizeTypeHint(value));
+    }
+
+    public static boolean isNull(final @NotNull String value) {
+        return "null".equals(normalizeTypeHint(value));
+    }
+
+    public static boolean isMixed(final @NotNull String value) {
+        return "mixed".equals(normalizeTypeHint(value));
+    }
+
+    public static boolean isMagicMethod(final @NotNull String value) {
+        return Arrays.asList(magicMethods).contains(value.toLowerCase());
+    }
+
+    @NotNull
+    public static String normalizeTypeHint(@NotNull String value) {
+        value = value.toLowerCase();
+        return value.startsWith("\\") ? value.substring(1) : value;
     }
 
 }

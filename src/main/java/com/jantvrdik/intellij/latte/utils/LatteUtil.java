@@ -2,6 +2,7 @@ package com.jantvrdik.intellij.latte.utils;
 
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiElement;
+import com.jantvrdik.intellij.latte.php.NettePhpType;
 import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
@@ -181,7 +182,7 @@ public class LatteUtil {
     }
 
     @Nullable
-    public static LattePhpType findFirstLatteTemplateType(PsiElement element) {
+    public static NettePhpType findFirstLatteTemplateType(PsiElement element) {
         List<LattePhpClassUsage> out = new ArrayList<>();
         findLatteTemplateType(out, element);
         return out.isEmpty() ? null : out.get(0).getPhpType();

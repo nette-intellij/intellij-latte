@@ -5,9 +5,9 @@ import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
+import com.jantvrdik.intellij.latte.php.NettePhpType;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LattePhpStaticVariable;
-import com.jantvrdik.intellij.latte.utils.LattePhpType;
 import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpModifier;
@@ -38,10 +38,10 @@ public class StaticPropertyUsagesInspection extends BaseLocalInspectionTool {
 			@Override
 			public void visitElement(PsiElement element) {
 				if (element instanceof LattePhpStaticVariable) {
-					LattePhpType phpType = ((LattePhpStaticVariable) element).getPhpType();
+					NettePhpType phpType = ((LattePhpStaticVariable) element).getPhpType();
 
 					Collection<PhpClass> phpClasses = phpType.getPhpClasses(element.getProject());
-					if (phpClasses == null) {
+					if (phpClasses.size() == 0) {
 						return;
 					}
 

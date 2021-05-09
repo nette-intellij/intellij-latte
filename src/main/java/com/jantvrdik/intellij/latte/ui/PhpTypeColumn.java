@@ -5,7 +5,7 @@ import com.intellij.ui.ColoredTableCellRenderer;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.util.ui.ColumnInfo;
-import com.jantvrdik.intellij.latte.utils.LattePhpType;
+import com.jantvrdik.intellij.latte.php.NettePhpType;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -31,7 +31,7 @@ abstract class PhpTypeColumn<T> extends ColumnInfo<T, String> {
 					return;
 				}
 
-				LattePhpType type = LattePhpType.create((String) value);
+				NettePhpType type = NettePhpType.create((String) value);
 				if (type.hasUndefinedClass(project)) {
 					append((String) value, new SimpleTextAttributes(Font.PLAIN, JBColor.RED));
 				} else {

@@ -5,7 +5,6 @@ import com.intellij.lang.LighterASTNode;
 import com.intellij.lang.LighterASTTokenNode;
 import com.intellij.psi.impl.source.tree.LightTreeUtil;
 import com.intellij.psi.stubs.*;
-import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.CharTable;
 import com.jantvrdik.intellij.latte.indexes.extensions.LattePhpMethodIndex;
 import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpMethodStub;
@@ -85,6 +84,9 @@ public class LattePhpMethodStubType extends LattePhpTypeStub<LattePhpMethodStub,
     @Override
     public LattePhpMethodStub createStub(@NotNull LighterAST tree, @NotNull LighterASTNode node, @NotNull StubElement parentStub) {
         LighterASTNode keyNode = LightTreeUtil.firstChildOfType(tree, node, LatteTypesUtil.methodTokens);
+        if (keyNode != null && keyNode.getTokenType() == LatteTypes.PHP_VARIABLE) {
+            keyNode = LightTreeUtil.firstChildOfType(tree, keyNode, LatteTypes.T_MACRO_ARGS_VAR);
+        }
         String key = intern(tree.getCharTable(), keyNode);
         return new LattePhpMethodStubImpl(parentStub, key);
     }

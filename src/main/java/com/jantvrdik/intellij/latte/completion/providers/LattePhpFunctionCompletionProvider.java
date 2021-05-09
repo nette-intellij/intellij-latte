@@ -12,7 +12,7 @@ import com.jantvrdik.intellij.latte.completion.handlers.MacroCustomFunctionInser
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.psi.LattePhpContent;
 import com.jantvrdik.intellij.latte.settings.LatteFunctionSettings;
-import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
+import com.jantvrdik.intellij.latte.php.LattePhpUtil;
 import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.completion.PhpLookupElement;
 import com.jetbrains.php.completion.insert.PhpFunctionInsertHandler;

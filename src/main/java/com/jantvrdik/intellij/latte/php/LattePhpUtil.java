@@ -1,4 +1,4 @@
-package com.jantvrdik.intellij.latte.utils;
+package com.jantvrdik.intellij.latte.php;
 
 import com.intellij.codeInsight.completion.PrefixMatcher;
 import com.intellij.openapi.project.Project;
@@ -6,6 +6,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveResult;
 import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
+import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
@@ -20,18 +21,18 @@ import java.util.List;
 public class LattePhpUtil {
 
     public static Collection<PhpNamedElement> getAllClassNamesAndInterfaces(Project project, Collection<String> classNames) {
-        Collection<PhpNamedElement> variants = new THashSet<PhpNamedElement>();
+        Collection<PhpNamedElement> variants = new THashSet<>();
         PhpIndex phpIndex = getPhpIndex(project);
 
         for (String name : classNames) {
-            variants.addAll(filterClasses(phpIndex.getClassesByName(name), null));
-            variants.addAll(filterClasses(phpIndex.getInterfacesByName(name), null));
+            variants.addAll(filterClasses(phpIndex.getClassesByFQN(name), null));
+            variants.addAll(filterClasses(phpIndex.getInterfacesByFQN(name), null));
         }
         return variants;
     }
 
     public static Collection<Function> getAllFunctions(Project project, Collection<String> functionNames) {
-        Collection<Function> variants = new THashSet<Function>();
+        Collection<Function> variants = new THashSet<>();
         PhpIndex phpIndex = getPhpIndex(project);
 
         for (String name : functionNames) {
@@ -112,8 +113,8 @@ public class LattePhpUtil {
     }
 
     public static List<Field> getFieldsForPhpElement(@NotNull BaseLattePhpElement psiElement) {
-        List<Field> out = new ArrayList<Field>();
-        LattePhpType phpType = psiElement.getPhpType();
+        List<Field> out = new ArrayList<>();
+        NettePhpType phpType = psiElement.getPhpType();
         String name = psiElement.getPhpElementName();
         boolean isConstant = psiElement instanceof LattePhpConstant;
         if (psiElement instanceof LattePhpVariable) {
@@ -125,7 +126,7 @@ public class LattePhpUtil {
         }
 
         Collection<PhpClass> phpClasses = phpType.getPhpClasses(psiElement.getProject());
-        if (phpClasses == null || phpClasses.size() == 0) {
+        if (phpClasses.size() == 0) {
             return out;
         }
 
@@ -144,9 +145,9 @@ public class LattePhpUtil {
     }
 
     public static List<Method> getMethodsForPhpElement(@NotNull LattePhpMethod psiElement) {
-        List<Method> out = new ArrayList<Method>();
+        List<Method> out = new ArrayList<>();
         Collection<PhpClass> phpClasses = psiElement.getPhpType().getPhpClasses(psiElement.getProject());
-        if (phpClasses != null && phpClasses.size() > 0) {
+        if (phpClasses.size() > 0) {
             String methodName = psiElement.getMethodName();
             for (PhpClass phpClass : phpClasses) {
                 for (Method currentMethod : phpClass.getMethods()) {
@@ -171,13 +172,27 @@ public class LattePhpUtil {
         return getPhpIndex(project).getNamespacesByName(className);
     }
 
+    public static Collection<PhpNamespace> getAlNamespaces(Project project, Collection<String> namespaceNames) {
+        Collection<PhpNamespace> variants = new THashSet<>();
+        PhpIndex phpIndex = getPhpIndex(project);
+
+        for (String name : namespaceNames) {
+            variants.addAll(phpIndex.getNamespacesByName(name));
+        }
+        return variants;
+    }
+
+    public static Collection<String> getAllExistingNamespacesByName(Project project, String className) {
+        return getPhpIndex(project).getAllChildNamespacesFqns(className);
+    }
+
     public static Collection<String> getAllExistingFunctionNames(Project project, PrefixMatcher prefixMatcher) {
         return getPhpIndex(project).getAllFunctionNames(prefixMatcher);
     }
 
 
     public static Collection<String> getAllExistingClassNames(Project project, PrefixMatcher prefixMatcher) {
-        return getPhpIndex(project).getAllClassNames(prefixMatcher);
+        return getPhpIndex(project).getAllClassFqns(prefixMatcher);
     }
 
     private static PhpIndex getPhpIndex(Project project) {
@@ -189,7 +204,7 @@ public class LattePhpUtil {
             return classes;
         }
         namespace = "\\" + namespace + "\\";
-        Collection<PhpClass> result = new ArrayList<PhpClass>();
+        Collection<PhpClass> result = new ArrayList<>();
         for (PhpClass cls : classes) {
             String classNs = cls.getNamespaceName();
             if (classNs.equals(namespace) || classNs.startsWith(namespace)) {
