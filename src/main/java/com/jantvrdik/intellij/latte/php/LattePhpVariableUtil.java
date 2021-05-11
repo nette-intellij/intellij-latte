@@ -34,29 +34,29 @@ public class LattePhpVariableUtil {
                 element.getVariableName()
         );
         List<PsiPositionedElement> definitions = all.stream().filter(
-                psiPositionedElement -> psiPositionedElement.getElement() instanceof LattePhpVariable
-                        && ((LattePhpVariable) psiPositionedElement.getElement()).isDefinition()
+                psiPositionedElement -> psiPositionedElement.getElement() != null
+                        && psiPositionedElement.getElement().isDefinition()
         ).collect(Collectors.toList());
 
         LattePhpStatementPartElement mainStatementPart = element.getPhpStatementPart();
 
         for (PsiPositionedElement positionedElement : definitions) {
-            if (!(positionedElement.getElement() instanceof LattePhpVariable)) {
+            if (positionedElement.getElement() == null) {
                 continue;
             }
 
-            PsiElement current = positionedElement.getElement();
+            LattePhpVariable current = positionedElement.getElement();
             if (
-                    ((LattePhpVariable) current).isVarTypeDefinition()
-                            || ((LattePhpVariable) current).isVarDefinition()
-                            || ((LattePhpVariable) current).isPhpArrayVarDefinition()
-                            || ((LattePhpVariable) current).isCaptureDefinition()
-                            || ((LattePhpVariable) current).isBlockDefineVarDefinition()
-                            || ((LattePhpVariable) current).isDefinitionInForeach()
+                    current.isVarTypeDefinition()
+                            || current.isVarDefinition()
+                            || current.isPhpArrayVarDefinition()
+                            || current.isCaptureDefinition()
+                            || current.isBlockDefineVarDefinition()
+                            || current.isDefinitionInForeach()
             ) {
                 int startDepth = 0;
                 if (!(current.getParent() instanceof LattePhpArrayOfVariables)) {
-                    NettePhpType prevPhpType = findPrevPhpType((LattePhpVariable) current);
+                    NettePhpType prevPhpType = findPrevPhpType(current);
                     if (prevPhpType != null) {
                         return prevPhpType;
                     }
@@ -64,7 +64,7 @@ public class LattePhpVariableUtil {
                     startDepth = 1;
                 }
 
-                if (((LattePhpVariable) current).isDefinitionInForeach()) {
+                if (current.isDefinitionInForeach()) {
                     PsiElement nextElement = PsiTreeUtil.skipWhitespacesForward(current);
                     IElementType type = nextElement != null ? nextElement.getNode().getElementType() : null;
                     if (type != T_PHP_DOUBLE_ARROW) {
@@ -75,7 +75,7 @@ public class LattePhpVariableUtil {
                     }
                 }
 
-                LattePhpStatementPartElement statementPart = ((LattePhpVariable) current).getPhpStatementPart();
+                LattePhpStatementPartElement statementPart = current.getPhpStatementPart();
                 LattePhpContent phpContent = PsiTreeUtil.getParentOfType(current, LattePhpContent.class);
                 if (phpContent != null && statementPart != mainStatementPart) {
                     return detectVariableType(phpContent, startDepth);
@@ -181,7 +181,8 @@ public class LattePhpVariableUtil {
     public static boolean isNextDefinitionOperator(@NotNull PsiElement element) {
         PsiElement found = null;
         if (element instanceof LattePhpVariable && ((LattePhpVariable) element).getPhpStatementPart() != null) {
-            found = ((LattePhpVariable) element).getPhpStatementPart().getPhpStatement();
+            LattePhpStatementPartElement statementPart = ((LattePhpVariable) element).getPhpStatementPart();
+            found = statementPart != null ? statementPart.getPhpStatement() : null;
         } else if (element.getParent() instanceof LattePhpArrayOfVariables) {
             found = element.getParent();
         }

@@ -28,7 +28,7 @@ public class LatteUtil {
         List<PsiPositionedElement> variables = findVariablesInFileBeforeElement(element, virtualFile, key);
 
         return variables.stream()
-                .filter(variableElement -> variableElement.getElement() instanceof LattePhpVariable && ((LattePhpVariable) variableElement.getElement()).isDefinition())
+                .filter(variableElement -> variableElement.getElement() != null && variableElement.getElement().isDefinition())
                 .collect(Collectors.toList());
     }
 
@@ -60,11 +60,11 @@ public class LatteUtil {
             }
 
             for (PsiPositionedElement variable : properties) {
-                if (!(variable.getElement() instanceof LattePhpVariable)) {
+                if (variable.getElement() == null) {
                     continue;
                 }
 
-                String varName = ((LattePhpVariable) variable.getElement()).getVariableName();
+                String varName = variable.getElement().getVariableName();
                 if (key == null || key.equals(varName)) {
                     if (result == null) {
                         result = new ArrayList<>();
@@ -156,11 +156,60 @@ public class LatteUtil {
     }
 
     private static void findLattePhpVariables(List<PsiPositionedElement> properties, PsiElement psiElement) {
+        findLattePhpVariables(properties, psiElement, null, false, -1, null);
+    }
+
+    private static void findLattePhpVariables(
+            List<PsiPositionedElement> properties,
+            PsiElement psiElement,
+            @Nullable String variableName,
+            boolean onlyDefinitions,
+            int offset,
+            @Nullable PsiElement context
+    ) {
+        /*psiElement.acceptChildren(new PsiRecursiveElementVisitor() {
+            @Override
+            public void visitElement(@NotNull PsiElement element) {
+                if (element instanceof LattePhpVariable) {
+                    if (onlyDefinitions) {
+                        if (!((LattePhpVariable) element).isDefinition() || (offset > 0 && getStartOffsetInFile(element) >= offset)) {
+                            return;
+                        }
+                    }
+                    if (variableName != null && !variableName.equals(((LattePhpVariable) element).getVariableName())) {
+                        return;
+                    }
+                    if (context != null && ((LattePhpVariable) element).getVariableContext() != context) {
+                        return;
+                    }
+                    properties.add(new PsiPositionedElement(getStartOffsetInFile(element), (LattePhpVariable) element));
+
+                } else {
+                    PsiElement nextSibling = element.getNextSibling();
+                    while (nextSibling != null) {
+                        visitElement(nextSibling);
+                        nextSibling = element.getNextSibling();
+                    }
+                    super.visitElement(element);
+                }
+            }
+        });*/
         psiElement.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
             @Override
-            public void visitElement(PsiElement element) {
+            public void visitElement(@NotNull PsiElement element) {
                 if (element instanceof LattePhpVariable) {
-                    properties.add(new PsiPositionedElement(getStartOffsetInFile(element), element));
+                    if (onlyDefinitions) {
+                        if (!((LattePhpVariable) element).isDefinition() || (offset > 0 && getStartOffsetInFile(element) >= offset)) {
+                            return;
+                        }
+                    }
+                    if (variableName != null && !variableName.equals(((LattePhpVariable) element).getVariableName())) {
+                        return;
+                    }
+                    if (context != null && ((LattePhpVariable) element).getVariableContext() != context) {
+                        return;
+                    }
+                    properties.add(new PsiPositionedElement(getStartOffsetInFile(element), (LattePhpVariable) element));
                 } else {
                     super.visitElement(element);
                 }
@@ -171,7 +220,7 @@ public class LatteUtil {
     private static <T> void findFileItem(List<PsiElement> properties, PsiElement psiElement, Class<T> className) {
         psiElement.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
             @Override
-            public void visitElement(PsiElement element) {
+            public void visitElement(@NotNull PsiElement element) {
                 if (className.isInstance(element)) {
                     properties.add(element);
                 } else {
@@ -191,7 +240,7 @@ public class LatteUtil {
     public static void findLatteTemplateType(List<LattePhpClassUsage> classes, PsiElement psiElement) {
         psiElement.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
             @Override
-            public void visitElement(PsiElement element) {
+            public void visitElement(@NotNull PsiElement element) {
                 if (element instanceof LattePhpClassUsage && ((LattePhpClassUsage) element).isTemplateType()) {
                     classes.add((LattePhpClassUsage) element);
                 } else {
@@ -204,7 +253,7 @@ public class LatteUtil {
     public static void findLatteMacroTemplateType(List<LatteMacroTag> classes, LatteFile file) {
         file.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
             @Override
-            public void visitElement(PsiElement element) {
+            public void visitElement(@NotNull PsiElement element) {
                 if (element instanceof LatteMacroTag && ((LatteMacroTag) element).matchMacroName("templateType")) {
                     classes.add((LatteMacroTag) element);
                 } else {
@@ -212,6 +261,103 @@ public class LatteUtil {
                 }
             }
         });
+    }
+
+    @NotNull
+    public static List<LattePhpVariableDefinition> getVariableDefinition(@NotNull LattePhpVariable element) {
+        PsiElement context = element.getVariableContext();
+        if (context == null || element.isDefinition()) {
+            return new ArrayList<>();
+        }
+
+        int offset = getStartOffsetInFile(element);
+        List<LattePhpVariableDefinition> definitions = getParentDefinition(element, context, offset);
+        if (definitions.size() == 0) {
+            List<PsiPositionedElement> contextDefinitions = new ArrayList<>();
+            findLattePhpVariables(contextDefinitions, context, element.getVariableName(), true, offset, null);
+            for (PsiPositionedElement contextDefinition : contextDefinitions) {
+                if (contextDefinition.getElement() != element) {
+                    definitions.add(new LattePhpVariableDefinition(true, contextDefinition.getElement()));
+                }
+            }
+        }
+        return definitions;
+    }
+
+    @NotNull
+    private static List<LattePhpVariableDefinition> getParentDefinition(
+            @NotNull LattePhpVariable element,
+            @NotNull PsiElement context,
+            int offset
+    ) {
+        List<PsiPositionedElement> contextDefinitions = new ArrayList<>();
+        findLattePhpVariables(
+                contextDefinitions,
+                context,
+                element.getVariableName(),
+                true,
+                offset,
+                context
+        );
+        if (contextDefinitions.size() > 0) {
+            List<LattePhpVariableDefinition> out = new ArrayList<>();
+            for (PsiPositionedElement contextDefinition : contextDefinitions) {
+                if (contextDefinition.getElement() != element) {
+                    out.add(new LattePhpVariableDefinition(false, contextDefinition.getElement()));
+                }
+            }
+            return out;
+        } else if (context instanceof LatteFile) {
+            return new ArrayList<>();
+        }
+
+        PsiElement parentContext = getCurrentContext(context.getParent());
+        if (parentContext == null) {
+            return new ArrayList<>();
+        }
+        return getParentDefinition(element, parentContext, offset);
+    }
+
+    @Nullable
+    public static PsiElement getCurrentContext(@NotNull PsiElement element) {
+        if (!(element instanceof LattePhpVariable) || !((LattePhpVariable) element).isDefinition()) {
+            PsiElement mainOpenTag = PsiTreeUtil.getParentOfType(element, LatteMacroOpenTag.class, LatteHtmlOpenTag.class);
+            if (mainOpenTag != null) {
+                element = mainOpenTag.getParent();
+            }
+        }
+
+        PsiElement context = PsiTreeUtil.getParentOfType(element, LattePairMacro.class, LatteHtmlPairTag.class, LatteFile.class);
+        if (context instanceof LattePairMacro) {
+            LatteMacroTag openTag = ((LattePairMacro) context).getMacroOpenTag();
+            if (openTag == null || !LatteTagsUtil.isContextTag(openTag.getMacroName())) {
+                return getCurrentContext(context);
+            }
+            return context;
+
+        } else if (context instanceof LatteHtmlPairTag) {
+            LatteHtmlOpenTag openTag = ((LatteHtmlPairTag) context).getHtmlOpenTag();
+            if (openTag.getHtmlTagContent() == null) {
+                return getCurrentContext(context);
+            }
+            for (LatteNetteAttr netteAttr : openTag.getHtmlTagContent().getNetteAttrList()) {
+                if (LatteTagsUtil.isContextNetteAttribute(netteAttr.getAttrName().getText())) {
+                    return context;
+                }
+            }
+            return getCurrentContext(context);
+        }
+        return context instanceof LatteFile ? context : PsiTreeUtil.getParentOfType(element, LatteFile.class);
+    }
+
+    public static boolean isSameOrParentContext(@Nullable PsiElement check, @Nullable PsiElement probablySameOrParent) {
+        if (check == probablySameOrParent) {
+            return true;
+        } else if (probablySameOrParent == null) {
+            return false;
+        }
+        PsiElement parentContext = getCurrentContext(probablySameOrParent.getParent());
+        return isSameOrParentContext(check, parentContext);
     }
 
     public static int getStartOffsetInFile(PsiElement psiElement) {

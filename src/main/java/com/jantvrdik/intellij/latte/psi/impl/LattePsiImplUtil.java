@@ -25,10 +25,7 @@ import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
 
@@ -81,6 +78,10 @@ public class LattePsiImplUtil {
 	public static @Nullable LattePhpContent getFirstPhpContent(@NotNull LatteMacroContent macroContent) {
 		List<LattePhpContent> phpContents = macroContent.getPhpContentList();
 		return phpContents.stream().findFirst().isPresent() ? phpContents.stream().findFirst().get() : null;
+	}
+
+	public static @Nullable PsiElement getMacroNameElement(@NotNull LatteMacroContent macroContent) {
+		return PsiTreeUtil.skipWhitespacesBackward(macroContent);
 	}
 
 	public static String getVariableName(@NotNull LattePhpVariable element) {
@@ -175,7 +176,7 @@ public class LattePsiImplUtil {
 		StringBuilder out = new StringBuilder();
 		classUsage.getParent().acceptChildren(new PsiRecursiveElementVisitor() {
 			@Override
-			public void visitElement(PsiElement element) {
+			public void visitElement(@NotNull PsiElement element) {
 				IElementType type = element.getNode().getElementType();
 				if (TokenSet.create(T_PHP_NAMESPACE_REFERENCE, T_PHP_NAMESPACE_RESOLUTION, T_PHP_IDENTIFIER).contains(type)) {
 					out.append(element.getText());
@@ -437,6 +438,31 @@ public class LattePsiImplUtil {
 
 	public static @NotNull NettePhpType getPhpType(@NotNull LattePhpNamespaceReference element) {
 		return NettePhpType.create(element.getNamespaceName(), false);
+	}
+
+	@Nullable
+	public static LatteMacroTag getMacroOpenTag(@NotNull LattePairMacro element) {
+		return element.getMacroTagList().stream().findFirst().orElse(null);
+	}
+
+	@Nullable
+	public static PsiElement getVariableContext(@NotNull LattePhpVariable element) {
+		return LatteUtil.getCurrentContext(element);
+	}
+
+	@Nullable
+	public static LatteHtmlOpenTag getHtmlOpenTag(@NotNull LatteHtmlTagContainer element) {
+		PsiElement prev = element.getPrevSibling();
+		if (prev instanceof LatteHtmlOpenTag) {
+			return (LatteHtmlOpenTag) prev;
+		}
+		return element.getHtmlOpenTag();
+	}
+
+	@NotNull
+	public static String getHtmlTagName(@NotNull LatteHtmlOpenTag element) {
+		PsiElement child = findFirstChildWithType(element, T_HTML_OPEN_TAG_OPEN);
+		return child != null ? child.getText() : "?";
 	}
 
 	public static boolean isTemplateType(@NotNull LattePhpClassUsage element) {

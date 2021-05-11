@@ -1,14 +1,14 @@
 package com.jantvrdik.intellij.latte.utils;
 
-import com.intellij.psi.PsiElement;
+import com.jantvrdik.intellij.latte.psi.LattePhpVariable;
 import org.jetbrains.annotations.NotNull;
 
 public class PsiPositionedElement {
 
     private final int position;
-    private final PsiElement element;
+    private final LattePhpVariable element;
 
-    public PsiPositionedElement(int position, @NotNull PsiElement element) {
+    public PsiPositionedElement(int position, @NotNull LattePhpVariable element) {
         this.position = position;
         this.element = element;
     }
@@ -17,7 +17,7 @@ public class PsiPositionedElement {
         return position;
     }
 
-    public PsiElement getElement() {
+    public LattePhpVariable getElement() {
         return element;
     }
 }
