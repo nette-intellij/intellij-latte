@@ -96,7 +96,11 @@ public class VariablesInspection extends BaseLocalInspectionTool {
 
 						if (!isDefined) {
 							LatteVariableSettings defaultVariable = LatteConfiguration.getInstance(element.getProject()).getVariable(variableName);
-							if (defaultVariable == null) {
+							if (defaultVariable != null) {
+								isDefined = true;
+								isProbablyUndefined = false;
+
+							} else {
 								List<Field> fields = LattePhpVariableUtil.findPhpFiledListFromTemplateTypeTag(element, variableName);
 								if (fields.size() > 0) {
 									isDefined = true;

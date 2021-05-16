@@ -1,4 +1,4 @@
-package com.jantvrdik.intellij.latte.context;
+package com.jantvrdik.intellij.latte.psi;
 
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.CharsetToolkit;
@@ -7,7 +7,6 @@ import com.intellij.testFramework.HeavyPlatformTestCase;
 import com.intellij.testFramework.TestDataFile;
 import com.jantvrdik.intellij.latte.BasePsiParsingTestCase;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.psi.LattePhpVariable;
 import com.jantvrdik.intellij.latte.settings.LatteSettings;
 import com.jantvrdik.intellij.latte.utils.LattePhpVariableDefinition;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
@@ -39,7 +38,7 @@ public class VariableDefinitionTest extends BasePsiParsingTestCase {
 
     @Override
     protected String getTestDataPath() {
-        URL url = getClass().getClassLoader().getResource("data/currentContext");
+        URL url = getClass().getClassLoader().getResource("data/psi/definition");
         assert url != null;
         return url.getFile();
     }
@@ -131,6 +130,52 @@ public class VariableDefinitionTest extends BasePsiParsingTestCase {
         Assert.assertSame(1, definitions6.size());
         Assert.assertSame(definition2, definitions6.get(0).getElement());
         Assert.assertTrue(definitions6.get(0).isProbablyUndefined());
+    }
+
+    @Test
+    public void testBlockInIf() throws IOException {
+        String name = "BlockInIf.latte";
+        PsiFile file = parseFile(name, loadFile(name));
+        List<LattePhpVariable> variables = collectVariables(file);
+        Assert.assertSame(2, variables.size());
+
+        LattePhpVariable definition = variables.get(0);
+        LattePhpVariable usage = variables.get(1);
+
+        List<LattePhpVariableDefinition> definitions1 = LatteUtil.getVariableDefinition(definition);
+        Assert.assertSame(0, definitions1.size());
+
+        List<LattePhpVariableDefinition> definitions2 = LatteUtil.getVariableDefinition(usage);
+        Assert.assertSame(1, definitions2.size());
+        Assert.assertSame(definition, definitions2.get(0).getElement());
+        Assert.assertFalse(definitions2.get(0).isProbablyUndefined());
+    }
+
+    @Test
+    public void testOtherVariables() throws IOException {
+        String name = "OtherVariables.latte";
+        PsiFile file = parseFile(name, loadFile(name));
+        List<LattePhpVariable> variables = collectVariables(file);
+        Assert.assertSame(3, variables.size());
+
+        LattePhpVariable definition1 = variables.get(0);
+        LattePhpVariable definition2 = variables.get(1);
+        LattePhpVariable usage = variables.get(2);
+
+        List<LattePhpVariableDefinition> definitions1 = LatteUtil.getVariableDefinition(definition1);
+        Assert.assertSame(0, definitions1.size());
+
+        List<LattePhpVariableDefinition> otherDefinitions = LatteUtil.getVariableOtherDefinitions(definition2);
+        Assert.assertSame(1, otherDefinitions.size());
+        Assert.assertSame(definition1, otherDefinitions.get(0).getElement());
+        Assert.assertFalse(otherDefinitions.get(0).isProbablyUndefined());
+
+        List<LattePhpVariableDefinition> definitions2 = LatteUtil.getVariableDefinition(usage);
+        Assert.assertSame(2, definitions2.size());
+        Assert.assertSame(definition1, definitions2.get(0).getElement());
+        Assert.assertSame(definition2, definitions2.get(1).getElement());
+        Assert.assertFalse(definitions2.get(0).isProbablyUndefined());
+        Assert.assertFalse(definitions2.get(1).isProbablyUndefined());
     }
 
 }

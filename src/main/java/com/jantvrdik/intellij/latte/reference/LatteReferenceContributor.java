@@ -28,6 +28,30 @@ public class LatteReferenceContributor extends PsiReferenceContributor {
 
                         PsiElement value = ((LattePhpVariable) element).getTextElement();
                         if (value != null && value.getTextLength() > 0) {
+                            PsiReference reference;
+                            if (((LattePhpVariable) element).isDefinition()) {
+                                reference = new LattePhpVariableDeclarationReference((LattePhpVariable) element, new TextRange(0, value.getTextLength()));
+                            } else {
+                                reference = new LattePhpVariableReference((LattePhpVariable) element, new TextRange(0, value.getTextLength()));
+                            }
+                            return new PsiReference[]{reference};
+                        }
+
+                        return PsiReference.EMPTY_ARRAY;
+                    }
+                });
+        registrar.registerReferenceProvider(
+                PlatformPatterns.psiElement(LatteTypes.PHP_VARIABLE),
+                new PsiReferenceProvider() {
+                    @NotNull
+                    @Override
+                    public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
+                        if (!(element instanceof LattePhpVariable) || !((LattePhpVariable) element).isDefinition()) {
+                            return PsiReference.EMPTY_ARRAY;
+                        }
+
+                        PsiElement value = ((LattePhpVariable) element).getTextElement();
+                        if (value != null && value.getTextLength() > 0) {
                             return new PsiReference[]{
                                     new LattePhpVariableReference((LattePhpVariable) element, new TextRange(0, value.getTextLength()))
                             };
@@ -51,7 +75,7 @@ public class LatteReferenceContributor extends PsiReferenceContributor {
                         if (methodName != null && methodName.length() > 0) {
                             int addition = element.getFirstChild().getNode().getElementType() == LatteTypes.T_PHP_NAMESPACE_RESOLUTION ? 1 : 0;
                             return new PsiReference[]{
-                                    new LattePhpMethodReference((LattePhpMethod) element, new TextRange(0 + addition, methodName.length() + addition))
+                                    new LattePhpMethodReference((LattePhpMethod) element, new TextRange(addition, methodName.length() + addition))
                             };
                         }
                         return PsiReference.EMPTY_ARRAY;

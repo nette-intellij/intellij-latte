@@ -9,9 +9,9 @@ import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpStatementPartElement;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpTypedPartElement;
 import com.jantvrdik.intellij.latte.settings.LatteVariableSettings;
+import com.jantvrdik.intellij.latte.utils.LattePhpVariableDefinition;
 import com.jantvrdik.intellij.latte.utils.LatteTypesUtil;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
-import com.jantvrdik.intellij.latte.utils.PsiPositionedElement;
 import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.NotNull;
@@ -21,67 +21,45 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
 
 public class LattePhpVariableUtil {
     public static NettePhpType detectVariableType(@NotNull LattePhpVariable element) {
         String variableName = element.getVariableName();
-        List<PsiPositionedElement> all = LatteUtil.findVariablesInFileBeforeElement(
-                element,
-                element.getContainingFile().getOriginalFile().getVirtualFile(),
-                element.getVariableName()
-        );
-        List<PsiPositionedElement> definitions = all.stream().filter(
-                psiPositionedElement -> psiPositionedElement.getElement() != null
-                        && psiPositionedElement.getElement().isDefinition()
-        ).collect(Collectors.toList());
+        List<LattePhpVariableDefinition> definitions = LatteUtil.getVariableDefinition(element);
 
         LattePhpStatementPartElement mainStatementPart = element.getPhpStatementPart();
 
-        for (PsiPositionedElement positionedElement : definitions) {
-            if (positionedElement.getElement() == null) {
-                continue;
-            }
-
+        for (LattePhpVariableDefinition positionedElement : definitions) {
             LattePhpVariable current = positionedElement.getElement();
-            if (
-                    current.isVarTypeDefinition()
-                            || current.isVarDefinition()
-                            || current.isPhpArrayVarDefinition()
-                            || current.isCaptureDefinition()
-                            || current.isBlockDefineVarDefinition()
-                            || current.isDefinitionInForeach()
-            ) {
-                int startDepth = 0;
-                if (!(current.getParent() instanceof LattePhpArrayOfVariables)) {
-                    NettePhpType prevPhpType = findPrevPhpType(current);
-                    if (prevPhpType != null) {
-                        return prevPhpType;
-                    }
-                } else {
-                    startDepth = 1;
+            int startDepth = 0;
+            if (!(current.getParent() instanceof LattePhpArrayOfVariables)) {
+                NettePhpType prevPhpType = findPrevPhpType(current);
+                if (prevPhpType != null) {
+                    return prevPhpType;
                 }
-
-                if (current.isDefinitionInForeach()) {
-                    PsiElement nextElement = PsiTreeUtil.skipWhitespacesForward(current);
-                    IElementType type = nextElement != null ? nextElement.getNode().getElementType() : null;
-                    if (type != T_PHP_DOUBLE_ARROW) {
-                        LattePhpForeach phpForeach = PsiTreeUtil.getParentOfType(current, LattePhpForeach.class);
-                        if (phpForeach != null && phpForeach.getPhpExpression().getPhpStatementList().size() > 0) {
-                            return phpForeach.getPhpExpression().getPhpType().withDepth(startDepth + 1);
-                        }
-                    }
-                }
-
-                LattePhpStatementPartElement statementPart = current.getPhpStatementPart();
-                LattePhpContent phpContent = PsiTreeUtil.getParentOfType(current, LattePhpContent.class);
-                if (phpContent != null && statementPart != mainStatementPart) {
-                    return detectVariableType(phpContent, startDepth);
-                }
-                return NettePhpType.MIXED;
+            } else {
+                startDepth = 1;
             }
+
+            if (current.isDefinitionInForeach()) {
+                PsiElement nextElement = PsiTreeUtil.skipWhitespacesForward(current);
+                IElementType type = nextElement != null ? nextElement.getNode().getElementType() : null;
+                if (type != T_PHP_DOUBLE_ARROW) {
+                    LattePhpForeach phpForeach = PsiTreeUtil.getParentOfType(current, LattePhpForeach.class);
+                    if (phpForeach != null && phpForeach.getPhpExpression().getPhpStatementList().size() > 0) {
+                        return phpForeach.getPhpExpression().getPhpType().withDepth(startDepth + 1);
+                    }
+                }
+            }
+
+            LattePhpStatementPartElement statementPart = current.getPhpStatementPart();
+            LattePhpContent phpContent = PsiTreeUtil.getParentOfType(current, LattePhpContent.class);
+            if (phpContent != null && statementPart != mainStatementPart) {
+                return detectVariableType(phpContent, startDepth);
+            }
+            return NettePhpType.MIXED;
         }
 
         NettePhpType templateType = detectVariableTypeFromTemplateType(element, variableName);

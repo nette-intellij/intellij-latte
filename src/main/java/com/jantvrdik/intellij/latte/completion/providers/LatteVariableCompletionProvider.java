@@ -5,7 +5,6 @@ import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.jantvrdik.intellij.latte.completion.handlers.PhpVariableInsertHandler;
@@ -32,7 +31,7 @@ public class LatteVariableCompletionProvider extends BaseLatteCompletionProvider
 	@Override
 	protected void addCompletions(
 			@NotNull CompletionParameters parameters,
-			ProcessingContext context,
+			@NotNull ProcessingContext context,
 			@NotNull CompletionResultSet result
 	) {
 		PsiElement element = parameters.getPosition().getParent();
@@ -40,7 +39,7 @@ public class LatteVariableCompletionProvider extends BaseLatteCompletionProvider
 			return;
 		}
 
-		List<LookupElement> elements = attachPhpVariableCompletions(element, parameters.getOriginalFile().getVirtualFile());
+		List<LookupElement> elements = attachPhpVariableCompletions(element);
 		result.addAllElements(elements);
 
 		if (parameters.getOriginalFile() instanceof LatteFile) {
@@ -71,23 +70,19 @@ public class LatteVariableCompletionProvider extends BaseLatteCompletionProvider
 		}
 	}
 
-	private List<LookupElement> attachPhpVariableCompletions(@NotNull PsiElement psiElement, @NotNull VirtualFile virtualFile) {
+	private List<LookupElement> attachPhpVariableCompletions(@NotNull PsiElement psiElement) {
 		List<LookupElement> lookupElements = new ArrayList<>();
 		List<String> foundVariables = new ArrayList<>();
 
-		for (PsiPositionedElement element : LatteUtil.findVariablesDefinitionsInFileBeforeElement(psiElement, virtualFile)) {
-			if (!(element.getElement() instanceof LattePhpVariable)) {
-				continue;
-			}
-
-			String variableName = ((LattePhpVariable) element.getElement()).getVariableName();
+		for (PsiPositionedElement element : LatteUtil.getVariablesDefinitionsBeforeElement(psiElement)) {
+			String variableName = element.getElement().getVariableName();
 			if (foundVariables.stream().anyMatch(variableName::equals)) {
 				continue;
 			}
 
 			LookupElementBuilder builder = LookupElementBuilder.create(element.getElement(), "$" + variableName);
 			builder = builder.withInsertHandler(PhpVariableInsertHandler.getInstance());
-			builder = builder.withTypeText(((LattePhpVariable) element.getElement()).getPhpType().toString());
+			builder = builder.withTypeText(element.getElement().getPhpType().toString());
 			builder = builder.withIcon(PhpIcons.VARIABLE);
 			builder = builder.withBoldness(true);
 			lookupElements.add(builder);
@@ -96,7 +91,6 @@ public class LatteVariableCompletionProvider extends BaseLatteCompletionProvider
 		}
 
 		Collection<LatteVariableSettings> defaultVariables = LatteConfiguration.getInstance(psiElement.getProject()).getVariables();
-
 		for (LatteVariableSettings variable : defaultVariables) {
 			String variableName = variable.getVarName();
 			if (foundVariables.stream().anyMatch(variableName::equals)) {

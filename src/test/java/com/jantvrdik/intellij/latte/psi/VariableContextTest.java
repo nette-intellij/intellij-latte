@@ -1,24 +1,17 @@
-package com.jantvrdik.intellij.latte.context;
+package com.jantvrdik.intellij.latte.psi;
 
-import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.openapi.vfs.CharsetToolkit;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.testFramework.HeavyPlatformTestCase;
-import com.intellij.testFramework.TestDataFile;
 import com.jantvrdik.intellij.latte.BasePsiParsingTestCase;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.psi.LatteHtmlTagContainer;
-import com.jantvrdik.intellij.latte.psi.LattePhpVariable;
+import com.jantvrdik.intellij.latte.psi.impl.LatteHtmlPairTagImpl;
 import com.jantvrdik.intellij.latte.settings.LatteSettings;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
@@ -41,7 +34,7 @@ public class VariableContextTest extends BasePsiParsingTestCase {
 
     @Override
     protected String getTestDataPath() {
-        URL url = getClass().getClassLoader().getResource("data/context");
+        URL url = getClass().getClassLoader().getResource("data/psi/context");
         assert url != null;
         return url.getFile();
     }
@@ -100,7 +93,7 @@ public class VariableContextTest extends BasePsiParsingTestCase {
         Assert.assertSame(file, context1);
 
         PsiElement context2 = LatteUtil.getCurrentContext(definition);
-        LatteHtmlTagContainer block = PsiTreeUtil.findChildOfAnyType(file, LatteHtmlTagContainer.class);
+        LatteHtmlPairTagImpl block = PsiTreeUtil.findChildOfAnyType(file, LatteHtmlPairTagImpl.class);
         Assert.assertNotNull(block);
         Assert.assertSame(block, context2);
     }
@@ -122,7 +115,7 @@ public class VariableContextTest extends BasePsiParsingTestCase {
         PsiElement context2 = LatteUtil.getCurrentContext(definition);
         PsiElement context3 = LatteUtil.getCurrentContext(usage1);
 
-        LatteHtmlTagContainer block = PsiTreeUtil.findChildOfAnyType(file, LatteHtmlTagContainer.class);
+        LatteHtmlPairTagImpl block = PsiTreeUtil.findChildOfAnyType(file, LatteHtmlPairTagImpl.class);
         Assert.assertNotNull(block);
         Assert.assertSame(block, context2);
         Assert.assertSame(block, context3);
