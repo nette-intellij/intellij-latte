@@ -2,11 +2,24 @@ package com.jantvrdik.intellij.latte.inspections;
 
 import com.intellij.codeInspection.*;
 import com.intellij.psi.PsiElement;
+import com.jantvrdik.intellij.latte.inspections.utils.LatteInspectionInfo;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 abstract class BaseLocalInspectionTool extends LocalInspectionTool {
+
+	protected void addInspections(
+			@NotNull final InspectionManager manager,
+			@NotNull final List<ProblemDescriptor> problems,
+			@NotNull final List<LatteInspectionInfo> inspectionInfo,
+			final boolean isOnTheFly
+	) {
+		for (LatteInspectionInfo info : inspectionInfo) {
+			ProblemDescriptor problem = manager.createProblemDescriptor(info.getElement(), info.getDescription(), true, info.getType(), isOnTheFly, info.getFixes());
+			problems.add(problem);
+		}
+	}
 
 	protected void addError(
 			@NotNull final InspectionManager manager,
@@ -36,26 +49,6 @@ abstract class BaseLocalInspectionTool extends LocalInspectionTool {
 			boolean isOnTheFly
 	) {
 		addProblem(manager, problems, element, description, ProblemHighlightType.LIKE_DEPRECATED, isOnTheFly);
-	}
-
-	protected void addUnused(
-			@NotNull final InspectionManager manager,
-			List<ProblemDescriptor> problems,
-			@NotNull PsiElement element,
-			@NotNull String description,
-			boolean isOnTheFly
-	) {
-		addProblem(manager, problems, element, description, ProblemHighlightType.LIKE_UNUSED_SYMBOL, isOnTheFly);
-	}
-
-	protected void addWeakWarning(
-			@NotNull final InspectionManager manager,
-			List<ProblemDescriptor> problems,
-			@NotNull PsiElement element,
-			@NotNull String description,
-			boolean isOnTheFly
-	) {
-		addProblem(manager, problems, element, description, ProblemHighlightType.WEAK_WARNING, isOnTheFly);
 	}
 
 	private void addProblem(

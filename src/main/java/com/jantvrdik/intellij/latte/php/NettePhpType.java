@@ -82,7 +82,7 @@ public class NettePhpType {
         for (PhpType type : phpTypes) {
             typesStrings.add(type.toString());
         }
-        Set<String> temp = new LinkedHashSet<String>(
+        Set<String> temp = new LinkedHashSet<>(
                 Arrays.asList(String.join("|", typesStrings).split("\\|"))
         );
         return create(null, String.join("|", temp));
@@ -162,7 +162,7 @@ public class NettePhpType {
 
             types.add(typePart.getPart());
         }
-        this.name = name == null ? null : LattePhpUtil.normalizePhpVariable(name);
+        this.name = name == null ? null : LattePhpVariableUtil.normalizePhpVariable(name);
 
         if (nullable && !this.nullable.contains(0)) {
             this.nullable.add(0);

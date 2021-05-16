@@ -1,12 +1,12 @@
-package com.jantvrdik.intellij.latte.psi;
+package com.jantvrdik.intellij.latte.php;
 
 import com.intellij.psi.PsiFile;
 import com.intellij.testFramework.HeavyPlatformTestCase;
 import com.jantvrdik.intellij.latte.BasePsiParsingTestCase;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
+import com.jantvrdik.intellij.latte.psi.LattePhpVariable;
 import com.jantvrdik.intellij.latte.settings.LatteSettings;
-import com.jantvrdik.intellij.latte.utils.LatteUtil;
-import com.jantvrdik.intellij.latte.utils.PsiPositionedElement;
+import com.jantvrdik.intellij.latte.utils.PsiCachedElement;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,7 +32,7 @@ public class VariableDefinitionBeforeElementTest extends BasePsiParsingTestCase 
 
     @Override
     protected String getTestDataPath() {
-        URL url = getClass().getClassLoader().getResource("data/psi/definition-before");
+        URL url = getClass().getClassLoader().getResource("data/php/definitionBefore");
         assert url != null;
         return url.getFile();
     }
@@ -47,7 +47,7 @@ public class VariableDefinitionBeforeElementTest extends BasePsiParsingTestCase 
         LattePhpVariable definition = variables.get(0);
         LattePhpVariable usage = variables.get(1);
 
-        List<PsiPositionedElement> definitions = LatteUtil.getVariablesDefinitionsBeforeElement(usage);
+        List<PsiCachedElement> definitions = LattePhpVariableUtil.getVariablesDefinitionsBeforeElement(usage);
         Assert.assertSame(1, definitions.size());
         Assert.assertSame(definition, definitions.get(0).getElement());
     }
@@ -63,7 +63,7 @@ public class VariableDefinitionBeforeElementTest extends BasePsiParsingTestCase 
         LattePhpVariable definition2 = variables.get(1);
         LattePhpVariable usage = variables.get(2);
 
-        List<PsiPositionedElement> definitions = LatteUtil.getVariablesDefinitionsBeforeElement(usage);
+        List<PsiCachedElement> definitions = LattePhpVariableUtil.getVariablesDefinitionsBeforeElement(usage);
         Assert.assertSame(2, definitions.size());
         Assert.assertSame(definition1, definitions.get(0).getElement());
         Assert.assertSame(definition2, definitions.get(1).getElement());

@@ -3,6 +3,7 @@ package com.jantvrdik.intellij.latte.reference.references;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.jantvrdik.intellij.latte.indexes.LatteIndexUtil;
+import com.jantvrdik.intellij.latte.php.LattePhpVariableUtil;
 import com.jantvrdik.intellij.latte.psi.LattePhpStaticVariable;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
 import com.jantvrdik.intellij.latte.php.LattePhpUtil;
@@ -16,8 +17,8 @@ import java.util.Collection;
 import java.util.List;
 
 public class LattePhpStaticVariableReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
-    private String variableName;
-    private Collection<PhpClass> phpClasses;
+    private final String variableName;
+    private final Collection<PhpClass> phpClasses;
 
     public LattePhpStaticVariableReference(@NotNull LattePhpStaticVariable element, TextRange textRange) {
         super(element, textRange);
@@ -67,7 +68,7 @@ public class LattePhpStaticVariableReference extends PsiReferenceBase<PsiElement
     @NotNull
     @Override
     public String getCanonicalText() {
-        return LattePhpUtil.normalizePhpVariable(getElement().getText());
+        return LattePhpVariableUtil.normalizePhpVariable(getElement().getText());
     }
 
     @Override

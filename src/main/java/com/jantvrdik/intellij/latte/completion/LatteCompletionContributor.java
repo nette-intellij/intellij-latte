@@ -143,7 +143,12 @@ public class LatteCompletionContributor extends CompletionContributor {
 		LookupElementBuilder builder = LookupElementBuilder.create(name);
 		builder = builder.withInsertHandler(MacroInsertHandler.getInstance());
 		if (!isEndTag) {
-			String appendText = tag.getType() == LatteTagSettings.Type.PAIR ? (" … {/" + tag.getMacroName() + "}") : "";
+			String appendText = "";
+			if (tag.getType() == LatteTagSettings.Type.PAIR) {
+				appendText = " … {/" + tag.getMacroName() + "}";
+			} else if (tag.getType() == LatteTagSettings.Type.AUTO_EMPTY) {
+				appendText = " … ?{/" + tag.getMacroName() + "}";
+			}
 			String arguments = tag.getArgumentsInfo();
 			if (arguments.length() > 0) {
 				builder = builder.withTailText(" " + arguments + "}" + appendText);

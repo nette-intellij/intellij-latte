@@ -2,7 +2,6 @@ package com.jantvrdik.intellij.latte.lexer;
 
 import com.intellij.lexer.Lexer;
 import com.intellij.lexer.LookAheadLexer;
-import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;

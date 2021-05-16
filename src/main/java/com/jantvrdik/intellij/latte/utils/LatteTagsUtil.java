@@ -12,7 +12,10 @@ public class LatteTagsUtil {
     public enum Type {
 
         BLOCK("block"),
+        CAPTURE("capture"),
+        DEFAULT("default"),
         DEFINE("define"),
+        DO("do"),
         FOREACH("foreach"),
         ELSE("else"),
         ELSEIF("elseif"),
@@ -23,6 +26,7 @@ public class LatteTagsUtil {
         IFSET("ifset"),
         LINK("link"),
         N_HREF("n:href"),
+        PHP("php"),
         PLINK("plink"),
         SNIPPET("snippet"),
         SNIPPETAREA("snippetArea"),

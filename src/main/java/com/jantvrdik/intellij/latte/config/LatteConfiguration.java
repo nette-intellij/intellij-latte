@@ -2,9 +2,9 @@ package com.jantvrdik.intellij.latte.config;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
+import com.jantvrdik.intellij.latte.php.LattePhpVariableUtil;
 import com.jantvrdik.intellij.latte.settings.*;
 import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileData;
-import com.jantvrdik.intellij.latte.php.LattePhpUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,9 +23,9 @@ public class LatteConfiguration {
 		LATTE("Latte", JBColor.ORANGE),
 		CUSTOM("Custom", JBColor.GRAY);
 
-		private String name;
+		private final String name;
 
-		private JBColor color;
+		private final JBColor color;
 
 		Vendor(String name, JBColor color) {
 			this.name = name;
@@ -41,9 +41,7 @@ public class LatteConfiguration {
 		}
 	}
 
-	private boolean checkDumbMode;
-
-	private static Map<Project, LatteConfiguration> instances = new HashMap<>();
+	private static final Map<Project, LatteConfiguration> instances = new HashMap<>();
 
 	@NotNull
 	private final Project project;
@@ -107,7 +105,7 @@ public class LatteConfiguration {
 	 */
 	@Nullable
 	public LatteVariableSettings getVariable(String name) {
-		name = LattePhpUtil.normalizePhpVariable(name);
+		name = LattePhpVariableUtil.normalizePhpVariable(name);
 		for (LatteVariableSettings variable : getVariables()) {
 			if (variable.getVarName().equals(name)) {
 				return variable;

@@ -41,14 +41,6 @@ public class LattePhpUtil {
         return variants;
     }
 
-    public static String normalizePhpVariable(String name) {
-        return name == null ? null : (name.startsWith("$") ? name.substring(1) : name);
-    }
-
-    public static String normalizeMethodName(String name) {
-        return name.trim().toLowerCase();
-    }
-
     public static boolean isReferenceTo(@NotNull PhpClass originalClass, @NotNull ResolveResult[] results, @NotNull PsiElement element, @NotNull String name) {
         for (ResolveResult result : results) {
             if (!(result.getElement() instanceof BaseLattePhpElement)) {

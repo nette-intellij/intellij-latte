@@ -28,12 +28,7 @@ public class LatteReferenceContributor extends PsiReferenceContributor {
 
                         PsiElement value = ((LattePhpVariable) element).getTextElement();
                         if (value != null && value.getTextLength() > 0) {
-                            PsiReference reference;
-                            if (((LattePhpVariable) element).isDefinition()) {
-                                reference = new LattePhpVariableDeclarationReference((LattePhpVariable) element, new TextRange(0, value.getTextLength()));
-                            } else {
-                                reference = new LattePhpVariableReference((LattePhpVariable) element, new TextRange(0, value.getTextLength()));
-                            }
+                            PsiReference reference = new LattePhpVariableReference((LattePhpVariable) element, new TextRange(0, value.getTextLength()));
                             return new PsiReference[]{reference};
                         }
 

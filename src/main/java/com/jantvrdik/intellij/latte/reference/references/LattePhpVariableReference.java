@@ -6,10 +6,10 @@ import com.intellij.pom.PomTargetPsiElement;
 import com.intellij.psi.*;
 import com.intellij.psi.xml.XmlAttributeValue;
 import com.jantvrdik.intellij.latte.config.LatteFileConfiguration;
+import com.jantvrdik.intellij.latte.php.LattePhpVariableUtil;
 import com.jantvrdik.intellij.latte.php.NettePhpType;
 import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
-import com.jantvrdik.intellij.latte.php.LattePhpUtil;
 import com.jantvrdik.intellij.latte.utils.LattePhpVariableDefinition;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import com.jetbrains.php.lang.psi.elements.Field;
@@ -53,7 +53,7 @@ public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> impl
             }
         }
 
-        final List<LattePhpVariableDefinition> variables = LatteUtil.getVariableDefinition(variable);
+        final List<LattePhpVariableDefinition> variables = LattePhpVariableUtil.getVariableDefinition(variable);
         for (LattePhpVariableDefinition variableDefinition : variables) {
             results.add(new PsiElementResolveResult(variableDefinition.getElement()));
         }
@@ -81,7 +81,7 @@ public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> impl
     @NotNull
     @Override
     public String getCanonicalText() {
-        return LattePhpUtil.normalizePhpVariable(getElement().getText());
+        return LattePhpVariableUtil.normalizePhpVariable(getElement().getText());
     }
 
     @Override
@@ -94,8 +94,8 @@ public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> impl
 
     @Override
     public boolean isReferenceTo(@NotNull PsiElement element) {
-        if (element instanceof LattePhpVariable) {
-            return !((LattePhpVariable) element).isDefinition() && ((LattePhpVariable) element).getVariableName().equals(variableName);
+        if (element instanceof LattePhpVariable && ((LattePhpVariable) element).isDefinition()) {
+            return ((LattePhpVariable) element).getVariableName().equals(variableName);
         }
 
         PsiElement currentElement = element;

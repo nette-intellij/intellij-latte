@@ -9,12 +9,13 @@ import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.jantvrdik.intellij.latte.completion.handlers.PhpVariableInsertHandler;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
+import com.jantvrdik.intellij.latte.php.LattePhpVariableUtil;
 import com.jantvrdik.intellij.latte.php.NettePhpType;
 import com.jantvrdik.intellij.latte.settings.LatteVariableSettings;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LattePhpVariable;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
-import com.jantvrdik.intellij.latte.utils.PsiPositionedElement;
+import com.jantvrdik.intellij.latte.utils.PsiCachedElement;
 import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
@@ -74,7 +75,7 @@ public class LatteVariableCompletionProvider extends BaseLatteCompletionProvider
 		List<LookupElement> lookupElements = new ArrayList<>();
 		List<String> foundVariables = new ArrayList<>();
 
-		for (PsiPositionedElement element : LatteUtil.getVariablesDefinitionsBeforeElement(psiElement)) {
+		for (PsiCachedElement element : LattePhpVariableUtil.getVariablesDefinitionsBeforeElement(psiElement)) {
 			String variableName = element.getElement().getVariableName();
 			if (foundVariables.stream().anyMatch(variableName::equals)) {
 				continue;
