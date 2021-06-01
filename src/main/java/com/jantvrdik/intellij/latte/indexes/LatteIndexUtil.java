@@ -3,8 +3,9 @@ package com.jantvrdik.intellij.latte.indexes;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.jantvrdik.intellij.latte.indexes.extensions.*;
+import com.jantvrdik.intellij.latte.php.LattePhpVariableUtil;
 import com.jantvrdik.intellij.latte.psi.*;
-import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
+import com.jantvrdik.intellij.latte.php.LattePhpUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -28,7 +29,7 @@ public class LatteIndexUtil {
 
     public static Collection<LattePhpStaticVariable> findStaticVariablesByName(@NotNull Project project, String name) {
         return LattePhpStaticVariableIndex.getInstance().get(
-                LattePhpUtil.normalizePhpVariable(name),
+                LattePhpVariableUtil.normalizePhpVariable(name),
                 project,
                 GlobalSearchScope.allScope(project)
         );
@@ -44,7 +45,7 @@ public class LatteIndexUtil {
 
     public static Collection<LattePhpVariable> findVariablesByName(@NotNull Project project, String name) {
         return LattePhpVariableIndex.getInstance().get(
-                LattePhpUtil.normalizePhpVariable(name),
+                LattePhpVariableUtil.normalizePhpVariable(name),
                 project,
                 GlobalSearchScope.allScope(project)
         );

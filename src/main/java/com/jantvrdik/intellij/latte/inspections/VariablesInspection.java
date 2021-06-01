@@ -2,25 +2,26 @@ package com.jantvrdik.intellij.latte.inspections;
 
 import com.intellij.codeInsight.intention.IntentionManager;
 import com.intellij.codeInspection.*;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.settings.LatteVariableSettings;
+import com.jantvrdik.intellij.latte.inspections.utils.LatteInspectionInfo;
 import com.jantvrdik.intellij.latte.intentions.AddCustomNotNullVariable;
 import com.jantvrdik.intellij.latte.intentions.AddCustomNullableVariable;
+import com.jantvrdik.intellij.latte.php.LattePhpVariableUtil;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LattePhpVariable;
-import com.jantvrdik.intellij.latte.utils.LattePhpVariableUtil;
-import com.jantvrdik.intellij.latte.utils.LatteUtil;
-import com.jantvrdik.intellij.latte.utils.PsiPositionedElement;
+import com.jantvrdik.intellij.latte.settings.LatteVariableSettings;
+import com.jantvrdik.intellij.latte.utils.LattePhpVariableDefinition;
+import com.jantvrdik.intellij.latte.utils.PsiCachedElement;
 import com.jetbrains.php.lang.psi.elements.Field;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class VariablesInspection extends BaseLocalInspectionTool {
@@ -31,122 +32,151 @@ public class VariablesInspection extends BaseLocalInspectionTool {
 		return "LatteVariablesProblems";
 	}
 
+
 	@Nullable
 	@Override
 	public ProblemDescriptor[] checkFile(@NotNull PsiFile file, @NotNull final InspectionManager manager, final boolean isOnTheFly) {
 		if (!(file instanceof LatteFile)) {
 			return null;
 		}
-
 		final List<ProblemDescriptor> problems = new ArrayList<>();
+		addInspections(manager, problems, checkFile(file), isOnTheFly);
+		return problems.toArray(new ProblemDescriptor[0]);
+	}
+
+
+
+	@NotNull
+	List<LatteInspectionInfo> checkFile(@NotNull final PsiFile file) {
+		final List<LatteInspectionInfo> problems = new ArrayList<>();
+		Map<PsiElement, PsiCachedElement> all = LattePhpVariableUtil.getAllVariablesInFile(file);
 		file.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
 			@Override
-			public void visitElement(PsiElement element) {
-				if (element instanceof LattePhpVariable) {
-					String variableName = ((LattePhpVariable) element).getVariableName();
-					VirtualFile file = element.getContainingFile().getVirtualFile();
-					List<PsiPositionedElement> all = LatteUtil.findVariablesInFile(element.getProject(), file, variableName);
-					List<PsiPositionedElement> afterElement = LatteUtil.findVariablesInFileAfterElement(element, file, variableName);
-					List<PsiPositionedElement> definitions = all.stream()
-							.filter(variableElement -> variableElement.getElement() instanceof LattePhpVariable && ((LattePhpVariable) variableElement.getElement()).isDefinition())
-							.collect(Collectors.toList());
-
-					int offset = LatteUtil.getStartOffsetInFile(element);
-					List<PsiPositionedElement> beforeElement = definitions.stream()
-							.filter(variableElement -> variableElement.getPosition() <= offset)
-							.collect(Collectors.toList());
-					int varDefinitions = (int) definitions.stream()
-							.filter(variableElement -> variableElement.getElement() instanceof LattePhpVariable && !((LattePhpVariable) variableElement.getElement()).isVarTypeDefinition())
-							.count();
-					int cyclesDefinitions = (int) definitions.stream()
-							.filter(
-									variableElement -> variableElement.getElement() instanceof LattePhpVariable
-											&& !((LattePhpVariable) variableElement.getElement()).isVarTypeDefinition()
-											&& (
-												((LattePhpVariable) variableElement.getElement()).isDefinitionInFor()
-												|| ((LattePhpVariable) variableElement.getElement()).isDefinitionInForeach()
-											)
-							).count();
-					int normalVarDefinitions =  varDefinitions - cyclesDefinitions;
-
-					ProblemHighlightType type = null;
-					String description = null;
-					boolean isUndefined = false;
-					if (((LattePhpVariable) element).isDefinition()) {
-						List<PsiPositionedElement> usages = afterElement.stream()
-								.filter(
-										variableElement -> variableElement.getElement() instanceof LattePhpVariable
-										&& !((LattePhpVariable) variableElement.getElement()).isDefinition()
-								)
-								.collect(Collectors.toList());
-
-						if (varDefinitions > 0 && !((LattePhpVariable) element).isVarTypeDefinition()) {
-							LatteVariableSettings defaultVariable = LatteConfiguration.getInstance(element.getProject()).getVariable(variableName);
-							if (defaultVariable != null) {
-								ProblemDescriptor descriptor = manager.createProblemDescriptor(
-										element,
-										"Rewrite default variable '" + variableName + "' defined as template parameters",
-										true,
-										ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
-										isOnTheFly
-								);
-								problems.add(descriptor);
-							}
-						}
-
-						if (normalVarDefinitions > 1) {
-							type = ProblemHighlightType.GENERIC_ERROR_OR_WARNING;
-							description = "Multiple definitions for variable '" + variableName + "'";
-
-						} else if (normalVarDefinitions == 1 && cyclesDefinitions > 0) {
-							type = ProblemHighlightType.GENERIC_ERROR_OR_WARNING;
-							description = "Multiple definitions for variable '" + variableName + "'. Defined in for/foreach and normally.";
-
-						} else if (usages.size() == 0) {
-							type = ProblemHighlightType.LIKE_UNUSED_SYMBOL;
-							description = "Unused variable '" + variableName + "'";
-						}
-
-					} else if (beforeElement.size() == 0) {
-						LatteVariableSettings defaultVariable = LatteConfiguration.getInstance(element.getProject()).getVariable(variableName);
-						if (defaultVariable == null) {
-							List<Field> fields = LattePhpVariableUtil.findPhpFiledListFromTemplateTypeTag(element, variableName);
-							if (fields.size() == 0) {
-								type = ProblemHighlightType.GENERIC_ERROR_OR_WARNING;
-								description = "Undefined variable '" + variableName + "'";
-								isUndefined = true;
-
-							} else {
-								for (Field field : fields) {
-									if (field.isDeprecated()) {
-										addDeprecated(manager, problems, element, "Variable '" + variableName + "' is deprecated", isOnTheFly);
-									}
-									if (field.isInternal()) {
-										addDeprecated(manager, problems, element, "Variable '" + variableName + "' is internal", isOnTheFly);
-									}
-								}
-							}
-						}
+			public void visitElement(@NotNull PsiElement psiElement) {
+				if (psiElement instanceof LattePhpVariable) {
+					PsiCachedElement element = all.get(psiElement);
+					if (element == null) {
+						super.visitElement(psiElement);
+						return;
 					}
 
-					if (type != null) {
-						ProblemDescriptor problem;
-						if (isUndefined) {
-							LocalQuickFix notNullFix = IntentionManager.getInstance().convertToFix(new AddCustomNullableVariable(variableName));
-							LocalQuickFix notNotNullFix = IntentionManager.getInstance().convertToFix(new AddCustomNotNullVariable(variableName));
-							problem = manager.createProblemDescriptor(element, description, true, type, isOnTheFly, notNotNullFix, notNullFix);
-						} else {
-							problem = manager.createProblemDescriptor(element, description, true, type, isOnTheFly);
-						}
-						problems.add(problem);
+					if (element.isDefinition()) {
+						List<PsiCachedElement> sameName = all.values().stream()
+								.filter((current) -> current.getVariableName() != null && current.getVariableName().equals(element.getVariableName()))
+								.collect(Collectors.toList());
+						checkVariableDefinition(sameName, element, problems);
+					} else {
+						checkVariableUsages(element, problems);
 					}
 
 				} else {
-					super.visitElement(element);
+					super.visitElement(psiElement);
 				}
 			}
 		});
-
-		return problems.toArray(new ProblemDescriptor[0]);
+		return problems;
 	}
+
+	private void checkVariableDefinition(
+			@NotNull final List<PsiCachedElement> sameName,
+			@NotNull final PsiCachedElement element,
+			@NotNull final List<LatteInspectionInfo> problems
+	) {
+		List<PsiCachedElement> definitions = sameName.stream()
+				.filter(current -> current.isDefinition() && !current.isVarTypeDefinition())
+				.collect(Collectors.toList());
+		List<PsiCachedElement> usages = sameName.stream()
+				.filter((current) -> !current.isDefinition() && current.getPosition() >= element.getPosition())
+				.collect(Collectors.toList());
+
+		LattePhpVariable variable = element.getElement();
+		String variableName = element.getVariableName();
+		if (!element.isVarTypeDefinition()) {
+			LatteVariableSettings defaultVariable = LatteConfiguration.getInstance(element.getProject()).getVariable(variableName);
+			if (defaultVariable != null) {
+				problems.add(
+					LatteInspectionInfo.error(variable, "Rewrite default variable '" + variableName + "' defined as template parameters")
+				);
+			}
+
+			for (PsiCachedElement varDefinition : definitions) {
+				if (!varDefinition.matchElement(element) && varDefinition.getVariableContext() == element.getVariableContext()) {
+					problems.add(
+						LatteInspectionInfo.warning(variable, "Multiple definitions for variable '" + variableName + "'")
+					);
+					break;
+				}
+			}
+		}
+
+		boolean isUsed = false;
+		if (usages.size() > 0) {
+			for (PsiCachedElement usage : usages) {
+				if (usage.getVariableDefinitions().contains(variable)) {
+					isUsed = true;
+					break;
+				}
+			}
+		}
+
+		if (!isUsed) {
+			problems.add(LatteInspectionInfo.unused(variable, "Unused variable '" + variableName + "'"));
+		}
+	}
+
+	private void checkVariableUsages(
+			@NotNull final PsiCachedElement element,
+			@NotNull final List<LatteInspectionInfo> problems
+	) {
+		LattePhpVariable variable = element.getElement();
+		List<LattePhpVariableDefinition> variableDefinitions = LattePhpVariableUtil.getVariableDefinition(variable);
+
+		boolean isDefined = false;
+		boolean isProbablyUndefined = false;
+		for (LattePhpVariableDefinition variableDefinition : variableDefinitions) {
+			if (!variableDefinition.isProbablyUndefined()) {
+				isDefined = true;
+			} else {
+				isProbablyUndefined = true;
+			}
+		}
+
+		String variableName = element.getVariableName();
+		if (!isDefined) {
+			LatteVariableSettings defaultVariable = LatteConfiguration.getInstance(element.getProject()).getVariable(variableName);
+			if (defaultVariable != null) {
+				isDefined = true;
+				isProbablyUndefined = false;
+
+			} else {
+				List<Field> fields = LattePhpVariableUtil.findPhpFiledListFromTemplateTypeTag(variable, variableName);
+				if (fields.size() > 0) {
+					isDefined = true;
+					isProbablyUndefined = false;
+					for (Field field : fields) {
+						if (field.isDeprecated()) {
+							problems.add(LatteInspectionInfo.deprecated(variable, "Variable '" + variableName + "' is deprecated"));
+						}
+						if (field.isInternal()) {
+							problems.add(LatteInspectionInfo.deprecated(variable, "Variable '" + variableName + "' is internal"));
+						}
+					}
+				}
+			}
+		}
+
+		if (!isDefined && isProbablyUndefined) {
+			problems.add(LatteInspectionInfo.weakWarning(variable, "Variable '" + variableName + "' is probably undefined"));
+
+		} else if (!isDefined) {
+			LatteInspectionInfo info = LatteInspectionInfo.error(variable, "Undefined variable '" + variableName + "'");
+			IntentionManager intentionManager = IntentionManager.getInstance();
+			if (intentionManager != null) {
+				info.addFix(intentionManager.convertToFix(new AddCustomNullableVariable(variableName)));
+				info.addFix(intentionManager.convertToFix(new AddCustomNotNullVariable(variableName)));
+			}
+			problems.add(info);
+		}
+	}
+
 }

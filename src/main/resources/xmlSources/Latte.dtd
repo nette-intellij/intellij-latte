@@ -8,7 +8,7 @@
 
 <!ELEMENT tag (arguments)?>
 <!ATTLIST tag name CDATA #REQUIRED>
-<!ATTLIST tag type (PAIR|UNPAIRED|UNPAIRED_ATTR|ATTR_ONLY) #REQUIRED>
+<!ATTLIST tag type (PAIR|UNPAIRED|UNPAIRED_ATTR|ATTR_ONLY|AUTO_EMPTY) #REQUIRED>
 <!ATTLIST tag allowedFilters (true|false) #IMPLIED>
 <!ATTLIST tag arguments CDATA #IMPLIED>
 <!ATTLIST tag deprecatedMessage CDATA #IMPLIED>

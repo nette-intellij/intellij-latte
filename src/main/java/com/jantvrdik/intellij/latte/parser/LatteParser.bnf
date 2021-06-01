@@ -36,6 +36,7 @@ macroClassic     ::= macroTag macroTag?{
 
 pairMacro        ::= macroOpenTag structureToken* macroCloseTag? { //incomplete pair macro is handled in a annotator
                             extends=macroClassic
+                            methods=[getMacroOpenTag]
                         }
 
 emptyMacro       ::= emptyMacroTag {
@@ -82,7 +83,7 @@ private
 classicMacroContent     ::= macroName macroContent?
 
 macroContent ::= macroArgs? (T_MACRO_MODIFIERS macroArgs)* {
-                        methods=[getFirstPhpContent]
+                        methods=[getFirstPhpContent getMacroNameElement]
                     }
 
 private
@@ -114,14 +115,19 @@ netteAttrValue   ::= T_HTML_TAG_ATTR_SQ macroContent? T_HTML_TAG_ATTR_SQ
 outerHtml ::= htmlTag | T_TEXT | T_HTML_CLOSE_TAG_OPEN | T_HTML_OPEN_TAG_OPEN | T_HTML_OPEN_TAG_CLOSE | T_HTML_TAG_CLOSE;
 
 private
-htmlTag            ::= <<checkPairHtmlTag true>> (htmlOpenTag htmlTagContainer htmlCloseTag) | <<checkPairHtmlTag false>> htmlEmptyTag
+htmlTag            ::= <<checkPairHtmlTag true>> htmlPairTag | <<checkPairHtmlTag false>> htmlEmptyTag
 
-htmlTagContainer     ::= (htmlTag | T_TEXT | macro | (pairMacro | unpairedMacro))*
+htmlPairTag         ::= htmlOpenTag htmlTagContainer htmlCloseTag
+
+htmlTagContainer     ::= (htmlTag | T_TEXT | macro | (pairMacro | unpairedMacro))* {
+                                methods=[getHtmlOpenTag]
+                            }
 
 htmlTagContent         ::= (netteAttr | macro | T_TEXT | (pairMacro | unpairedMacro))*
 
 htmlOpenTag     ::= T_HTML_OPEN_TAG_OPEN htmlTagContent T_HTML_TAG_CLOSE {
                         pin=1
+                        methods=[getHtmlTagName]
                      }
 
 htmlCloseTag    ::= T_HTML_CLOSE_TAG_OPEN htmlTagContent T_HTML_TAG_CLOSE {
@@ -147,7 +153,7 @@ phpVariable        ::= T_MACRO_ARGS_VAR phpArrayUsage* {
                             getName setName getNameIdentifier getTextElement getVariableName isDefinition
                             getPhpArrayLevel isDefinitionInFor isDefinitionInForeach getReturnType getPhpType
                             isCaptureDefinition isBlockDefineVarDefinition isVarTypeDefinition isVarDefinition
-                            isPhpArrayVarDefinition getPhpStatementPart
+                            isPhpArrayVarDefinition getPhpStatementPart getVariableContext getVariableDefinition
                         ]
                     }
 
@@ -320,7 +326,7 @@ phpPrivateArgument    ::=  phpString | phpArrayOfVariables | phpTypedArguments |
                     | macroModifier | T_PHP_IDENTIFIER | T_PHP_MACRO_SEPARATOR | T_PHP_OR_INCLUSIVE | T_PHP_DEFINITION_OPERATOR
 
 phpExpression    ::= (expression | T_MACRO_ARGS)* {
-                           methods=[getPhpType]
+                           methods=[getPhpType getPhpArrayLevel]
                            implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpExpressionElement"
                        }
 

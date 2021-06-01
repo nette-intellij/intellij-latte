@@ -2,11 +2,24 @@ package com.jantvrdik.intellij.latte.inspections;
 
 import com.intellij.codeInspection.*;
 import com.intellij.psi.PsiElement;
+import com.jantvrdik.intellij.latte.inspections.utils.LatteInspectionInfo;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 abstract class BaseLocalInspectionTool extends LocalInspectionTool {
+
+	protected void addInspections(
+			@NotNull final InspectionManager manager,
+			@NotNull final List<ProblemDescriptor> problems,
+			@NotNull final List<LatteInspectionInfo> inspectionInfo,
+			final boolean isOnTheFly
+	) {
+		for (LatteInspectionInfo info : inspectionInfo) {
+			ProblemDescriptor problem = manager.createProblemDescriptor(info.getElement(), info.getDescription(), true, info.getType(), isOnTheFly, info.getFixes());
+			problems.add(problem);
+		}
+	}
 
 	protected void addError(
 			@NotNull final InspectionManager manager,

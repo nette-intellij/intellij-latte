@@ -3,6 +3,7 @@ package com.jantvrdik.intellij.latte.settings;
 import com.intellij.util.xmlb.annotations.Attribute;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.*;
@@ -145,6 +146,27 @@ public class LatteTagSettings extends BaseLatteSettings implements Serializable 
 			return String.join(" ", builder);
 		}
 		return "";
+	}
+
+	public List<String> getAllowedNetteAttributes() {
+		return createNetteAttributes(
+				getMacroName(),
+			getType() != LatteTagSettings.Type.UNPAIRED,
+			getType() == LatteTagSettings.Type.PAIR || getMacroName().equals("block")
+		);
+	}
+
+	public static List<String> createNetteAttributes(String tagName, boolean allowed, boolean pair) {
+		if (!allowed) {
+			return Collections.emptyList();
+		}
+		List<String> out = new ArrayList<>();
+		out.add("n:" + tagName);
+		if (pair) {
+			out.add("n:tag-" + tagName);
+			out.add("n:inner-" + tagName);
+		}
+		return out;
 	}
 
 	public boolean hasParameters() {

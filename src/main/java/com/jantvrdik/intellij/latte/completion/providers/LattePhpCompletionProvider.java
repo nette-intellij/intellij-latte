@@ -6,9 +6,10 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.jantvrdik.intellij.latte.completion.handlers.PhpVariableInsertHandler;
+import com.jantvrdik.intellij.latte.php.NettePhpType;
 import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
-import com.jantvrdik.intellij.latte.utils.LattePhpType;
+import com.jantvrdik.intellij.latte.utils.LatteTagsUtil;
 import com.jantvrdik.intellij.latte.utils.LatteTypesUtil;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import com.jetbrains.php.completion.PhpLookupElement;
@@ -19,6 +20,7 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpModifier;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
@@ -43,7 +45,8 @@ public class LattePhpCompletionProvider extends BaseLatteCompletionProvider {
 			ProcessingContext context,
 			@NotNull CompletionResultSet result
 	) {
-		PsiElement element = parameters.getPosition().getParent();
+		PsiElement current = parameters.getPosition();
+		PsiElement element = current.getParent();
 		if (
 				element instanceof LattePhpStaticVariable
 						|| element instanceof LattePhpConstant
@@ -56,9 +59,17 @@ public class LattePhpCompletionProvider extends BaseLatteCompletionProvider {
 		} else if (!(element instanceof LatteMacroModifier) && !(element instanceof LattePhpString)) {
 			classCompletionProvider.addCompletions(parameters, context, result);
 			namespaceCompletionProvider.addCompletions(parameters, context, result);
+			if (isInClassDefinition(element)) {
+				return;
+			}
 
-			if (LatteUtil.matchParentMacroName(element, "varType") || LatteUtil.matchParentMacroName(element, "var")) {
+			boolean parentType = LatteUtil.matchParentMacroName(element, LatteTagsUtil.Type.VAR_TYPE.getTagName());
+			boolean parentTemplateType = LatteUtil.matchParentMacroName(element, LatteTagsUtil.Type.TEMPLATE_TYPE.getTagName());
+			if (parentType || parentTemplateType || LatteUtil.matchParentMacroName(element, LatteTagsUtil.Type.VAR.getTagName())) {
 				attachVarTypes(result);
+ 				if (parentType || parentTemplateType || isInTypeDefinition(current)) {
+					return;
+				}
 			}
 
 			variableCompletionProvider.addCompletions(parameters, context, result);
@@ -79,10 +90,10 @@ public class LattePhpCompletionProvider extends BaseLatteCompletionProvider {
 			@NotNull BaseLattePhpElement psiElement,
 			boolean isStatic
 	) {
-		LattePhpType type = psiElement.getPhpType();
+		NettePhpType type = psiElement.getPhpType();
 
 		Collection<PhpClass> phpClasses = type.getPhpClasses(psiElement.getProject());
-		if (phpClasses == null || phpClasses.size() == 0) {
+		if (phpClasses.size() == 0) {
 			if (psiElement instanceof LattePhpMethod && (psiElement.getPhpStatementPart() == null || psiElement.getPhpStatementPart().getPrevPhpStatementPart() == null)) {
 				functionCompletionProvider.addCompletions(parameters, context, result);
 			}
@@ -135,6 +146,16 @@ public class LattePhpCompletionProvider extends BaseLatteCompletionProvider {
 				}
 			}
 		}
+	}
+
+	private boolean isInClassDefinition(@Nullable PsiElement element) {
+		return element != null && element.getNode().getElementType() == LatteTypes.PHP_CLASS_USAGE;
+	}
+
+	private boolean isInTypeDefinition(@Nullable PsiElement element) {
+		return element != null
+				&& (element.getPrevSibling() == null || (LatteTypesUtil.phpTypeTokens.contains(element.getPrevSibling().getNode().getElementType())))
+				&& element.getNode().getElementType() != LatteTypes.T_MACRO_ARGS_VAR;
 	}
 
 	private boolean canShowCompletionElement(boolean isStatic, @NotNull PhpModifier modifier) {

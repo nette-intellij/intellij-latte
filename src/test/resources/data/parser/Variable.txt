@@ -1,5 +1,5 @@
 Latte file
-  LattePairMacroImpl(PAIR_MACRO)
+  LatteUnpairedMacroImpl(UNPAIRED_MACRO)
     LatteMacroOpenTagImpl(MACRO_OPEN_TAG)
       PsiElement(LatteTokenType.T_MACRO_OPEN_TAG_OPEN)('{')
       LatteMacroContentImpl(MACRO_CONTENT)

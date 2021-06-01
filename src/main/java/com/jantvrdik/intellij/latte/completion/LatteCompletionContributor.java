@@ -33,7 +33,7 @@ public class LatteCompletionContributor extends CompletionContributor {
 
 		extend(CompletionType.BASIC, PlatformPatterns.psiElement(LatteTypes.T_MACRO_NAME).withLanguage(LatteLanguage.INSTANCE), new CompletionProvider<CompletionParameters>() {
 			@Override
-			protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
+			protected void addCompletions(@NotNull CompletionParameters parameters, @NotNull ProcessingContext context, @NotNull CompletionResultSet result) {
 				PsiElement parent = parameters.getPosition().getParent();
 				Project project = parameters.getOriginalFile().getProject();
 				attachClassicMacrosCompletion(project, result, parent instanceof LatteMacroCloseTag);
@@ -42,7 +42,7 @@ public class LatteCompletionContributor extends CompletionContributor {
 
 		extend(CompletionType.BASIC, PlatformPatterns.psiElement(LatteTypes.T_HTML_TAG_NATTR_NAME).withLanguage(LatteLanguage.INSTANCE), new CompletionProvider<CompletionParameters>() {
 			@Override
-			protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
+			protected void addCompletions(@NotNull CompletionParameters parameters, @NotNull ProcessingContext context, @NotNull CompletionResultSet result) {
 				Project project = parameters.getOriginalFile().getProject();
 				Map<String, LatteTagSettings> customMacros = LatteConfiguration.getInstance(project).getTags();
 				result.addAllElements(getAttrMacroCompletions(customMacros));
@@ -51,7 +51,7 @@ public class LatteCompletionContributor extends CompletionContributor {
 
 		extend(CompletionType.BASIC, PlatformPatterns.psiElement().withLanguage(LatteLanguage.INSTANCE), new CompletionProvider<CompletionParameters>() {
 			@Override
-			protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
+			protected void addCompletions(@NotNull CompletionParameters parameters, @NotNull ProcessingContext context, @NotNull CompletionResultSet result) {
 				PsiElement element = parameters.getPosition().getParent();
 				if (!LatteUtil.matchParentMacroName(element, "contentType")) {
 					return;
@@ -62,7 +62,7 @@ public class LatteCompletionContributor extends CompletionContributor {
 
 		extend(CompletionType.BASIC, PlatformPatterns.psiElement(LatteTypes.T_MACRO_FILTERS).withLanguage(LatteLanguage.INSTANCE), new CompletionProvider<CompletionParameters>() {
 			@Override
-			protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
+			protected void addCompletions(@NotNull CompletionParameters parameters, @NotNull ProcessingContext context, @NotNull CompletionResultSet result) {
 				PsiElement element = parameters.getPosition().getParent();
 				if (!(element instanceof LatteMacroModifier)) {
 					return;
@@ -143,7 +143,12 @@ public class LatteCompletionContributor extends CompletionContributor {
 		LookupElementBuilder builder = LookupElementBuilder.create(name);
 		builder = builder.withInsertHandler(MacroInsertHandler.getInstance());
 		if (!isEndTag) {
-			String appendText = tag.getType() == LatteTagSettings.Type.PAIR ? (" … {/" + tag.getMacroName() + "}") : "";
+			String appendText = "";
+			if (tag.getType() == LatteTagSettings.Type.PAIR) {
+				appendText = " … {/" + tag.getMacroName() + "}";
+			} else if (tag.getType() == LatteTagSettings.Type.AUTO_EMPTY) {
+				appendText = " … ?{/" + tag.getMacroName() + "}";
+			}
 			String arguments = tag.getArgumentsInfo();
 			if (arguments.length() > 0) {
 				builder = builder.withTailText(" " + arguments + "}" + appendText);
@@ -173,12 +178,8 @@ public class LatteCompletionContributor extends CompletionContributor {
 	private List<LookupElement> getAttrMacroCompletions(Map<String, LatteTagSettings> macros) {
 		List<LookupElement> lookupElements = new ArrayList<>(macros.size());
 		for (LatteTagSettings macro : macros.values()) {
-			if (macro.getType() != LatteTagSettings.Type.UNPAIRED) {
-				lookupElements.add(createBuilderForTag("n:" + macro.getMacroName()));
-				if (macro.getType() == LatteTagSettings.Type.PAIR || macro.getType() == LatteTagSettings.Type.AUTO_EMPTY) {
-					lookupElements.add(createBuilderForTag("n:tag-" + macro.getMacroName()));
-					lookupElements.add(createBuilderForTag("n:inner-" + macro.getMacroName()));
-				}
+			for (String tagName : macro.getAllowedNetteAttributes()) {
+				lookupElements.add(createBuilderForTag(tagName));
 			}
 		}
 		return lookupElements;

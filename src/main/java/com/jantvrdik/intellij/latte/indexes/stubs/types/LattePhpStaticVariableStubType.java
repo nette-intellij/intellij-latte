@@ -15,10 +15,10 @@ import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpStaticVariableStub;
 import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpTypeStub;
 import com.jantvrdik.intellij.latte.indexes.stubs.impl.LattePhpStaticVariableStubImpl;
 import com.jantvrdik.intellij.latte.parser.LatteElementTypes;
+import com.jantvrdik.intellij.latte.php.LattePhpVariableUtil;
 import com.jantvrdik.intellij.latte.psi.LattePhpStaticVariable;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
 import com.jantvrdik.intellij.latte.psi.impl.LattePhpStaticVariableImpl;
-import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -67,7 +67,7 @@ public class LattePhpStaticVariableStubType extends LattePhpTypeStub<LattePhpSta
     public LattePhpStaticVariableStub createStub(@NotNull LighterAST tree, @NotNull LighterASTNode node, @NotNull StubElement parentStub) {
         LighterASTNode keyNode = LightTreeUtil.firstChildOfType(tree, node, TokenSet.create(LatteTypes.T_MACRO_ARGS_VAR));
         String key = intern(tree.getCharTable(), keyNode);
-        return new LattePhpStaticVariableStubImpl(parentStub, LattePhpUtil.normalizePhpVariable(key));
+        return new LattePhpStaticVariableStubImpl(parentStub, LattePhpVariableUtil.normalizePhpVariable(key));
     }
 
     public static String intern(@NotNull CharTable table, LighterASTNode node) {

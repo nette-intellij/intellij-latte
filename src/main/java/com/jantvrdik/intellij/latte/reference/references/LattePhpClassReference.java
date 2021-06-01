@@ -6,7 +6,7 @@ import com.intellij.psi.*;
 import com.jantvrdik.intellij.latte.indexes.LatteIndexUtil;
 import com.jantvrdik.intellij.latte.indexes.extensions.LattePhpClassIndex;
 import com.jantvrdik.intellij.latte.psi.LattePhpClassUsage;
-import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
+import com.jantvrdik.intellij.latte.php.LattePhpUtil;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpNamespace;
 import org.jetbrains.annotations.NotNull;

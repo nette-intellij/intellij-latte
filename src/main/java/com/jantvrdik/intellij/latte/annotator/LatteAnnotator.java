@@ -11,11 +11,7 @@ import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.intentions.*;
 import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.settings.LatteTagSettings;
-import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Collection;
 
 /**
  * Annotator is mostly used to check semantic rules which can not be easily checked during parsing.
@@ -59,7 +55,7 @@ public class LatteAnnotator implements Annotator {
 					.range(attrName)
 					.withFix(new AddCustomPairMacro(tagName));
 			if (!prefixed) {
-				builder.withFix(new AddCustomAttrOnlyMacro(tagName));
+				builder = builder.withFix(new AddCustomAttrOnlyMacro(tagName));
 			}
 			builder.create();
 

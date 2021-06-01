@@ -6,12 +6,12 @@ import com.intellij.pom.PomTargetPsiElement;
 import com.intellij.psi.*;
 import com.intellij.psi.xml.XmlAttributeValue;
 import com.jantvrdik.intellij.latte.config.LatteFileConfiguration;
+import com.jantvrdik.intellij.latte.php.LattePhpVariableUtil;
+import com.jantvrdik.intellij.latte.php.NettePhpType;
 import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
-import com.jantvrdik.intellij.latte.utils.LattePhpType;
-import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
+import com.jantvrdik.intellij.latte.utils.LattePhpVariableDefinition;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
-import com.jantvrdik.intellij.latte.utils.PsiPositionedElement;
 import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.*;
@@ -20,21 +20,20 @@ import java.util.*;
 
 public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
 
-    private String variableName;
-    private boolean definition;
+    private final String variableName;
 
     public LattePhpVariableReference(@NotNull LattePhpVariable element, TextRange textRange) {
         super(element, textRange);
         variableName = element.getVariableName();
-        definition = element.isDefinition();
     }
 
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
-        if (getElement().getContainingFile().getVirtualFile() == null) {
+        if (!(getElement() instanceof LattePhpVariable || getElement().getContainingFile().getVirtualFile() == null)) {
             return new ResolveResult[0];
         }
+        LattePhpVariable variable = (LattePhpVariable) getElement();
 
         Project project = getElement().getProject();
         List<ResolveResult> results = new ArrayList<>();
@@ -42,7 +41,7 @@ public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> impl
             results.add(new PsiElementResolveResult(attributeValue));
         }
 
-        LattePhpType fields = LatteUtil.findFirstLatteTemplateType(getElement().getContainingFile());
+        NettePhpType fields = LatteUtil.findFirstLatteTemplateType(getElement().getContainingFile());
         String name = ((BaseLattePhpElement) getElement()).getPhpElementName();
         if (fields != null) {
             for (PhpClass phpClass : fields.getPhpClasses(project)) {
@@ -54,26 +53,9 @@ public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> impl
             }
         }
 
-        //todo: complete resolving for variables
-        //final List<PsiPositionedElement> variables = LatteUtil.findVariablesInFileBeforeElement(getElement(), getElement().getContainingFile().getVirtualFile(), variableName);
-        final List<PsiPositionedElement> variables = LatteUtil.findVariablesInFile(getElement().getProject(), getElement().getContainingFile().getVirtualFile(), variableName);
-        /*if (!(getElement() instanceof LattePhpVariable)) {
-            return new ResolveResult[0];
-        }
-
-        final List<PsiPositionedElement> variables;
-        if (((LattePhpVariable) getElement()).isVarTypeDefinition()) {
-            variables = LatteUtil.findVariablesInFileAfterElement(getElement(), getElement().getContainingFile().getVirtualFile(), variableName);
-        } else {
-            variables = LatteUtil.findVariablesInFileBeforeElement(getElement(), getElement().getContainingFile().getVirtualFile(), variableName);
-        }*/
-
-        for (PsiPositionedElement variable : variables) {
-            PsiElement var = variable.getElement();
-            if (!(var instanceof LattePhpVariable) || !((LattePhpVariable) var).isDefinition()) {
-                continue;
-            }
-            results.add(new PsiElementResolveResult(variable.getElement()));
+        final List<LattePhpVariableDefinition> variables = LattePhpVariableUtil.getVariableDefinition(variable);
+        for (LattePhpVariableDefinition variableDefinition : variables) {
+            results.add(new PsiElementResolveResult(variableDefinition.getElement()));
         }
         return results.toArray(new ResolveResult[0]);
     }
@@ -99,7 +81,7 @@ public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> impl
     @NotNull
     @Override
     public String getCanonicalText() {
-        return LattePhpUtil.normalizePhpVariable(getElement().getText());
+        return LattePhpVariableUtil.normalizePhpVariable(getElement().getText());
     }
 
     @Override
@@ -112,9 +94,8 @@ public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> impl
 
     @Override
     public boolean isReferenceTo(@NotNull PsiElement element) {
-        if (element instanceof LattePhpVariable) {
-            return (!definition || !((LattePhpVariable) element).isDefinition())
-                    && ((LattePhpVariable) element).getVariableName().equals(variableName);
+        if (element instanceof LattePhpVariable && ((LattePhpVariable) element).isDefinition()) {
+            return ((LattePhpVariable) element).getVariableName().equals(variableName);
         }
 
         PsiElement currentElement = element;

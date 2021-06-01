@@ -17,7 +17,7 @@ import com.jantvrdik.intellij.latte.indexes.stubs.impl.LattePhpClassStubImpl;
 import com.jantvrdik.intellij.latte.parser.LatteElementTypes;
 import com.jantvrdik.intellij.latte.psi.LattePhpClassReference;
 import com.jantvrdik.intellij.latte.psi.impl.LattePhpClassReferenceImpl;
-import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
+import com.jantvrdik.intellij.latte.php.LattePhpUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

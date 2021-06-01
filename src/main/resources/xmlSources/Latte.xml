@@ -12,7 +12,7 @@
 				<argument name="expression" types="PHP_EXPRESSION" validType="string" required="true" />
 			</arguments>
 		</tag>
-		<tag name="block" type="PAIR" allowedFilters="true" multiLine="true">
+		<tag name="block" type="AUTO_EMPTY" allowedFilters="true" multiLine="true">
 			<arguments>
 				<argument name="name" types="PHP_IDENTIFIER,VARIABLE,PHP_EXPRESSION" validType="string" required="true" />
 			</arguments>
@@ -182,6 +182,11 @@
 		</tag>
 		<tag name="try" type="PAIR" />
 		<tag name="rollback" type="UNPAIRED" />
+		<tag name="tag" type="ATTR_ONLY">
+			<arguments>
+				<argument name="expression" types="PHP_EXPRESSION" required="true" validType="string" repeatable="true" />
+			</arguments>
+		</tag>
 		<tag name="ifchanged" type="PAIR">
 			<arguments>
 				<argument name="expression" types="PHP_EXPRESSION" required="true" repeatable="true" />
@@ -197,6 +202,7 @@
 				<argument name="variable" types="VARIABLE_DEFINITION_EXPRESSION" required="true" repeatable="true" />
 			</arguments>
 		</tag>
+		<tag name="trace" type="UNPAIRED" />
 		<tag name="varPrint" type="UNPAIRED" arguments="all" />
 		<tag name="varType" type="UNPAIRED">
 			<arguments>
@@ -209,6 +215,7 @@
 				<argument name="condition" types="PHP_CONDITION" validType="bool" required="true" />
 			</arguments>
 		</tag>
+		<tag name="iterateWhile" type="PAIR" multiLine="true" />
 		<tag name="embed" type="PAIR" multiLine="true">
 			<arguments>
 				<argument name="file" types="BLOCK_USAGE,PHP_IDENTIFIER,VARIABLE,PHP_EXPRESSION" validType="string" required="true" />
@@ -220,25 +227,25 @@
 		<tag name="truncate" type="UNPAIRED" arguments="expression" deprecatedMessage="Tag {? ...} is deprecated in Latte 2.4. For variable definitions use {var ...} or {php ...} in other cases." />
 	</tags>
 	<filters>
-		<filter name="truncate" arguments=":(length, append = '…')" description="shortens the length preserving whole words" insertColons=":" />
-		<filter name="substr" arguments=":(offset [, length])" description="returns part of the string" insertColons=":" />
-		<filter name="trim" arguments=":(charset = mezery)" description="strips whitespace or other characters from the beginning and end of the string" />
+		<filter name="truncate" arguments=":($length, $append = '…')" description="shortens the length preserving whole words" insertColons=":" />
+		<filter name="substr" arguments=":($offset [, $length])" description="returns part of the string" insertColons=":" />
+		<filter name="trim" arguments=":($charset = mezery)" description="strips whitespace or other characters from the beginning and end of the string" />
 		<filter name="stripHtml" arguments="" description="removes HTML tags and converts HTML entities to text" />
 		<filter name="strip" arguments="" description="removes whitespace" />
-		<filter name="indent" arguments=":(level = 1, char = '\t')" description="indents the text from left with number of tabs" />
-		<filter name="replace" arguments=":(search, replace = '')" description="replaces all occurrences of the search string with the replacement" insertColons=":" />
-		<filter name="replaceRE" arguments=":(pattern, replace = '')" description="replaces all occurrences according to regular expression" insertColons=":" />
-		<filter name="padLeft" arguments=":(length, pad = ' ')" description="completes the string to given length from left" insertColons=":" />
-		<filter name="padRight" arguments=":(length, pad = ' ')" description="completes the string to given length from right" insertColons=":" />
-		<filter name="repeat" arguments=":(count)" description="repeats the string" insertColons=":" />
-		<filter name="implode" arguments=":(glue = '')" description="joins an array to a string" />
+		<filter name="indent" arguments=":($level = 1, $char = '\t')" description="indents the text from left with number of tabs" />
+		<filter name="replace" arguments=":($search, $replace = '')" description="replaces all occurrences of the search string with the replacement" insertColons=":" />
+		<filter name="replaceRE" arguments=":($pattern, $replace = '')" description="replaces all occurrences according to regular expression" insertColons=":" />
+		<filter name="padLeft" arguments=":($length, $pad = ' ')" description="completes the string to given length from left" insertColons=":" />
+		<filter name="padRight" arguments=":($length, $pad = ' ')" description="completes the string to given length from right" insertColons=":" />
+		<filter name="repeat" arguments=":($count)" description="repeats the string" insertColons=":" />
+		<filter name="implode" arguments=":($glue = '')" description="joins an array to a string" />
 		<filter name="webalize" description="adjusts the UTF-8 string to the shape used in the URL" />
 		<filter name="breaklines" description="inserts HTML line breaks before all newlines" />
 		<filter name="reverse" description="reverse an UTF-8 string or array" />
 		<filter name="length" description="returns length of a string or array" />
 		<filter name="sort" description="simply sorts array" />
 		<filter name="reverse" description="array sorted in reverse order (used with |sort)" />
-		<filter name="batch" arguments=":(array, length [, item])" description="returns length of a string or array" insertColons="::" />
+		<filter name="batch" arguments=":($array, $length [, $item])" description="returns length of a string or array" insertColons="::" />
 
 		<filter name="clamp" description="returns value clamped to the inclusive range of min and max." insertColons="::" />
 
@@ -247,18 +254,37 @@
 		<filter name="firstUpper" description="makes the first letter upper case" />
 		<filter name="capitalize" description="lower case, the first letter of each word upper case" />
 
-		<filter name="date" arguments=":(format)" description="formats date" insertColons=":" />
-		<filter name="number" arguments=":(decimals = 0, decPoint = '.', thousandsSep = ',')" description="format number" />
-		<filter name="bytes" arguments=":(precision = 2)" description="formats size in bytes" />
-		<filter name="dataStream" arguments=":(mimetype = detect)" description="Data URI protocol conversion" />
+		<filter name="date" arguments=":($format)" description="formats date" insertColons=":" />
+		<filter name="number" arguments=":($decimals = 0, $decPoint = '.', $thousandsSep = ',')" description="format number" />
+		<filter name="bytes" arguments=":($precision = 2)" description="formats size in bytes" />
+		<filter name="dataStream" arguments=":($mimetype = 'detect')" description="Data URI protocol conversion" />
 
 		<filter name="noescape" description="prints a variable without escaping" />
 		<filter name="escapeurl" description="escapes parameter in URL" />
 
 		<filter name="nocheck" description="prevents automatic URL sanitization" />
 		<filter name="checkurl" description="sanitizes string for use inside href attribute" />
+
+		<filter name="query" description="generates a query string in the URL" />
+		<filter name="ceil" arguments=":(int $precision = 0)" description="rounds a number up to a given precision" />
+		<filter name="explode" arguments=":(string $separator = '')" description="splits a string by the given delimiter" />
+		<filter name="first" description="returns first element of array or character of string" />
+		<filter name="floor" arguments=":(int $precision = 0)" description="rounds a number down to a given precision" />
+		<filter name="join" arguments=":(string $glue = '')" description="joins an array to a string" />
+		<filter name="last" description="returns last element of array or character of string" />
+		<filter name="random" description="returns random element of array or character of string" />
+		<filter name="round" arguments=":(int $precision = 0)" description="rounds a number to a given precision" />
+		<filter name="slice" arguments=":(int $start, int $length = null, bool $preserveKeys = false)" description="extracts a slice of an array or a string" insertColons=":" />
+		<filter name="spaceless" description="removes whitespace" />
+		<filter name="split" arguments=":(string $separator = '')" description="splits a string by the given delimiter" />
 	</filters>
 	<functions>
 		<function name="clamp" returnType="int|float" arguments="(int|float $value, int|float $min, int|float $max)" description="clamps value to the inclusive range of min and max" />
+		<function name="divisibleBy" returnType="bool" arguments="(int $value)" description="checks if a variable is divisible by a number" />
+		<function name="even" returnType="bool" arguments="(int $value)" description="checks if the given number is even" />
+		<function name="first" returnType="mixed" arguments="(string|array $value)" description="returns first element of array or character of string" />
+		<function name="last" returnType="mixed" arguments="(string|array $value)" description="returns last element of array or character of string" />
+		<function name="odd" returnType="bool" arguments="(int $value)" description="checks if the given number is odd" />
+		<function name="slice" returnType="string|array" arguments="(string|array $value, int $start, int $length = null, bool $preserveKeys = false)" description="extracts a slice of an array or a string" />
 	</functions>
 </latte>

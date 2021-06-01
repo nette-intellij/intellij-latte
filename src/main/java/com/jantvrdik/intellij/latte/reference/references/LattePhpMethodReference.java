@@ -8,7 +8,7 @@ import com.intellij.psi.xml.XmlAttributeValue;
 import com.jantvrdik.intellij.latte.config.LatteFileConfiguration;
 import com.jantvrdik.intellij.latte.indexes.LatteIndexUtil;
 import com.jantvrdik.intellij.latte.psi.LattePhpMethod;
-import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
+import com.jantvrdik.intellij.latte.php.LattePhpUtil;
 import com.jetbrains.php.lang.psi.elements.Function;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;

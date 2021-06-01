@@ -7,7 +7,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
 import com.jantvrdik.intellij.latte.completion.handlers.PhpClassInsertHandler;
 import com.jantvrdik.intellij.latte.psi.LattePhpContent;
-import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
+import com.jantvrdik.intellij.latte.php.LattePhpUtil;
 import com.jetbrains.php.completion.PhpLookupElement;
 import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
 import org.jetbrains.annotations.NotNull;
@@ -34,15 +34,14 @@ public class LattePhpClassCompletionProvider extends BaseLatteCompletionProvider
 			return;
 		}
 
-		PrefixMatcher prefixMatcher = results.getPrefixMatcher();
-		String prefix = prefixMatcher.getPrefix();
-		if (prefix.contains("\\")) {
-			int index = prefix.lastIndexOf("\\");
-			prefixMatcher = prefixMatcher.cloneWithPrefix(prefix.substring(index + 1));
+		String prefix = results.getPrefixMatcher().getPrefix();
+		String namespaceName = getNamespaceName(curr);
+		if (namespaceName.length() > 0) {
+			namespaceName = namespaceName + "\\" + prefix;
 		}
 
 		Project project = params.getPosition().getProject();
-		Collection<String> classNames = LattePhpUtil.getAllExistingClassNames(project, prefixMatcher);
+		Collection<String> classNames = LattePhpUtil.getAllExistingClassNames(project, results.getPrefixMatcher().cloneWithPrefix(namespaceName));
 		Collection<PhpNamedElement> variants = LattePhpUtil.getAllClassNamesAndInterfaces(project, classNames);
 
 		// Add variants

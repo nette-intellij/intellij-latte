@@ -5,10 +5,10 @@ import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
+import com.jantvrdik.intellij.latte.php.LattePhpVariableUtil;
+import com.jantvrdik.intellij.latte.php.NettePhpType;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LattePhpProperty;
-import com.jantvrdik.intellij.latte.utils.LattePhpType;
-import com.jantvrdik.intellij.latte.utils.LattePhpUtil;
 import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpModifier;
@@ -37,12 +37,12 @@ public class PropertyUsagesInspection extends BaseLocalInspectionTool {
 		final List<ProblemDescriptor> problems = new ArrayList<>();
 		file.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
 			@Override
-			public void visitElement(PsiElement element) {
+			public void visitElement(@NotNull PsiElement element) {
 				if (element instanceof LattePhpProperty) {
-					LattePhpType phpType = ((LattePhpProperty) element).getPhpType();
+					NettePhpType phpType = ((LattePhpProperty) element).getPhpType();
 
 					Collection<PhpClass> phpClasses = phpType.getPhpClasses(element.getProject());
-					if (phpClasses == null) {
+					if (phpClasses.size() == 0) {
 						return;
 					}
 
@@ -50,7 +50,7 @@ public class PropertyUsagesInspection extends BaseLocalInspectionTool {
 					String variableName = ((LattePhpProperty) element).getPropertyName();
 					for (PhpClass phpClass : phpClasses) {
 						for (Field field : phpClass.getFields()) {
-							if (!field.isConstant() && field.getName().equals(LattePhpUtil.normalizePhpVariable(variableName))) {
+							if (!field.isConstant() && field.getName().equals(LattePhpVariableUtil.normalizePhpVariable(variableName))) {
 								PhpModifier modifier = field.getModifier();
 								if (modifier.isPrivate()) {
 									addProblem(manager, problems, element, "Used private property '" + variableName + "'", isOnTheFly);

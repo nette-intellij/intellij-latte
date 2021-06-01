@@ -1,19 +1,21 @@
 package com.jantvrdik.intellij.latte.completion.providers;
 
 import com.intellij.codeInsight.completion.CompletionParameters;
-import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
+import com.jantvrdik.intellij.latte.completion.handlers.PhpNamespaceInsertHandler;
 import com.jantvrdik.intellij.latte.psi.LattePhpContent;
-import com.jetbrains.php.PhpIndex;
-import com.jetbrains.php.completion.PhpCompletionUtil;
-import com.jetbrains.php.completion.insert.PhpNamespaceInsertHandler;
+import com.jantvrdik.intellij.latte.php.LattePhpUtil;
+import com.jetbrains.php.completion.PhpLookupElement;
+import com.jetbrains.php.lang.psi.elements.PhpNamespace;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 
-public class LattePhpNamespaceCompletionProvider extends CompletionProvider<CompletionParameters> {
+public class LattePhpNamespaceCompletionProvider extends BaseLatteCompletionProvider {
 
 	public LattePhpNamespaceCompletionProvider() {
 	}
@@ -25,14 +27,28 @@ public class LattePhpNamespaceCompletionProvider extends CompletionProvider<Comp
 			return;
 		}
 
-		PhpIndex phpIndex = PhpIndex.getInstance(curr.getProject());
-		String prefix = result.getPrefixMatcher().getPrefix();
-		String namespace = "";
-		if (prefix.contains("\\")) {
-			int index = prefix.lastIndexOf("\\");
-			namespace = prefix.substring(0, index) + "\\";
-			prefix = prefix.substring(index + 1);
+		String namespaceName = getNamespaceName(curr);
+		Collection<String> namespaceNames = LattePhpUtil.getAllExistingNamespacesByName(curr.getProject(), namespaceName);
+		Collection<PhpNamespace> namespaces = LattePhpUtil.getAlNamespaces(curr.getProject(), namespaceNames);
+		for (PhpNamespace namespace : namespaces) {
+			PhpLookupElement lookupItem = getPhpLookupElement(namespace, null, getTypeText(namespace.getParentNamespaceName()));
+			lookupItem.handler = PhpNamespaceInsertHandler.getInstance();
+			result.addElement(lookupItem);
 		}
-		PhpCompletionUtil.addSubNamespaces(namespace, result.withPrefixMatcher(prefix), phpIndex, PhpNamespaceInsertHandler.getInstance());
 	}
+
+	@Nullable
+	private String getTypeText(String parentNamespace) {
+		if (parentNamespace.length() > 1) {
+			if (parentNamespace.startsWith("\\")) {
+				parentNamespace = parentNamespace.substring(1);
+			}
+			if (parentNamespace.endsWith("\\") && parentNamespace.length() > 1) {
+				parentNamespace = parentNamespace.substring(0, parentNamespace.length() - 1);
+			}
+			return " [" + parentNamespace + "]";
+		}
+		return null;
+	}
+
 }
