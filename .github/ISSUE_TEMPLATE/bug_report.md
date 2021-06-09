@@ -21,6 +21,9 @@ Steps to reproduce the behavior (or attach video):
 3. Scroll down to '....'
 4. See error
 
+**Code**
+If applicable, add your Latte code here as a text or upload file (text is better than screenshot for debugging)
+
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
