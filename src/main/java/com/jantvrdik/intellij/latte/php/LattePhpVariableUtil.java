@@ -262,7 +262,7 @@ public class LattePhpVariableUtil {
 
         NettePhpType templateType = detectVariableTypeFromTemplateType(element, variableName);
         if (templateType != null) {
-            return templateType;
+            return templateType.withDepth(element.getPhpArrayLevel());
         }
 
         LatteVariableSettings defaultVariable = LatteConfiguration.getInstance(element.getProject()).getVariable(variableName);
@@ -321,7 +321,7 @@ public class LattePhpVariableUtil {
             @Override
             public void visitElement(@NotNull PsiElement element) {
                 if (
-                        element instanceof LattePhpStatement && ((LattePhpStatement) element).isPhpVariableOnly()
+                        varDefinition[0] == null && element instanceof LattePhpStatement && ((LattePhpStatement) element).isPhpVariableOnly()
                                 || element instanceof LattePhpArrayOfVariables
                 ) {
                     varDefinition[0] = element;

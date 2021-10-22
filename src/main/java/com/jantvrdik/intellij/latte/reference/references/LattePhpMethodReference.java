@@ -20,9 +20,9 @@ import java.util.Collection;
 import java.util.List;
 
 public class LattePhpMethodReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
-    private String methodName;
-    private Collection<PhpClass> phpClasses;
-    private boolean isFunction;
+    final private String methodName;
+    final private Collection<PhpClass> phpClasses;
+    final private boolean isFunction;
 
     public LattePhpMethodReference(@NotNull LattePhpMethod element, TextRange textRange) {
         super(element, textRange);
@@ -136,7 +136,7 @@ public class LattePhpMethodReference extends PsiReferenceBase<PsiElement> implem
                     currentElement = element;
                 }
             }
-            if (currentElement instanceof XmlAttributeValue && isFunction && LatteFileConfiguration.hasParentXmlTagName(currentElement, "function")) {
+            if (currentElement instanceof XmlAttributeValue && LatteFileConfiguration.hasParentXmlTagName(currentElement, "function")) {
                 return ((XmlAttributeValue) currentElement).getValue().equals(methodName);
             }
         }

@@ -1,6 +1,5 @@
 package com.jantvrdik.intellij.latte.indexes.stubs.types;
 
-import com.intellij.lang.ASTNode;
 import com.intellij.lang.LighterAST;
 import com.intellij.lang.LighterASTNode;
 import com.intellij.lang.LighterASTTokenNode;

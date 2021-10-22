@@ -68,8 +68,8 @@
 
 		<psi.referenceContributor implementation="com.jantvrdik.intellij.latte.reference.LatteReferenceContributor"/>
 
+		<defaultLiveTemplates file="/liveTemplates/Latte.xml"/>
 		<liveTemplateContext implementation="com.jantvrdik.intellij.latte.liveTemplates.LatteTemplateContext"/>
-		<defaultLiveTemplatesProvider implementation="com.jantvrdik.intellij.latte.liveTemplates.LatteTemplateProvider"/>
 		<liveTemplatePreprocessor implementation="com.jantvrdik.intellij.latte.liveTemplates.LatteTemplatePreprocessor"/>
 
 		<projectConfigurable instance="com.jantvrdik.intellij.latte.ui.LatteSettingsForm"
