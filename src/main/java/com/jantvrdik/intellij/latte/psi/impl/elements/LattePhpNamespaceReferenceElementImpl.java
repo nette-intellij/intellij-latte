@@ -6,6 +6,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
 import com.intellij.psi.stubs.IStubElementType;
 import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpNamespaceStub;
+import com.jantvrdik.intellij.latte.php.NettePhpType;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpNamespaceReferenceElement;
 import com.jetbrains.php.PhpIcons;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +28,11 @@ public abstract class LattePhpNamespaceReferenceElementImpl extends StubBasedPsi
 	public String getPhpElementName()
 	{
 		return getNamespaceName();
+	}
+
+	@Override
+	public NettePhpType getReturnType() {
+		return NettePhpType.create(getNamespaceName());
 	}
 
 	@Override

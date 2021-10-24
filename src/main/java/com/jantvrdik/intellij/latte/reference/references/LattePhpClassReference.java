@@ -4,7 +4,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.jantvrdik.intellij.latte.indexes.LatteIndexUtil;
-import com.jantvrdik.intellij.latte.indexes.extensions.LattePhpClassIndex;
 import com.jantvrdik.intellij.latte.psi.LattePhpClassUsage;
 import com.jantvrdik.intellij.latte.php.LattePhpUtil;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
@@ -17,13 +16,15 @@ import java.util.Collection;
 import java.util.List;
 
 public class LattePhpClassReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
-    private String className;
-    private Collection<PhpClass> phpClasses;
+    final private String className;
+    final private Collection<PhpClass> phpClasses;
+    final private Project project;
 
     public LattePhpClassReference(@NotNull LattePhpClassUsage element, TextRange textRange) {
         super(element, textRange);
         className = element.getClassName();
-        phpClasses = element.getPhpType().getPhpClasses(element.getProject());
+        project = element.getProject();
+        phpClasses = element.getPhpType().getPhpClasses(project);
     }
 
     @NotNull
@@ -33,15 +34,12 @@ public class LattePhpClassReference extends PsiReferenceBase<PsiElement> impleme
             return new ResolveResult[0];
         }
 
-        Project project = getElement().getProject();
         List<ResolveResult> results = new ArrayList<>();
         for (PhpClass phpClass : ((LattePhpClassUsage) getElement()).getPhpType().getPhpClasses(project)) {
             if (LattePhpUtil.isReferenceFor(className, phpClass)) {
                 results.add(new PsiElementResolveResult(phpClass));
             }
         }
-
-        Collection<String> keys = LattePhpClassIndex.getInstance().getAllKeys(project);
 
         for (com.jantvrdik.intellij.latte.psi.LattePhpClassReference classReference : LatteIndexUtil.getClassesByFqn(project, className)) {
             results.add(new PsiElementResolveResult(classReference.getPhpClassUsage()));
@@ -77,14 +75,14 @@ public class LattePhpClassReference extends PsiReferenceBase<PsiElement> impleme
             return className.equals(((LattePhpClassUsage) element).getClassName());
         }
         /*if (element instanceof LattePhpClassUsage) {
-            Collection<PhpClass> originalClasses = ((LattePhpClassUsage) element).getPhpType().getPhpClasses(element.getProject());
+            Collection<PhpClass> originalClasses = ((LattePhpClassUsage) element).getPhpType().getPhpClasses(project);
             if (originalClasses.size() > 0) {
                 for (ResolveResult result : multiResolve(false)) {
                     if (!(result.getElement() instanceof LattePhpClassUsage)) {
                         continue;
                     }
 
-                    Collection<PhpClass> targetClasses = ((LattePhpClassUsage) result.getElement()).getPhpType().getPhpClasses(element.getProject());
+                    Collection<PhpClass> targetClasses = ((LattePhpClassUsage) result.getElement()).getPhpType().getPhpClasses(project);
                     if (targetClasses.size() == 0) {
                         continue;
                     }
@@ -108,7 +106,7 @@ public class LattePhpClassReference extends PsiReferenceBase<PsiElement> impleme
         }*/
 
         if (element instanceof PhpClass) {
-            return LattePhpUtil.isReferenceTo((PhpClass) element, multiResolve(false), element, ((PhpClass) element).getFQN());
+            return LattePhpUtil.isReferenceTo((PhpClass) element, multiResolve(false), project, ((PhpClass) element).getFQN());
         }
 
         if (!(element instanceof PhpNamespace)) {

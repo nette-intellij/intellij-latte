@@ -26,6 +26,7 @@ public class LatteTagsUtil {
         IFSET("ifset"),
         LINK("link"),
         N_HREF("n:href"),
+        PARAMETERS("parameters"),
         PHP("php"),
         PLINK("plink"),
         SNIPPET("snippet"),

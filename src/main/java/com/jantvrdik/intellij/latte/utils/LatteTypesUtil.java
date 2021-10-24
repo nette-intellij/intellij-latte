@@ -24,6 +24,7 @@ public class LatteTypesUtil {
     final public static TokenSet methodTokens = TokenSet.create(LatteTypes.T_PHP_IDENTIFIER, LatteTypes.T_PHP_NAMESPACE_REFERENCE, LatteTypes.PHP_VARIABLE);
 
     final public static TokenSet phpTypeTokens = TokenSet.create(
+        LatteTypes.T_PHP_NULL_MARK,
         LatteTypes.T_PHP_TYPE,
         LatteTypes.T_PHP_NULL,
         LatteTypes.T_PHP_MIXED,

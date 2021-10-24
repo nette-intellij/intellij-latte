@@ -4,6 +4,8 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
+import com.jantvrdik.intellij.latte.php.LattePhpTypeDetector;
+import com.jantvrdik.intellij.latte.php.NettePhpType;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpClassUsageElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,6 +20,11 @@ public abstract class LattePhpClassUsageElementImpl extends ASTWrapperPsiElement
 	public String getPhpElementName()
 	{
 		return getClassName();
+	}
+
+	@Override
+	public NettePhpType getReturnType() {
+		return NettePhpType.create(getClassName());
 	}
 
 	@Nullable

@@ -6,6 +6,8 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
 import com.intellij.psi.stubs.IStubElementType;
 import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpClassStub;
+import com.jantvrdik.intellij.latte.php.LattePhpTypeDetector;
+import com.jantvrdik.intellij.latte.php.NettePhpType;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpClassReferenceElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,6 +26,11 @@ public abstract class LattePhpClassReferenceElementImpl extends StubBasedPsiElem
 	public String getPhpElementName()
 	{
 		return getClassName();
+	}
+
+	@Override
+	public NettePhpType getReturnType() {
+		return LattePhpTypeDetector.detectPhpType(this);
 	}
 
 	@Nullable

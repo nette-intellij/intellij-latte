@@ -90,7 +90,7 @@ public class LattePhpCompletionProvider extends BaseLatteCompletionProvider {
 			@NotNull BaseLattePhpElement psiElement,
 			boolean isStatic
 	) {
-		NettePhpType type = psiElement.getPhpType();
+		NettePhpType type = psiElement.getPrevReturnType();
 
 		Collection<PhpClass> phpClasses = type.getPhpClasses(psiElement.getProject());
 		if (phpClasses.size() == 0) {

@@ -41,7 +41,7 @@ public class LattePhpUtil {
         return variants;
     }
 
-    public static boolean isReferenceTo(@NotNull PhpClass originalClass, @NotNull ResolveResult[] results, @NotNull PsiElement element, @NotNull String name) {
+    public static boolean isReferenceTo(@NotNull PhpClass originalClass, @NotNull ResolveResult[] results, @NotNull Project project, @NotNull String name) {
         for (ResolveResult result : results) {
             if (!(result.getElement() instanceof BaseLattePhpElement)) {
                 continue;
@@ -51,7 +51,7 @@ public class LattePhpUtil {
                 continue;
             }
 
-            Collection<PhpClass> phpClasses = ((BaseLattePhpElement) result.getElement()).getPhpType().getPhpClasses(element.getProject());
+            Collection<PhpClass> phpClasses = ((BaseLattePhpElement) result.getElement()).getPrevReturnType().getPhpClasses(project);
             if (phpClasses.size() == 0) {
                 continue;
             }
@@ -66,7 +66,7 @@ public class LattePhpUtil {
     }
 
     public static boolean isNullable(@NotNull PhpType type) {
-        return false;
+        return false; //todo: replace with type.isNullable()
     }
 
     public static boolean isReferenceFor(@NotNull PhpClass originalClass, @NotNull PhpClass targetClass) {
@@ -104,9 +104,9 @@ public class LattePhpUtil {
         return false;
     }
 
-    public static List<Field> getFieldsForPhpElement(@NotNull BaseLattePhpElement psiElement) {
+    public static List<Field> getFieldsForPhpElement(@NotNull BaseLattePhpElement psiElement, @NotNull Project project) {
         List<Field> out = new ArrayList<>();
-        NettePhpType phpType = psiElement.getPhpType();
+        NettePhpType phpType = psiElement.getPrevReturnType();
         String name = psiElement.getPhpElementName();
         boolean isConstant = psiElement instanceof LattePhpConstant;
         if (psiElement instanceof LattePhpVariable) {
@@ -117,7 +117,7 @@ public class LattePhpUtil {
             name = ((LattePhpVariable) psiElement).getVariableName();
         }
 
-        Collection<PhpClass> phpClasses = phpType.getPhpClasses(psiElement.getProject());
+        Collection<PhpClass> phpClasses = phpType.getPhpClasses(project);
         if (phpClasses.size() == 0) {
             return out;
         }
@@ -136,9 +136,9 @@ public class LattePhpUtil {
         return fields;
     }
 
-    public static List<Method> getMethodsForPhpElement(@NotNull LattePhpMethod psiElement) {
+    public static List<Method> getMethodsForPhpElement(@NotNull LattePhpMethod psiElement, Project project) {
         List<Method> out = new ArrayList<>();
-        Collection<PhpClass> phpClasses = psiElement.getPhpType().getPhpClasses(psiElement.getProject());
+        Collection<PhpClass> phpClasses = psiElement.getPrevReturnType().getPhpClasses(project);
         if (phpClasses.size() > 0) {
             String methodName = psiElement.getMethodName();
             for (PhpClass phpClass : phpClasses) {

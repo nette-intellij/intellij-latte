@@ -10,7 +10,7 @@ import com.jantvrdik.intellij.latte.php.LattePhpVariableUtil;
 import com.jantvrdik.intellij.latte.php.NettePhpType;
 import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
-import com.jantvrdik.intellij.latte.utils.LattePhpVariableDefinition;
+import com.jantvrdik.intellij.latte.utils.LattePhpCachedVariable;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
@@ -21,10 +21,12 @@ import java.util.*;
 public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
 
     private final String variableName;
+    private final Project project;
 
     public LattePhpVariableReference(@NotNull LattePhpVariable element, TextRange textRange) {
         super(element, textRange);
         variableName = element.getVariableName();
+        project = element.getProject();
     }
 
     @NotNull
@@ -35,7 +37,6 @@ public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> impl
         }
         LattePhpVariable variable = (LattePhpVariable) getElement();
 
-        Project project = getElement().getProject();
         List<ResolveResult> results = new ArrayList<>();
         for (XmlAttributeValue attributeValue : LatteFileConfiguration.getAllMatchedXmlAttributeValues(project, "variable", variableName)) {
             results.add(new PsiElementResolveResult(attributeValue));
@@ -53,8 +54,8 @@ public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> impl
             }
         }
 
-        final List<LattePhpVariableDefinition> variables = LattePhpVariableUtil.getVariableDefinition(variable);
-        for (LattePhpVariableDefinition variableDefinition : variables) {
+        final List<LattePhpCachedVariable> variables = variable.getVariableDefinition();
+        for (LattePhpCachedVariable variableDefinition : variables) {
             results.add(new PsiElementResolveResult(variableDefinition.getElement()));
         }
         return results.toArray(new ResolveResult[0]);

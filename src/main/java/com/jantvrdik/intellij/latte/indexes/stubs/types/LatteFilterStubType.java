@@ -12,7 +12,6 @@ import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.CharTable;
 import com.jantvrdik.intellij.latte.indexes.extensions.LattePhpNamespaceIndex;
 import com.jantvrdik.intellij.latte.indexes.stubs.LatteFilterStub;
-import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpTypeStub;
 import com.jantvrdik.intellij.latte.indexes.stubs.impl.LatteFilterStubImpl;
 import com.jantvrdik.intellij.latte.parser.LatteElementTypes;
 import com.jantvrdik.intellij.latte.psi.LatteMacroModifier;
@@ -22,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-public class LatteFilterStubType extends LattePhpTypeStub<LatteFilterStub, LatteMacroModifier> {
+public class LatteFilterStubType extends LattePhpStubType<LatteFilterStub, LatteMacroModifier> {
     public LatteFilterStubType(String debugName) {
         super(debugName, LatteElementTypes.LANG);
     }

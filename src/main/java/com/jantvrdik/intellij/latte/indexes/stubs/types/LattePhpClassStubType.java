@@ -12,7 +12,6 @@ import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.CharTable;
 import com.jantvrdik.intellij.latte.indexes.extensions.LattePhpClassIndex;
 import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpClassStub;
-import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpTypeStub;
 import com.jantvrdik.intellij.latte.indexes.stubs.impl.LattePhpClassStubImpl;
 import com.jantvrdik.intellij.latte.parser.LatteElementTypes;
 import com.jantvrdik.intellij.latte.psi.LattePhpClassReference;
@@ -25,7 +24,7 @@ import java.util.List;
 
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
 
-public class LattePhpClassStubType extends LattePhpTypeStub<LattePhpClassStub, LattePhpClassReference> {
+public class LattePhpClassStubType extends LattePhpStubType<LattePhpClassStub, LattePhpClassReference> {
     public LattePhpClassStubType(String debugName) {
         super(debugName, LatteElementTypes.LANG);
     }
@@ -68,14 +67,15 @@ public class LattePhpClassStubType extends LattePhpTypeStub<LattePhpClassStub, L
     @Override
     public LattePhpClassStub createStub(@NotNull LighterAST tree, @NotNull LighterASTNode node, @NotNull StubElement parentStub) {
         List<LighterASTNode> keyNode = LightTreeUtil.getChildrenOfType(tree, node, TokenSet.create(PHP_NAMESPACE_REFERENCE, T_PHP_NAMESPACE_RESOLUTION, PHP_CLASS_USAGE));
+        TokenSet tokens = TokenSet.create(T_PHP_NAMESPACE_REFERENCE, T_PHP_NAMESPACE_RESOLUTION, T_PHP_IDENTIFIER);
         StringBuilder builder = new StringBuilder();
         for (LighterASTNode astNode : keyNode) {
-            if (TokenSet.create(T_PHP_NAMESPACE_REFERENCE, T_PHP_NAMESPACE_RESOLUTION, T_PHP_IDENTIFIER).contains(astNode.getTokenType())) {
+            if (tokens.contains(astNode.getTokenType())) {
                 builder.append(intern(tree.getCharTable(), astNode));
                 continue;
             }
 
-            List<LighterASTNode> children = LightTreeUtil.getChildrenOfType(tree, astNode, TokenSet.create(T_PHP_NAMESPACE_REFERENCE, T_PHP_NAMESPACE_RESOLUTION, T_PHP_IDENTIFIER));
+            List<LighterASTNode> children = LightTreeUtil.getChildrenOfType(tree, astNode, tokens);
             for (LighterASTNode current : children) {
                 builder.append(intern(tree.getCharTable(), current));
             }

@@ -1,5 +1,6 @@
 package com.jantvrdik.intellij.latte.psi.elements;
 
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.StubBasedPsiElement;
 import com.jantvrdik.intellij.latte.indexes.stubs.LatteFilterStub;
@@ -12,5 +13,7 @@ public interface LatteMacroModifierElement extends PsiNameIdentifierOwner, StubB
 
     @Nullable
     public LatteFilterSettings getMacroModifier();
+
+    public @Nullable PsiElement getTextElement();
 
 }

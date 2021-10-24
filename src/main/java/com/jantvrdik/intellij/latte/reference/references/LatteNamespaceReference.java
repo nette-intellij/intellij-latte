@@ -14,18 +14,19 @@ import java.util.List;
 
 
 public class LatteNamespaceReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
-    private String namespaceName;
+    private final String namespaceName;
+    private final Project project;
 
     public LatteNamespaceReference(@NotNull LattePhpNamespaceReference element, TextRange textRange) {
         super(element, textRange);
         namespaceName = element.getNamespaceName();
+        project = element.getProject();
     }
 
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean b) {
         List<ResolveResult> results = new ArrayList<>();
-        Project project = getElement().getProject();
         for (PhpNamespace phpNamespace : LattePhpUtil.getNamespacesByName(project, namespaceName)) {
             results.add(new PsiElementResolveResult(phpNamespace));
         }

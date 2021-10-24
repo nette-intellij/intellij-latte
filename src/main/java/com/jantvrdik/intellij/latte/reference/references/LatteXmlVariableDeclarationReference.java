@@ -1,5 +1,6 @@
 package com.jantvrdik.intellij.latte.reference.references;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.xml.XmlAttributeValue;
@@ -15,10 +16,12 @@ import java.util.List;
 public class LatteXmlVariableDeclarationReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
 
     private final String name;
+    private final Project project;
 
     public LatteXmlVariableDeclarationReference(@NotNull XmlAttributeValue element, TextRange textRange) {
         super(element, textRange);
         name = element.getValue();
+        project = element.getProject();
     }
 
     @NotNull
@@ -26,7 +29,7 @@ public class LatteXmlVariableDeclarationReference extends PsiReferenceBase<PsiEl
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         List<ResolveResult> results = new ArrayList<>();
 
-        final Collection<LattePhpVariable> variables = LatteIndexUtil.findVariablesByName(getElement().getProject(), name);
+        final Collection<LattePhpVariable> variables = LatteIndexUtil.findVariablesByName(project, name);
         for (LattePhpVariable variable : variables) {
             if (!variable.isDefinition()) {
                 continue;
@@ -58,7 +61,7 @@ public class LatteXmlVariableDeclarationReference extends PsiReferenceBase<PsiEl
 
     @Override
     public boolean isReferenceTo(@NotNull PsiElement element) {
-        final Collection<LattePhpVariable> variables = LatteIndexUtil.findVariablesByName(getElement().getProject(), name);
+        final Collection<LattePhpVariable> variables = LatteIndexUtil.findVariablesByName(project, name);
         /*if (!(getElement() instanceof LattePhpVariable)) {
             return new ResolveResult[0];
         }

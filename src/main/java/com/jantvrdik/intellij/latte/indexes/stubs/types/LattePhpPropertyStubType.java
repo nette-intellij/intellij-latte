@@ -12,7 +12,6 @@ import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.CharTable;
 import com.jantvrdik.intellij.latte.indexes.extensions.LattePhpPropertyIndex;
 import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpPropertyStub;
-import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpTypeStub;
 import com.jantvrdik.intellij.latte.indexes.stubs.impl.LattePhpPropertyStubImpl;
 import com.jantvrdik.intellij.latte.parser.LatteElementTypes;
 import com.jantvrdik.intellij.latte.psi.LattePhpProperty;
@@ -22,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-public class LattePhpPropertyStubType extends LattePhpTypeStub<LattePhpPropertyStub, LattePhpProperty> {
+public class LattePhpPropertyStubType extends LattePhpStubType<LattePhpPropertyStub, LattePhpProperty> {
     public LattePhpPropertyStubType(String debugName) {
         super(debugName, LatteElementTypes.LANG);
     }

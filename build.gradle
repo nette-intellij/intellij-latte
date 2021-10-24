@@ -19,7 +19,7 @@ properties.load(project.rootProject.file("local.properties").newDataInputStream(
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-version '1.1.4-alpha1'
+version '1.1.4-alpha2'
 group 'com.jantvrdik.intellij.latte'
 
 jar {
@@ -125,11 +125,11 @@ task generateLattePhpLexer(type: GenerateLexer) {
 task generateFlexFiles {
     println('Generating Classes (Lexer)')
     //dependsOn(generateLatteParser)
-    dependsOn(generateLatteLexer)
-    dependsOn(generateLatteMacroContentLexer)
-    dependsOn(generateLatteMacroLexer)
-    dependsOn(generateLattePhpLexer)
-    dependsOn(generateLatteTopLexer)
+    //dependsOn(generateLatteLexer)
+    //dependsOn(generateLatteMacroContentLexer)
+    //dependsOn(generateLatteMacroLexer)
+    //dependsOn(generateLattePhpLexer)
+    //dependsOn(generateLatteTopLexer)
 }
 
 compileJava.dependsOn(generateFlexFiles)

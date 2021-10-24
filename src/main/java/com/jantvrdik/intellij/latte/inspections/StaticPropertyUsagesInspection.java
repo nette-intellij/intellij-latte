@@ -38,7 +38,7 @@ public class StaticPropertyUsagesInspection extends BaseLocalInspectionTool {
 			@Override
 			public void visitElement(PsiElement element) {
 				if (element instanceof LattePhpStaticVariable) {
-					NettePhpType phpType = ((LattePhpStaticVariable) element).getPhpType();
+					NettePhpType phpType = ((LattePhpStaticVariable) element).getPrevReturnType();
 
 					Collection<PhpClass> phpClasses = phpType.getPhpClasses(element.getProject());
 					if (phpClasses.size() == 0) {

@@ -2,12 +2,13 @@ package com.jantvrdik.intellij.latte.psi.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementVisitor;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.indexes.stubs.*;
+import com.jantvrdik.intellij.latte.php.LattePhpTypeDetector;
 import com.jantvrdik.intellij.latte.php.LattePhpUtil;
 import com.jantvrdik.intellij.latte.php.LattePhpVariableUtil;
 import com.jantvrdik.intellij.latte.php.NettePhpType;
@@ -15,13 +16,8 @@ import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpExpressionElement;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpStatementPartElement;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpTypedPartElement;
-import com.jantvrdik.intellij.latte.settings.LatteFunctionSettings;
 import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.utils.*;
-import com.jetbrains.php.lang.psi.elements.Field;
-import com.jetbrains.php.lang.psi.elements.Method;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -90,8 +86,12 @@ public class LattePsiImplUtil {
 	}
 
 	@NotNull
-	public static List<LattePhpVariableDefinition> getVariableDefinition(@NotNull LattePhpVariable element) {
-		return LattePhpVariableUtil.getVariableDefinition(element);
+	public static List<LattePhpCachedVariable> getVariableDefinition(@NotNull LattePhpVariable element) {
+		PsiFile file = element.getContainingFile();
+		if (!(file instanceof LatteFile)) {
+			return Collections.emptyList();
+		}
+		return ((LatteFile) file).getCachedVariableDefinitions(element);
 	}
 
 	public static String getVariableName(@NotNull LattePhpStaticVariable element) {
@@ -209,37 +209,7 @@ public class LattePsiImplUtil {
 	}
 
 	public static @NotNull NettePhpType getPhpType(@NotNull LattePhpVariable element) {
-		return LattePhpVariableUtil.detectVariableType(element);
-	}
-
-	public static @NotNull NettePhpType getPhpType(@NotNull LattePhpTypeElement element) {
-		List<String> out = new ArrayList<>();
-		for (LattePhpTypePart part : element.getPhpTypePartList()) {
-			String item;
-			if (part.getPhpClassReference() != null) {
-				item = part.getPhpClassReference().getClassName();
-			} else {
-				item = part.getFirstChild().getText();
-			}
-			int size = part.getPhpTypeIterableList().size();
-			if (size > 0) {
-				item += String.join("", Collections.nCopies(part.getPhpTypeIterableList().size(), "[]"));
-			}
-			out.add(item);
-		}
-		return NettePhpType.create(String.join("|", out));
-	}
-
-	public static @NotNull NettePhpType getPhpType(@NotNull BaseLattePhpElement element) {
-		LattePhpStatementPartElement part = element.getPhpStatementPart();
-		if (part == null) {
-			return NettePhpType.MIXED;
-		}
-		part = part.getPrevPhpStatementPart();
-		if (part == null || part.getPhpElement() == null) {
-			return NettePhpType.MIXED;
-		}
-		return part.getPhpType().withDepth(part.getPhpElement().getPhpArrayLevel());
+		return LattePhpTypeDetector.detectPhpType(element);
 	}
 
 	public static int getPhpArrayLevel(@NotNull BaseLattePhpElement element) {
@@ -275,13 +245,11 @@ public class LattePsiImplUtil {
 	}
 
 	public static @NotNull NettePhpType getPhpType(@NotNull LattePhpStatement statement) {
-		BaseLattePhpElement last = statement.getLastPhpElement();
-		return last != null ? last.getReturnType() : NettePhpType.MIXED;
+		return LattePhpTypeDetector.detectPhpType(statement);
 	}
 
-	public static @NotNull NettePhpType getPhpType(@NotNull LattePhpTypedPartElement statement) {
-		LattePhpTypeElement typeElement = statement.getPhpTypeElement();
-		return typeElement == null ? NettePhpType.MIXED : typeElement.getPhpType();
+	public static @NotNull NettePhpType getReturnType(@NotNull LattePhpTypedPartElement statementPart) {
+		return LattePhpTypeDetector.detectPhpType(statementPart);
 	}
 
 	public static int getPhpArrayLevel(@NotNull LattePhpExpressionElement expression) {
@@ -294,15 +262,11 @@ public class LattePsiImplUtil {
 	}
 
 	public static @NotNull NettePhpType getPhpType(@NotNull LattePhpExpression expression) {
-		return getPhpType((LattePhpExpressionElement) expression).withDepth(expression.getPhpArrayLevel());
+		return LattePhpTypeDetector.detectPhpType(expression);
 	}
 
-	public static @NotNull NettePhpType getPhpType(@NotNull LattePhpExpressionElement expression) {
-		List<LattePhpStatement> statements = expression.getPhpStatementList();
-		if (statements.size() > 0) {
-			return statements.get(0).getPhpType();
-		}
-		return NettePhpType.MIXED;
+	public static @NotNull NettePhpType getPhpType(@NotNull LattePhpExpressionElement expressionElement) {
+		return LattePhpTypeDetector.detectPhpType(expressionElement);
 	}
 
 	public static @Nullable BaseLattePhpElement getLastPhpElement(@NotNull LattePhpStatement statement) {
@@ -346,8 +310,7 @@ public class LattePsiImplUtil {
 	}
 
 	public static @NotNull NettePhpType getPhpType(@NotNull LattePhpStatementPartElement statement) {
-		BaseLattePhpElement phpElement = statement.getPhpElement();
-		return phpElement == null ? NettePhpType.MIXED : phpElement.getReturnType();
+		return LattePhpTypeDetector.detectPhpType(statement);
 	}
 
 	public static boolean isStatic(@NotNull PsiElement element) {
@@ -364,54 +327,20 @@ public class LattePsiImplUtil {
 		return element.getPhpType();
 	}
 
-	@NotNull
-	public static NettePhpType getReturnType(@NotNull LattePhpClassReference element) {
-		return element.getPhpClassUsage().getPhpType();
-	}
-
-	public static @NotNull NettePhpType getReturnType(@NotNull LattePhpClassUsage element) {
-		return element.getPhpType();
-	}
-
-	public static @NotNull NettePhpType getReturnType(@NotNull LattePhpNamespaceReference element) {
-		return element.getPhpType();
-	}
-
 	public static @NotNull NettePhpType getReturnType(@NotNull LattePhpMethod element) {
-		NettePhpType type = element.getPhpType();
-		Collection<PhpClass> phpClasses = type.getPhpClasses(element.getProject());
-		String name = element.getMethodName();
-		if (phpClasses.size() == 0) {
-			LatteFunctionSettings customFunction = LatteConfiguration.getInstance(element.getProject()).getFunction(name);
-			return customFunction == null ? NettePhpType.MIXED : NettePhpType.create(customFunction.getFunctionReturnType());
-		}
-
-		List<PhpType> types = new ArrayList<>();
-		for (PhpClass phpClass : phpClasses) {
-			for (Method phpMethod : phpClass.getMethods()) {
-				if (phpMethod.getName().equals(name)) {
-					types.add(phpMethod.getType());
-				}
-			}
-		}
-		return types.size() > 0 ? NettePhpType.create(types).withDepth(element.getPhpArrayLevel()) : NettePhpType.MIXED;
+		return LattePhpTypeDetector.detectPhpType(element);
 	}
 
-	public static @NotNull NettePhpType getReturnType(@NotNull BaseLattePhpElement element) {
-		Collection<PhpClass> phpClasses = element.getPhpType().getPhpClasses(element.getProject());
-		if (phpClasses.size() == 0) {
-			return NettePhpType.MIXED;
-		}
+	public static @NotNull NettePhpType getReturnType(@NotNull LattePhpConstant element) {
+		return LattePhpTypeDetector.detectPhpType(element);
+	}
 
-		List<PhpType> types = new ArrayList<>();
-		for (PhpClass phpClass : phpClasses) {
-			for (Field field : phpClass.getFields()) {
-				if (field.getName().equals(LattePhpVariableUtil.normalizePhpVariable(element.getPhpElementName()))) {
-					types.add(field.getType());
-				}
-			}
-		}
-		return types.size() > 0 ? NettePhpType.create(types).withDepth(element.getPhpArrayLevel()) : NettePhpType.MIXED;
+	public static @NotNull NettePhpType getReturnType(@NotNull LattePhpStaticVariable element) {
+		return LattePhpTypeDetector.detectPhpType(element);
+	}
+
+	public static @NotNull NettePhpType getReturnType(@NotNull LattePhpProperty element) {
+		return LattePhpTypeDetector.detectPhpType(element);
 	}
 
 	public static @NotNull String getNamespaceName(LattePhpNamespaceReference namespaceReference) {
@@ -472,38 +401,6 @@ public class LattePsiImplUtil {
 
 	public static boolean isTemplateType(@NotNull LattePhpClassUsage element) {
 		return LatteUtil.matchParentMacroName(element, "templateType");
-	}
-
-	public static boolean isVarTypeDefinition(@NotNull LattePhpVariable element) {
-		return LattePhpVariableUtil.isVarTypeDefinition(element);
-	}
-
-	public static boolean isCaptureDefinition(@NotNull LattePhpVariable element) {
-		return LattePhpVariableUtil.isCaptureDefinition(element);
-	}
-
-	public static boolean isBlockDefineVarDefinition(@NotNull LattePhpVariable element) {
-		return LattePhpVariableUtil.isBlockDefineVarDefinition(element);
-	}
-
-	public static boolean isVarDefinition(@NotNull LattePhpVariable element) {
-		return LattePhpVariableUtil.isVarDefinition(element);
-	}
-
-	public static boolean isPhpArrayVarDefinition(@NotNull LattePhpVariable element) {
-		return LattePhpVariableUtil.isPhpArrayVarDefinition(element);
-	}
-
-	public static boolean isDefinitionInForeach(@NotNull PsiElement element) {
-		return LattePhpVariableUtil.isDefinitionInForeach(element);
-	}
-
-	public static boolean isDefinitionInFor(@NotNull LattePhpVariable element) {
-		return LattePhpVariableUtil.isDefinitionInFor(element);
-	}
-
-	public static boolean isDefinition(@NotNull LattePhpVariable element) {
-		return LattePhpVariableUtil.isVariableDefinition(element);
 	}
 
 	public static String getName(LattePhpVariable element) {

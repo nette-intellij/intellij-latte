@@ -61,6 +61,7 @@
 		<stubIndex implementation="com.jantvrdik.intellij.latte.indexes.extensions.LattePhpNamespaceIndex"/>
 		<stubIndex implementation="com.jantvrdik.intellij.latte.indexes.extensions.LattePhpPropertyIndex"/>
 		<stubIndex implementation="com.jantvrdik.intellij.latte.indexes.extensions.LattePhpStaticVariableIndex"/>
+		<stubIndex implementation="com.jantvrdik.intellij.latte.indexes.extensions.LattePhpTypeIndex"/>
 		<stubIndex implementation="com.jantvrdik.intellij.latte.indexes.extensions.LattePhpVariableIndex"/>
 
  		<codeStyleSettingsProvider implementation="com.jantvrdik.intellij.latte.codeStyle.LatteCodeStyleSettingsProvider"/>

@@ -24,7 +24,7 @@ public class LatteMacroTagReference extends PsiReferenceBase<PsiElement> impleme
             return new ResolveResult[0];
         }
 
-        List<ResolveResult> results = new ArrayList<ResolveResult>();
+        List<ResolveResult> results = new ArrayList<>();
         results.add(new PsiElementResolveResult(((LatteMacroClassic) parent).getOpenTag()));
 
         LatteMacroTag closeTag = ((LatteMacroClassic) parent).getCloseTag();

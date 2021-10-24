@@ -1,14 +1,14 @@
 package com.jantvrdik.intellij.latte.utils;
 
-import com.jantvrdik.intellij.latte.psi.LattePhpVariable;
+import com.jantvrdik.intellij.latte.psi.elements.LattePhpVariableElement;
 import org.jetbrains.annotations.NotNull;
 
 public class LattePhpVariableDefinition {
 
     private final boolean probablyUndefined;
-    private final LattePhpVariable element;
+    private final LattePhpVariableElement element;
 
-    public LattePhpVariableDefinition(boolean probablyUndefined, @NotNull LattePhpVariable element) {
+    public LattePhpVariableDefinition(boolean probablyUndefined, @NotNull LattePhpVariableElement element) {
         this.probablyUndefined = probablyUndefined;
         this.element = element;
     }
@@ -17,7 +17,7 @@ public class LattePhpVariableDefinition {
         return probablyUndefined;
     }
 
-    public LattePhpVariable getElement() {
+    public LattePhpVariableElement getElement() {
         return element;
     }
 }

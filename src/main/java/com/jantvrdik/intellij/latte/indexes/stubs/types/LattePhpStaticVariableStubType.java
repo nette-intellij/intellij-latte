@@ -12,7 +12,6 @@ import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.CharTable;
 import com.jantvrdik.intellij.latte.indexes.extensions.LattePhpStaticVariableIndex;
 import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpStaticVariableStub;
-import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpTypeStub;
 import com.jantvrdik.intellij.latte.indexes.stubs.impl.LattePhpStaticVariableStubImpl;
 import com.jantvrdik.intellij.latte.parser.LatteElementTypes;
 import com.jantvrdik.intellij.latte.php.LattePhpVariableUtil;
@@ -23,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-public class LattePhpStaticVariableStubType extends LattePhpTypeStub<LattePhpStaticVariableStub, LattePhpStaticVariable> {
+public class LattePhpStaticVariableStubType extends LattePhpStubType<LattePhpStaticVariableStub, LattePhpStaticVariable> {
     public LattePhpStaticVariableStubType(String debugName) {
         super(debugName, LatteElementTypes.LANG);
     }

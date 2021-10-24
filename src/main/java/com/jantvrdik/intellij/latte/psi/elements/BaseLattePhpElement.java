@@ -14,7 +14,9 @@ public interface BaseLattePhpElement extends PsiNameIdentifierOwner {
 	@NotNull
 	List<LattePhpArrayUsage> getPhpArrayUsageList();
 
-	public abstract NettePhpType getPhpType();
+	default NettePhpType getPrevReturnType() {
+		return getReturnType();
+	}
 
 	public abstract NettePhpType getReturnType();
 
