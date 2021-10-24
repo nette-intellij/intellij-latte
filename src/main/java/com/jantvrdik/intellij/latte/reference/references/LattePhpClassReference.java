@@ -30,21 +30,16 @@ public class LattePhpClassReference extends PsiReferenceBase<PsiElement> impleme
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean b) {
-        if (phpClasses.size() == 0) {
-            return new ResolveResult[0];
-        }
-
         List<ResolveResult> results = new ArrayList<>();
-        for (PhpClass phpClass : ((LattePhpClassUsage) getElement()).getReturnType().getPhpClasses(project)) {
+        for (PhpClass phpClass : phpClasses) {
             if (LattePhpUtil.isReferenceFor(className, phpClass)) {
                 results.add(new PsiElementResolveResult(phpClass));
             }
         }
 
-        for (com.jantvrdik.intellij.latte.psi.LattePhpClassReference classReference : LatteIndexUtil.getClassesByFqn(project, className)) {
-            results.add(new PsiElementResolveResult(classReference.getPhpClassUsage()));
-        }
-
+        //for (com.jantvrdik.intellij.latte.psi.LattePhpClassReference classReference : LatteIndexUtil.getClassesByFqn(project, className)) {
+        //    results.add(new PsiElementResolveResult(classReference.getPhpClassUsage()));
+        //}
         return results.toArray(new ResolveResult[0]);
     }
 
@@ -52,7 +47,17 @@ public class LattePhpClassReference extends PsiReferenceBase<PsiElement> impleme
     @Override
     public PsiElement resolve() {
         ResolveResult[] resolveResults = multiResolve(false);
-        return resolveResults.length > 0 ? resolveResults[0].getElement() : null;
+        for (ResolveResult resolveResult : resolveResults) {
+            if (!(resolveResult.getElement() instanceof LattePhpClassUsage)) {
+                return resolveResult.getElement();
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean isSoft() {
+        return true;
     }
 
     @NotNull
@@ -74,15 +79,15 @@ public class LattePhpClassReference extends PsiReferenceBase<PsiElement> impleme
         if (element instanceof LattePhpClassUsage) {
             return className.equals(((LattePhpClassUsage) element).getClassName());
         }
-        /*if (element instanceof LattePhpClassUsage) {
-            Collection<PhpClass> originalClasses = ((LattePhpClassUsage) element).getPhpType().getPhpClasses(project);
+       /* if (element instanceof LattePhpClassUsage) {
+            Collection<PhpClass> originalClasses = ((LattePhpClassUsage) element).getPrevReturnType().getPhpClasses(project);
             if (originalClasses.size() > 0) {
                 for (ResolveResult result : multiResolve(false)) {
                     if (!(result.getElement() instanceof LattePhpClassUsage)) {
                         continue;
                     }
 
-                    Collection<PhpClass> targetClasses = ((LattePhpClassUsage) result.getElement()).getPhpType().getPhpClasses(project);
+                    Collection<PhpClass> targetClasses = ((LattePhpClassUsage) result.getElement()).getPrevReturnType().getPhpClasses(project);
                     if (targetClasses.size() == 0) {
                         continue;
                     }

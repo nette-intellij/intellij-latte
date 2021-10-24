@@ -20,10 +20,13 @@ public class LatteTagsUtil {
         ELSE("else"),
         ELSEIF("elseif"),
         ELSEIFSET("elseifset"),
+        EXTENDS("extends"),
         FOR("for"),
         IF("if"),
         IFCHANGED("ifchanged"),
         IFSET("ifset"),
+        IMPORT("import"),
+        LAYOUT("layout"),
         LINK("link"),
         N_HREF("n:href"),
         PARAMETERS("parameters"),
@@ -53,6 +56,7 @@ public class LatteTagsUtil {
             Type.PLINK.getTagName(),
             Type.N_HREF.getTagName()
     );
+
     public static final List<String> CONTEXT_TAGS_LIST = Arrays.asList(
             Type.FOREACH.getTagName(),
             Type.FOR.getTagName(),

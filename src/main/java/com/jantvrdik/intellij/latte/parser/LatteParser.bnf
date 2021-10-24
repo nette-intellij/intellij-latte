@@ -191,11 +191,13 @@ phpNamespaceReference    ::= T_PHP_NAMESPACE_REFERENCE {
                      elementTypeClass="com.jantvrdik.intellij.latte.indexes.stubs.types.LattePhpNamespaceStubType"
                  }
 
-macroModifier    ::= T_MACRO_FILTERS {
+macroModifier    ::= T_MACRO_FILTERS (T_PHP_COLON macroModifierPart)* {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LatteMacroModifierElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LatteMacroModifierElement"
                         elementTypeClass="com.jantvrdik.intellij.latte.indexes.stubs.types.LatteFilterStubType"
                     }
+
+macroModifierPart    ::= phpPrivateArgument*
 
 phpStatement       ::= phpStatementFirstPart phpStatementPart* {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpStatementElementImpl"
@@ -278,7 +280,7 @@ phpMethodArgs       ::= T_WHITESPACE? phpArgument+ ( T_WHITESPACE? "," T_WHITESP
 phpString    ::=  phpSingleQuotedString | phpDoubleQuotedString | T_MACRO_ARGS_STRING
 
 private
-phpArgument    ::= phpPrivateArgument | T_PHP_AS | T_PHP_DOUBLE_ARROW
+phpArgument    ::= phpPrivateArgument | macroModifier | T_PHP_AS | T_PHP_DOUBLE_ARROW | T_PHP_COLON
 
 private
 phpPrivateArgument    ::=  phpString | phpArrayOfVariables | phpTypedArguments | phpStatement | phpType | T_MACRO_ARGS_NUMBER
@@ -286,11 +288,10 @@ phpPrivateArgument    ::=  phpString | phpArrayOfVariables | phpTypedArguments |
                     | phpStatic | phpInBrackets | phpVariable | T_PHP_NULL_MARK | T_PHP_CONTENT_TYPE | T_PHP_OBJECT_OPERATOR
                     | T_PHP_RELATIONAL_OPERATOR | T_PHP_ASSIGNMENT_OPERATOR | T_PHP_LOGIC_OPERATOR | T_PHP_OPERATOR
                     | T_PHP_ADDITIVE_OPERATOR | T_PHP_BITWISE_OPERATOR | T_PHP_REFERENCE_OPERATOR | T_PHP_SHIFT_OPERATOR
-                    | T_PHP_DOUBLE_COLON | T_PHP_METHOD | T_PHP_TYPE | T_PHP_KEYWORD
-                    | T_PHP_CAST | T_PHP_NAMESPACE_RESOLUTION | T_BLOCK_NAME | T_PHP_COLON
-                    | T_PHP_CONCATENATION | T_PHP_MULTIPLICATIVE_OPERATORS | T_PHP_UNARY_OPERATOR
+                    | T_PHP_DOUBLE_COLON | T_PHP_METHOD | T_PHP_TYPE | T_PHP_KEYWORD | T_PHP_CAST | T_PHP_NAMESPACE_RESOLUTION
+                    | T_BLOCK_NAME | T_PHP_CONCATENATION | T_PHP_MULTIPLICATIVE_OPERATORS | T_PHP_UNARY_OPERATOR
                     | T_PHP_EXPRESSION | T_PHP_NEW | T_PHP_NULL | T_PHP_MIXED | T_PHP_LEFT_CURLY_BRACE | T_PHP_RIGHT_CURLY_BRACE
-                    | macroModifier | T_PHP_IDENTIFIER | T_PHP_MACRO_SEPARATOR | T_PHP_OR_INCLUSIVE | T_PHP_DEFINITION_OPERATOR
+                    | T_PHP_IDENTIFIER | T_PHP_MACRO_SEPARATOR | T_PHP_OR_INCLUSIVE | T_PHP_DEFINITION_OPERATOR
 
 phpExpression    ::= (expression | T_MACRO_ARGS)* {
                             mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpExpressionElementImpl"
@@ -301,7 +302,7 @@ private
 phpInternalExpression    ::= expression | T_PHP_AS | T_PHP_DOUBLE_ARROW | T_MACRO_ARGS
 
 private
-expression    ::= T_PHP_OR_INCLUSIVE | T_PHP_MACRO_SEPARATOR | phpPrivateArgument
+expression    ::= T_PHP_OR_INCLUSIVE | T_PHP_MACRO_SEPARATOR | phpPrivateArgument | macroModifier | T_PHP_COLON
                     | T_PHP_LEFT_NORMAL_BRACE | T_PHP_RIGHT_NORMAL_BRACE | T_PHP_LEFT_BRACKET | T_PHP_RIGHT_BRACKET
 
 private

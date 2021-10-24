@@ -34,7 +34,7 @@ public class ModifierDefinitionInspection extends LocalInspectionTool {
 		final List<ProblemDescriptor> problems = new ArrayList<>();
 		file.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
 			@Override
-			public void visitElement(PsiElement element) {
+			public void visitElement(@NotNull PsiElement element) {
 				if (element instanceof LatteMacroModifier) {
 					String filterName = ((LatteMacroModifier) element).getModifierName();
 					LatteFilterSettings latteFilter = LatteConfiguration.getInstance(element.getProject()).getFilter(filterName);
@@ -43,6 +43,12 @@ public class ModifierDefinitionInspection extends LocalInspectionTool {
 						ProblemHighlightType type = ProblemHighlightType.GENERIC_ERROR_OR_WARNING;
 						String description = "Undefined latte filter '" + filterName + "'";
 						ProblemDescriptor problem = manager.createProblemDescriptor(element, description, true, type, isOnTheFly, addModifierFix);
+						problems.add(problem);
+
+					} else if (((LatteMacroModifier) element).getMacroModifierPartList().size() < latteFilter.getModifierInsert().length()) {
+						ProblemHighlightType type = ProblemHighlightType.WARNING;
+						String description = "Missing required filter parameters (" + latteFilter.getModifierInsert().length() + " required)";
+						ProblemDescriptor problem = manager.createProblemDescriptor(element, description, true, type, isOnTheFly);
 						problems.add(problem);
 					}
 

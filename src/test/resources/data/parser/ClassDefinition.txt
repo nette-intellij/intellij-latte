@@ -10,7 +10,7 @@ Latte file
             LattePhpFirstTypedVariableImpl(PHP_FIRST_TYPED_VARIABLE)
               LattePhpTypeImpl(PHP_TYPE)('\PDO[][]')
                 LattePhpTypePartImpl(PHP_TYPE_PART)
-                  {}
+                  LattePhpClassReferenceImpl(PHP_CLASS_REFERENCE)('\PDO')
                     LattePhpClassUsageImpl(PHP_CLASS_USAGE)
                       PsiElement(LatteTokenType.T_PHP_NAMESPACE_RESOLUTION)('\')
                       PsiElement(LatteTokenType.T_PHP_NAMESPACE_REFERENCE)('PDO')

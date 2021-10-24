@@ -151,7 +151,7 @@ AS="as"
     }
 
     ":" {
-        return T_PHP_EXPRESSION;
+        return T_PHP_COLON;
     }
 
     "?" {

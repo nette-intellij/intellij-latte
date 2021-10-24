@@ -81,4 +81,9 @@ public class ParserTest extends BasePsiParsingTestCase {
         doTest(true, true);
     }
 
+    @Test
+    public void testMacroFilters() {
+        doTest(true, true);
+    }
+
 }

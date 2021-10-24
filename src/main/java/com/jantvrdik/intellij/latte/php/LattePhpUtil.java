@@ -43,7 +43,9 @@ public class LattePhpUtil {
 
     public static boolean isReferenceTo(@NotNull PhpClass originalClass, @NotNull ResolveResult[] results, @NotNull Project project, @NotNull String name) {
         for (ResolveResult result : results) {
-            if (!(result.getElement() instanceof BaseLattePhpElement)) {
+            if (result.getElement() == originalClass) {
+                return true;
+            } else if (!(result.getElement() instanceof BaseLattePhpElement)) {
                 continue;
             }
 

@@ -26,7 +26,7 @@ Latte file
               LattePhpTypeImpl(PHP_TYPE)('?\DateTime')
                 PsiElement(LatteTokenType.T_MACRO_ARGS)('?')
                 LattePhpTypePartImpl(PHP_TYPE_PART)
-                  {}
+                  LattePhpClassReferenceImpl(PHP_CLASS_REFERENCE)('\DateTime')
                     LattePhpClassUsageImpl(PHP_CLASS_USAGE)
                       PsiElement(LatteTokenType.T_PHP_NAMESPACE_RESOLUTION)('\')
                       PsiElement(LatteTokenType.T_PHP_NAMESPACE_REFERENCE)('DateTime')
