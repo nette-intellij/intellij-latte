@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 public interface LattePhpClassReferenceElement extends BaseLattePhpElement, StubBasedPsiElement<LattePhpClassStub> {
 
-	public abstract String getClassName();
+	String getClassName();
 
 	@NotNull
 	LattePhpClassUsage getPhpClassUsage();

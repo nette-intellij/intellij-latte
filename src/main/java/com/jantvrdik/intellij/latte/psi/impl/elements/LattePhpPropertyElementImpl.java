@@ -1,16 +1,24 @@
 package com.jantvrdik.intellij.latte.psi.impl.elements;
 
-import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiReference;
-import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
+import com.intellij.util.IncorrectOperationException;
 import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpPropertyStub;
+import com.jantvrdik.intellij.latte.psi.LatteElementFactory;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpPropertyElement;
+import com.jantvrdik.intellij.latte.psi.impl.LatteBaseStubPhpElementImpl;
+import com.jantvrdik.intellij.latte.psi.impl.LattePsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class LattePhpPropertyElementImpl extends StubBasedPsiElementBase<LattePhpPropertyStub> implements LattePhpPropertyElement {
+import static com.jantvrdik.intellij.latte.psi.LatteTypes.T_PHP_IDENTIFIER;
+
+public abstract class LattePhpPropertyElementImpl extends LatteBaseStubPhpElementImpl<LattePhpPropertyStub> implements LattePhpPropertyElement {
+
+	private @Nullable String name = null;
+	private @Nullable String propertyName = null;
+	private @Nullable PsiElement identifier = null;
 
 	public LattePhpPropertyElementImpl(@NotNull ASTNode node) {
 		super(node);
@@ -21,19 +29,58 @@ public abstract class LattePhpPropertyElementImpl extends StubBasedPsiElementBas
 	}
 
 	@Override
+	public void subtreeChanged() {
+		super.subtreeChanged();
+		this.name = null;
+		this.propertyName = null;
+		this.identifier = null;
+	}
+
+	@Override
 	public String getPhpElementName()
 	{
 		return getPropertyName();
 	}
 
-	@Nullable
-	public PsiReference getReference() {
-		PsiReference[] references = getReferences();
-		return references.length == 0 ? null : references[0];
+	@Override
+	public String getPropertyName() {
+		if (propertyName == null) {
+			final LattePhpPropertyStub stub = getStub();
+			if (stub != null) {
+				propertyName = stub.getPropertyName();
+				return propertyName;
+			}
+
+			PsiElement found = getTextElement();
+			propertyName = found != null ? found.getText() : null;
+		}
+		return propertyName;
 	}
 
-	@NotNull
-	public PsiReference[] getReferences() {
-		return ReferenceProvidersRegistry.getReferencesFromProviders(this);
+	@Override
+	public @Nullable PsiElement getNameIdentifier() {
+		if (identifier == null) {
+			identifier = LattePsiImplUtil.findFirstChildWithType(this, T_PHP_IDENTIFIER);
+		}
+		return identifier;
+	}
+
+	@Override
+	public PsiElement setName(@NotNull String name) throws IncorrectOperationException {
+		ASTNode keyNode = getFirstChild().getNode();
+		PsiElement property = LatteElementFactory.createProperty(getProject(), name);
+		if (property == null) {
+			return this;
+		}
+		return LatteElementFactory.replaceChildNode(this, property, keyNode);
+	}
+
+	@Override
+	public String getName() {
+		if (name == null) {
+			PsiElement found = getNameIdentifier();
+			name = found != null ? found.getText() : null;
+		}
+		return name;
 	}
 }

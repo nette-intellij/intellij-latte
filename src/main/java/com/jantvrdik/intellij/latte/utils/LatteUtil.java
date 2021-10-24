@@ -64,7 +64,7 @@ public class LatteUtil {
     public static NettePhpType findFirstLatteTemplateType(PsiElement element) {
         List<LattePhpClassUsage> out = new ArrayList<>();
         findLatteTemplateType(out, element);
-        return out.isEmpty() ? null : out.get(0).getPhpType();
+        return out.isEmpty() ? null : out.get(0).getReturnType();
     }
 
     public static void findLatteTemplateType(List<LattePhpClassUsage> classes, PsiElement psiElement) {

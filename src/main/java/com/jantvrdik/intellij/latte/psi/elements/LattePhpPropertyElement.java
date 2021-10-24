@@ -11,6 +11,6 @@ public interface LattePhpPropertyElement extends BaseLattePhpElement, StubBasedP
 		return LattePhpTypeDetector.detectPrevPhpType(this);
 	}
 
-	public abstract String getPropertyName();
+	String getPropertyName();
 
 }

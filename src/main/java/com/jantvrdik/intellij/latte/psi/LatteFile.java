@@ -2,7 +2,6 @@ package com.jantvrdik.intellij.latte.psi;
 
 import com.intellij.extapi.psi.PsiFileBase;
 import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.project.Project;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
@@ -11,7 +10,6 @@ import com.jantvrdik.intellij.latte.LatteLanguage;
 import com.jantvrdik.intellij.latte.php.NettePhpType;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpVariableElement;
 import com.jantvrdik.intellij.latte.utils.LattePhpCachedVariable;
-import com.jantvrdik.intellij.latte.utils.LattePhpVariableDefinition;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -189,7 +187,7 @@ public class LatteFile extends PsiFileBase {
 	public NettePhpType getFirstLatteTemplateType() {
 		if (templateType == null) {
 			List<LattePhpClassUsage> types = getLatteTemplateTypes();
-			templateType = types.isEmpty() ? null : types.get(0).getPhpType();
+			templateType = types.isEmpty() ? null : types.get(0).getReturnType();
 		}
 		return templateType;
 	}

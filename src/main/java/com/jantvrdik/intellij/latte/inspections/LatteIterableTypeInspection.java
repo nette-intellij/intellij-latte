@@ -47,7 +47,7 @@ public class LatteIterableTypeInspection extends BaseLocalInspectionTool {
 					}
 
 				} else if (element instanceof LattePhpForeach) {
-					NettePhpType type = ((LattePhpForeach) element).getPhpExpression().getPhpType();
+					NettePhpType type = ((LattePhpForeach) element).getPhpExpression().getReturnType();
 					if (!type.isMixed() && !type.isIterable(element.getProject())) {
 						addProblem(
 								manager,

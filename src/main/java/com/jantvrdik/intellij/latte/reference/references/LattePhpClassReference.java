@@ -24,7 +24,7 @@ public class LattePhpClassReference extends PsiReferenceBase<PsiElement> impleme
         super(element, textRange);
         className = element.getClassName();
         project = element.getProject();
-        phpClasses = element.getPhpType().getPhpClasses(project);
+        phpClasses = element.getReturnType().getPhpClasses(project);
     }
 
     @NotNull
@@ -35,7 +35,7 @@ public class LattePhpClassReference extends PsiReferenceBase<PsiElement> impleme
         }
 
         List<ResolveResult> results = new ArrayList<>();
-        for (PhpClass phpClass : ((LattePhpClassUsage) getElement()).getPhpType().getPhpClasses(project)) {
+        for (PhpClass phpClass : ((LattePhpClassUsage) getElement()).getReturnType().getPhpClasses(project)) {
             if (LattePhpUtil.isReferenceFor(className, phpClass)) {
                 results.add(new PsiElementResolveResult(phpClass));
             }

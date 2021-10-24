@@ -2,10 +2,10 @@ package com.jantvrdik.intellij.latte.psi.elements;
 
 public interface LattePhpClassUsageElement extends BaseLattePhpElement {
 
-	public abstract String getClassName();
+	String getClassName();
 
-	public boolean isTemplateType();
+	boolean isTemplateType();
 
-	//public void reset();
+	void reset();
 
 }

@@ -11,6 +11,6 @@ public interface LattePhpStaticVariableElement extends BaseLattePhpElement, Stub
 		return LattePhpTypeDetector.detectPrevPhpType(this);
 	}
 
-	public abstract String getVariableName();
+	String getVariableName();
 
 }

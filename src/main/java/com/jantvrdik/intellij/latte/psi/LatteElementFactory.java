@@ -1,5 +1,6 @@
 package com.jantvrdik.intellij.latte.psi;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -109,6 +110,38 @@ public class LatteElementFactory {
 		} catch (NullPointerException e) {
 			return null;
 		}
+	}
+
+	@NotNull
+	public static PsiElement replaceChildNode(@NotNull PsiElement psiElement, @NotNull PsiElement newElement, @Nullable ASTNode keyNode) {
+		ASTNode newKeyNode = newElement.getFirstChild().getNode();
+		if (newKeyNode == null) {
+			return psiElement;
+		}
+
+		if (keyNode == null) {
+			psiElement.getNode().addChild(newKeyNode);
+
+		} else {
+			psiElement.getNode().replaceChild(keyNode, newKeyNode);
+		}
+		return psiElement;
+	}
+
+	@NotNull
+	public static PsiElement replaceLastNode(@NotNull PsiElement psiElement, @NotNull PsiElement newElement, @Nullable ASTNode keyNode) {
+		ASTNode newKeyNode = newElement.getLastChild().getNode();
+		if (newKeyNode == null) {
+			return psiElement;
+		}
+
+		if (keyNode == null) {
+			psiElement.getNode().addChild(newKeyNode);
+
+		} else {
+			psiElement.getNode().replaceChild(keyNode, newKeyNode);
+		}
+		return psiElement;
 	}
 
 	@Nullable

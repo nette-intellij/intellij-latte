@@ -11,6 +11,6 @@ public interface LattePhpConstantElement extends BaseLattePhpElement, StubBasedP
 		return LattePhpTypeDetector.detectPrevPhpType(this);
 	}
 
-	public abstract String getConstantName();
+	String getConstantName();
 
 }

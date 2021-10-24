@@ -11,6 +11,10 @@ public interface LattePhpMethodElement extends BaseLattePhpElement, StubBasedPsi
 		return LattePhpTypeDetector.detectPrevPhpType(this);
 	}
 
-	public abstract String getMethodName();
+	String getMethodName();
+
+	boolean isStatic();
+
+	boolean isFunction();
 
 }

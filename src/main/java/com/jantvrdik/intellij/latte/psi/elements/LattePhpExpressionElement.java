@@ -10,7 +10,7 @@ import java.util.List;
 public interface LattePhpExpressionElement extends PsiElement {
 
     @NotNull
-    NettePhpType getPhpType();
+    NettePhpType getReturnType();
 
     @NotNull
     List<LattePhpStatement> getPhpStatementList();
