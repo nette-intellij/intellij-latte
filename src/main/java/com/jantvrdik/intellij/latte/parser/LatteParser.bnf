@@ -2,7 +2,8 @@
 	parserClass="com.jantvrdik.intellij.latte.parser.LatteParser"
 	parserUtilClass="com.jantvrdik.intellij.latte.parser.LatteParserUtil"
 
-	extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+	extends="com.jantvrdik.intellij.latte.psi.impl.LattePsiElementImpl"
+	implements="com.jantvrdik.intellij.latte.psi.elements.LattePsiElement"
 
 	psiClassPrefix="Latte"
 	psiImplClassSuffix="Impl"
@@ -197,16 +198,17 @@ macroModifier    ::= T_MACRO_FILTERS {
                     }
 
 phpStatement       ::= phpStatementFirstPart phpStatementPart* {
-                methods=[getReturnType isPhpVariableOnly isPhpClassReferenceOnly getLastPhpElement]
-                }
+                        mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpStatementElementImpl"
+                        implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpStatementElement"
+                    }
 
 phpStatementFirstPart    ::= phpVariable | phpMethod | phpClassReference {
-                    methods=[getReturnType getPhpStatement getPrevPhpStatementPart getPhpElement]
-                    implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpStatementPartElement"
-                }
+                        mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpStatementPartElementImpl"
+                        implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpStatementPartElement"
+                    }
 
 phpStatementPart    ::= phpDefinition | phpStatic {
-                    methods=[getReturnType getPhpStatement getPrevPhpStatementPart getPhpElement]
+                    mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpStatementPartElementImpl"
                     implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpStatementPartElement"
                  }
 
@@ -223,24 +225,24 @@ phpTypeIterable       ::= T_PHP_LEFT_BRACKET T_PHP_RIGHT_BRACKET
 phpTypedArguments       ::= phpFirstTypedVariable | (phpTypedVariable "," phpTypedVariable ("," phpTypedVariable)*)
 
 phpFirstTypedVariable       ::= phpType phpVariable {
-                         methods=[getReturnType]
+                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpTypedPartElementImpl"
                          implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpTypedPartElement"
                      }
 
 phpTypedVariable       ::= phpType? phpVariable {
-                         methods=[getReturnType]
+                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpTypedPartElementImpl"
                          implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpTypedPartElement"
                      }
 
 phpKeyArrayItem   ::= phpArrayKey (T_PHP_DOUBLE_ARROW | "=>") phpArrayValue
 
 phpArrayKey   ::= phpPrivateArgument* {
-                    methods=[getReturnType]
+                    mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpExpressionElementImpl"
                     implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpExpressionElement"
                 }
 
 phpArrayValue   ::= phpPrivateArgument* {
-                   methods=[getReturnType]
+                   mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpExpressionElementImpl"
                    implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpExpressionElement"
                }
 
@@ -291,8 +293,8 @@ phpPrivateArgument    ::=  phpString | phpArrayOfVariables | phpTypedArguments |
                     | macroModifier | T_PHP_IDENTIFIER | T_PHP_MACRO_SEPARATOR | T_PHP_OR_INCLUSIVE | T_PHP_DEFINITION_OPERATOR
 
 phpExpression    ::= (expression | T_MACRO_ARGS)* {
-                           methods=[getReturnType getPhpArrayLevel]
-                           implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpExpressionElement"
+                            mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpExpressionElementImpl"
+                            implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpExpressionElement"
                        }
 
 private

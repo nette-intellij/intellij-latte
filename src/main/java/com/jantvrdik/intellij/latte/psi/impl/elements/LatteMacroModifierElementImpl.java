@@ -10,7 +10,7 @@ import com.jantvrdik.intellij.latte.indexes.stubs.LatteFilterStub;
 import com.jantvrdik.intellij.latte.psi.LatteMacroContent;
 import com.jantvrdik.intellij.latte.psi.LattePhpInBrackets;
 import com.jantvrdik.intellij.latte.psi.elements.LatteMacroModifierElement;
-import com.jantvrdik.intellij.latte.psi.impl.LatteBaseStubElementImpl;
+import com.jantvrdik.intellij.latte.psi.impl.LatteStubElementImpl;
 import com.jantvrdik.intellij.latte.psi.impl.LattePsiImplUtil;
 import com.jantvrdik.intellij.latte.settings.LatteFilterSettings;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
@@ -21,7 +21,7 @@ import javax.swing.*;
 
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.T_MACRO_FILTERS;
 
-public abstract class LatteMacroModifierElementImpl extends LatteBaseStubElementImpl<LatteFilterStub> implements LatteMacroModifierElement {
+public abstract class LatteMacroModifierElementImpl extends LatteStubElementImpl<LatteFilterStub> implements LatteMacroModifierElement {
 
 	private @Nullable String modifierName = null;
 	private @Nullable PsiElement identifier = null;

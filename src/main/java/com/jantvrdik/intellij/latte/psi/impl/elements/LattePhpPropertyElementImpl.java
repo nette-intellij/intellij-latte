@@ -7,14 +7,14 @@ import com.intellij.util.IncorrectOperationException;
 import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpPropertyStub;
 import com.jantvrdik.intellij.latte.psi.LatteElementFactory;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpPropertyElement;
-import com.jantvrdik.intellij.latte.psi.impl.LatteBaseStubPhpElementImpl;
+import com.jantvrdik.intellij.latte.psi.impl.LatteStubPhpElementImpl;
 import com.jantvrdik.intellij.latte.psi.impl.LattePsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.T_PHP_IDENTIFIER;
 
-public abstract class LattePhpPropertyElementImpl extends LatteBaseStubPhpElementImpl<LattePhpPropertyStub> implements LattePhpPropertyElement {
+public abstract class LattePhpPropertyElementImpl extends LatteStubPhpElementImpl<LattePhpPropertyStub> implements LattePhpPropertyElement {
 
 	private @Nullable String name = null;
 	private @Nullable String propertyName = null;

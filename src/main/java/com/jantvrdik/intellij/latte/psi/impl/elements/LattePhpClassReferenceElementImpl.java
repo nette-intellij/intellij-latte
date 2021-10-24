@@ -6,11 +6,11 @@ import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.util.IncorrectOperationException;
 import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpClassStub;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpClassReferenceElement;
-import com.jantvrdik.intellij.latte.psi.impl.LatteBaseStubPhpElementImpl;
+import com.jantvrdik.intellij.latte.psi.impl.LatteStubPhpElementImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class LattePhpClassReferenceElementImpl extends LatteBaseStubPhpElementImpl<LattePhpClassStub> implements LattePhpClassReferenceElement {
+public abstract class LattePhpClassReferenceElementImpl extends LatteStubPhpElementImpl<LattePhpClassStub> implements LattePhpClassReferenceElement {
 
 	private @Nullable String name = null;
 	private @Nullable String className = null;

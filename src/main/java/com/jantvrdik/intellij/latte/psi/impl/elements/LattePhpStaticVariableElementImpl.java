@@ -8,14 +8,14 @@ import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpStaticVariableStub;
 import com.jantvrdik.intellij.latte.php.LattePhpVariableUtil;
 import com.jantvrdik.intellij.latte.psi.LatteElementFactory;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpStaticVariableElement;
-import com.jantvrdik.intellij.latte.psi.impl.LatteBaseStubPhpElementImpl;
+import com.jantvrdik.intellij.latte.psi.impl.LatteStubPhpElementImpl;
 import com.jantvrdik.intellij.latte.psi.impl.LattePsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.T_MACRO_ARGS_VAR;
 
-public abstract class LattePhpStaticVariableElementImpl extends LatteBaseStubPhpElementImpl<LattePhpStaticVariableStub> implements LattePhpStaticVariableElement {
+public abstract class LattePhpStaticVariableElementImpl extends LatteStubPhpElementImpl<LattePhpStaticVariableStub> implements LattePhpStaticVariableElement {
 
 	private @Nullable String name = null;
 	private @Nullable String variableName = null;

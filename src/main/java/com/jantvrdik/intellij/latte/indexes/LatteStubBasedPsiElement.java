@@ -6,10 +6,11 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubElement;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
+import com.jantvrdik.intellij.latte.psi.elements.LattePsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class LatteStubBasedPsiElement<T extends StubElement> extends StubBasedPsiElementBase<T> {
+public class LatteStubBasedPsiElement<T extends StubElement> extends StubBasedPsiElementBase<T>implements LattePsiElement {
     private LatteFile file = null;
 
     public LatteStubBasedPsiElement(@NotNull T stub, @NotNull IStubElementType nodeType) {

@@ -28,7 +28,7 @@ import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
 
 public class LattePhpTypeDetector {
     public static @NotNull NettePhpType detectPhpType(@NotNull PsiElement element) {
-        PsiFile file = element.getContainingFile();
+        PsiFile file = element instanceof LattePsiElement ? ((LattePsiElement) element).getLatteFile() : element.getContainingFile();
         if (!(file instanceof LatteFile)) {
             return NettePhpType.MIXED;
         }
@@ -75,16 +75,16 @@ public class LattePhpTypeDetector {
             } else if (current instanceof LattePhpStaticVariable) {
                 return detect(((LattePhpStaticVariable) current)).withDepth(((LattePhpStaticVariable) current).getPhpArrayLevel());
             } else if (current instanceof LattePhpType) {
-                return ((LattePhpType) current).getReturnType(); // called from element, because in PhpType is type cached
+                return ((LattePhpType) current).getReturnType(); // called from element, because type is cached in PhpType
             } else if (current instanceof LattePhpTypedPartElement) {
                 LattePhpType typeElement = ((LattePhpTypedPartElement) current).getPhpType();
-                return typeElement == null ? NettePhpType.MIXED : detect(typeElement);
+                return typeElement == null ? NettePhpType.MIXED : detect(typeElement); // use detect from LattePhpType
             } else if (current instanceof LattePhpClassUsage) {
-                return ((LattePhpClassUsage) current).getReturnType(); // called from element, because in PhpType is type cached
+                return ((LattePhpClassUsage) current).getReturnType(); // called from element, because type is cached in ClassUsage
             } else if (current instanceof LattePhpClassReference) {
                 return detect(((LattePhpClassReference) current).getPhpClassUsage()); // use detect from LattePhpClassUsage
             } else if (current instanceof LattePhpNamespaceReference) {
-                return ((LattePhpNamespaceReference) current).getReturnType(); // called from element, because in PhpType is type cached
+                return ((LattePhpNamespaceReference) current).getReturnType(); // called from element, because type is cached in NamespaceReference
             } else if (current instanceof LattePhpStatement) {
                 return detect((LattePhpStatement) current);
             } else if (current instanceof LattePhpStatementPartElement) {
@@ -234,7 +234,7 @@ public class LattePhpTypeDetector {
         }
 
         private @NotNull NettePhpType detect(@NotNull LattePhpExpression expression) {
-            return detect((LattePhpExpressionElement) expression).withDepth(expression.getPhpArrayLevel());
+            return detect((LattePhpExpressionElement) expression);
         }
 
         private @NotNull NettePhpType detect(@NotNull LattePhpExpressionElement expressionElement) {

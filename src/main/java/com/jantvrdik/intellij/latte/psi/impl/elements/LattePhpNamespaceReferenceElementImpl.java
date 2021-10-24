@@ -9,14 +9,14 @@ import com.jantvrdik.intellij.latte.php.LattePhpUtil;
 import com.jantvrdik.intellij.latte.php.NettePhpType;
 import com.jantvrdik.intellij.latte.psi.LattePhpNamespaceReference;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpNamespaceReferenceElement;
-import com.jantvrdik.intellij.latte.psi.impl.LatteBaseStubPhpElementImpl;
+import com.jantvrdik.intellij.latte.psi.impl.LatteStubPhpElementImpl;
 import com.jetbrains.php.PhpIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public abstract class LattePhpNamespaceReferenceElementImpl extends LatteBaseStubPhpElementImpl<LattePhpNamespaceStub> implements LattePhpNamespaceReferenceElement {
+public abstract class LattePhpNamespaceReferenceElementImpl extends LatteStubPhpElementImpl<LattePhpNamespaceStub> implements LattePhpNamespaceReferenceElement {
 
 	public LattePhpNamespaceReferenceElementImpl(@NotNull ASTNode node) {
 		super(node);

@@ -1,7 +1,6 @@
 package com.jantvrdik.intellij.latte.psi.elements;
 
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiNameIdentifierOwner;
 import com.jantvrdik.intellij.latte.php.LattePhpTypeDetector;
 import com.jantvrdik.intellij.latte.php.NettePhpType;
 import com.jantvrdik.intellij.latte.psi.LattePhpArrayUsage;
@@ -11,10 +10,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.List;
 
-public interface BaseLattePhpElement extends PsiNameIdentifierOwner {
+public interface BaseLattePhpElement extends LattePsiNamedElement {
 
-	@NotNull
-	default List<LattePhpArrayUsage> getPhpArrayUsageList() {
+	default @NotNull List<LattePhpArrayUsage> getPhpArrayUsageList() {
 		return Collections.emptyList();
 	}
 
@@ -30,10 +28,8 @@ public interface BaseLattePhpElement extends PsiNameIdentifierOwner {
 
 	int getPhpArrayLevel();
 
-	@Nullable
-	PsiElement getTextElement();
+	@Nullable PsiElement getTextElement();
 
-	@Nullable
-	LattePhpStatementPartElement getPhpStatementPart();
+	@Nullable LattePhpStatementPartElement getPhpStatementPart();
 
 }

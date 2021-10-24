@@ -11,15 +11,15 @@ import com.jantvrdik.intellij.latte.indexes.LatteStubBasedPsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class LatteBaseStubElementImpl<T extends StubElement> extends LatteStubBasedPsiElement<T> implements StubBasedPsiElement<T> {
+public abstract class LatteStubElementImpl<T extends StubElement> extends LatteStubBasedPsiElement<T> implements StubBasedPsiElement<T> {
 
 	private Project project = null;
 
-	public LatteBaseStubElementImpl(@NotNull ASTNode node) {
+	public LatteStubElementImpl(@NotNull ASTNode node) {
 		super(node);
 	}
 
-	public LatteBaseStubElementImpl(final T stub, final IStubElementType nodeType) {
+	public LatteStubElementImpl(final T stub, final IStubElementType nodeType) {
 		super(stub, nodeType);
 	}
 

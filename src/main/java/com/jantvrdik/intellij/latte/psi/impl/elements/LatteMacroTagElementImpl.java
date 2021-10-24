@@ -1,12 +1,11 @@
 package com.jantvrdik.intellij.latte.psi.impl.elements;
 
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.jantvrdik.intellij.latte.icons.LatteIcons;
 import com.jantvrdik.intellij.latte.psi.LatteMacroContent;
 import com.jantvrdik.intellij.latte.psi.elements.LatteMacroTagElement;
-import com.jantvrdik.intellij.latte.psi.impl.LatteBaseElementImpl;
+import com.jantvrdik.intellij.latte.psi.impl.LatteReferencedElementImpl;
 import com.jantvrdik.intellij.latte.psi.impl.LattePsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,7 +14,7 @@ import javax.swing.*;
 
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
 
-public abstract class LatteMacroTagElementImpl extends LatteBaseElementImpl implements LatteMacroTagElement {
+public abstract class LatteMacroTagElementImpl extends LatteReferencedElementImpl implements LatteMacroTagElement {
 
 	private @Nullable String tagName = null;
 	private @Nullable PsiElement identifier = null;

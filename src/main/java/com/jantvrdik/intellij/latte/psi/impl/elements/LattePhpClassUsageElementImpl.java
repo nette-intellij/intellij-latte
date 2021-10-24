@@ -10,15 +10,14 @@ import com.jantvrdik.intellij.latte.php.LattePhpUtil;
 import com.jantvrdik.intellij.latte.php.NettePhpType;
 import com.jantvrdik.intellij.latte.psi.LatteElementFactory;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpClassUsageElement;
-import com.jantvrdik.intellij.latte.psi.impl.LatteBasePhpElementImpl;
-import com.jantvrdik.intellij.latte.psi.impl.LattePsiImplUtil;
+import com.jantvrdik.intellij.latte.psi.impl.LattePhpElementImpl;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
 
-public abstract class LattePhpClassUsageElementImpl extends LatteBasePhpElementImpl implements LattePhpClassUsageElement {
+public abstract class LattePhpClassUsageElementImpl extends LattePhpElementImpl implements LattePhpClassUsageElement {
 
 	private @Nullable String className = null;
 	private @Nullable PsiElement identifier = null;

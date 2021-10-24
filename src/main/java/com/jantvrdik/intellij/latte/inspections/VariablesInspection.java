@@ -127,12 +127,12 @@ public class VariablesInspection extends BaseLocalInspectionTool {
 			@NotNull final List<LatteInspectionInfo> problems
 	) {
 		LattePhpVariableElement variable = element.getElement();
-		PsiFile file = variable.getContainingFile();
-		if (!(file instanceof LatteFile)) {
+		LatteFile file = variable.getLatteFile();
+		if (file == null) {
 			return;
 		}
 
-		List<LattePhpCachedVariable> variableDefinitions = ((LatteFile) file).getCachedVariableDefinitions(variable);
+		List<LattePhpCachedVariable> variableDefinitions = file.getCachedVariableDefinitions(variable);
 		boolean isDefined = false;
 		boolean isProbablyUndefined = false;
 		for (LattePhpCachedVariable variableDefinition : variableDefinitions) {

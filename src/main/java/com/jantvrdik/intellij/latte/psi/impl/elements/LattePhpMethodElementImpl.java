@@ -8,14 +8,14 @@ import com.intellij.util.IncorrectOperationException;
 import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpMethodStub;
 import com.jantvrdik.intellij.latte.psi.LatteElementFactory;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpMethodElement;
-import com.jantvrdik.intellij.latte.psi.impl.LatteBaseStubPhpElementImpl;
+import com.jantvrdik.intellij.latte.psi.impl.LatteStubPhpElementImpl;
 import com.jantvrdik.intellij.latte.psi.impl.LattePsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
 
-public abstract class LattePhpMethodElementImpl extends LatteBaseStubPhpElementImpl<LattePhpMethodStub> implements LattePhpMethodElement {
+public abstract class LattePhpMethodElementImpl extends LatteStubPhpElementImpl<LattePhpMethodStub> implements LattePhpMethodElement {
 
 	private @Nullable String name = null;
 	private @Nullable String methodName = null;

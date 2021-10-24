@@ -4,11 +4,6 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.jantvrdik.intellij.latte.php.LattePhpTypeDetector;
-import com.jantvrdik.intellij.latte.php.NettePhpType;
-import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
-import com.jantvrdik.intellij.latte.psi.elements.LattePhpExpressionElement;
-import com.jantvrdik.intellij.latte.psi.elements.LattePhpStatementPartElement;
 import com.jantvrdik.intellij.latte.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -70,78 +65,6 @@ public class LattePsiImplUtil {
 
 	public static @Nullable PsiElement getMacroNameElement(@NotNull LatteMacroContent macroContent) {
 		return PsiTreeUtil.skipWhitespacesBackward(macroContent);
-	}
-
-	public static @Nullable LattePhpStatementPartElement getPrevPhpStatementPart(@NotNull LattePhpStatementPartElement element) {
-		LattePhpStatement statement = element.getPhpStatement();
-		if (element == statement.getPhpStatementFirstPart()) {
-			return null;
-		}
-		LattePhpStatementPartElement previous = null;
-		for (LattePhpStatementPart part : statement.getPhpStatementPartList()) {
-			if (part == element) {
-				return previous == null ? statement.getPhpStatementFirstPart() : previous;
-			}
-			previous = part;
-		}
-		return null;
-	}
-
-	public static @NotNull LattePhpStatement getPhpStatement(@NotNull LattePhpStatementPartElement element) {
-		return (LattePhpStatement) element.getParent();
-	}
-
-	public static int getPhpArrayLevel(@NotNull LattePhpExpressionElement expression) {
-		List<LattePhpStatement> statements = expression.getPhpStatementList();
-		if (statements.size() > 0) {
-			BaseLattePhpElement phpElement = statements.get(statements.size() - 1).getLastPhpElement();
-			return phpElement != null ? phpElement.getPhpArrayLevel() : 0;
-		}
-		return 0;
-	}
-
-	public static @NotNull NettePhpType getReturnType(@NotNull PsiElement element) {
-		return LattePhpTypeDetector.detectPhpType(element);
-	}
-
-	public static @Nullable BaseLattePhpElement getLastPhpElement(@NotNull LattePhpStatement statement) {
-		int partsCount = statement.getPhpStatementPartList().size();
-		if (partsCount > 0) {
-			return statement.getPhpStatementPartList().get(partsCount - 1).getPhpElement();
-		}
-		return statement.getPhpStatementFirstPart().getPhpElement();
-	}
-
-	public static @Nullable BaseLattePhpElement getPhpElement(@NotNull LattePhpStatementFirstPart statement) {
-		if (statement.getPhpClassReference() != null) {
-			return statement.getPhpClassReference();
-		} else if (statement.getPhpMethod() != null) {
-			return statement.getPhpMethod();
-		} else if (statement.getPhpVariable() != null) {
-			return statement.getPhpVariable();
-		}
-		return null;
-	}
-
-	public static @Nullable BaseLattePhpElement getPhpElement(@NotNull LattePhpStatementPart statement) {
-		if (statement.getPhpConstant() != null) {
-			return statement.getPhpConstant();
-		} else if (statement.getPhpMethod() != null) {
-			return statement.getPhpMethod();
-		} else if (statement.getPhpProperty() != null) {
-			return statement.getPhpProperty();
-		} else if (statement.getPhpStaticVariable() != null) {
-			return statement.getPhpStaticVariable();
-		}
-		return null;
-	}
-
-	public static boolean isPhpVariableOnly(@NotNull LattePhpStatement statement) {
-		return statement.getPhpStatementFirstPart().getPhpVariable() != null && statement.getPhpStatementPartList().size() == 0;
-	}
-
-	public static boolean isPhpClassReferenceOnly(@NotNull LattePhpStatement statement) {
-		return statement.getPhpStatementFirstPart().getPhpClassReference() != null && statement.getPhpStatementPartList().size() == 0;
 	}
 
 	@Nullable

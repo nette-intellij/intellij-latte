@@ -9,7 +9,7 @@ import com.jantvrdik.intellij.latte.php.LattePhpVariableUtil;
 import com.jantvrdik.intellij.latte.psi.LatteElementFactory;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpVariableElement;
-import com.jantvrdik.intellij.latte.psi.impl.LatteBaseStubPhpElementImpl;
+import com.jantvrdik.intellij.latte.psi.impl.LatteStubPhpElementImpl;
 import com.jantvrdik.intellij.latte.psi.impl.LattePsiImplUtil;
 import com.jantvrdik.intellij.latte.utils.LattePhpCachedVariable;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +20,7 @@ import java.util.List;
 
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.T_MACRO_ARGS_VAR;
 
-public abstract class LattePhpVariableElementImpl extends LatteBaseStubPhpElementImpl<LattePhpVariableStub> implements LattePhpVariableElement {
+public abstract class LattePhpVariableElementImpl extends LatteStubPhpElementImpl<LattePhpVariableStub> implements LattePhpVariableElement {
 
 	private @Nullable String name = null;
 	private @Nullable PsiElement identifier = null;

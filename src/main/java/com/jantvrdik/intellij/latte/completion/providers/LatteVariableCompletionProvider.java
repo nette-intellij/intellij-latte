@@ -11,6 +11,7 @@ import com.intellij.util.ProcessingContext;
 import com.jantvrdik.intellij.latte.completion.handlers.PhpVariableInsertHandler;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.php.NettePhpType;
+import com.jantvrdik.intellij.latte.psi.elements.LattePsiElement;
 import com.jantvrdik.intellij.latte.settings.LatteVariableSettings;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LattePhpVariable;
@@ -72,7 +73,7 @@ public class LatteVariableCompletionProvider extends BaseLatteCompletionProvider
 	}
 
 	private List<LookupElement> attachPhpVariableCompletions(@NotNull PsiElement psiElement) {
-		PsiFile file = psiElement.getContainingFile();
+		PsiFile file = psiElement instanceof LattePsiElement ? ((LattePsiElement) psiElement).getLatteFile() : psiElement.getContainingFile();
 		if (!(file instanceof LatteFile)) {
 			return Collections.emptyList();
 		}

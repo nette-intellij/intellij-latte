@@ -10,16 +10,16 @@ import com.jantvrdik.intellij.latte.psi.LatteFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class LatteBaseElementImpl extends ASTWrapperPsiElement {
+public abstract class LatteReferencedElementImpl extends ASTWrapperPsiElement {
 
 	private Project project = null;
 	private LatteFile file = null;
 
-	public LatteBaseElementImpl(@NotNull ASTNode node) {
+	public LatteReferencedElementImpl(@NotNull ASTNode node) {
 		super(node);
 	}
 
-	@Nullable public LatteFile getLatteFile() {
+	public @Nullable LatteFile getLatteFile() {
 		if (file == null) {
 			PsiFile containingFile = getContainingFile();
 			file = containingFile instanceof LatteFile ? (LatteFile) containingFile : null;
@@ -35,14 +35,12 @@ public abstract class LatteBaseElementImpl extends ASTWrapperPsiElement {
 		return project;
 	}
 
-	@Nullable
-	public PsiReference getReference() {
+	public @Nullable PsiReference getReference() {
 		PsiReference[] references = getReferences();
 		return references.length == 0 ? null : references[0];
 	}
 
-	@NotNull
-	public PsiReference[] getReferences() {
+	public @NotNull PsiReference[] getReferences() {
 		return ReferenceProvidersRegistry.getReferencesFromProviders(this);
 	}
 }
