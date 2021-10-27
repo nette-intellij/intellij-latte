@@ -1,20 +1,18 @@
 package com.jantvrdik.intellij.latte.config;
 
-import com.intellij.notification.Notification;
 import com.intellij.openapi.project.Project;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration.Vendor;
-import com.jantvrdik.intellij.latte.utils.LatteReparseFilesUtil;
 import com.jantvrdik.intellij.latte.settings.*;
 import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileData;
 import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileDataFactory;
 import com.jantvrdik.intellij.latte.utils.LatteIdeHelper;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class LatteDefaultConfiguration {
 
@@ -24,17 +22,13 @@ public class LatteDefaultConfiguration {
 		put("NetteForms.xml", Vendor.NETTE_FORMS);
 	}};
 
-	private static Map<Project, LatteDefaultConfiguration> instances = new HashMap<>();
+	private static final Map<Project, LatteDefaultConfiguration> instances = new HashMap<>();
 
 	private Map<Vendor, LatteXmlFileData> xmlData = new HashMap<>();
 
-	@NotNull
-	private final Project project;
+	private final @NotNull Project project;
 
 	private final boolean disableLoading;
-
-	@Nullable
-	private Notification notification = null;
 
 	public LatteDefaultConfiguration(@NotNull Project project, boolean disableLoading) {
 		this.project = project;
@@ -42,10 +36,11 @@ public class LatteDefaultConfiguration {
 		reinitialize();
 	}
 
-	public void reinitialize() {
+	public boolean reinitialize() {
+		int oldHash = hashCode();
 		xmlData = new HashMap<>();
 		if (disableLoading) {
-			return;
+			return false;
 		}
 
 		LatteIdeHelper.saveFileToProjectTemp(project, "xmlSources/Latte.dtd");
@@ -62,11 +57,23 @@ public class LatteDefaultConfiguration {
 				xmlData.put(vendorResult.vendor, data);
 
 			} else if (LatteIdeHelper.holdsReadLock()) {
-				if (notification == null || notification.isExpired() || LatteReparseFilesUtil.isNotificationOutdated(notification)) {
-					notification = LatteReparseFilesUtil.notifyDefaultReparse(project);
-				}
+				LatteReparseUtil.getInstance(project).reinitializeDefault();
 			}
 		}
+		return oldHash == hashCode();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		LatteDefaultConfiguration that = (LatteDefaultConfiguration) o;
+		return Objects.equals(xmlData, that.xmlData) && project.equals(that.project);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(xmlData, project);
 	}
 
 	public static LatteDefaultConfiguration getInstance(@NotNull Project project) {

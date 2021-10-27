@@ -115,7 +115,9 @@ public class NettePhpType {
                 instances.put(type, nettePhpType);
             }
         }
-        return instances.get(type);
+
+        NettePhpType out = instances.get(type);
+        return out != null ? out : MIXED;
     }
 
     private NettePhpType(@NotNull String type) {

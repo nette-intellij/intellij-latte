@@ -3,7 +3,7 @@ package com.jantvrdik.intellij.latte.ui;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.table.TableView;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.utils.LatteReparseFilesUtil;
+import com.jantvrdik.intellij.latte.config.LatteReparseUtil;
 import com.jantvrdik.intellij.latte.settings.LatteFunctionSettings;
 
 import javax.swing.*;
@@ -22,8 +22,8 @@ public class LatteCustomFunctionSettingsDialog extends JDialog {
     private JTextField textReturnType;
     private JTextArea textDescription;
     private LatteFunctionSettings latteFunctionSettings;
-    private TableView<LatteFunctionSettings> tableView;
-    private Project project;
+    private final TableView<LatteFunctionSettings> tableView;
+    private final Project project;
 
     public LatteCustomFunctionSettingsDialog(TableView<LatteFunctionSettings> tableView, Project project) {
         this.tableView = tableView;
@@ -82,9 +82,7 @@ public class LatteCustomFunctionSettingsDialog extends JDialog {
             this.tableView.setRowSelectionInterval(row, row);
         }
 
-        if (LatteReparseFilesUtil.reinitialize(project)) {
-            dispose();
-        }
+        LatteReparseUtil.getInstance(project).reinitialize(this::dispose);
     }
 
     private void setOkState() {

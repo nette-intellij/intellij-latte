@@ -18,7 +18,6 @@ import com.intellij.util.indexing.FileBasedIndex;
 import com.intellij.util.xml.DomTarget;
 import com.jantvrdik.intellij.latte.indexes.LatteIndexExtension;
 import com.jantvrdik.intellij.latte.utils.LatteIdeHelper;
-import com.jantvrdik.intellij.latte.utils.LatteReparseFilesUtil;
 import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileData;
 import com.jantvrdik.intellij.latte.settings.*;
 import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileDataFactory;
@@ -34,14 +33,11 @@ public class LatteFileConfiguration implements Serializable {
 
     final public static List<String> REFERENCED_TAGS = Arrays.asList("filter", "variable", "function");
 
-    private static Map<Project, LatteFileConfiguration> instances = new HashMap<>();
+    private static final Map<Project, LatteFileConfiguration> instances = new HashMap<>();
 
     private Map<String, LatteTagSettings> tags = new HashMap<>();
-
     private Map<String, LatteFilterSettings> filters = new HashMap<>();
-
     private Map<String, LatteVariableSettings> variables = new HashMap<>();
-
     private Map<String, LatteFunctionSettings> functions = new HashMap<>();
 
     private List<LatteConfiguration.Vendor> vendors = new ArrayList<>();
@@ -49,8 +45,6 @@ public class LatteFileConfiguration implements Serializable {
     final private Project project;
 
     final private Collection<LatteXmlFileData> xmlFileData;
-
-    private Notification notification = null;
 
     public LatteFileConfiguration(final Project project, final @Nullable Collection<LatteXmlFileData> xmlFileData) {
         this.project = project;
@@ -94,10 +88,8 @@ public class LatteFileConfiguration implements Serializable {
     }
 
     private void initializeFromFileIndex() {
-        if (false && ActionUtil.isDumbMode(project)) {
-            if (notification == null || notification.isExpired() || LatteReparseFilesUtil.isNotificationOutdated(notification)) {
-                notification = LatteReparseFilesUtil.notifyReparseFiles(project);
-            }
+        if (ActionUtil.isDumbMode(project)) {
+            LatteReparseUtil.getInstance(project).reinitialize();
             return;
         }
 
@@ -109,15 +101,12 @@ public class LatteFileConfiguration implements Serializable {
                         key,
                         GlobalSearchScope.allScope(project)
                 );
-                if (xmlData != null) {
-                    initializeFromXmlData(xmlData);
-                }
+                initializeFromXmlData(xmlData);
             }
 
         } catch (IndexNotReadyException e) {
-            notification = LatteReparseFilesUtil.notifyReparseFiles(project);
+            LatteReparseUtil.getInstance(project).reinitialize();
         }
-        //PsiFile[] files = FilenameIndex.getFilesByName(project, FILE_NAME, GlobalSearchScope.allScope(project));
     }
 
     public void applyXmlData(LatteXmlFileData data) {
@@ -144,13 +133,30 @@ public class LatteFileConfiguration implements Serializable {
         functions.entrySet().removeIf(entry -> entry.getValue().getVendorName().equals(vendorResult.vendorName));
     }
 
-    public void reinitialize() {
+    public boolean reinitialize() {
+        int oldHash = hashCode();
+
         tags = new HashMap<>();
         filters = new HashMap<>();
         variables = new HashMap<>();
         functions = new HashMap<>();
         vendors = new ArrayList<>();
         initialize();
+
+        return oldHash == hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LatteFileConfiguration that = (LatteFileConfiguration) o;
+        return Objects.equals(tags, that.tags) && Objects.equals(filters, that.filters) && Objects.equals(variables, that.variables) && Objects.equals(functions, that.functions) && Objects.equals(vendors, that.vendors);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(tags, filters, variables, functions, vendors);
     }
 
     @Nullable

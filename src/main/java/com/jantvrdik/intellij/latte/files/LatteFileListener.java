@@ -9,7 +9,7 @@ import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
 import com.intellij.psi.xml.XmlDocument;
 import com.intellij.psi.xml.XmlFile;
 import com.jantvrdik.intellij.latte.config.LatteFileConfiguration;
-import com.jantvrdik.intellij.latte.utils.LatteReparseFilesUtil;
+import com.jantvrdik.intellij.latte.config.LatteReparseUtil;
 import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileData;
 import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileDataFactory;
 import org.jetbrains.annotations.NotNull;
@@ -45,7 +45,7 @@ public class LatteFileListener implements BulkFileListener {
                 Collections.addAll(projects, ProjectManager.getInstance().getOpenProjects());
             }
 
-            LatteReparseFilesUtil.notifyRemovedFiles(projects);
+            LatteReparseUtil.reinitialize(projects);
         }
     }
 }

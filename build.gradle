@@ -19,7 +19,7 @@ properties.load(project.rootProject.file("local.properties").newDataInputStream(
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-version '1.1.4-alpha3'
+version '1.1.4-alpha4'
 group 'com.jantvrdik.intellij.latte'
 
 jar {
