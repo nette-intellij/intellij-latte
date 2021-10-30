@@ -21,7 +21,7 @@ public class LattePhpPropertyIndex extends StringStubIndexExtension<LattePhpProp
 
     @Override
     public int getVersion() {
-        return super.getVersion() + 1;
+        return super.getVersion() + 2;
     }
 
     @Override
