@@ -1,280 +1,286 @@
 <html>
 
-1.1.4-RC1
-- upgraded LatteReparseUtil for reloading config from XML without user interaction (issue #161, #167)
+<p>1.1.4-RC1</p>
+<ul>
+	<li>upgraded LatteReparseUtil for reloading config from XML without user interaction (issue #161, #167)</li>
+</ul>
 
-1.1.4-alfa3
-- added showing completion auto popup after type ->, ::, \, $, | (issue #76)
-- added support for caching identifiers in PsiElements (performance improvement)
-- added support for Latte tag {parameters}
-- moved Latte filters and their arguments to one PSI element (issue #108)
+<p>1.1.4-alfa3</p>
+<ul>
+	<li>added showing completion auto popup after type ->, ::, \, $, | (issue #76)</li>
+	<li>added support for caching identifiers in PsiElements (performance improvement)</li>
+	<li>added support for Latte tag {parameters}</li>
+	<li>moved Latte filters and their arguments to one PSI element (issue #108)</li>
+</ul>
 
-1.1.4-alfa2
-- added LattePhpTypeDetector (faster PhpTypes detector)
-- added stub index for PhpType (issue #180)
-- fixed detect for variable if reference is in foreach value
-- fixed ? in type definitions like ?int, ?string, ...
+<p>1.1.4-alfa2</p>
+<ul>
+	<li>added LattePhpTypeDetector (faster PhpTypes detector)</li>
+	<li>added stub index for PhpType (issue #180)</li>
+	<li>fixed detect for variable if reference is in foreach value</li>
+	<li>fixed ? in type definitions like ?int, ?string, ...</li>
 </ul>
 
 <p>1.1.4-alfa1</p>
 <ul>
-	fixed and removed more deprecated usages (prepare for higher versions)
-	fixed problem with resolving methods witch use array access for variables defined by templateType tag (issue #179)
+	<li>fixed and removed more deprecated usages (prepare for higher versions)</li>
+	<li>fixed problem with resolving methods witch use array access for variables defined by templateType tag (issue #179)</li>
 </ul>
 
 <p>1.1.3</p>
 <ul>
-	just released
+	<li>just released</li>
 </ul>
 
 <p>1.1.3-RC1</p>
 <ul>
-	added missing tags and filters for latest Latte version
-	better completion for tags with optional closing tag (issue #110)
-	fixed for 2021.1 (issue #163, #164)
-	fixed methods with variable in name (issue #153, #166)
-	fixed and improved variables inspections, implemented variable context (issue #104)
-	fixed detection for variable types in varType tag (issue #107)
-	fixed problem with multiple variable definitions (issue #124)
-	added more tests for psi helpers and variable inspections
+	<li>added missing tags and filters for latest Latte version</li>
+	<li>better completion for tags with optional closing tag (issue #110)</li>
+	<li>fixed for 2021.1 (issue #163, #164)</li>
+	<li>fixed methods with variable in name (issue #153, #166)</li>
+	<li>fixed and improved variables inspections, implemented variable context (issue #104)</li>
+	<li>fixed detection for variable types in varType tag (issue #107)</li>
+	<li>fixed problem with multiple variable definitions (issue #124)</li>
+	<li>added more tests for psi helpers and variable inspections</li>
 </ul>
 
 <p>1.1.2</p>
 <ul>
-	just released
+	<li>just released</li>
 </ul>
 
 <p>1.1.2-RC1</p>
 <ul>
-	fixed bug with bad ASTNode creating (issue #135)
-	fixed for PhpStorm 2020.3
-	fixed class completion if part of namespace is typed (and for classes without namespace)
-	fixed saving settings (tags, etc...) (issue #136, #145, #149)
-	fixed /} for {block /} and {label /} tags
+	<li>fixed bug with bad ASTNode creating (issue #135)</li>
+	<li>fixed for PhpStorm 2020.3</li>
+	<li>fixed class completion if part of namespace is typed (and for classes without namespace)</li>
+	<li>fixed saving settings (tags, etc...) (issue #136, #145, #149)</li>
+	<li>fixed /} for {block /} and {label /} tags</li>
 </ul>
 
 <p>1.1.1</p>
 <ul>
-	just released
+	<li>just released</li>
 </ul>
 
 <p>1.1.1-RC3</p>
 <ul>
-	minor changes for PhpStorm 2020.3
-	increased minimum compatibility to 2020.2.4
+	<li>minor changes for PhpStorm 2020.3</li>
+	<li>increased minimum compatibility to 2020.2.4</li>
 </ul>
 
 <p>1.1.1-RC2</p>
 <ul>
-	added new tags {try} {rollback} {ifchanged} {skipIf}
-	added new filters |clamp |sort and custom function clamp()
-	added support for references to core functions with \, e.g. \current()
-	added support for floats, hex, oct, bin and numbers with exponent (issue #123)
-	added support for UNPAIRED_ATTR tags (issue #120)
-	fixed undefined variable problem in n:for loop (issue #98)
-	fixed marked parameters as link (issue #102)
-	fixed bug with nested blocks used as n: attributes (issue #109)
-	fixed bug in code formatting for AUTO_EMPTY tags (issue #114, #125, #116)
-	fixed performance bugs (issue #105, #117)
-	fixed bug with double-click behavior in double quoted strings (issue #111)
+	<li>added new tags {try} {rollback} {ifchanged} {skipIf}</li>
+	<li>added new filters |clamp |sort and custom function clamp()</li>
+	<li>added support for references to core functions with \, e.g. \current()</li>
+	<li>added support for floats, hex, oct, bin and numbers with exponent (issue #123)</li>
+	<li>added support for UNPAIRED_ATTR tags (issue #120)</li>
+	<li>fixed undefined variable problem in n:for loop (issue #98)</li>
+	<li>fixed marked parameters as link (issue #102)</li>
+	<li>fixed bug with nested blocks used as n: attributes (issue #109)</li>
+	<li>fixed bug in code formatting for AUTO_EMPTY tags (issue #114, #125, #116)</li>
+	<li>fixed performance bugs (issue #105, #117)</li>
+	<li>fixed bug with double-click behavior in double quoted strings (issue #111)</li>
 </ul>
 
 <p>1.1.1-RC1</p>
 <ul>
-	added stub indexes - it improve performance if references are resolved (issue #100)
-	added better support for XML configuration files (references to .latte templates etc.)
-	added .dtd file for validate XML configurations in IDE
-	fixed bug in auto completion for methods (now it is not detected as PHP function)
+	<li>added stub indexes - it improve performance if references are resolved (issue #100)</li>
+	<li>added better support for XML configuration files (references to .latte templates etc.)</li>
+	<li>added .dtd file for validate XML configurations in IDE</li>
+	<li>fixed bug in auto completion for methods (now it is not detected as PHP function)</li>
 </ul>
 
 <p>1.1.0 - Iterable types + XML config update</p>
 <ul>
-	added support for iterable types (issue #70)
-	added new inspections for iterable types (issue #78)
-	added support for array access (eg. $arr[][]) to parser (issue #82)
-	added support for define variables in tag {define} (issue #84)
-	added live template {va
-	fixed detecting variable type from code
-	fixed bug in autocomplete inside var macro
-	added support for load configuration from XML files (issue #81)
-	added support for multi line macro settings
-	added support for reformat code for spaces around assignment and equality operators
-	added support for reformat code for spaces after tag name and before closing tag
-	added support for reformat code for spaces before tag filters
-	added support for change syntax highlight for operators
-	added Latte context for live templates
-	added live templates {fore, {forek, {fori and {ife
-	added new tags {do}, {sandbox}, {widget} and {varPrint}
-	added new filter |batch:(array, length [, item])
-	added tag {inputError} - (reload for Nette tag settings needed)
-	switched to not deprecated api around Latte code formatter
-	upgraded more deprecated usages
-	improved LattePhpType to use less memory and work faster (about -75% processing time)
-	implemented Gradle (for better plugin development)
-	tag {? ...} was tagged as deprecated since Nette 2.4
-	increased minimum compatibility to PhpStorm 193.5233.102
-	added support for use HTML elements in PSI tree (internal feature for future improvements)
-	fixed issue #66 - methods, constants and properties are now recognized for static classes
-	fixed issue #64 - ifcontent is now macro without parameters
-	fixed issue #61 - improved working with methods (now it is prepared for future enhacements)
-	fixed issue #69 - determine type for a variable, if call some on this now working
-	fixed issue #62 - now is space after function name allowed and it is determined as function
-	fixed issue #80 - better parsing for namespaces and classes and fixed refactoring for classes
-	fixed issue #72 - added support for double colons in filters
-	fixed issue #77 - added inspection for deprecated and internal usages
-	fixed issue #55 - fixed macro {label foo} as unpaired (also fixed other AUTO_EMPTY tags)
+	<li>added support for iterable types (issue #70)</li>
+	<li>added new inspections for iterable types (issue #78)</li>
+	<li>added support for array access (eg. $arr[][]) to parser (issue #82)</li>
+	<li>added support for define variables in tag {define} (issue #84)</li>
+	<li>added live template {va</li>
+	<li>fixed detecting variable type from code</li>
+	<li>fixed bug in autocomplete inside var macro</li>
+	<li>added support for load configuration from XML files (issue #81)</li>
+	<li>added support for multi line macro settings</li>
+	<li>added support for reformat code for spaces around assignment and equality operators</li>
+	<li>added support for reformat code for spaces after tag name and before closing tag</li>
+	<li>added support for reformat code for spaces before tag filters</li>
+	<li>added support for change syntax highlight for operators</li>
+	<li>added Latte context for live templates</li>
+	<li>added live templates {fore, {forek, {fori and {ife</li>
+	<li>added new tags {do}, {sandbox}, {widget} and {varPrint}</li>
+	<li>added new filter |batch:(array, length [, item])</li>
+	<li>added tag {inputError} - (reload for Nette tag settings needed)</li>
+	<li>switched to not deprecated api around Latte code formatter</li>
+	<li>upgraded more deprecated usages</li>
+	<li>improved LattePhpType to use less memory and work faster (about -75% processing time)</li>
+	<li>implemented Gradle (for better plugin development)</li>
+	<li>tag {? ...} was tagged as deprecated since Nette 2.4</li>
+	<li>increased minimum compatibility to PhpStorm 193.5233.102</li>
+	<li>added support for use HTML elements in PSI tree (internal feature for future improvements)</li>
+	<li>fixed issue #66 - methods, constants and properties are now recognized for static classes</li>
+	<li>fixed issue #64 - ifcontent is now macro without parameters</li>
+	<li>fixed issue #61 - improved working with methods (now it is prepared for future enhacements)</li>
+	<li>fixed issue #69 - determine type for a variable, if call some on this now working</li>
+	<li>fixed issue #62 - now is space after function name allowed and it is determined as function</li>
+	<li>fixed issue #80 - better parsing for namespaces and classes and fixed refactoring for classes</li>
+	<li>fixed issue #72 - added support for double colons in filters</li>
+	<li>fixed issue #77 - added inspection for deprecated and internal usages</li>
+	<li>fixed issue #55 - fixed macro {label foo} as unpaired (also fixed other AUTO_EMPTY tags)</li>
 </ul>
 
 <p>1.0.2</p>
 <ul>
-	added code style settings (settings for use tabs or spaces) (issue #46, #30)
-	added support for define variable in tag {default $foo = 123}
-	added class namespaces completion
-	added support for define variables by {php [$foo, $bar] = $arr}
-	implemented some performance improvements
-	fixed resolving methods if a type is more classes FooClass|BarClass
-	fixed completion for unpaired macro after if missing end }
-	fixed filters on variables (issue #47)
-	fixed wrong indent for elseifset (issue #42)
-	fixed multiple variable definitions in for/foreach cycles
-	fixed auto-complete (disabled in strings, more improvements)
-	increased minimum compatibility to 2018.3
+	<li>added code style settings (settings for use tabs or spaces) (issue #46, #30)</li>
+	<li>added support for define variable in tag {default $foo = 123}</li>
+	<li>added class namespaces completion</li>
+	<li>added support for define variables by {php [$foo, $bar] = $arr}</li>
+	<li>implemented some performance improvements</li>
+	<li>fixed resolving methods if a type is more classes FooClass|BarClass</li>
+	<li>fixed completion for unpaired macro after if missing end }</li>
+	<li>fixed filters on variables (issue #47)</li>
+	<li>fixed wrong indent for elseifset (issue #42)</li>
+	<li>fixed multiple variable definitions in for/foreach cycles</li>
+	<li>fixed auto-complete (disabled in strings, more improvements)</li>
+	<li>increased minimum compatibility to 2018.3</li>
 </ul>
 
 <p>1.0.1</p>
 <ul>
-	fixed compatibility issues
-	fixed structure view (added n:tags and images)
+	<li>fixed compatibility issues</li>
+	<li>fixed structure view (added n:tags and images)</li>
 </ul>
 
 <p>1.0.0</p>
 <ul>
-	added support for PHP content
-	added variable types
-	added highlighting and go to source support for latte variables
-	added support for define custom default variables per project
-	added code-completions for latte variables, PHP functions, methods, constants and properties
-	added varType macro
-	added templateType macro
-	added support for define type in {var Bar\FooClass $class = ...}
-	added support for mime types and code-completion it in contentType macro
-	added reference search for usages from PHP to Latte (for classes, methods, properties and constants)
-	added brace matcher for highlight braces
-	added go to source for class names, methods, constants and properties
-	added support for highlighting macro name and pair macro
-	added support for refactoring rename (methods, properties, constants and class names)
-	added code-completion for latte filters and custom function
-	added support for adding custom latte filters and functions
-	added UI for setting custom variables, filters, custom function and macros
-	added help buttons in settings to go to documentation
-	added completion pair macro if use code-completion for pair macro name and click enter
-	
+	<li>added support for PHP content</li>
+	<li>added variable types</li>
+	<li>added highlighting and go to source support for latte variables</li>
+	<li>added support for define custom default variables per project</li>
+	<li>added code-completions for latte variables, PHP functions, methods, constants and properties</li>
+	<li>added varType macro</li>
+	<li>added templateType macro</li>
+	<li>added support for define type in {var Bar\FooClass $class = ...}</li>
+	<li>added support for mime types and code-completion it in contentType macro</li>
+	<li>added reference search for usages from PHP to Latte (for classes, methods, properties and constants)</li>
+	<li>added brace matcher for highlight braces</li>
+	<li>added go to source for class names, methods, constants and properties</li>
+	<li>added support for highlighting macro name and pair macro</li>
+	<li>added support for refactoring rename (methods, properties, constants and class names)</li>
+	<li>added code-completion for latte filters and custom function</li>
+	<li>added support for adding custom latte filters and functions</li>
+	<li>added UI for setting custom variables, filters, custom function and macros</li>
+	<li>added help buttons in settings to go to documentation</li>
+	<li>added completion pair macro if use code-completion for pair macro name and click enter</li>
+	<li>
 		added inspections for:
 		<ul>
-			class usages (Undefined class)
-			checking not defined variables, more definitions with same variable name etc.
-			checking constant, property and methods visibility (if is not public it make warning)
-			checking not existing constants, properties and methods
-			checking static methods and properties used non statically and vice versa
-			checking valid content for templateType, varType and var macro
-			checking existing latte filters
+			<li>class usages (Undefined class)</li>
+			<li>checking not defined variables, more definitions with same variable name etc.</li>
+			<li>checking constant, property and methods visibility (if is not public it make warning)</li>
+			<li>checking not existing constants, properties and methods</li>
+			<li>checking static methods and properties used non statically and vice versa</li>
+			<li>checking valid content for templateType, varType and var macro</li>
+			<li>checking existing latte filters</li>
 		</ul>
-	
-	Increased minimum compatibility with PhpStorm version to 2017.3 from PhpStorm 8 (pre-2016.2 IDE version)
+	</li>
+	<li>Increased minimum compatibility with PhpStorm version to 2017.3 from PhpStorm 8 (pre-2016.2 IDE version)</li>
 </ul>
 
 <p>0.3.3</p>
 <ul>
-	fixed null pointer exception
+	<li>fixed null pointer exception</li>
 </ul>
 
 <p>0.3.2</p>
 <ul>
-	fixed disappearing comments
-	Latte 2.4: added new macros
-	Latte 2.4: added AUTO_EMPTY support
-	Latte 2.4: added info about deprecated macro(s)
+	<li>fixed disappearing comments</li>
+	<li>Latte 2.4: added new macros</li>
+	<li>Latte 2.4: added AUTO_EMPTY support</li>
+	<li>Latte 2.4: added info about deprecated macro(s)</li>
 </ul>
 
 <p>0.3.1</p>
 <ul>
-	fixed phpstorm 9.0 compatibility
+	<li>fixed phpstorm 9.0 compatibility</li>
 </ul>
 
 <p>0.3.0</p>
 <ul>
-	fixed comment parsing ("todo" support)
-	added "modifier not allowed" inspection
-	added structure view
-	improved macro folding
+	<li>fixed comment parsing ("todo" support)</li>
+	<li>added "modifier not allowed" inspection</li>
+	<li>added structure view</li>
+	<li>improved macro folding</li>
 
 </ul>
 
 <p>0.2.0</p>
 <ul>
-	html/xml support
-	better macro content parsing
-	parsing of n:macros content
+	<li>html/xml support</li>
+	<li>better macro content parsing</li>
+	<li>parsing of n:macros content</li>
 </ul>
 
 <p>0.1.1</p>
 <ul>
-	implemented basic html tags and macros folding
-	typing '}' is ignored when the next character is '}'
+	<li>implemented basic html tags and macros folding</li>
+	<li>typing '}' is ignored when the next character is '}'</li>
 </ul>
 
 <p>0.1.0-rc1 / 0.1.0</p>
 <ul>
-	selecting attribute macro from code-completion list auto-inserts =&quot;&quot; and put caret inside those quotes
+	<li>selecting attribute macro from code-completion list auto-inserts =&quot;&quot; and put caret inside those quotes</li>
 </ul>
 
 <p>0.1.0-beta3</p>
 <ul>
-	typing '{' auto-inserts '}'
+	<li>typing '{' auto-inserts '}'</li>
 </ul>
 
 <p>0.1.0-beta2</p>
 <ul>
-	fixed minimum required IDEA build number to 133.326
+	<li>fixed minimum required IDEA build number to 133.326</li>
 </ul>
 
 <p>0.1.0-beta1</p>
 <ul>
-	registering new macro will force re-analyzing of all project files
+	<li>registering new macro will force re-analyzing of all project files</li>
 </ul>
 
 <p>0.1.0-alpha7</p>
 <ul>
-	name of closing HTML tag must be the same the opening tag
-	implemented basic commenter
-	hard coded fix for macro _ which can be both pair and unpaired
+	<li>name of closing HTML tag must be the same the opening tag</li>
+	<li>implemented basic commenter</li>
+	<li>hard coded fix for macro _ which can be both pair and unpaired</li>
 </ul>
 
 <p>0.1.0-alpha6</p>
 <ul>
-	implemented support for custom attribute macros
-	only a single top-level {block} macro can be auto-closed
+	<li>implemented support for custom attribute macros</li>
+	<li>only a single top-level {block} macro can be auto-closed</li>
 </ul>
 
 <p>0.1.0-alpha5</p>
 <ul>
-	plugin is now really compatible with Java 6
+	<li>plugin is now really compatible with Java 6</li>
 </ul>
 
 <p>0.1.0-alpha4</p>
 <ul>
-	implemented support for custom macros
-	macros are auto-closed at end of file
+	<li>implemented support for custom macros</li>
+	<li>macros are auto-closed at end of file</li>
 </ul>
 
 <p>0.1.0-alpha3</p>
 <ul>
-	plugin should be compatible with Java 6
-	new icon for Latte file
+	<li>plugin should be compatible with Java 6</li>
+	<li>new icon for Latte file</li>
 </ul>
 
 <p>0.1.0-alpha2</p>
 <ul>
-	fixed macro comment priority when macro comment contained a quote
+	<li>fixed macro comment priority when macro comment contained a quote</li>
 </ul>
 </html>
+
