@@ -48,7 +48,7 @@ public class VariableIsDefinitionTest extends BasePsiParsingTestCase {
         LattePhpVariable usage = variables.get(2);
 
         Assert.assertTrue(LattePhpVariableUtil.isVariableDefinition(varTypeDefinition));
-        Assert.assertTrue(LattePhpVariableUtil.isVarTypeDefinition(varTypeDefinition));
+        Assert.assertTrue(LattePhpVariableUtil.isVariableDefinition(varTypeDefinition));
         Assert.assertTrue(LattePhpVariableUtil.isVariableDefinition(varDefinition));
         Assert.assertFalse(LattePhpVariableUtil.isVariableDefinition(usage));
     }

@@ -1,7 +1,6 @@
 package com.jantvrdik.intellij.latte.indexes;
 
 import com.intellij.ide.highlighter.XmlFileType;
-import com.intellij.notification.Notification;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.xml.XmlFile;
@@ -10,10 +9,10 @@ import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.jantvrdik.intellij.latte.config.LatteFileConfiguration;
+import com.jantvrdik.intellij.latte.config.LatteReparseUtil;
 import com.jantvrdik.intellij.latte.indexes.externalizer.ObjectStreamDataExternalizer;
 import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileData;
 import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileDataFactory;
-import com.jantvrdik.intellij.latte.utils.LatteReparseFilesUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.coverage.gnu.trove.THashMap;
 
@@ -23,9 +22,7 @@ public class LatteIndexExtension extends FileBasedIndexExtension<String, LatteXm
     public static final ID<String, LatteXmlFileData> KEY = ID.create("com.jantvrdik.intellij.latte.configuration_index");
 
     private final KeyDescriptor<String> KEY_DESCRIPTOR = new EnumeratorStringDescriptor();
-    private static ObjectStreamDataExternalizer<LatteXmlFileData> DATA_EXTERNALIZER = new ObjectStreamDataExternalizer<>();
-
-    private Notification notification = null;
+    private static final ObjectStreamDataExternalizer<LatteXmlFileData> DATA_EXTERNALIZER = new ObjectStreamDataExternalizer<>();
 
     @NotNull
     @Override
@@ -45,11 +42,7 @@ public class LatteIndexExtension extends FileBasedIndexExtension<String, LatteXm
                     out.put(xmlFileData.getVendorResult().vendorName, xmlFileData);
                 }
             }
-
-            if (notification == null || notification.isExpired() || LatteReparseFilesUtil.isNotificationOutdated(notification)) {
-                notification = LatteReparseFilesUtil.notifyReparseFiles(project);
-            }
-
+            LatteReparseUtil.getInstance(project).reinitialize();
             return out;
         };
     }

@@ -36,7 +36,8 @@ public class LatteTemplateDataElementType extends TemplateDataElementType {
 							": " + getRangeDump(currentRange, sourceCode) + " followed by " + getRangeDump(newRange, sourceCode);
 			currentRange = newRange;
 			if (elementTypesSet.contains(baseLexer.getTokenType())) {
-				appendCurrentTemplateToken(result, sourceCode, baseLexer, rangeCollector);
+				result.append(sourceCode, baseLexer.getTokenStart(), baseLexer.getTokenEnd());
+				appendCurrentTemplateToken(baseLexer.getTokenEnd(), sourceCode);
 			}
 			else {
 				rangeCollector.addOuterRange(currentRange);

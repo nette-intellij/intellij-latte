@@ -16,9 +16,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class LatteBlock extends TemplateLanguageBlock {
-	private SpacingBuilder spacingBuilder;
+	final private SpacingBuilder spacingBuilder;
 
-	private boolean isPair;
+	final private boolean isPair;
 
 	public LatteBlock(
 			AbstractXmlTemplateFormattingModelBuilder abstractTemplateLanguageFormattingModelBuilder,

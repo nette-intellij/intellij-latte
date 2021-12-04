@@ -12,7 +12,6 @@ import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.CharTable;
 import com.jantvrdik.intellij.latte.indexes.extensions.LattePhpNamespaceIndex;
 import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpNamespaceStub;
-import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpTypeStub;
 import com.jantvrdik.intellij.latte.indexes.stubs.impl.LattePhpNamespaceStubImpl;
 import com.jantvrdik.intellij.latte.parser.LatteElementTypes;
 import com.jantvrdik.intellij.latte.psi.LattePhpNamespaceReference;
@@ -23,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-public class LattePhpNamespaceStubType extends LattePhpTypeStub<LattePhpNamespaceStub, LattePhpNamespaceReference> {
+public class LattePhpNamespaceStubType extends LattePhpStubType<LattePhpNamespaceStub, LattePhpNamespaceReference> {
     public LattePhpNamespaceStubType(String debugName) {
         super(debugName, LatteElementTypes.LANG);
     }

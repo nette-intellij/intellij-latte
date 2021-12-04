@@ -46,4 +46,44 @@ public class ParserTest extends BasePsiParsingTestCase {
         doTest(true, true);
     }
 
+    @Test
+    public void testClassDefinition() {
+        doTest(true, true);
+    }
+
+    @Test
+    public void testTypedDefinition() {
+        doTest(true, true);
+    }
+
+    @Test
+    public void testForeachDefinition() {
+        doTest(true, true);
+    }
+
+    @Test
+    public void testForeachReferenceDefinition() {
+        doTest(true, true);
+    }
+
+    @Test
+    public void testBlockDefinition() {
+        doTest(true, true);
+    }
+
+    @Test
+    public void testForDefinition() {
+        doTest(true, true);
+    }
+
+    @Test
+    public void testParametersDefinition() {
+        doTest(true, true);
+    }
+
+    @Test
+    public void testMacroFilters() {
+        doTest(true, true);
+    }
+
 }

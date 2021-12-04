@@ -1,5 +1,6 @@
 package com.jantvrdik.intellij.latte.reference.references;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.jantvrdik.intellij.latte.indexes.LatteIndexUtil;
@@ -16,13 +17,15 @@ import java.util.Collection;
 import java.util.List;
 
 public class LattePhpPropertyReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
-    private String key;
-    private Collection<PhpClass> phpClasses;
+    final private String key;
+    final private Project project;
+    final private Collection<PhpClass> phpClasses;
 
     public LattePhpPropertyReference(@NotNull LattePhpProperty element, TextRange textRange) {
         super(element, textRange);
         key = element.getPropertyName();
-        phpClasses = element.getPhpType().getPhpClasses(element.getProject());
+        project = element.getProject();
+        phpClasses = element.getPrevReturnType().getPhpClasses(project);
     }
 
     @NotNull
@@ -32,15 +35,15 @@ public class LattePhpPropertyReference extends PsiReferenceBase<PsiElement> impl
             return new ResolveResult[0];
         }
 
-        final Collection<LattePhpProperty> methods = LatteIndexUtil.findPropertiesByName(getElement().getProject(), key);
+        final Collection<LattePhpProperty> methods = LatteIndexUtil.findPropertiesByName(project, key);
         List<ResolveResult> results = new ArrayList<>();
         for (BaseLattePhpElement method : methods) {
-            if (method.getPhpType().hasClass(phpClasses)) {
+            if (method.getPrevReturnType().hasClass(phpClasses)) {
                 results.add(new PsiElementResolveResult(method));
             }
         }
 
-        List<Field> fields = LattePhpUtil.getFieldsForPhpElement((BaseLattePhpElement) getElement());
+        List<Field> fields = LattePhpUtil.getFieldsForPhpElement((BaseLattePhpElement) getElement(), project);
         String name = ((BaseLattePhpElement) getElement()).getPhpElementName();
         for (Field field : fields) {
             if (field.getName().equals(name)) {
@@ -54,7 +57,7 @@ public class LattePhpPropertyReference extends PsiReferenceBase<PsiElement> impl
     @Nullable
     @Override
     public PsiElement resolve() {
-        List<Field> fields = LattePhpUtil.getFieldsForPhpElement((BaseLattePhpElement) getElement());
+        List<Field> fields = LattePhpUtil.getFieldsForPhpElement((BaseLattePhpElement) getElement(), project);
         return fields.size() > 0 ? fields.get(0) : null;
     }
 
@@ -67,10 +70,10 @@ public class LattePhpPropertyReference extends PsiReferenceBase<PsiElement> impl
     @Override
     public boolean isReferenceTo(@NotNull PsiElement element) {
         if (element instanceof LattePhpProperty) {
-            Collection<PhpClass> originalClasses = ((LattePhpProperty) element).getPhpType().getPhpClasses(element.getProject());
+            Collection<PhpClass> originalClasses = ((LattePhpProperty) element).getPrevReturnType().getPhpClasses(project);
             if (originalClasses.size() > 0) {
                 for (PhpClass originalClass : originalClasses) {
-                    if (LattePhpUtil.isReferenceTo(originalClass, multiResolve(false), element, ((LattePhpProperty) element).getPropertyName())) {
+                    if (LattePhpUtil.isReferenceTo(originalClass, multiResolve(false), project, ((LattePhpProperty) element).getPropertyName())) {
                         return true;
                     }
                 }
@@ -84,7 +87,7 @@ public class LattePhpPropertyReference extends PsiReferenceBase<PsiElement> impl
         if (originalClass == null) {
             return false;
         }
-        return LattePhpUtil.isReferenceTo(originalClass, multiResolve(false), element, ((Field) element).getName());
+        return LattePhpUtil.isReferenceTo(originalClass, multiResolve(false), project, ((Field) element).getName());
     }
 
     @Override

@@ -3,7 +3,7 @@ package com.jantvrdik.intellij.latte.ui;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.table.TableView;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.utils.LatteReparseFilesUtil;
+import com.jantvrdik.intellij.latte.config.LatteReparseUtil;
 import com.jantvrdik.intellij.latte.settings.LatteVariableSettings;
 
 import javax.swing.*;
@@ -20,8 +20,8 @@ public class LatteVariableSettingsDialog extends JDialog {
     private JTextField textVarName;
     private JTextField textVarType;
     private LatteVariableSettings latteVariableSettings;
-    private TableView<LatteVariableSettings> tableView;
-    private Project project;
+    private final TableView<LatteVariableSettings> tableView;
+    private final Project project;
 
     public LatteVariableSettingsDialog(TableView<LatteVariableSettings> tableView, Project project) {
         this.tableView = tableView;
@@ -63,20 +63,18 @@ public class LatteVariableSettingsDialog extends JDialog {
 
         // re-add old item to not use public setter wor twigpaths
         // update ?
-        if(this.latteVariableSettings != null) {
-            int row = this.tableView.getSelectedRows()[0];
+        int row;
+        if (this.latteVariableSettings != null) {
+            row = this.tableView.getSelectedRows()[0];
             this.tableView.getListTableModel().removeRow(row);
             this.tableView.getListTableModel().insertRow(row, settings);
-            this.tableView.setRowSelectionInterval(row, row);
         } else {
-            int row = this.tableView.getRowCount();
+            row = this.tableView.getRowCount();
             this.tableView.getListTableModel().addRow(settings);
-            this.tableView.setRowSelectionInterval(row, row);
         }
+        this.tableView.setRowSelectionInterval(row, row);
 
-        if (LatteReparseFilesUtil.reinitialize(project)) {
-            dispose();
-        }
+        LatteReparseUtil.getInstance(project).reinitialize(this::dispose);
     }
 
     private void setOkState() {

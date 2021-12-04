@@ -4,9 +4,10 @@ import com.intellij.psi.PsiFile;
 import com.intellij.testFramework.HeavyPlatformTestCase;
 import com.jantvrdik.intellij.latte.BasePsiParsingTestCase;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
+import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LattePhpVariable;
 import com.jantvrdik.intellij.latte.settings.LatteSettings;
-import com.jantvrdik.intellij.latte.utils.PsiCachedElement;
+import com.jantvrdik.intellij.latte.utils.LattePhpCachedVariable;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -39,15 +40,17 @@ public class VariableDefinitionBeforeElementTest extends BasePsiParsingTestCase 
 
     @Test
     public void testSimpleDefinition() throws IOException {
-        String name = "SimpleDefinition.latte";
+        String name = "ArrayDefinition.latte";
         PsiFile file = parseFile(name, loadFile(name));
+        assert file instanceof LatteFile;
+
         List<LattePhpVariable> variables = collectVariables(file);
         Assert.assertSame(2, variables.size());
 
         LattePhpVariable definition = variables.get(0);
         LattePhpVariable usage = variables.get(1);
 
-        List<PsiCachedElement> definitions = LattePhpVariableUtil.getVariablesDefinitionsBeforeElement(usage);
+        List<LattePhpCachedVariable> definitions = ((LatteFile) file).getCachedVariableDefinitions(usage.getTextOffset());
         Assert.assertSame(1, definitions.size());
         Assert.assertSame(definition, definitions.get(0).getElement());
     }
@@ -56,6 +59,8 @@ public class VariableDefinitionBeforeElementTest extends BasePsiParsingTestCase 
     public void testDefinitionInBlock() throws IOException {
         String name = "DefinitionInBlock.latte";
         PsiFile file = parseFile(name, loadFile(name));
+        assert file instanceof LatteFile;
+
         List<LattePhpVariable> variables = collectVariables(file);
         Assert.assertSame(3, variables.size());
 
@@ -63,7 +68,7 @@ public class VariableDefinitionBeforeElementTest extends BasePsiParsingTestCase 
         LattePhpVariable definition2 = variables.get(1);
         LattePhpVariable usage = variables.get(2);
 
-        List<PsiCachedElement> definitions = LattePhpVariableUtil.getVariablesDefinitionsBeforeElement(usage);
+        List<LattePhpCachedVariable> definitions = ((LatteFile) file).getCachedVariableDefinitions(usage.getTextOffset());
         Assert.assertSame(2, definitions.size());
         Assert.assertSame(definition1, definitions.get(0).getElement());
         Assert.assertSame(definition2, definitions.get(1).getElement());

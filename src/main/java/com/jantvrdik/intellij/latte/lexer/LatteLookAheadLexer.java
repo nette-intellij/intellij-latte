@@ -58,8 +58,8 @@ public class LatteLookAheadLexer extends LookAheadLexer {
 
 		super.addToken(endOffset, type);
 		if (!TAG_TAGS.contains(type)) {
-			checkMacroType("links", type, LatteTagsUtil.LINK_TAGS_LIST, wasLinkDestination);
-			checkMacroType("types", type, LatteTagsUtil.TYPE_TAGS_LIST, wasTypeDefinition);
+			checkMacroType(IDENTIFIER_LINKS, type, LatteTagsUtil.LINK_TAGS_LIST, wasLinkDestination);
+			checkMacroType(IDENTIFIER_TYPES, type, LatteTagsUtil.TYPE_TAGS_LIST, wasTypeDefinition);
 		}
 	}
 

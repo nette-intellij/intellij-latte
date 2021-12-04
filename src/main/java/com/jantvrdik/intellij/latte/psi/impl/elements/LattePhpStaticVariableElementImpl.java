@@ -1,16 +1,25 @@
 package com.jantvrdik.intellij.latte.psi.impl.elements;
 
-import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiReference;
-import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
+import com.intellij.util.IncorrectOperationException;
 import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpStaticVariableStub;
+import com.jantvrdik.intellij.latte.php.LattePhpVariableUtil;
+import com.jantvrdik.intellij.latte.psi.LatteElementFactory;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpStaticVariableElement;
+import com.jantvrdik.intellij.latte.psi.impl.LatteStubPhpElementImpl;
+import com.jantvrdik.intellij.latte.psi.impl.LattePsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class LattePhpStaticVariableElementImpl extends StubBasedPsiElementBase<LattePhpStaticVariableStub> implements LattePhpStaticVariableElement {
+import static com.jantvrdik.intellij.latte.psi.LatteTypes.T_MACRO_ARGS_VAR;
+
+public abstract class LattePhpStaticVariableElementImpl extends LatteStubPhpElementImpl<LattePhpStaticVariableStub> implements LattePhpStaticVariableElement {
+
+	private @Nullable String name = null;
+	private @Nullable String variableName = null;
+	private @Nullable PsiElement identifier = null;
 
 	public LattePhpStaticVariableElementImpl(@NotNull ASTNode node) {
 		super(node);
@@ -21,19 +30,58 @@ public abstract class LattePhpStaticVariableElementImpl extends StubBasedPsiElem
 	}
 
 	@Override
+	public void subtreeChanged() {
+		super.subtreeChanged();
+		this.name = null;
+		this.variableName = null;
+		this.identifier = null;
+	}
+
+	@Override
 	public String getPhpElementName()
 	{
 		return getVariableName();
 	}
 
-	@Nullable
-	public PsiReference getReference() {
-		PsiReference[] references = getReferences();
-		return references.length == 0 ? null : references[0];
+	@Override
+	public String getVariableName() {
+		if (variableName == null) {
+			final LattePhpStaticVariableStub stub = getStub();
+			if (stub != null) {
+				variableName = stub.getVariableName();
+				return variableName;
+			}
+
+			PsiElement found = getTextElement();
+			variableName = found != null ? LattePhpVariableUtil.normalizePhpVariable(found.getText()) : null;
+		}
+		return variableName;
 	}
 
-	@NotNull
-	public PsiReference[] getReferences() {
-		return ReferenceProvidersRegistry.getReferencesFromProviders(this);
+	@Override
+	public @Nullable PsiElement getNameIdentifier() {
+		if (identifier == null) {
+			identifier = LattePsiImplUtil.findFirstChildWithType(this, T_MACRO_ARGS_VAR);
+		}
+		return identifier;
+	}
+
+	@Override
+	public PsiElement setName(@NotNull String name) throws IncorrectOperationException {
+		ASTNode keyNode = getFirstChild().getNode();
+		PsiElement property = LatteElementFactory.createStaticVariable(getProject(), name);
+		if (property == null) {
+			return this;
+		}
+		return LatteElementFactory.replaceChildNode(this, property, keyNode);
+	}
+
+	@Override
+	public String getName() {
+		if (name == null) {
+			PsiElement found = getNameIdentifier();
+			name = found != null ? found.getText() : null;
+		}
+		return name;
 	}
 }

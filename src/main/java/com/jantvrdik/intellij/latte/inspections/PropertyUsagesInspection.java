@@ -39,7 +39,7 @@ public class PropertyUsagesInspection extends BaseLocalInspectionTool {
 			@Override
 			public void visitElement(@NotNull PsiElement element) {
 				if (element instanceof LattePhpProperty) {
-					NettePhpType phpType = ((LattePhpProperty) element).getPhpType();
+					NettePhpType phpType = ((LattePhpProperty) element).getPrevReturnType();
 
 					Collection<PhpClass> phpClasses = phpType.getPhpClasses(element.getProject());
 					if (phpClasses.size() == 0) {

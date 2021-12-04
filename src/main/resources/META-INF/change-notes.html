@@ -1,5 +1,37 @@
 <html>
 
+<p>1.1.4</p>
+<ul>
+	<li>just released</li>
+</ul>
+
+<p>1.1.4-RC1</p>
+<ul>
+	<li>upgraded LatteReparseUtil for reloading config from XML without user interaction (issue #161, #167)</li>
+</ul>
+
+<p>1.1.4-alfa3</p>
+<ul>
+	<li>added showing completion auto popup after type ->, ::, \, $, | (issue #76)</li>
+	<li>added support for caching identifiers in PsiElements (performance improvement)</li>
+	<li>added support for Latte tag {parameters}</li>
+	<li>moved Latte filters and their arguments to one PSI element (issue #108)</li>
+</ul>
+
+<p>1.1.4-alfa2</p>
+<ul>
+	<li>added LattePhpTypeDetector (faster PhpTypes detector)</li>
+	<li>added stub index for PhpType (issue #180)</li>
+	<li>fixed detect for variable if reference is in foreach value</li>
+	<li>fixed ? in type definitions like ?int, ?string, ...</li>
+</ul>
+
+<p>1.1.4-alfa1</p>
+<ul>
+	<li>fixed and removed more deprecated usages (prepare for higher versions)</li>
+	<li>fixed problem with resolving methods witch use array access for variables defined by templateType tag (issue #179)</li>
+</ul>
+
 <p>1.1.3</p>
 <ul>
 	<li>just released</li>
@@ -256,3 +288,4 @@
 	<li>fixed macro comment priority when macro comment contained a quote</li>
 </ul>
 </html>
+

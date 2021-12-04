@@ -12,9 +12,9 @@ import com.jantvrdik.intellij.latte.intentions.AddCustomNullableVariable;
 import com.jantvrdik.intellij.latte.php.LattePhpVariableUtil;
 import com.jantvrdik.intellij.latte.psi.LatteFile;
 import com.jantvrdik.intellij.latte.psi.LattePhpVariable;
+import com.jantvrdik.intellij.latte.psi.elements.LattePhpVariableElement;
 import com.jantvrdik.intellij.latte.settings.LatteVariableSettings;
-import com.jantvrdik.intellij.latte.utils.LattePhpVariableDefinition;
-import com.jantvrdik.intellij.latte.utils.PsiCachedElement;
+import com.jantvrdik.intellij.latte.utils.LattePhpCachedVariable;
 import com.jetbrains.php.lang.psi.elements.Field;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -44,24 +44,22 @@ public class VariablesInspection extends BaseLocalInspectionTool {
 		return problems.toArray(new ProblemDescriptor[0]);
 	}
 
-
-
 	@NotNull
 	List<LatteInspectionInfo> checkFile(@NotNull final PsiFile file) {
 		final List<LatteInspectionInfo> problems = new ArrayList<>();
-		Map<PsiElement, PsiCachedElement> all = LattePhpVariableUtil.getAllVariablesInFile(file);
+		Map<PsiElement, LattePhpCachedVariable> all = LattePhpVariableUtil.getAllVariablesInFile(file);
 		file.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
 			@Override
 			public void visitElement(@NotNull PsiElement psiElement) {
 				if (psiElement instanceof LattePhpVariable) {
-					PsiCachedElement element = all.get(psiElement);
+					LattePhpCachedVariable element = all.get(psiElement);
 					if (element == null) {
 						super.visitElement(psiElement);
 						return;
 					}
 
 					if (element.isDefinition()) {
-						List<PsiCachedElement> sameName = all.values().stream()
+						List<LattePhpCachedVariable> sameName = all.values().stream()
 								.filter((current) -> current.getVariableName() != null && current.getVariableName().equals(element.getVariableName()))
 								.collect(Collectors.toList());
 						checkVariableDefinition(sameName, element, problems);
@@ -78,18 +76,18 @@ public class VariablesInspection extends BaseLocalInspectionTool {
 	}
 
 	private void checkVariableDefinition(
-			@NotNull final List<PsiCachedElement> sameName,
-			@NotNull final PsiCachedElement element,
+			@NotNull final List<LattePhpCachedVariable> sameName,
+			@NotNull final LattePhpCachedVariable element,
 			@NotNull final List<LatteInspectionInfo> problems
 	) {
-		List<PsiCachedElement> definitions = sameName.stream()
+		List<LattePhpCachedVariable> definitions = sameName.stream()
 				.filter(current -> current.isDefinition() && !current.isVarTypeDefinition())
 				.collect(Collectors.toList());
-		List<PsiCachedElement> usages = sameName.stream()
+		List<LattePhpCachedVariable> usages = sameName.stream()
 				.filter((current) -> !current.isDefinition() && current.getPosition() >= element.getPosition())
 				.collect(Collectors.toList());
 
-		LattePhpVariable variable = element.getElement();
+		LattePhpVariableElement variable = element.getElement();
 		String variableName = element.getVariableName();
 		if (!element.isVarTypeDefinition()) {
 			LatteVariableSettings defaultVariable = LatteConfiguration.getInstance(element.getProject()).getVariable(variableName);
@@ -99,7 +97,7 @@ public class VariablesInspection extends BaseLocalInspectionTool {
 				);
 			}
 
-			for (PsiCachedElement varDefinition : definitions) {
+			for (LattePhpCachedVariable varDefinition : definitions) {
 				if (!varDefinition.matchElement(element) && varDefinition.getVariableContext() == element.getVariableContext()) {
 					problems.add(
 						LatteInspectionInfo.warning(variable, "Multiple definitions for variable '" + variableName + "'")
@@ -111,7 +109,7 @@ public class VariablesInspection extends BaseLocalInspectionTool {
 
 		boolean isUsed = false;
 		if (usages.size() > 0) {
-			for (PsiCachedElement usage : usages) {
+			for (LattePhpCachedVariable usage : usages) {
 				if (usage.getVariableDefinitions().contains(variable)) {
 					isUsed = true;
 					break;
@@ -125,15 +123,19 @@ public class VariablesInspection extends BaseLocalInspectionTool {
 	}
 
 	private void checkVariableUsages(
-			@NotNull final PsiCachedElement element,
+			@NotNull final LattePhpCachedVariable element,
 			@NotNull final List<LatteInspectionInfo> problems
 	) {
-		LattePhpVariable variable = element.getElement();
-		List<LattePhpVariableDefinition> variableDefinitions = LattePhpVariableUtil.getVariableDefinition(variable);
+		LattePhpVariableElement variable = element.getElement();
+		LatteFile file = variable.getLatteFile();
+		if (file == null) {
+			return;
+		}
 
+		List<LattePhpCachedVariable> variableDefinitions = file.getCachedVariableDefinitions(variable);
 		boolean isDefined = false;
 		boolean isProbablyUndefined = false;
-		for (LattePhpVariableDefinition variableDefinition : variableDefinitions) {
+		for (LattePhpCachedVariable variableDefinition : variableDefinitions) {
 			if (!variableDefinition.isProbablyUndefined()) {
 				isDefined = true;
 			} else {

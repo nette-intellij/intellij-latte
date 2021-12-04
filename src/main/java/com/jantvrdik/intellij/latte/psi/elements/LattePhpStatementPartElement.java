@@ -1,22 +1,21 @@
 package com.jantvrdik.intellij.latte.psi.elements;
 
-import com.intellij.psi.PsiElement;
+import com.jantvrdik.intellij.latte.php.LattePhpTypeDetector;
 import com.jantvrdik.intellij.latte.php.NettePhpType;
 import com.jantvrdik.intellij.latte.psi.LattePhpStatement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface LattePhpStatementPartElement extends PsiElement {
+public interface LattePhpStatementPartElement extends LattePsiElement {
 
-	public abstract NettePhpType getPhpType();
+	default @NotNull NettePhpType getReturnType() {
+		return LattePhpTypeDetector.detectPhpType(this);
+	}
 
-	@NotNull
-	public LattePhpStatement getPhpStatement();
+	@NotNull LattePhpStatement getPhpStatement();
 
-	@Nullable
-	public LattePhpStatementPartElement getPrevPhpStatementPart();
+	@Nullable LattePhpStatementPartElement getPrevPhpStatementPart();
 
-	@Nullable
-	public BaseLattePhpElement getPhpElement();
+	@Nullable BaseLattePhpElement getPhpElement();
 
 }

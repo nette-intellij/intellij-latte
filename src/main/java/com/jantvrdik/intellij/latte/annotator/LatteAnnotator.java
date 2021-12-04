@@ -6,7 +6,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiErrorElement;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.intentions.*;
 import com.jantvrdik.intellij.latte.psi.*;
@@ -106,11 +105,10 @@ public class LatteAnnotator implements Annotator {
 				&& closeTag == null
 				&& ((element instanceof LattePairMacro && macro.getType() == LatteTagSettings.Type.AUTO_EMPTY) || macro.getType() == LatteTagSettings.Type.PAIR)
 		) {
-			//if (!macro.isTagBlock() || element.getContainingFile().getLastChild() == openTag.getParent()) {
 			final int[] unclosed = {0};
 			openTag.getParent().acceptChildren(new PsiRecursiveElementWalkingVisitor() {
 				@Override
-				public void visitElement(PsiElement element) {
+				public void visitElement(@NotNull PsiElement element) {
 					if (element instanceof LattePairMacro) {
 						LatteMacroTag tag = ((LattePairMacro) element).getOpenTag();
 						if (tag.getMacroName().equals("block") && ((LattePairMacro) element).getCloseTag() == null) {
@@ -124,7 +122,7 @@ public class LatteAnnotator implements Annotator {
 					}
 				}
 			});
-			PsiElement el = PsiTreeUtil.getChildOfAnyType(openTag.getParent(), LattePairMacro.class);
+			//PsiElement el = PsiTreeUtil.getChildOfAnyType(openTag.getParent(), LattePairMacro.class);
 			if (!macro.isTagBlock() || unclosed[0] > 0) {
 				createErrorAnnotation(holder, openTag, "Unclosed tag " + openTagName);
 			}

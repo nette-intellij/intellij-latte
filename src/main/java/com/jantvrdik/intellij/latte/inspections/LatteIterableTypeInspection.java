@@ -11,6 +11,7 @@ import com.jantvrdik.intellij.latte.psi.LattePhpArrayUsage;
 import com.jantvrdik.intellij.latte.psi.LattePhpForeach;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
 import com.jantvrdik.intellij.latte.php.LattePhpVariableUtil;
+import com.jantvrdik.intellij.latte.utils.LattePhpCachedVariable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,7 +38,7 @@ public class LatteIterableTypeInspection extends BaseLocalInspectionTool {
 			@Override
 			public void visitElement(PsiElement element) {
 				if (element instanceof BaseLattePhpElement) {
-					if (!LattePhpVariableUtil.isNextDefinitionOperator(element)) {
+					if (!LattePhpCachedVariable.isNextDefinitionOperator(element)) {
 						for (LattePhpArrayUsage usage : ((BaseLattePhpElement) element).getPhpArrayUsageList()) {
 							if (usage.getPhpArrayContent().getFirstChild() == null) {
 								addError(manager, problems, usage, "Can not use [] for reading", isOnTheFly);
@@ -46,7 +47,7 @@ public class LatteIterableTypeInspection extends BaseLocalInspectionTool {
 					}
 
 				} else if (element instanceof LattePhpForeach) {
-					NettePhpType type = ((LattePhpForeach) element).getPhpExpression().getPhpType();
+					NettePhpType type = ((LattePhpForeach) element).getPhpExpression().getReturnType();
 					if (!type.isMixed() && !type.isIterable(element.getProject())) {
 						addProblem(
 								manager,

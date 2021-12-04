@@ -1,21 +1,35 @@
 package com.jantvrdik.intellij.latte.psi.impl.elements;
 
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiReference;
-import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
+import com.intellij.psi.PsiElement;
 import com.jantvrdik.intellij.latte.icons.LatteIcons;
 import com.jantvrdik.intellij.latte.psi.LatteMacroContent;
 import com.jantvrdik.intellij.latte.psi.elements.LatteMacroTagElement;
+import com.jantvrdik.intellij.latte.psi.impl.LatteReferencedElementImpl;
+import com.jantvrdik.intellij.latte.psi.impl.LattePsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public abstract class LatteMacroTagElementImpl extends ASTWrapperPsiElement implements LatteMacroTagElement {
+import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
+
+public abstract class LatteMacroTagElementImpl extends LatteReferencedElementImpl implements LatteMacroTagElement {
+
+	private @Nullable String tagName = null;
+	private @Nullable PsiElement identifier = null;
+	private int macroNameLength = -1;
 
 	public LatteMacroTagElementImpl(@NotNull ASTNode node) {
 		super(node);
+	}
+
+	@Override
+	public void subtreeChanged() {
+		super.subtreeChanged();
+		tagName = null;
+		identifier = null;
+		macroNameLength = -1;
 	}
 
 	@Nullable
@@ -28,14 +42,36 @@ public abstract class LatteMacroTagElementImpl extends ASTWrapperPsiElement impl
 		return LatteIcons.MACRO;
 	}
 
-	@Nullable
-	public PsiReference getReference() {
-		PsiReference[] references = getReferences();
-		return references.length == 0 ? null : references[0];
+	@Override
+	public @NotNull String getMacroName() {
+		if (tagName == null) {
+			tagName = LattePsiImplUtil.getMacroName(this);
+		}
+		return tagName;
 	}
 
-	@NotNull
-	public PsiReference[] getReferences() {
-		return ReferenceProvidersRegistry.getReferencesFromProviders(this);
+	@Override
+	public String getName() {
+		return getMacroName();
+	}
+
+	@Override
+	public @Nullable PsiElement getNameIdentifier() {
+		if (identifier == null) {
+			identifier = LattePsiImplUtil.findFirstChildWithType(this, T_MACRO_NAME);
+		}
+		return identifier;
+	}
+
+	public boolean matchMacroName(@NotNull String name) {
+		return LattePsiImplUtil.matchMacroName(this, name);
+	}
+
+	@Override
+	public int getMacroNameLength() {
+		if (macroNameLength == -1) {
+			macroNameLength = LattePsiImplUtil.getMacroNameLength(this);
+		}
+		return macroNameLength;
 	}
 }

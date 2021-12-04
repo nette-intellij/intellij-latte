@@ -38,7 +38,7 @@ public class ConstantUsagesInspection extends BaseLocalInspectionTool {
 			@Override
 			public void visitElement(PsiElement element) {
 				if (element instanceof LattePhpConstant) {
-					NettePhpType phpType = ((LattePhpConstant) element).getPhpType();
+					NettePhpType phpType = ((LattePhpConstant) element).getPrevReturnType();
 
 					Collection<PhpClass> phpClasses = phpType.getPhpClasses(element.getProject());
 					if (phpClasses.size() == 0) {

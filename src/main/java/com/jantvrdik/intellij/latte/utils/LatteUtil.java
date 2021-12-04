@@ -14,14 +14,20 @@ import java.util.*;
 public class LatteUtil {
 
     public static boolean matchParentMacroName(@NotNull PsiElement element, @NotNull String name) {
+        return getParentMacroName(element).equals(name);
+    }
+
+    public static @NotNull String getParentMacroName(@NotNull PsiElement element) {
         PsiElement foundElement = PsiTreeUtil.getParentOfType(element, LatteMacroClassic.class, LatteNetteAttr.class);
         if (foundElement instanceof LatteMacroClassic) {
-            return ((LatteMacroClassic) foundElement).getOpenTag().getMacroName().equals(name);
+            return ((LatteMacroClassic) foundElement).getOpenTag().getMacroName();
         } else if (foundElement == null) {
-            return false;
+            return "=";
         }
         String attributeName = ((LatteNetteAttr) foundElement).getAttrName().getText();
-        return attributeName.equals("n:" + name) || attributeName.equals("n:tag-" + name) || attributeName.equals("n:inner-" + name);
+        return attributeName.replace("n:inner-", "")
+                .replace("n:tag-", "")
+                .replace("n:", "");
     }
 
     public static String getSpacesBeforeCaret(@NotNull Editor editor) {
@@ -58,7 +64,7 @@ public class LatteUtil {
     public static NettePhpType findFirstLatteTemplateType(PsiElement element) {
         List<LattePhpClassUsage> out = new ArrayList<>();
         findLatteTemplateType(out, element);
-        return out.isEmpty() ? null : out.get(0).getPhpType();
+        return out.isEmpty() ? null : out.get(0).getReturnType();
     }
 
     public static void findLatteTemplateType(List<LattePhpClassUsage> classes, PsiElement psiElement) {

@@ -99,7 +99,7 @@ public class MethodUsagesInspection extends BaseLocalInspectionTool {
 			@NotNull final InspectionManager manager,
 			final boolean isOnTheFly
 	) {
-		NettePhpType phpType = element.getPhpType();
+		NettePhpType phpType = element.getPrevReturnType();
 
 		boolean isFound = false;
 		Collection<PhpClass> phpClasses = phpType.getPhpClasses(element.getProject());

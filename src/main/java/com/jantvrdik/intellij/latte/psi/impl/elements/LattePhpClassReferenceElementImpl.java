@@ -1,16 +1,19 @@
 package com.jantvrdik.intellij.latte.psi.impl.elements;
 
-import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiReference;
-import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
+import com.intellij.util.IncorrectOperationException;
 import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpClassStub;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpClassReferenceElement;
+import com.jantvrdik.intellij.latte.psi.impl.LatteStubPhpElementImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class LattePhpClassReferenceElementImpl extends StubBasedPsiElementBase<LattePhpClassStub> implements LattePhpClassReferenceElement {
+public abstract class LattePhpClassReferenceElementImpl extends LatteStubPhpElementImpl<LattePhpClassStub> implements LattePhpClassReferenceElement {
+
+	private @Nullable String name = null;
+	private @Nullable String className = null;
 
 	public LattePhpClassReferenceElementImpl(@NotNull ASTNode node) {
 		super(node);
@@ -21,19 +24,48 @@ public abstract class LattePhpClassReferenceElementImpl extends StubBasedPsiElem
 	}
 
 	@Override
+	public void subtreeChanged() {
+		super.subtreeChanged();
+		name = null;
+		className = null;
+		getPhpClassUsage().reset();
+	}
+
+	@Override
 	public String getPhpElementName()
 	{
 		return getClassName();
 	}
 
-	@Nullable
-	public PsiReference getReference() {
-		PsiReference[] references = getReferences();
-		return references.length == 0 ? null : references[0];
+	@Override
+	public @Nullable PsiElement getNameIdentifier() {
+		return getPhpClassUsage().getNameIdentifier();
 	}
 
-	@NotNull
-	public PsiReference[] getReferences() {
-		return ReferenceProvidersRegistry.getReferencesFromProviders(this);
+	@Override
+	public String getClassName() {
+		if (className == null) {
+			final LattePhpClassStub stub = getStub();
+			if (stub != null) {
+				className = stub.getClassName();
+				return className;
+			}
+			className = getPhpClassUsage().getClassName();
+		}
+		return className;
+	}
+
+	@Override
+	public PsiElement setName(@NotNull String name) throws IncorrectOperationException {
+		return this;
+	}
+
+	@Override
+	public String getName() {
+		if (name == null) {
+			PsiElement found = getNameIdentifier();
+			name = found != null ? found.getText() : null;
+		}
+		return name;
 	}
 }

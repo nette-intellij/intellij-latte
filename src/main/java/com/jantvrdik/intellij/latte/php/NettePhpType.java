@@ -56,28 +56,23 @@ public class NettePhpType {
     private final Map<Integer, List<String>> classes = new HashMap<>();
     private final Map<Integer, NettePhpType> forDepth = new HashMap<>();
 
-    @NotNull
-    public static NettePhpType create(final @Nullable String type, boolean nullable) {
+    public static @NotNull NettePhpType create(final @Nullable String type, boolean nullable) {
         return create(null, type, nullable);
     }
 
-    @NotNull
-    public static NettePhpType create(final @Nullable String name, final @Nullable String type) {
+    public static @NotNull NettePhpType create(final @Nullable String name, final @Nullable String type) {
         return create(name, type, false);
     }
 
-    @NotNull
-    public static NettePhpType create(final @Nullable String type) {
+    public static @NotNull NettePhpType create(final @Nullable String type) {
         return create(null, type, false);
     }
 
-    @NotNull
-    public static NettePhpType create(final @NotNull PhpType phpType) {
+    public static @NotNull NettePhpType create(final @NotNull PhpType phpType) {
         return create(null, String.join("|", phpType.getTypes()), LattePhpUtil.isNullable(phpType));
     }
 
-    @NotNull
-    public static NettePhpType create(final @NotNull List<PhpType> phpTypes) {
+    public static @NotNull NettePhpType create(final @NotNull List<PhpType> phpTypes) {
         List<String> typesStrings = new ArrayList<>();
         for (PhpType type : phpTypes) {
             typesStrings.add(type.toString());
@@ -88,8 +83,7 @@ public class NettePhpType {
         return create(null, String.join("|", temp));
     }
 
-    @NotNull
-    public static NettePhpType create(final @Nullable String name, final @Nullable String type, final boolean nullable) {
+    public static @NotNull NettePhpType create(final @Nullable String name, final @Nullable String type, final boolean nullable) {
         if (type == null || type.trim().length() == 0) {
             return NettePhpType.MIXED;
         }
@@ -103,28 +97,41 @@ public class NettePhpType {
             if (isNativeTypeHint(typeHint)) {
                 return nativeTypes.get(normalizeTypeHint(typeHint))[2];
             }
-
         }
 
-        if (trimmed.endsWith("|null") || trimmed.startsWith("null|")) {
+        if (trimmed.endsWith("|null") || trimmed.startsWith("null|") || trimmed.startsWith("?")) {
             String typeHint = trimmed.startsWith("null|") ? trimmed.substring(6) : trimmed.substring(0, trimmed.length() - 5);
+            typeHint = typeHint.startsWith("?") ? typeHint.substring(1) : typeHint;
             if (isNativeTypeHint(typeHint)) {
                 return nativeTypes.get(normalizeTypeHint(typeHint))[1];
             }
         }
 
-        if (!instances.containsKey(type)) {
-            instances.put(type, new NettePhpType(name, type, nullable));
+        if (!instances.containsKey(type) || instances.get(type) == null) {
+            NettePhpType nettePhpType = new NettePhpType(name, type, nullable);
+            if (instances.containsKey(type)) {
+                instances.replace(type, nettePhpType);
+            } else {
+                instances.put(type, nettePhpType);
+            }
         }
-        return instances.get(type);
+
+        NettePhpType out = instances.get(type);
+        return out != null ? out : MIXED;
     }
 
     private NettePhpType(@NotNull String type) {
         this(null, type, false);
     }
 
-    private NettePhpType(final @Nullable String name, final @NotNull String typeString, final boolean nullable) {
-        String[] parts = typeString.split("\\|");
+    private NettePhpType(final @Nullable String name, @NotNull String typeString, final boolean nullable) {
+        List<String> parts = new ArrayList<>();
+        if (typeString.startsWith("?")) {
+            parts.add("null");
+            typeString = typeString.substring(1);
+        }
+
+        parts.addAll(Arrays.asList(typeString.split("\\|")));
         for (String part : parts) {
             part = part.trim();
             if (part.length() == 0) {

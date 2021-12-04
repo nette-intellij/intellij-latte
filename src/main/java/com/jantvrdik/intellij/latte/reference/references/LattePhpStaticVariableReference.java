@@ -1,5 +1,6 @@
 package com.jantvrdik.intellij.latte.reference.references;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.jantvrdik.intellij.latte.indexes.LatteIndexUtil;
@@ -18,12 +19,14 @@ import java.util.List;
 
 public class LattePhpStaticVariableReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
     private final String variableName;
+    final private Project project;
     private final Collection<PhpClass> phpClasses;
 
     public LattePhpStaticVariableReference(@NotNull LattePhpStaticVariable element, TextRange textRange) {
         super(element, textRange);
         variableName = element.getVariableName();
-        phpClasses = element.getPhpType().getPhpClasses(element.getProject());
+        project = element.getProject();
+        phpClasses = element.getPrevReturnType().getPhpClasses(project);
     }
 
     @NotNull
@@ -33,15 +36,15 @@ public class LattePhpStaticVariableReference extends PsiReferenceBase<PsiElement
             return new ResolveResult[0];
         }
 
-        final Collection<LattePhpStaticVariable> methods = LatteIndexUtil.findStaticVariablesByName(getElement().getProject(), variableName);
+        final Collection<LattePhpStaticVariable> methods = LatteIndexUtil.findStaticVariablesByName(project, variableName);
         List<ResolveResult> results = new ArrayList<>();
         for (BaseLattePhpElement method : methods) {
-            if (method.getPhpType().hasClass(phpClasses)) {
+            if (method.getPrevReturnType().hasClass(phpClasses)) {
                 results.add(new PsiElementResolveResult(method));
             }
         }
 
-        List<Field> fields = LattePhpUtil.getFieldsForPhpElement((BaseLattePhpElement) getElement());
+        List<Field> fields = LattePhpUtil.getFieldsForPhpElement((BaseLattePhpElement) getElement(), project);
         String name = ((BaseLattePhpElement) getElement()).getPhpElementName();
         for (Field field : fields) {
             if (field.getName().equals(name)) {
@@ -55,7 +58,7 @@ public class LattePhpStaticVariableReference extends PsiReferenceBase<PsiElement
     @Nullable
     @Override
     public PsiElement resolve() {
-        List<Field> fields = LattePhpUtil.getFieldsForPhpElement((BaseLattePhpElement) getElement());
+        List<Field> fields = LattePhpUtil.getFieldsForPhpElement((BaseLattePhpElement) getElement(), project);
         return fields.size() > 0 ? fields.get(0) : null;
     }
 
@@ -82,7 +85,7 @@ public class LattePhpStaticVariableReference extends PsiReferenceBase<PsiElement
     @Override
     public boolean isReferenceTo(@NotNull PsiElement element) {
         if (element instanceof LattePhpStaticVariable) {
-            PhpClass originalClass = ((LattePhpStaticVariable) element).getPhpType().getFirstPhpClass(element.getProject());
+            PhpClass originalClass = ((LattePhpStaticVariable) element).getPhpType().getFirstPhpClass(project);
             if (originalClass != null) {
                 if (LattePhpUtil.isReferenceTo(originalClass, multiResolve(false), element, ((LattePhpStaticVariable) element).getVariableName())) {
                     return true;

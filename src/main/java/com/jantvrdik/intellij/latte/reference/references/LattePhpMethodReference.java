@@ -20,14 +20,16 @@ import java.util.Collection;
 import java.util.List;
 
 public class LattePhpMethodReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
-    private String methodName;
-    private Collection<PhpClass> phpClasses;
-    private boolean isFunction;
+    final private String methodName;
+    final private Collection<PhpClass> phpClasses;
+    final private boolean isFunction;
+    final private Project project;
 
     public LattePhpMethodReference(@NotNull LattePhpMethod element, TextRange textRange) {
         super(element, textRange);
         methodName = element.getMethodName();
-        phpClasses = element.getPhpType().getPhpClasses(element.getProject());
+        project = element.getProject();
+        phpClasses = element.getPrevReturnType().getPhpClasses(project);
         isFunction = element.isFunction();
     }
 
@@ -45,14 +47,14 @@ public class LattePhpMethodReference extends PsiReferenceBase<PsiElement> implem
     @NotNull
     public ResolveResult[] multiResolveMethod() {
         List<ResolveResult> results = new ArrayList<>();
-        final Collection<LattePhpMethod> methods = LatteIndexUtil.findMethodsByName(getElement().getProject(), methodName);
+        final Collection<LattePhpMethod> methods = LatteIndexUtil.findMethodsByName(project, methodName);
         for (LattePhpMethod method : methods) {
-            if (method.getPhpType().hasClass(phpClasses)) {
+            if (method.getPrevReturnType().hasClass(phpClasses)) {
                 results.add(new PsiElementResolveResult(method));
             }
         }
 
-        List<Method> phpMethods = LattePhpUtil.getMethodsForPhpElement((LattePhpMethod) getElement());
+        List<Method> phpMethods = LattePhpUtil.getMethodsForPhpElement((LattePhpMethod) getElement(), project);
         String methodName = ((LattePhpMethod) getElement()).getMethodName();
         for (Method currentMethod : phpMethods) {
             if (currentMethod.getName().equals(methodName)) {
@@ -67,7 +69,6 @@ public class LattePhpMethodReference extends PsiReferenceBase<PsiElement> implem
     public ResolveResult[] multiResolveFunction() {
         List<ResolveResult> results = new ArrayList<>();
 
-        Project project = getElement().getProject();
         Collection<Function> phpFunctions = LattePhpUtil.getFunctionByName(project, methodName);
         for (Function currentFunction : phpFunctions) {
             if (currentFunction.getName().equals(methodName)) {
@@ -100,7 +101,7 @@ public class LattePhpMethodReference extends PsiReferenceBase<PsiElement> implem
             return result.length == 1 ? result[0].getElement() : null;
 
         } else {
-            List<Method> phpMethods = LattePhpUtil.getMethodsForPhpElement((LattePhpMethod) getElement());
+            List<Method> phpMethods = LattePhpUtil.getMethodsForPhpElement((LattePhpMethod) getElement(), project);
             return phpMethods.size() > 0 ? phpMethods.get(0) : null;
         }
     }
@@ -115,10 +116,10 @@ public class LattePhpMethodReference extends PsiReferenceBase<PsiElement> implem
     public boolean isReferenceTo(@NotNull PsiElement element) {
         if (element instanceof LattePhpMethod) {
             if (!isFunction && !((LattePhpMethod) element).isFunction()) {
-                Collection<PhpClass> originalClasses = ((LattePhpMethod) element).getPhpType().getPhpClasses(element.getProject());
+                Collection<PhpClass> originalClasses = ((LattePhpMethod) element).getPrevReturnType().getPhpClasses(project);
                 if (originalClasses.size() > 0) {
                     for (PhpClass originalClass : originalClasses) {
-                        if (LattePhpUtil.isReferenceTo(originalClass, multiResolve(false), element, ((LattePhpMethod) element).getMethodName())) {
+                        if (LattePhpUtil.isReferenceTo(originalClass, multiResolve(false), project, ((LattePhpMethod) element).getMethodName())) {
                             return true;
                         }
                     }
@@ -136,7 +137,7 @@ public class LattePhpMethodReference extends PsiReferenceBase<PsiElement> implem
                     currentElement = element;
                 }
             }
-            if (currentElement instanceof XmlAttributeValue && isFunction && LatteFileConfiguration.hasParentXmlTagName(currentElement, "function")) {
+            if (currentElement instanceof XmlAttributeValue && LatteFileConfiguration.hasParentXmlTagName(currentElement, "function")) {
                 return ((XmlAttributeValue) currentElement).getValue().equals(methodName);
             }
         }
@@ -146,7 +147,7 @@ public class LattePhpMethodReference extends PsiReferenceBase<PsiElement> implem
             if (originalClass == null) {
                 return false;
             }
-            return LattePhpUtil.isReferenceTo(originalClass, multiResolve(false), element, ((Method) element).getName());
+            return LattePhpUtil.isReferenceTo(originalClass, multiResolve(false), project, ((Method) element).getName());
         } else if (element instanceof Function) {
             String name = ((Function) element).getName();
             final Collection<LattePhpMethod> methods = LatteIndexUtil.findMethodsByName(element.getProject(), methodName);

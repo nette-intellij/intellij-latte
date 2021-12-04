@@ -9,7 +9,6 @@ import com.intellij.util.CharTable;
 import com.jantvrdik.intellij.latte.indexes.extensions.LattePhpMethodIndex;
 import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpMethodStub;
 import com.jantvrdik.intellij.latte.indexes.stubs.impl.LattePhpMethodStubImpl;
-import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpTypeStub;
 import com.jantvrdik.intellij.latte.parser.LatteElementTypes;
 import com.jantvrdik.intellij.latte.psi.LattePhpMethod;
 import com.jantvrdik.intellij.latte.psi.LatteTypes;
@@ -19,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-public class LattePhpMethodStubType extends LattePhpTypeStub<LattePhpMethodStub, LattePhpMethod> {
+public class LattePhpMethodStubType extends LattePhpStubType<LattePhpMethodStub, LattePhpMethod> {
     public LattePhpMethodStubType(String debugName) {
         super(debugName, LatteElementTypes.LANG);
     }

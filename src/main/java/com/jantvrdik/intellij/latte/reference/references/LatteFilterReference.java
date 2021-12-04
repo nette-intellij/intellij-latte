@@ -16,22 +16,23 @@ import java.util.List;
 public class LatteFilterReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
 
     private final String modifierName;
+    private final Project project;
 
     public LatteFilterReference(@NotNull LatteMacroModifier element, TextRange textRange) {
         super(element, textRange);
         modifierName = element.getModifierName();
+        project = element.getProject();
     }
 
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         List<ResolveResult> results = new ArrayList<>();
-        Project project = getElement().getProject();
         for (XmlAttributeValue attributeValue : LatteFileConfiguration.getAllMatchedXmlAttributeValues(project, "filter", modifierName)) {
             results.add(new PsiElementResolveResult(attributeValue));
         }
 
-        //final Collection<LatteMacroModifier> modifiers = LatteIndexUtil.findFiltersByName(getElement().getProject(), modifierName);
+        //final Collection<LatteMacroModifier> modifiers = LatteIndexUtil.findFiltersByName(project, modifierName);
         //for (LatteMacroModifier modifier : modifiers) {
         //    results.add(new PsiElementResolveResult(modifier));
         //}

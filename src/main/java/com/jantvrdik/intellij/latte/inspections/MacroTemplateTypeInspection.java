@@ -32,12 +32,12 @@ public class MacroTemplateTypeInspection extends LocalInspectionTool {
 			return null;
 		}
 
-		final List<ProblemDescriptor> problems = new ArrayList<ProblemDescriptor>();
+		final List<ProblemDescriptor> problems = new ArrayList<>();
 		file.acceptChildren(new PsiRecursiveElementWalkingVisitor() {
 			@Override
-			public void visitElement(PsiElement element) {
+			public void visitElement(@NotNull PsiElement element) {
 				if (element instanceof LatteMacroTag && ((LatteMacroTag) element).matchMacroName("templateType")) {
-					List<LatteMacroTag> allMacros = new ArrayList<LatteMacroTag>();
+					List<LatteMacroTag> allMacros = new ArrayList<>();
 					LatteUtil.findLatteMacroTemplateType(allMacros, (LatteFile) file);
 					if (allMacros.size() > 1) {
 						ProblemDescriptor problem = manager.createProblemDescriptor(
@@ -50,7 +50,7 @@ public class MacroTemplateTypeInspection extends LocalInspectionTool {
 						problems.add(problem);
 
 					} else {
-						List<LattePhpClassUsage> currentClasses = new ArrayList<LattePhpClassUsage>();
+						List<LattePhpClassUsage> currentClasses = new ArrayList<>();
 						LatteUtil.findLatteTemplateType(currentClasses, element);
 						if (currentClasses.size() == 0) {
 							ProblemDescriptor problem = manager.createProblemDescriptor(
@@ -70,6 +70,6 @@ public class MacroTemplateTypeInspection extends LocalInspectionTool {
 			}
 		});
 
-		return problems.toArray(new ProblemDescriptor[problems.size()]);
+		return problems.toArray(new ProblemDescriptor[0]);
 	}
 }

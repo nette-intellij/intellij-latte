@@ -134,8 +134,12 @@ AS="as"
         return T_PHP_ADDITIVE_OPERATOR;
     }
 
-    ("&" | "^") {
+    "^" {
         return T_PHP_BITWISE_OPERATOR;
+    }
+
+    "&" {
+        return T_PHP_REFERENCE_OPERATOR;
     }
 
     "." {
@@ -147,7 +151,7 @@ AS="as"
     }
 
     ":" {
-        return T_PHP_EXPRESSION;
+        return T_PHP_COLON;
     }
 
     "?" {

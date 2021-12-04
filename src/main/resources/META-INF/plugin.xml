@@ -40,6 +40,7 @@
 		<lang.quoteHandler language="Latte" implementationClass="com.jantvrdik.intellij.latte.editorActions.LatteQuoteHandler"/>
 		<annotator language="Latte" implementationClass="com.jantvrdik.intellij.latte.annotator.LatteAnnotator"/>
 		<typedHandler implementation="com.jantvrdik.intellij.latte.editorActions.LatteTypedHandler"/>
+		<typedHandler implementation="com.jantvrdik.intellij.latte.editorActions.LatteCompletionAutoPopupHandler"/>
 		<highlightErrorFilter implementation="com.jantvrdik.intellij.latte.psi.ErrorFilter"/>
 		<indexPatternBuilder implementation="com.jantvrdik.intellij.latte.psi.LatteIndexPatternBuilder"/>
 		<lang.psiStructureViewFactory language="Latte" implementationClass="com.jantvrdik.intellij.latte.editor.LatteStructureViewFactory"/>
@@ -48,6 +49,7 @@
 		<lang.braceMatcher language="Latte" implementationClass="com.jantvrdik.intellij.latte.reference.LatteBraceMatcher"/>
 		<renamePsiElementProcessor implementation="com.jantvrdik.intellij.latte.refactoring.LatteRenamePsiElementProcessor"/>
 		<lang.documentationProvider language="Latte" implementationClass="com.jantvrdik.intellij.latte.documentation.LatteDocumentationProvider"/>
+		<lang.smartEnterProcessor implementationClass="com.jantvrdik.intellij.latte.editor.LatteSmartEnterProcessor" />
 
 		<fileBasedIndex implementation="com.jantvrdik.intellij.latte.indexes.LatteIndexExtension"/>
 
@@ -61,6 +63,7 @@
 		<stubIndex implementation="com.jantvrdik.intellij.latte.indexes.extensions.LattePhpNamespaceIndex"/>
 		<stubIndex implementation="com.jantvrdik.intellij.latte.indexes.extensions.LattePhpPropertyIndex"/>
 		<stubIndex implementation="com.jantvrdik.intellij.latte.indexes.extensions.LattePhpStaticVariableIndex"/>
+		<stubIndex implementation="com.jantvrdik.intellij.latte.indexes.extensions.LattePhpTypeIndex"/>
 		<stubIndex implementation="com.jantvrdik.intellij.latte.indexes.extensions.LattePhpVariableIndex"/>
 
  		<codeStyleSettingsProvider implementation="com.jantvrdik.intellij.latte.codeStyle.LatteCodeStyleSettingsProvider"/>
@@ -68,8 +71,8 @@
 
 		<psi.referenceContributor implementation="com.jantvrdik.intellij.latte.reference.LatteReferenceContributor"/>
 
+		<defaultLiveTemplates file="/liveTemplates/Latte.xml"/>
 		<liveTemplateContext implementation="com.jantvrdik.intellij.latte.liveTemplates.LatteTemplateContext"/>
-		<defaultLiveTemplatesProvider implementation="com.jantvrdik.intellij.latte.liveTemplates.LatteTemplateProvider"/>
 		<liveTemplatePreprocessor implementation="com.jantvrdik.intellij.latte.liveTemplates.LatteTemplatePreprocessor"/>
 
 		<projectConfigurable instance="com.jantvrdik.intellij.latte.ui.LatteSettingsForm"

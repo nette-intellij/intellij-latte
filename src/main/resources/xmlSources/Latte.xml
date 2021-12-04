@@ -57,6 +57,11 @@
 				<argument name="variable" types="VARIABLE_DEFINITION_EXPRESSION" required="true" repeatable="true" />
 			</arguments>
 		</tag>
+		<tag name="parameters" type="UNPAIRED">
+			<arguments>
+				<argument name="parameter" types="VARIABLE_DEFINITION_EXPRESSION" required="true" repeatable="true" />
+			</arguments>
+		</tag>
 		<tag name="define" type="PAIR" multiLine="true">
 			<arguments>
 				<argument name="name" types="PHP_IDENTIFIER,VARIABLE,PHP_EXPRESSION" required="true" />

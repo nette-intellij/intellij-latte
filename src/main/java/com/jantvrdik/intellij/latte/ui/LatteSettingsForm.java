@@ -7,8 +7,8 @@ import com.intellij.openapi.project.Project;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.config.LatteDefaultConfiguration;
 import com.jantvrdik.intellij.latte.config.LatteFileConfiguration;
+import com.jantvrdik.intellij.latte.config.LatteReparseUtil;
 import com.jantvrdik.intellij.latte.icons.LatteIcons;
-import com.jantvrdik.intellij.latte.utils.LatteReparseFilesUtil;
 import com.jantvrdik.intellij.latte.settings.LatteSettings;
 import com.jantvrdik.intellij.latte.utils.LatteIdeHelper;
 import org.jetbrains.annotations.Nls;
@@ -30,7 +30,7 @@ public class LatteSettingsForm implements Configurable {
 	private JCheckBox enableNetteFormsTagsCheckBox;
 	private JCheckBox enableLatteTagsAndCheckBox;
 
-	private Project project;
+	private final Project project;
 	private boolean changed = false;
 
 	public LatteSettingsForm(Project project) {
@@ -143,10 +143,8 @@ public class LatteSettingsForm implements Configurable {
 		getSettings().enableNette = enableNetteCheckBox.isSelected();
 		getSettings().enableNetteForms = enableNetteFormsTagsCheckBox.isSelected();
 
-		boolean success = LatteReparseFilesUtil.reinitialize(project);
-		if (success) {
-			this.changed = false;
-		}
+		LatteReparseUtil.getInstance(project).reinitialize();
+		this.changed = false;
 	}
 
 	private LatteSettings getSettings() {
