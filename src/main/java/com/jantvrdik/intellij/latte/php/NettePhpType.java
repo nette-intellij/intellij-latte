@@ -34,7 +34,7 @@ public class NettePhpType {
     final public static NettePhpType ITERABLE = new NettePhpType("iterable");
 
     final private static Map<String, NettePhpType[]> nativeTypes = new HashMap<String, NettePhpType[]>() {{
-        put("string", new NettePhpType[]{STRING, new NettePhpType("mixed|null"), new NettePhpType("mixed[]")});
+        put("string", new NettePhpType[]{STRING, new NettePhpType("string|null"), new NettePhpType("string[]")});
         put("int", new NettePhpType[]{INT, new NettePhpType("int|null"), new NettePhpType("int[]")});
         put("bool", new NettePhpType[]{BOOL, new NettePhpType("bool|null"), new NettePhpType("bool[]")});
         put("object", new NettePhpType[]{OBJECT, new NettePhpType("object|null"), new NettePhpType("object[]")});
@@ -49,10 +49,12 @@ public class NettePhpType {
     private final @Nullable String name;
     private final List<String> types = new ArrayList<>();
     private final Map<Integer, List<String>> wholeTypes = new HashMap<>();
-    private final List<Integer> nullable = new ArrayList<>();
-    private final List<Integer> mixed = new ArrayList<>();
-    private final List<Integer> iterable = new ArrayList<>();
-    private final List<Integer> natives = new ArrayList<>();
+    private final Set<Integer> nullable = new HashSet<>();
+    private final Set<Integer> mixed = new HashSet<>();
+    private final Set<Integer> iterable = new HashSet<>();
+    private final Set<Integer> natives = new HashSet<>();
+    private final Set<Integer> objectOnly = new HashSet<>();
+    private final Set<Integer> nativeObjects = new HashSet<>();
     private final Map<Integer, List<String>> classes = new HashMap<>();
     private final Map<Integer, NettePhpType> forDepth = new HashMap<>();
 
@@ -132,6 +134,7 @@ public class NettePhpType {
         }
 
         parts.addAll(Arrays.asList(typeString.split("\\|")));
+        Map<Integer, Boolean> isObjectOnly = new HashMap<>();
         for (String part : parts) {
             part = part.trim();
             if (part.length() == 0) {
@@ -139,28 +142,38 @@ public class NettePhpType {
             }
 
             NettePhpType.TypePart typePart = new NettePhpType.TypePart(part);
+            if (!typePart.isClass() && !typePart.isObject()) {
+                isObjectOnly.put(typePart.depth, false);
+            } else if (!isObjectOnly.containsKey(typePart.depth)) {
+                isObjectOnly.put(typePart.depth, true);
+            }
+
             if (typePart.isClass()) {
                 if (!this.classes.containsKey(typePart.depth)) {
-                    this.classes.put(typePart.depth, new ArrayList<>());
+                    classes.put(typePart.depth, new ArrayList<>());
                 }
                 String className = typePart.arrayOf != null ? typePart.arrayOf.getPart() : typePart.getPart();
                 if (!this.classes.get(typePart.depth).contains(className)) {
-                    this.classes.get(typePart.depth).add(className);
+                    classes.get(typePart.depth).add(className);
                 }
 
             } else if (typePart.isNullable()) {
                 this.nullable.add(typePart.depth);
 
             } else if (typePart.isMixed()) {
-                this.mixed.add(typePart.depth);
+                mixed.add(typePart.depth);
 
             } else if (typePart.isNative()) {
-                this.natives.add(typePart.depth);
+                natives.add(typePart.depth);
+            }
+
+            if (typePart.isObject()) {
+                nativeObjects.add(typePart.depth);
             }
 
             if (typePart.isIterable()) {
                 for (int i = typePart.depth - 1; i >= 0; i--) {
-                    this.iterable.add(i);
+                    iterable.add(i);
                 }
             }
 
@@ -171,8 +184,14 @@ public class NettePhpType {
         }
         this.name = name == null ? null : LattePhpVariableUtil.normalizePhpVariable(name);
 
-        if (nullable && !this.nullable.contains(0)) {
+        if (nullable) {
             this.nullable.add(0);
+        }
+
+        for (int depth : isObjectOnly.keySet()) {
+            if (isObjectOnly.get(depth)) {
+                this.objectOnly.add(depth);
+            }
         }
     }
 
@@ -183,6 +202,24 @@ public class NettePhpType {
 
     public boolean containsClasses() {
         return this.classes.containsKey(0);
+    }
+
+    public boolean contains(NettePhpType type) {
+        if (isNullable() && type.isNullable() || isMixed()) {
+            return true;
+        }
+        if (types.contains("object") && type.containsObjectsOnly()) {
+            return true;
+        }
+        if (type.isOneDepthOnly() && containsNativeObject(type.getFirstDepth()) && type.containsObjectsOnly(type.getFirstDepth())) {
+            return true;
+        }
+        for (String part : type.getTypes()) {
+            if (!types.contains(part)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public boolean hasUndefinedClass(final @NotNull Project project) {
@@ -226,12 +263,40 @@ public class NettePhpType {
         return nullable.contains(depth);
     }
 
+    public boolean isOneDepthOnly() {
+        return wholeTypes.size() == 1;
+    }
+
+    private int getFirstDepth() {
+        return wholeTypes.keySet().stream().findFirst().orElse(0);
+    }
+
+    public boolean isDepthOnly(int depth) {
+        return isOneDepthOnly() && wholeTypes.containsKey(depth);
+    }
+
     public boolean isNative() {
         return isNative(0);
     }
 
     public boolean isNative(final int depth) {
         return natives.contains(depth);
+    }
+
+    public boolean containsObjectsOnly() {
+        return containsObjectsOnly(0);
+    }
+
+    public boolean containsObjectsOnly(final int depth) {
+        return objectOnly.contains(depth);
+    }
+
+    public boolean containsNativeObject() {
+        return containsNativeObject(0);
+    }
+
+    public boolean containsNativeObject(final int depth) {
+        return nativeObjects.contains(depth);
     }
 
     public boolean isMixed() {
@@ -362,6 +427,7 @@ public class NettePhpType {
         private boolean isNative = false;
         private boolean isNull = false;
         private boolean isMixed = false;
+        private boolean isObject = false;
         private boolean isClass = false;
         private @Nullable
         NettePhpType.TypePart arrayOf = null;
@@ -386,6 +452,8 @@ public class NettePhpType {
                     this.isNull = true;
                 } else if (NettePhpType.isMixed(part)) {
                     this.isMixed = true;
+                } else if (NettePhpType.isObject(part)) {
+                    this.isObject = true;
                 }
                 this.isNative = true;
 
@@ -411,6 +479,10 @@ public class NettePhpType {
 
         boolean isMixed() {
             return isMixed || (arrayOf != null && arrayOf.isMixed());
+        }
+
+        boolean isObject() {
+            return isObject || (arrayOf != null && arrayOf.isObject());
         }
 
         boolean isNative() {
@@ -463,6 +535,10 @@ public class NettePhpType {
 
     public static boolean isMixed(final @NotNull String value) {
         return "mixed".equals(normalizeTypeHint(value));
+    }
+
+    public static boolean isObject(final @NotNull String value) {
+        return "object".equals(normalizeTypeHint(value));
     }
 
     public static boolean isMagicMethod(final @NotNull String value) {

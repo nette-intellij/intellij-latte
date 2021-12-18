@@ -1,10 +1,14 @@
 package com.jantvrdik.intellij.latte.php;
 
+import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
 public class NettePhpTypeTest {
+
 	@Test
 	public void testReadableString() {
 		assertLattePhpType("string", "string");
@@ -36,6 +40,57 @@ public class NettePhpTypeTest {
 	}
 
 	@Test
+	public void testContainsObjectsOnly() {
+		assertContainsObjectsOnly("string", false);
+		assertContainsObjectsOnly("Int", false);
+		assertContainsObjectsOnly("callable", false);
+		assertContainsObjectsOnly("Iterable|NULL", false);
+		assertContainsObjectsOnly("Iterable[]|null", false);
+		assertContainsObjectsOnly("\\Foo\\Bar\\TestClass", true);
+		assertContainsObjectsOnly("\\Foo\\Bar\\TestClass|object", true);
+		assertContainsObjectsOnly("object", true);
+		assertContainsObjectsOnly("object|null", false);
+		assertContainsObjectsOnly("Foo\\Bar\\TestClass|\\Bar\\TestClass|null", false);
+		assertContainsObjectsOnly("Foo\\Bar\\TestClass|Bar\\TestClass|null", false);
+		assertContainsObjectsOnly("Foo\\Bar\\TestClass|String|null", false);
+		assertContainsObjectsOnly("Foo\\Bar\\TestClass[][]|String|null", false);
+		assertContainsObjectsOnly("Unknown|String|NULL", false);
+	}
+
+	@Test
+	public void testContainsObjectsOnlyForDepth() {
+		assertContainsObjectsOnly(0, "string", false);
+		assertContainsObjectsOnly(1, "Foo\\Bar\\TestClass[]", true);
+		assertContainsObjectsOnly(1, "\\Foo\\Bar\\TestClass", false);
+		assertContainsObjectsOnly(1, "\\Foo\\Bar\\TestClass[]|object[]", true);
+		assertContainsObjectsOnly(2, "\\Foo\\Bar\\TestClass[][]|object[][]", true);
+		assertContainsObjectsOnly(2, "\\Foo\\Bar\\TestClass[]|object[][]", false);
+	}
+
+	@Test
+	public void testContainsNativeObject() {
+		assertContainsNativeObject("string", false);
+		assertContainsNativeObject("object", true);
+		assertContainsNativeObject("object|string|null", true);
+		assertContainsNativeObject("Foo\\Bar\\TestClass", false);
+		assertContainsNativeObject("Foo\\Bar\\TestClass[]|object[]", false);
+		assertContainsNativeObject("\\Bar\\TestClass|object", true);
+	}
+
+	@Test
+	public void testContainsNativeObjectForDepth() {
+		assertContainsNativeObject(1, "Foo\\Bar\\TestClass", false);
+		assertContainsNativeObject(1, "Foo\\Bar\\TestClass|object", false);
+		assertContainsNativeObject(1, "Foo\\Bar\\TestClass[]", false);
+		assertContainsNativeObject(1, "\\Foo\\Bar\\TestClass|object", false);
+		assertContainsNativeObject(1, "\\Foo\\Bar\\TestClass[]|object[]", true);
+		assertContainsNativeObject(1, "\\Foo\\Bar\\TestClass[]|object[][]", false);
+		assertContainsNativeObject(2, "\\Foo\\Bar\\TestClass[]|object[][]", true);
+		assertContainsNativeObject(2, "string|object[][]", true);
+		assertContainsNativeObject(2, "object|string[][]", false);
+	}
+
+	@Test
 	public void testClassNamesForDepth() {
 		assertLattePhpTypeClasses(1, new String[]{}, "Iterable|NULL");
 		assertLattePhpTypeClasses(1, new String[]{}, "Iterable[]|null");
@@ -47,7 +102,38 @@ public class NettePhpTypeTest {
 	}
 
 	@Test
+	public void testGetTypes() {
+		assertGetTypes("string|null", new String[]{"string", "null"});
+		assertGetTypes("int|null", new String[]{"int", "null"});
+		assertGetTypes("int", new String[]{"int"});
+		assertGetTypes("\\Foo\\Bar\\TestClass", new String[]{"\\Foo\\Bar\\TestClass"});
+	}
+
+	@Test
+	public void testContains() {
+		assertContains("string|null", "null", true);
+		assertContains("string|null", "string", true);
+		assertContains("string[]|null", "string[]", true);
+		assertContains("mixed", "string[]", true);
+		assertContains("mixed", "\\Foo\\Bar", true);
+		assertContains("mixed", "object|null", true);
+		assertContains("Iterable|null", "iterable", true);
+		assertContains("Int", "int", true);
+		assertContains("string|null", "int", false);
+		assertContains("string|int|null", "int", true);
+		assertContains("string|int|null", "\\Foo\\Bar", false);
+		assertContains("\\Foo\\Bar|null", "\\Foo\\Bar", true);
+		assertContains("object", "\\Foo\\Bar", true);
+		assertContains("object|null", "\\Foo\\Bar|null", true);
+		assertContains("object[]", "\\Foo\\Bar[]", true);
+		assertContains("object[]|string", "\\Foo\\Bar[]|\\Bar[]", true);
+		assertContains("object[]|string", "\\Foo\\Bar[]|\\Bar[]|string[]", false);
+		assertContains("object", "\\Foo\\Bar|string", false);
+	}
+
+	@Test
 	public void testIsNullable() {
+		assertIsNullable(true, "null");
 		assertIsNullable(false, "string");
 		assertIsNullable(false, "Int");
 		assertIsNullable(false, "callable");
@@ -177,6 +263,30 @@ public class NettePhpTypeTest {
 		}
 	}
 
+	public static void assertContainsObjectsOnly(String type, boolean objectOnly) {
+		assertContainsObjectsOnly(0, type, objectOnly);
+	}
+
+	public static void assertContainsObjectsOnly(int depth, String type, boolean objectOnly) {
+		if (objectOnly) {
+			assertTrue(NettePhpType.create(type).containsObjectsOnly(depth));
+		} else {
+			assertFalse(NettePhpType.create(type).containsObjectsOnly(depth));
+		}
+	}
+
+	public static void assertContainsNativeObject(String type, boolean nativeObject) {
+		assertContainsNativeObject(0, type, nativeObject);
+	}
+
+	public static void assertContainsNativeObject(int depth, String type, boolean nativeObject) {
+		if (nativeObject) {
+			assertTrue(NettePhpType.create(type).containsNativeObject(depth));
+		} else {
+			assertFalse(NettePhpType.create(type).containsNativeObject(depth));
+		}
+	}
+
 	public static void assertIsNative(boolean isNative, String type) {
 		assertIsNative(0, isNative, type);
 	}
@@ -186,6 +296,18 @@ public class NettePhpTypeTest {
 			assertTrue(NettePhpType.create(type).isNative(depth));
 		} else {
 			assertFalse(NettePhpType.create(type).isNative(depth));
+		}
+	}
+
+	public static void assertGetTypes(String type, String[] actual) {
+		Assert.assertEquals(Arrays.asList(actual), NettePhpType.create(type).getTypes());
+	}
+
+	public static void assertContains(String type, String actual, boolean contains) {
+		if (contains) {
+			assertTrue(NettePhpType.create(type).contains(NettePhpType.create(actual)));
+		} else {
+			assertFalse(NettePhpType.create(type).contains(NettePhpType.create(actual)));
 		}
 	}
 
