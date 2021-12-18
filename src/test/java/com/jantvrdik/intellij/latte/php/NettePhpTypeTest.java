@@ -172,6 +172,8 @@ public class NettePhpTypeTest {
 
 	@Test
 	public void testIsMixed() {
+		assertIsMixed(false, "array");
+		assertIsMixed(false, "iterable");
 		assertIsMixed(true, "mixed");
 		assertIsMixed(false, "mixed[]");
 		assertIsMixed(false, "Int");
@@ -183,11 +185,14 @@ public class NettePhpTypeTest {
 
 		assertIsMixed(1, true, "Iterable[]");
 		assertIsMixed(2, true, "mixed[][]");
+		assertIsMixed(2, false, "string[][]");
 		assertIsMixed(5, false, "string[][]");
 	}
 
 	@Test
 	public void testIsIterable() {
+		assertIsIterable(true, "array");
+		assertIsIterable(true, "iterable");
 		assertIsIterable(false, "mixed");
 		assertIsIterable(true, "mixed[]");
 		assertIsIterable(false, "Int");

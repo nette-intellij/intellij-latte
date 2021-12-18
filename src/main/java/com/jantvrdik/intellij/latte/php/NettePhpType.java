@@ -205,7 +205,7 @@ public class NettePhpType {
     }
 
     public boolean contains(NettePhpType type) {
-        if (isNullable() && type.isNullable() || isMixed()) {
+        if (isNullable() && type.isNullable() || isMixed() || (type.isOneDepthOnly() && isMixed(type.getFirstDepth()))) {
             return true;
         }
         if (types.contains("object") && type.containsObjectsOnly()) {
@@ -447,7 +447,7 @@ public class NettePhpType {
                 part = part.toLowerCase();
 
                 if (NettePhpType.isIterable(part)) {
-                    loadArrayOf("mixed", depth);
+                    loadArrayOf("mixed", depth + 1);
                 } else if (NettePhpType.isNull(part)) {
                     this.isNull = true;
                 } else if (NettePhpType.isMixed(part)) {
