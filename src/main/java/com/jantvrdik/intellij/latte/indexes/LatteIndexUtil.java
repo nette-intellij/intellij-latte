@@ -43,14 +43,6 @@ public class LatteIndexUtil {
         );
     }
 
-    public static Collection<LattePhpVariable> findVariablesByName(@NotNull Project project, String name) {
-        return LattePhpVariableIndex.getInstance().get(
-                LattePhpVariableUtil.normalizePhpVariable(name),
-                project,
-                GlobalSearchScope.allScope(project)
-        );
-    }
-
     public static Collection<LattePhpClassReference> getClassesByFqn(@NotNull Project project, String fqn) {
         return LattePhpClassIndex.getInstance().get(
                 LattePhpUtil.normalizeClassName(fqn),

@@ -21,7 +21,7 @@ public class LatteFilterIndex extends StringStubIndexExtension<LatteMacroModifie
 
     @Override
     public int getVersion() {
-        return super.getVersion() + 2;
+        return super.getVersion() + 3;
     }
 
     @Override

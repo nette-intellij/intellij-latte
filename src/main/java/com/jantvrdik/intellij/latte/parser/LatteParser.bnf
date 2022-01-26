@@ -147,7 +147,6 @@ linkDestination    ::= T_LINK_DESTINATION T_LINK_DESTINATION*
 phpVariable        ::= T_MACRO_ARGS_VAR phpArrayUsage* {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpVariableElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpVariableElement"
-                        elementTypeClass="com.jantvrdik.intellij.latte.indexes.stubs.types.LattePhpVariableStubType"
                     }
 
 phpStaticVariable  ::= T_MACRO_ARGS_VAR phpArrayUsage* {

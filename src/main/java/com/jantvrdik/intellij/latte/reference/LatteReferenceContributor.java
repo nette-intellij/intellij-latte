@@ -257,8 +257,6 @@ public class LatteReferenceContributor extends PsiReferenceContributor {
         switch (tag) {
             case "filter":
                 return new LatteXmlFilterDeclarationReference(element, range);
-            case "variable":
-                return new LatteXmlVariableDeclarationReference(element, range);
             case "function":
                 return new LatteXmlFunctionDeclarationReference(element, range);
         }

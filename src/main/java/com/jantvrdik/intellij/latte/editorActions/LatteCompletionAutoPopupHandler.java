@@ -5,6 +5,7 @@ import com.intellij.codeInsight.editorActions.CompletionAutoPopupHandler;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
+import com.jantvrdik.intellij.latte.psi.LatteFile;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -28,6 +29,10 @@ public class LatteCompletionAutoPopupHandler extends CompletionAutoPopupHandler 
 
 	@Override
 	public @NotNull Result checkAutoPopup(char charTyped, @NotNull Project project, @NotNull Editor editor, @NotNull PsiFile file) {
+		if (!(file instanceof LatteFile)) {
+			return Result.DEFAULT;
+		}
+
 		if (allowedCharacters.contains(charTyped)) {
 			AutoPopupController.getInstance(project).scheduleAutoPopup(editor);
 			return Result.STOP;

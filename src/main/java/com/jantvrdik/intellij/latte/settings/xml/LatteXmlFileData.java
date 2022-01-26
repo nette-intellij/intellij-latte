@@ -16,10 +16,10 @@ import java.util.Objects;
 public class LatteXmlFileData implements Serializable {
     final private LatteXmlFileData.VendorResult vendorResult;
 
-    private Map<String, LatteTagSettings> tags = new HashMap<>();
-    private Map<String, LatteFilterSettings> filters = new HashMap<>();
-    private Map<String, LatteVariableSettings> variables = new HashMap<>();
-    private Map<String, LatteFunctionSettings> functions = new HashMap<>();
+    private final Map<String, LatteTagSettings> tags = new HashMap<>();
+    private final Map<String, LatteFilterSettings> filters = new HashMap<>();
+    private final Map<String, LatteVariableSettings> variables = new HashMap<>();
+    private final Map<String, LatteFunctionSettings> functions = new HashMap<>();
 
     public LatteXmlFileData(LatteXmlFileData.VendorResult vendorResult) {
         this.vendorResult = vendorResult;

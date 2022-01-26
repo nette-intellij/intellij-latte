@@ -3,7 +3,6 @@ package com.jantvrdik.intellij.latte.settings;
 import com.intellij.util.xmlb.annotations.Attribute;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.*;
@@ -24,6 +23,18 @@ public class LatteTagSettings extends BaseLatteSettings implements Serializable 
 
 	public LatteTagSettings(String macroName, Type macroType) {
 		this(macroName, macroType, false, "", false, LatteConfiguration.Vendor.OTHER, "", Collections.emptyList(), "");
+	}
+
+	public LatteTagSettings(String macroName, Type macroType, boolean allowedFilters, boolean multiLine, LatteConfiguration.Vendor vendor, List<LatteArgumentSettings> argumentSettings) {
+		this(macroName, macroType, allowedFilters, "", multiLine, vendor, "", argumentSettings, "");
+	}
+
+	public LatteTagSettings(String macroName, Type macroType, boolean allowedFilters, boolean multiLine, LatteConfiguration.Vendor vendor, String arguments) {
+		this(macroName, macroType, allowedFilters, arguments, multiLine, vendor, "", Collections.emptyList(), "");
+	}
+
+	public LatteTagSettings(String macroName, Type macroType, boolean allowedFilters, boolean multiLine, LatteConfiguration.Vendor vendor, String arguments, List<LatteArgumentSettings> argumentSettings) {
+		this(macroName, macroType, allowedFilters, arguments, multiLine, vendor, "", argumentSettings, "");
 	}
 
 	public LatteTagSettings(String macroName, Type macroType, boolean allowedFilters, String arguments, boolean multiLine, String deprecatedMessage, List<LatteArgumentSettings> argumentSettings) {

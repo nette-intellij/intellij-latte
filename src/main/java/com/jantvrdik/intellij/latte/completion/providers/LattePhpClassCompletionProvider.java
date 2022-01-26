@@ -24,11 +24,7 @@ public class LattePhpClassCompletionProvider extends BaseLatteCompletionProvider
 	}
 
 	@Override
-	protected void addCompletions(
-			@NotNull CompletionParameters params,
-			ProcessingContext ctx,
-			@NotNull CompletionResultSet results
-	) {
+	protected void addCompletions(@NotNull CompletionParameters params, @NotNull ProcessingContext ctx, @NotNull CompletionResultSet results) {
 		PsiElement curr = params.getPosition().getOriginalElement();
 		if (PsiTreeUtil.getParentOfType(curr, LattePhpContent.class) == null) {
 			return;
@@ -41,7 +37,7 @@ public class LattePhpClassCompletionProvider extends BaseLatteCompletionProvider
 		}
 
 		Project project = params.getPosition().getProject();
-		Collection<String> classNames = LattePhpUtil.getAllExistingClassNames(project, results.getPrefixMatcher().cloneWithPrefix(namespaceName));
+		Collection<String> classNames = LattePhpUtil.getAllExistingClassAndInterfacesNames(project, results.getPrefixMatcher().cloneWithPrefix(namespaceName));
 		Collection<PhpNamedElement> variants = LattePhpUtil.getAllClassNamesAndInterfaces(project, classNames);
 
 		// Add variants

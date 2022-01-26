@@ -2,7 +2,6 @@ package com.jantvrdik.intellij.latte.php;
 
 import com.intellij.codeInsight.completion.PrefixMatcher;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveResult;
 import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.psi.elements.BaseLattePhpElement;
@@ -185,8 +184,11 @@ public class LattePhpUtil {
     }
 
 
-    public static Collection<String> getAllExistingClassNames(Project project, PrefixMatcher prefixMatcher) {
-        return getPhpIndex(project).getAllClassFqns(prefixMatcher);
+    public static Collection<String> getAllExistingClassAndInterfacesNames(Project project, PrefixMatcher prefixMatcher) {
+        List<String> out = new ArrayList<>();
+        out.addAll(getPhpIndex(project).getAllInterfacesFqns(prefixMatcher));
+        out.addAll(getPhpIndex(project).getAllClassFqns(prefixMatcher));
+        return out;
     }
 
     private static PhpIndex getPhpIndex(Project project) {
