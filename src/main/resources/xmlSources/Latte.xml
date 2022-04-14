@@ -185,6 +185,11 @@
 				<argument name="class-name" types="PHP_CLASS_NAME" required="true" />
 			</arguments>
 		</tag>
+		<tag name="translate" type="AUTO_EMPTY" allowedFilters="true">
+			<arguments>
+				<argument name="expression" types="PHP_EXPRESSION" validType="string" required="true" />
+			</arguments>
+		</tag>
 		<tag name="try" type="PAIR" />
 		<tag name="rollback" type="UNPAIRED" />
 		<tag name="tag" type="ATTR_ONLY">
