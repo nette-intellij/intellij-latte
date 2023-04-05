@@ -5,7 +5,6 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.pom.PomTargetPsiElement;
 import com.intellij.psi.*;
 import com.intellij.psi.xml.*;
-import com.jantvrdik.intellij.latte.config.LatteFileConfiguration;
 import com.jantvrdik.intellij.latte.psi.LatteMacroModifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,9 +27,9 @@ public class LatteFilterReference extends PsiReferenceBase<PsiElement> implement
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         List<ResolveResult> results = new ArrayList<>();
-        for (XmlAttributeValue attributeValue : LatteFileConfiguration.getAllMatchedXmlAttributeValues(project, "filter", modifierName)) {
-            results.add(new PsiElementResolveResult(attributeValue));
-        }
+        //for (XmlAttributeValue attributeValue : LatteFileConfiguration.getAllMatchedXmlAttributeValues(project, "filter", modifierName)) {
+        //    results.add(new PsiElementResolveResult(attributeValue));
+        //}
 
         //final Collection<LatteMacroModifier> modifiers = LatteIndexUtil.findFiltersByName(project, modifierName);
         //for (LatteMacroModifier modifier : modifiers) {
@@ -56,17 +55,6 @@ public class LatteFilterReference extends PsiReferenceBase<PsiElement> implement
     public boolean isReferenceTo(@NotNull PsiElement element) {
         if (element instanceof LatteMacroModifier) {
             return ((LatteMacroModifier) element).getModifierName().equals(modifierName);
-        }
-
-        PsiElement currentElement = element;
-        if (element instanceof PomTargetPsiElement) {
-            currentElement = LatteFileConfiguration.getPsiElementFromDomTarget("filter", element);
-            if (currentElement == null) {
-                currentElement = element;
-            }
-        }
-        if (currentElement instanceof XmlAttributeValue && LatteFileConfiguration.hasParentXmlTagName(currentElement, "filter")) {
-            return ((XmlAttributeValue) currentElement).getValue().equals(modifierName);
         }
         return super.isReferenceTo(element);
     }

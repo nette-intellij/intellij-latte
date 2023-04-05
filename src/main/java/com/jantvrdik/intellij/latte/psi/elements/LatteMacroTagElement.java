@@ -3,6 +3,7 @@ package com.jantvrdik.intellij.latte.psi.elements;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.IncorrectOperationException;
 import com.jantvrdik.intellij.latte.psi.LatteMacroContent;
+import com.jantvrdik.intellij.latte.psi.impl.LattePsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

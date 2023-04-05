@@ -11,7 +11,6 @@ import com.intellij.util.ui.ListTableModel;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.settings.LatteFilterSettings;
 import com.jantvrdik.intellij.latte.settings.LatteSettings;
-import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileData;
 import com.jantvrdik.intellij.latte.utils.LatteIdeHelper;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
@@ -221,7 +220,7 @@ public class LatteCustomModifierSettingsForm implements Configurable {
 
 		@Nullable
 		@Override
-		public LatteXmlFileData.VendorResult valueOf(LatteFilterSettings customMacroSettings) {
+		public LatteConfiguration.VendorResult valueOf(LatteFilterSettings customMacroSettings) {
 			return LatteConfiguration.getInstance(project).getVendorForFilter(customMacroSettings.getModifierName());
 		}
 	}

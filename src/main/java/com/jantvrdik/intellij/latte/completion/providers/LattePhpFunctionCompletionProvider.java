@@ -68,7 +68,7 @@ public class LattePhpFunctionCompletionProvider extends BaseLatteCompletionProvi
 
 	private LookupElementBuilder createBuilderWithHelp(LatteFunctionSettings settings) {
 		LookupElementBuilder builder = LookupElementBuilder.create(settings.getFunctionName());
-		builder = builder.withIcon(PhpIcons.FUNCTION_ICON);
+		builder = builder.withIcon(PhpIcons.FUNCTION);
 		builder = builder.withInsertHandler(MacroCustomFunctionInsertHandler.getInstance());
 		if (settings.getFunctionHelp().trim().length() > 0) {
 			builder = builder.withTailText(settings.getFunctionHelp());

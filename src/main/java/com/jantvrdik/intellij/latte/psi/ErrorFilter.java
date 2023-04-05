@@ -6,7 +6,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiErrorElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiWhiteSpace;
-import com.intellij.psi.css.CssElement;
 import com.intellij.psi.templateLanguages.OuterLanguageElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtilCore;
@@ -28,7 +27,7 @@ public class ErrorFilter extends HighlightErrorFilter {
 		if (language != LatteLanguage.INSTANCE) {
 			return true;
 		}
-		if (element.getParent() instanceof XmlElement || element.getParent() instanceof CssElement) {
+		if (element.getParent() instanceof XmlElement) {
 			return false;
 		}
 		if (element.getParent().getLanguage() == LatteLanguage.INSTANCE) {

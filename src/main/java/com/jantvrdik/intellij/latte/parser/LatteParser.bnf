@@ -37,7 +37,9 @@ macroClassic     ::= macroTag macroTag?{
 
 pairMacro        ::= macroOpenTag structureToken* macroCloseTag? { //incomplete pair macro is handled in a annotator
                             extends=macroClassic
-                            methods=[getMacroOpenTag]
+                            mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePairMacroImpl"
+                            implements="com.jantvrdik.intellij.latte.psi.elements.LattePairMacroElement"
+                            //methods=[getMacroOpenTag]
                         }
 
 emptyMacro       ::= emptyMacroTag {
@@ -50,10 +52,9 @@ unpairedMacro    ::= macroOpenTag {
 
 fake
 macroTag         ::= classicMacroContent {
+                        mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LatteMacroTagElementImpl"
+                        implements="com.jantvrdik.intellij.latte.psi.elements.LatteMacroTagElement"
                      	methods = [
-                            getMacroName
-                            matchMacroName
-                            getMacroNameLength
                      		macroContent="macroContent"
                      	]
                      }
@@ -82,7 +83,8 @@ private
 classicMacroContent     ::= macroName macroContent?
 
 macroContent ::= macroArgs? (T_MACRO_MODIFIERS macroArgs)* {
-                        methods=[getFirstPhpContent getMacroNameElement]
+                        mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LatteMacroContentImpl"
+                        implements="com.jantvrdik.intellij.latte.psi.elements.LatteMacroContentElement"
                     }
 
 private
@@ -119,7 +121,8 @@ htmlTag            ::= <<checkPairHtmlTag true>> htmlPairTag | <<checkPairHtmlTa
 htmlPairTag         ::= htmlOpenTag htmlTagContainer htmlCloseTag
 
 htmlTagContainer     ::= (htmlTag | T_TEXT | macro | (pairMacro | unpairedMacro))* {
-                                methods=[getHtmlOpenTag]
+                                mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LatteHtmlTagContainerImpl"
+                                implements="com.jantvrdik.intellij.latte.psi.elements.LatteHtmlTagContainerElement"
                             }
 
 htmlTagContent         ::= (netteAttr | macro | T_TEXT | (pairMacro | unpairedMacro))*
@@ -153,30 +156,35 @@ phpStaticVariable  ::= T_MACRO_ARGS_VAR phpArrayUsage* {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpStaticVariableElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpStaticVariableElement"
                         elementTypeClass="com.jantvrdik.intellij.latte.indexes.stubs.types.LattePhpStaticVariableStubType"
+                        stubClass="com.jantvrdik.intellij.latte.indexes.stubs.LattePhpStaticVariableStub"
                     }
 
 phpMethod        ::= (T_PHP_IDENTIFIER | phpVariable | (T_PHP_NAMESPACE_RESOLUTION T_PHP_NAMESPACE_REFERENCE)) T_WHITESPACE? phpArgumentList T_WHITESPACE? phpArrayUsage* {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpMethodElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpMethodElement"
                         elementTypeClass="com.jantvrdik.intellij.latte.indexes.stubs.types.LattePhpMethodStubType"
+                        stubClass="com.jantvrdik.intellij.latte.indexes.stubs.LattePhpMethodStub"
                     }
 
 phpConstant        ::= T_PHP_IDENTIFIER phpArrayUsage* {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpConstantElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpConstantElement"
                         elementTypeClass="com.jantvrdik.intellij.latte.indexes.stubs.types.LattePhpConstantStubType"
+                        stubClass="com.jantvrdik.intellij.latte.indexes.stubs.LattePhpConstantStub"
                     }
 
 phpProperty        ::= T_PHP_IDENTIFIER phpArrayUsage* {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpPropertyElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpPropertyElement"
                         elementTypeClass="com.jantvrdik.intellij.latte.indexes.stubs.types.LattePhpPropertyStubType"
+                        stubClass="com.jantvrdik.intellij.latte.indexes.stubs.LattePhpPropertyStub"
                     }
 
 phpClassReference    ::= (T_PHP_NAMESPACE_RESOLUTION? <<isNamespace>> phpNamespaceReference)? (T_PHP_NAMESPACE_RESOLUTION <<isNamespace>> phpNamespaceReference)* phpClassUsage {
                     mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpClassReferenceElementImpl"
                     implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpClassReferenceElement"
                     elementTypeClass="com.jantvrdik.intellij.latte.indexes.stubs.types.LattePhpClassStubType"
+                    stubClass="com.jantvrdik.intellij.latte.indexes.stubs.LattePhpClassStub"
                 }
 
 phpClassUsage       ::= T_PHP_NAMESPACE_RESOLUTION (T_PHP_IDENTIFIER | T_PHP_NAMESPACE_REFERENCE)? {
@@ -188,12 +196,14 @@ phpNamespaceReference    ::= T_PHP_NAMESPACE_REFERENCE {
                      mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpNamespaceReferenceElementImpl"
                      implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpNamespaceReferenceElement"
                      elementTypeClass="com.jantvrdik.intellij.latte.indexes.stubs.types.LattePhpNamespaceStubType"
+                     stubClass="com.jantvrdik.intellij.latte.indexes.stubs.LattePhpNamespaceStub"
                  }
 
 macroModifier    ::= T_MACRO_FILTERS (T_PHP_COLON macroModifierPart)* {
                         mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LatteMacroModifierElementImpl"
                         implements="com.jantvrdik.intellij.latte.psi.elements.LatteMacroModifierElement"
                         elementTypeClass="com.jantvrdik.intellij.latte.indexes.stubs.types.LatteFilterStubType"
+                        stubClass="com.jantvrdik.intellij.latte.indexes.stubs.LatteFilterStub"
                     }
 
 macroModifierPart    ::= phpPrivateArgument*
@@ -217,6 +227,7 @@ phpType       ::= (T_PHP_NULL_MARK | "?")? phpTypePart (T_PHP_OR_INCLUSIVE phpTy
                     mixin="com.jantvrdik.intellij.latte.psi.impl.elements.LattePhpTypeElementImpl"
                     implements="com.jantvrdik.intellij.latte.psi.elements.LattePhpTypeElement"
                     elementTypeClass="com.jantvrdik.intellij.latte.indexes.stubs.types.LattePhpTypeStubType"
+                    stubClass="com.jantvrdik.intellij.latte.indexes.stubs.LattePhpTypeStub"
                 }
 
 phpTypePart       ::= (T_PHP_TYPE | T_PHP_NULL | T_PHP_MIXED | phpClassReference) phpTypeIterable*

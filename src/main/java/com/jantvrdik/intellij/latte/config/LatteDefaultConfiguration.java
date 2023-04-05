@@ -1,118 +1,68 @@
 package com.jantvrdik.intellij.latte.config;
 
-import com.intellij.openapi.project.Project;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration.Vendor;
 import com.jantvrdik.intellij.latte.settings.*;
 import com.jantvrdik.intellij.latte.settings.LatteTagSettings.*;
-import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileData;
-import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileDataFactory;
-import com.jantvrdik.intellij.latte.utils.LatteIdeHelper;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class LatteDefaultConfiguration {
 
-	public static Map<String, Vendor> sourceFiles = new HashMap<String, Vendor>(){{
-		put("Latte.xml", Vendor.LATTE);
-		put("NetteApplication.xml", Vendor.NETTE_APPLICATION);
-		put("NetteForms.xml", Vendor.NETTE_FORMS);
-	}};
+	private static @Nullable LatteDefaultConfiguration instance = null;
 
-	private static final Map<Project, LatteDefaultConfiguration> instances = new HashMap<>();
+	private static final @NotNull Set<Vendor> vendors = Stream
+			.of(Vendor.LATTE, Vendor.NETTE_FORMS, Vendor.NETTE_APPLICATION)
+			.collect(Collectors.toSet());
 
-	private Map<Vendor, LatteXmlFileData> xmlData = new HashMap<>();
 	private final Map<Vendor, Map<String, LatteTagSettings>> defaultTags = new HashMap<>();
+	private final Map<Vendor, Map<String, LatteFilterSettings>> defaultFilters = new HashMap<>();
+	private final Map<Vendor, Map<String, LatteVariableSettings>> defaultVariables = new HashMap<>();
+	private final Map<Vendor, Map<String, LatteFunctionSettings>> defaultFunctions = new HashMap<>();
 
-	private final @NotNull Project project;
-
-	private final boolean disableLoading;
-
-	public LatteDefaultConfiguration(@NotNull Project project, boolean disableLoading) {
-		this.project = project;
-		this.disableLoading = disableLoading;
+	public LatteDefaultConfiguration() {
 		loadDefaults();
-		reinitialize();
 	}
 
-	public boolean reinitialize() {
-		int oldHash = hashCode();
-		xmlData = new HashMap<>();
-		if (disableLoading) {
-			return false;
+	public static LatteDefaultConfiguration getInstance() {
+		if (instance == null) {
+			instance = new LatteDefaultConfiguration();
 		}
-
-		LatteIdeHelper.saveFileToProjectTemp(project, "xmlSources/Latte.dtd");
-		for (String sourceFile : sourceFiles.keySet()) {
-			Path path = LatteIdeHelper.saveFileToProjectTemp(project, "xmlSources/" + sourceFile);
-			if (path == null) {
-				continue;
-			}
-
-			LatteXmlFileData data = LatteXmlFileDataFactory.parse(project, path);
-			if (data != null) {
-				LatteXmlFileData.VendorResult vendorResult = data.getVendorResult();
-				xmlData.remove(vendorResult.vendor);
-				xmlData.put(vendorResult.vendor, data);
-
-			} else if (LatteIdeHelper.holdsReadLock()) {
-				LatteReparseUtil.getInstance(project).reinitializeDefault();
-			}
-		}
-		return oldHash == hashCode();
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		LatteDefaultConfiguration that = (LatteDefaultConfiguration) o;
-		return Objects.equals(xmlData, that.xmlData) && project.equals(that.project);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(xmlData, project);
-	}
-
-	public static LatteDefaultConfiguration getInstance(@NotNull Project project) {
-		return getInstance(project, false);
-	}
-
-	public static LatteDefaultConfiguration getInstance(@NotNull Project project, boolean disableLoading) {
-		if (!instances.containsKey(project)) {
-			instances.put(project, new LatteDefaultConfiguration(project, disableLoading));
-		}
-		return instances.get(project);
+		return instance;
 	}
 
 	public Vendor[] getVendors() {
-		return xmlData.keySet().toArray(new Vendor[0]);
+		return vendors.toArray(new Vendor[0]);
 	}
 
 	public Map<String, LatteTagSettings> getTags(Vendor vendor) {
-		return defaultTags.get(vendor);
+		return defaultTags.getOrDefault(vendor, Collections.emptyMap());
 	}
 
 	public Map<String, LatteFilterSettings> getFilters(Vendor vendor) {
-		LatteXmlFileData data = xmlData.getOrDefault(vendor, null);
-		return data != null ? data.getFilters() : Collections.emptyMap();
+		return defaultFilters.getOrDefault(vendor, Collections.emptyMap());
 	}
 
 	public Map<String, LatteVariableSettings> getVariables(Vendor vendor) {
-		LatteXmlFileData data = xmlData.getOrDefault(vendor, null);
-		return data != null ? data.getVariables() : Collections.emptyMap();
+		return defaultVariables.getOrDefault(vendor, Collections.emptyMap());
 	}
 
 	public Map<String, LatteFunctionSettings> getFunctions(Vendor vendor) {
-		LatteXmlFileData data = xmlData.getOrDefault(vendor, null);
-		return data != null ? data.getFunctions() : Collections.emptyMap();
+		return defaultFunctions.getOrDefault(vendor, Collections.emptyMap());
 	}
 
 	private void loadDefaults() {
 		loadDefaultLatteTags();
+		loadDefaultLatteFilters();
+		loadDefaultLatteFunctions();
+
 		loadDefaultNetteApplicationTags();
+		loadDefaultNetteApplicationFunctions();
+		loadDefaultNetteApplicationVariables();
+
 		loadDefaultNetteFormsTags();
 	}
 
@@ -175,6 +125,69 @@ public class LatteDefaultConfiguration {
 		addLatteTag(multiTag("embed", Type.PAIR, requiredArgument("file", "string", LatteArgumentSettings.Type.BLOCK_USAGE, LatteArgumentSettings.Type.PHP_IDENTIFIER, LatteArgumentSettings.Type.VARIABLE, LatteArgumentSettings.Type.PHP_EXPRESSION), repeatableArgument("key-value", LatteArgumentSettings.Type.KEY_VALUE)));
 	}
 
+	private void loadDefaultLatteFilters() {
+		addLatteFilter("truncate", ":($length, $append = '…')", "shortens the length preserving whole words", ":");
+		addLatteFilter("substr", ":($offset [, $length])", "returns part of the string", ":");
+		addLatteFilter("trim", ":($charset = mezery)", "strips whitespace or other characters from the beginning and end of the string");
+		addLatteFilter("stripHtml", "", "removes HTML tags and converts HTML entities to text");
+		addLatteFilter("strip", "", "removes whitespace");
+		addLatteFilter("indent", ":($level = 1, $char = '\t')", "indents the text from left with number of tabs");
+		addLatteFilter("replace", ":($search, $replace = '')", "replaces all occurrences of the search string with the replacement", ":");
+		addLatteFilter("replaceRE", ":($pattern, $replace = '')", "replaces all occurrences according to regular expression", ":");
+		addLatteFilter("padLeft", ":($length, $pad = ' ')", "completes the string to given length from left", ":");
+		addLatteFilter("padRight", ":($length, $pad = ' ')", "completes the string to given length from right", ":");
+		addLatteFilter("repeat", ":($count)", "repeats the string", ":");
+		addLatteFilter("implode", ":($glue = '')", "joins an array to a string");
+		addLatteFilter("webalize", "adjusts the UTF-8 string to the shape used in the URL");
+		addLatteFilter("breaklines", "inserts HTML line breaks before all newlines");
+		addLatteFilter("reverse", "reverse an UTF-8 string or array");
+		addLatteFilter("length", "returns length of a string or array");
+		addLatteFilter("sort", "simply sorts array");
+		addLatteFilter("reverse", "array sorted in reverse order (used with |sort)");
+		addLatteFilter("batch", ":($array, $length [, $item])", "returns length of a string or array", "::");
+
+		addLatteFilter("date", ":(int $min, int $max)", "returns value clamped to the inclusive range of min and max.", "::");
+
+		addLatteFilter("lower", "makes a string lower case");
+		addLatteFilter("upper", "makes a string upper case");
+		addLatteFilter("firstUpper", "makes the first letter upper case");
+		addLatteFilter("capitalize", "lower case, the first letter of each word upper case");
+
+		addLatteFilter("date", ":($format)", "formats date", ":");
+		addLatteFilter("number", ":($decimals = 0, $decPoint = '.', $thousandsSep = ',')", "format number");
+		addLatteFilter("bytes", ":($precision = 2)", "formats size in bytes");
+		addLatteFilter("dataStream", ":($mimetype = 'detect')", "Data URI protocol conversion");
+
+		addLatteFilter("noescape", "prints a variable without escaping");
+		addLatteFilter("escapeurl", "escapes parameter in URL");
+
+		addLatteFilter("nocheck", "prevents automatic URL sanitization");
+		addLatteFilter("checkurl", "sanitizes string for use inside href attribute");
+
+		addLatteFilter("query", "generates a query string in the URL");
+		addLatteFilter("ceil", ":(int $precision = 0)", "rounds a number up to a given precision");
+		addLatteFilter("explode", ":(string $separator = '')", "splits a string by the given delimiter");
+		addLatteFilter("first", "returns first element of array or character of string");
+		addLatteFilter("floor", ":(int $precision = 0)", "rounds a number down to a given precision");
+		addLatteFilter("join", ":(string $glue = '')", "joins an array to a string");
+		addLatteFilter("last", "returns last element of array or character of string");
+		addLatteFilter("random", "returns random element of array or character of string");
+		addLatteFilter("round", ":(int $precision = 0)", "rounds a number to a given precision");
+		addLatteFilter("slice", ":(int $start, int $length = null, bool $preserveKeys = false)", "extracts a slice of an array or a string", ":");
+		addLatteFilter("spaceless", "removes whitespace");
+		addLatteFilter("split", ":(string $separator = '')", "splits a string by the given delimiter");
+	}
+
+	private void loadDefaultLatteFunctions() {
+		addLatteFunction("clamp", "int|float", "(int|float $value, int|float $min, int|float $max)", "clamps value to the inclusive range of min and max");
+		addLatteFunction("divisibleBy", "bool", "(int $value)", "checks if a variable is divisible by a number");
+		addLatteFunction("even", "bool", "(int $value)", "checks if the given number is even");
+		addLatteFunction("first", "mixed", "(string|array $value)", "returns first element of array or character of string");
+		addLatteFunction("last", "mixed", "(string|array $value)", "returns last element of array or character of string");
+		addLatteFunction("odd", "bool", "(int $value)", "checks if the given number is odd");
+		addLatteFunction("slice", "string|array", "(string|array $value, int $start, int $length = null, bool $preserveKeys = false)", "extracts a slice of an array or a string");
+	}
+
 	private void loadDefaultNetteApplicationTags() {
 		addNetteTag(tag("cache", Type.PAIR, "if => expr, key, …", requiredArgument("name[:part]", "string", LatteArgumentSettings.Type.KEY_VALUE), repeatableArgument("arguments", LatteArgumentSettings.Type.PHP_EXPRESSION)));
 		addNetteTag(tag("control", Type.UNPAIRED, requiredArgument("name[:part]", "string", LatteArgumentSettings.Type.PHP_IDENTIFIER, LatteArgumentSettings.Type.PHP_EXPRESSION), repeatableArgument("arguments", LatteArgumentSettings.Type.PHP_EXPRESSION)));
@@ -187,6 +200,22 @@ public class LatteDefaultConfiguration {
 		ifCurrent.setDeprecated(true);
 		ifCurrent.setDeprecatedMessage("Tag {ifCurrent} is deprecated in Latte 2.6. Use custom function isLinkCurrent() instead.");
 		addNetteTag(ifCurrent);
+	}
+
+	private void loadDefaultNetteApplicationVariables() {
+		addNetteVariable("control", "\\Nette\\Application\\UI\\Control");
+		addNetteVariable("basePath", "string");
+		addNetteVariable("baseUrl", "string");
+		addNetteVariable("flashes", "mixed[]");
+		addNetteVariable("presenter", "\\Nette\\Application\\UI\\Presenter");
+		addNetteVariable("iterator", "\\Latte\\Runtime\\CachingIterator");
+		addNetteVariable("form", "\\Nette\\Application\\UI\\Form");
+		addNetteVariable("user", "\\Nette\\Security\\User");
+	}
+
+	private void loadDefaultNetteApplicationFunctions() {
+		addNetteFunction("isLinkCurrent", "bool", "(string $destination = null, $args = [])");
+		addNetteFunction("isModuleCurrent", "bool", "(string $moduleName)");
 	}
 
 	private void loadDefaultNetteFormsTags() {
@@ -203,8 +232,32 @@ public class LatteDefaultConfiguration {
 		addTag(Vendor.LATTE, tag);
 	}
 
+	private void addLatteFilter(String name, String arguments, String description, String insertColons) {
+		addFilter(Vendor.LATTE, name, arguments, description, insertColons);
+	}
+
+	private void addLatteFilter(String name, String arguments, String description) {
+		addFilter(Vendor.LATTE, name, arguments, description, "");
+	}
+
+	private void addLatteFilter(String name, String description) {
+		addFilter(Vendor.LATTE, name, "", description, "");
+	}
+
+	private void addLatteFunction(String name, String returnType, String arguments, String description) {
+		addFunction(Vendor.LATTE, name, returnType, arguments, description);
+	}
+
 	private void addNetteTag(LatteTagSettings tag) {
 		addTag(Vendor.NETTE_APPLICATION, tag);
+	}
+
+	private void addNetteVariable(String name, String type) {
+		addVariable(Vendor.NETTE_APPLICATION, name, type);
+	}
+
+	private void addNetteFunction(String name, String returnType, String arguments) {
+		addFunction(Vendor.NETTE_APPLICATION, name, returnType, arguments, "");
 	}
 
 	private void addFormsTag(LatteTagSettings tag) {
@@ -220,6 +273,42 @@ public class LatteDefaultConfiguration {
 			defaultTags.put(vendor, map);
 		}
 		map.put(tag.getMacroName(), tag);
+	}
+
+	private void addVariable(Vendor vendor, String name, String type) {
+		Map<String, LatteVariableSettings> map;
+		if (defaultVariables.containsKey(vendor)) {
+			map = defaultVariables.get(vendor);
+		} else {
+			map = new HashMap<>();
+			defaultVariables.put(vendor, map);
+		}
+		LatteVariableSettings variable = new LatteVariableSettings(name, type);
+		map.put(variable.getVarName(), variable);
+	}
+
+	private void addFilter(Vendor vendor, String name, String arguments, String description, String insertColons) {
+		Map<String, LatteFilterSettings> map;
+		if (defaultFilters.containsKey(vendor)) {
+			map = defaultFilters.get(vendor);
+		} else {
+			map = new HashMap<>();
+			defaultFilters.put(vendor, map);
+		}
+		LatteFilterSettings filter = new LatteFilterSettings(name, description, arguments, insertColons);
+		map.put(filter.getModifierName(), filter);
+	}
+
+	private void addFunction(Vendor vendor, String name, String returnType, String arguments, String description) {
+		Map<String, LatteFunctionSettings> map;
+		if (defaultFunctions.containsKey(vendor)) {
+			map = defaultFunctions.get(vendor);
+		} else {
+			map = new HashMap<>();
+			defaultFunctions.put(vendor, map);
+		}
+		LatteFunctionSettings function = new LatteFunctionSettings(name, returnType, arguments, description);
+		map.put(function.getFunctionName(), function);
 	}
 
 	private LatteTagSettings filtersTag(String macroName, Type macroType, LatteArgumentSettings ...argumentSettings) {

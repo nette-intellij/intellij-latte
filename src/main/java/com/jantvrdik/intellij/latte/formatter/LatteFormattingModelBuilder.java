@@ -73,11 +73,7 @@ public class LatteFormattingModelBuilder extends AbstractXmlTemplateFormattingMo
 				.none()
 
 				.after(LatteTypes.T_MACRO_NAME)
-				.spaces(1)
-				//.spaceIf(LatteCodeStyleSettings.SPACE_BEFORE_CLOSING_TAG)
-				//.before(SimpleTypes.PROPERTY)
-				//.none()
-				;
+				.spaces(1);
 	}
 
 }

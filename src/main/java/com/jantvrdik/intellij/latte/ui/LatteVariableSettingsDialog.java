@@ -3,7 +3,6 @@ package com.jantvrdik.intellij.latte.ui;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.table.TableView;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.config.LatteReparseUtil;
 import com.jantvrdik.intellij.latte.settings.LatteVariableSettings;
 
 import javax.swing.*;
@@ -73,8 +72,6 @@ public class LatteVariableSettingsDialog extends JDialog {
             this.tableView.getListTableModel().addRow(settings);
         }
         this.tableView.setRowSelectionInterval(row, row);
-
-        LatteReparseUtil.getInstance(project).reinitialize(this::dispose);
     }
 
     private void setOkState() {

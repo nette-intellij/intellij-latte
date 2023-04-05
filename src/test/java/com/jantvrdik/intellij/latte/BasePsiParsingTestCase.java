@@ -7,19 +7,14 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import com.intellij.testFramework.ParsingTestCase;
 import com.intellij.testFramework.TestDataFile;
-import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.parser.LatteParserDefinition;
 import com.jantvrdik.intellij.latte.psi.LattePhpVariable;
-import com.jantvrdik.intellij.latte.settings.LatteTagSettings;
-import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileData;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 abstract public class BasePsiParsingTestCase extends ParsingTestCase {
@@ -49,18 +44,6 @@ abstract public class BasePsiParsingTestCase extends ParsingTestCase {
             }
         });
         return variables;
-    }
-
-    protected Collection<LatteXmlFileData> getXmlFileData() {
-        Collection<LatteXmlFileData> out = new HashSet<>();
-        LatteXmlFileData xmlFileData = new LatteXmlFileData(new LatteXmlFileData.VendorResult(LatteConfiguration.Vendor.LATTE, "Latte"));
-        out.add(xmlFileData);
-        xmlFileData.addTag(new LatteTagSettings("block", LatteTagSettings.Type.PAIR));
-        xmlFileData.addTag(new LatteTagSettings("define", LatteTagSettings.Type.PAIR));
-        xmlFileData.addTag(new LatteTagSettings("foreach", LatteTagSettings.Type.PAIR));
-        xmlFileData.addTag(new LatteTagSettings("if", LatteTagSettings.Type.PAIR));
-        xmlFileData.addTag(new LatteTagSettings("var", LatteTagSettings.Type.UNPAIRED));
-        return out;
     }
 
 }

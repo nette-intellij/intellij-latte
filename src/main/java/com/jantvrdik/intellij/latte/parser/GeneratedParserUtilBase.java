@@ -39,14 +39,10 @@ import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.Function;
 import com.intellij.util.PairProcessor;
 import com.intellij.util.containers.LimitedPool;
-import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * It is copied for a compatibility with PhpStorm 9.0
@@ -729,7 +725,7 @@ public class GeneratedParserUtilBase {
 
 	public static class CompletionState implements Function<Object, String> {
 		public final int offset;
-		public final Collection<String> items = new THashSet<>();
+		public final Collection<String> items = new HashSet<>();
 
 		public CompletionState(int offset_) {
 			offset = offset_;

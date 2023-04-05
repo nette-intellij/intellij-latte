@@ -107,7 +107,7 @@ public class LatteVariableCompletionProvider extends BaseLatteCompletionProvider
 			LookupElementBuilder builder = LookupElementBuilder.create("$" + variableName);
 			builder = builder.withInsertHandler(PhpVariableInsertHandler.getInstance());
 			builder = builder.withTypeText(variable.toPhpType().toString());
-			builder = builder.withIcon(PhpIcons.VARIABLE_READ_ACCESS);
+			builder = builder.withIcon(PhpIcons.VARIABLE);
 			builder = builder.withBoldness(false);
 			lookupElements.add(builder);
 

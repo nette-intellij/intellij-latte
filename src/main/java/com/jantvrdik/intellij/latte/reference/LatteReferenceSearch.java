@@ -45,16 +45,13 @@ public class LatteReferenceSearch extends QueryExecutorBase<PsiReference, Refere
             }
 
             PsiSearchHelper.getInstance(phpClass.getProject())
-                    .processElementsWithWord(new TextOccurenceProcessor() {
-                        @Override
-                        public boolean execute(@NotNull PsiElement psiElement, int i) {
-                            PsiElement currentClass = psiElement.getParent();
-                            if (currentClass instanceof LattePhpClassUsage) {
-                                String value = ((LattePhpClassUsage) currentClass).getClassName();
-                                processor.process(new LattePhpClassReference((LattePhpClassUsage) currentClass, new TextRange(0, value.length())));
-                            }
-                            return true;
+                    .processElementsWithWord((psiElement, i) -> {
+                        PsiElement currentClass = psiElement.getParent();
+                        if (currentClass instanceof LattePhpClassUsage) {
+                            String value = ((LattePhpClassUsage) currentClass).getClassName();
+                            processor.process(new LattePhpClassReference((LattePhpClassUsage) currentClass, new TextRange(0, value.length())));
                         }
+                        return true;
                     }, searchScope, searchString, UsageSearchContext.IN_CODE, true);
         });
     }
@@ -67,30 +64,27 @@ public class LatteReferenceSearch extends QueryExecutorBase<PsiReference, Refere
             String fieldName = field.getName();
 
             PsiSearchHelper.getInstance(field.getProject())
-                    .processElementsWithWord(new TextOccurenceProcessor() {
-                        @Override
-                        public boolean execute(PsiElement psiElement, int i) {
-                            PsiElement currentMethod = psiElement.getParent();
-                            if (currentMethod instanceof LattePhpStaticVariable) {
-                                String value = ((LattePhpStaticVariable) currentMethod).getVariableName();
-                                processor.process(new LattePhpStaticVariableReference((LattePhpStaticVariable) currentMethod, new TextRange(0, value.length() + 1)));
+                    .processElementsWithWord((psiElement, i) -> {
+                        PsiElement currentMethod = psiElement.getParent();
+                        if (currentMethod instanceof LattePhpStaticVariable) {
+                            String value = ((LattePhpStaticVariable) currentMethod).getVariableName();
+                            processor.process(new LattePhpStaticVariableReference((LattePhpStaticVariable) currentMethod, new TextRange(0, value.length() + 1)));
 
-                            } else if (currentMethod instanceof LattePhpVariable && field.getContainingClass() != null) {
-                                NettePhpType type = LatteUtil.findFirstLatteTemplateType(currentMethod.getContainingFile());
-                                if (type == null) {
-                                    return true;
-                                }
+                        } else if (currentMethod instanceof LattePhpVariable && field.getContainingClass() != null) {
+                            NettePhpType type = LatteUtil.findFirstLatteTemplateType(currentMethod.getContainingFile());
+                            if (type == null) {
+                                return true;
+                            }
 
-                                Collection<PhpClass> classes = type.getPhpClasses(psiElement.getProject());
-                                for (PhpClass phpClass : classes) {
-                                    if (LattePhpUtil.isReferenceFor(field.getContainingClass(), phpClass)) {
-                                        String value = ((LattePhpVariable) currentMethod).getVariableName();
-                                        processor.process(new LattePhpVariableReference((LattePhpVariable) currentMethod, new TextRange(0, value.length() + 1)));
-                                    }
+                            Collection<PhpClass> classes = type.getPhpClasses(psiElement.getProject());
+                            for (PhpClass phpClass : classes) {
+                                if (LattePhpUtil.isReferenceFor(field.getContainingClass(), phpClass)) {
+                                    String value = ((LattePhpVariable) currentMethod).getVariableName();
+                                    processor.process(new LattePhpVariableReference((LattePhpVariable) currentMethod, new TextRange(0, value.length() + 1)));
                                 }
                             }
-                            return true;
                         }
+                        return true;
                     }, searchScope, "$" + fieldName, UsageSearchContext.IN_CODE, true);
             // ProjectScope.getProjectScope(field.getProject())
         });

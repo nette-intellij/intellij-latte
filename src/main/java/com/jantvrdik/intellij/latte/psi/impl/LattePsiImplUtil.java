@@ -5,6 +5,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jantvrdik.intellij.latte.psi.*;
+import com.jantvrdik.intellij.latte.psi.elements.LatteHtmlTagContainerElement;
+import com.jantvrdik.intellij.latte.psi.elements.LatteMacroContentElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,12 +60,12 @@ public class LattePsiImplUtil {
 		return "=";
 	}
 
-	public static @Nullable LattePhpContent getFirstPhpContent(@NotNull LatteMacroContent macroContent) {
+	public static @Nullable LattePhpContent getFirstPhpContent(@NotNull LatteMacroContentElement macroContent) {
 		List<LattePhpContent> phpContents = macroContent.getPhpContentList();
 		return phpContents.stream().findFirst().isPresent() ? phpContents.stream().findFirst().get() : null;
 	}
 
-	public static @Nullable PsiElement getMacroNameElement(@NotNull LatteMacroContent macroContent) {
+	public static @Nullable PsiElement getMacroNameElement(@NotNull LatteMacroContentElement macroContent) {
 		return PsiTreeUtil.skipWhitespacesBackward(macroContent);
 	}
 
@@ -73,7 +75,7 @@ public class LattePsiImplUtil {
 	}
 
 	@Nullable
-	public static LatteHtmlOpenTag getHtmlOpenTag(@NotNull LatteHtmlTagContainer element) {
+	public static LatteHtmlOpenTag getHtmlOpenTag(@NotNull LatteHtmlTagContainerElement element) {
 		PsiElement prev = element.getPrevSibling();
 		if (prev instanceof LatteHtmlOpenTag) {
 			return (LatteHtmlOpenTag) prev;

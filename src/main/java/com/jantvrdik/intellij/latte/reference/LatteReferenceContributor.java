@@ -2,12 +2,10 @@ package com.jantvrdik.intellij.latte.reference;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.patterns.PlatformPatterns;
-import com.intellij.patterns.XmlPatterns;
 import com.intellij.psi.*;
 import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.util.ProcessingContext;
 import com.jantvrdik.intellij.latte.LatteLanguage;
-import com.jantvrdik.intellij.latte.config.LatteFileConfiguration;
 import com.jantvrdik.intellij.latte.psi.*;
 import com.jantvrdik.intellij.latte.reference.references.*;
 import com.jantvrdik.intellij.latte.reference.references.LattePhpClassReference;
@@ -218,28 +216,6 @@ public class LatteReferenceContributor extends PsiReferenceContributor {
                         PsiElement textElement = ((LatteMacroModifier) element).getTextElement();
                         if (textElement != null && textElement.getTextLength() > 0) {
                             return new PsiReference[]{new LatteFilterReference(constantElement, new TextRange(0, textElement.getTextLength()))};
-                        }
-                        return PsiReference.EMPTY_ARRAY;
-                    }
-                });
-
-        registrar.registerReferenceProvider(
-                PlatformPatterns.or(
-                        XmlPatterns.xmlAttributeValue("name")
-                ),
-                new PsiReferenceProvider() {
-                    @NotNull
-                    @Override
-                    public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
-                        for (String tag : LatteFileConfiguration.REFERENCED_TAGS) {
-                            if (!LatteFileConfiguration.hasParentXmlTagName(element, tag)) {
-                                continue;
-                            }
-
-                            PsiReferenceBase<PsiElement> reference = getXmlReferenceByTag(tag, (XmlAttributeValue) element);
-                            if (reference != null) {
-                                return new PsiReference[]{reference};
-                            }
                         }
                         return PsiReference.EMPTY_ARRAY;
                     }

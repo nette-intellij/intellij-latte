@@ -9,18 +9,18 @@ import com.jantvrdik.intellij.latte.utils.LatteUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
-import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 public class LattePhpUtil {
 
     public static Collection<PhpNamedElement> getAllClassNamesAndInterfaces(Project project, Collection<String> classNames) {
-        Collection<PhpNamedElement> variants = new THashSet<>();
+        Collection<PhpNamedElement> variants = new HashSet<>();
         PhpIndex phpIndex = getPhpIndex(project);
 
         for (String name : classNames) {
@@ -31,7 +31,7 @@ public class LattePhpUtil {
     }
 
     public static Collection<Function> getAllFunctions(Project project, Collection<String> functionNames) {
-        Collection<Function> variants = new THashSet<>();
+        Collection<Function> variants = new HashSet<>();
         PhpIndex phpIndex = getPhpIndex(project);
 
         for (String name : functionNames) {
@@ -166,7 +166,7 @@ public class LattePhpUtil {
     }
 
     public static Collection<PhpNamespace> getAlNamespaces(Project project, Collection<String> namespaceNames) {
-        Collection<PhpNamespace> variants = new THashSet<>();
+        Collection<PhpNamespace> variants = new HashSet<>();
         PhpIndex phpIndex = getPhpIndex(project);
 
         for (String name : namespaceNames) {

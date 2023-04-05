@@ -3,23 +3,12 @@
 	<name>Latte</name>
 	<vendor>Jan Tvrdík, Matouš Němec</vendor>
 
-	<description><![CDATA[
-		<p>
-			Provides support for <a href="https://github.com/nette/latte/">Latte</a> &ndash; a template engine for PHP.
-			It's a must have plugin for Nette developers.
-		</p>
-	]]></description>
-
 	<!-- http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges -->
 	<idea-version since-build="202.8194.7"/>
 
 	<!-- http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products -->
 	<depends>com.intellij.modules.lang</depends>
 	<depends>com.jetbrains.php</depends>
-
-	<applicationListeners>
-		<listener class="com.jantvrdik.intellij.latte.files.LatteFileListener" topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
-	</applicationListeners>
 
 	<extensions defaultExtensionNs="com.intellij">
 
@@ -35,25 +24,27 @@
 		<lang.fileViewProviderFactory language="Latte" implementationClass="com.jantvrdik.intellij.latte.psi.LatteFileViewProviderFactory"/>
 		<lang.formatter language="Latte" implementationClass="com.jantvrdik.intellij.latte.formatter.LatteFormattingModelBuilder"/>
 		<colorSettingsPage implementation="com.jantvrdik.intellij.latte.syntaxHighlighter.LatteColorSettingsPage"/>
-		<completion.contributor language="Latte" implementationClass="com.jantvrdik.intellij.latte.completion.LatteCompletionContributor"/>
-		<referencesSearch implementation="com.jantvrdik.intellij.latte.reference.LatteReferenceSearch"/>
 		<lang.quoteHandler language="Latte" implementationClass="com.jantvrdik.intellij.latte.editorActions.LatteQuoteHandler"/>
 		<annotator language="Latte" implementationClass="com.jantvrdik.intellij.latte.annotator.LatteAnnotator"/>
 		<typedHandler implementation="com.jantvrdik.intellij.latte.editorActions.LatteTypedHandler"/>
 		<typedHandler implementation="com.jantvrdik.intellij.latte.editorActions.LatteCompletionAutoPopupHandler"/>
-		<highlightErrorFilter implementation="com.jantvrdik.intellij.latte.psi.ErrorFilter"/>
-		<indexPatternBuilder implementation="com.jantvrdik.intellij.latte.psi.LatteIndexPatternBuilder"/>
-		<lang.psiStructureViewFactory language="Latte" implementationClass="com.jantvrdik.intellij.latte.editor.LatteStructureViewFactory"/>
-		<lang.findUsagesProvider language="XML" implementationClass="com.jantvrdik.intellij.latte.reference.LatteXmlFindUsagesProvider"/>
-		<lang.findUsagesProvider language="Latte" implementationClass="com.jantvrdik.intellij.latte.reference.LatteFindUsagesProvider"/>
 		<lang.braceMatcher language="Latte" implementationClass="com.jantvrdik.intellij.latte.reference.LatteBraceMatcher"/>
-		<renamePsiElementProcessor implementation="com.jantvrdik.intellij.latte.refactoring.LatteRenamePsiElementProcessor"/>
+		<indexPatternBuilder implementation="com.jantvrdik.intellij.latte.psi.LatteIndexPatternBuilder"/>
+		<highlightErrorFilter implementation="com.jantvrdik.intellij.latte.psi.ErrorFilter"/>
+		<lang.psiStructureViewFactory language="Latte" implementationClass="com.jantvrdik.intellij.latte.editor.LatteStructureViewFactory"/>
+		<lang.findUsagesProvider language="Latte" implementationClass="com.jantvrdik.intellij.latte.reference.LatteFindUsagesProvider"/>
+		<psi.referenceContributor implementation="com.jantvrdik.intellij.latte.reference.LatteReferenceContributor"/>
+		<codeStyleSettingsProvider implementation="com.jantvrdik.intellij.latte.codeStyle.LatteCodeStyleSettingsProvider"/>
+		<langCodeStyleSettingsProvider implementation="com.jantvrdik.intellij.latte.codeStyle.LatteLanguageCodeStyleSettingsProvider"/>
 		<lang.documentationProvider language="Latte" implementationClass="com.jantvrdik.intellij.latte.documentation.LatteDocumentationProvider"/>
+
+		<!-- must have -->
+		<completion.contributor language="Latte" implementationClass="com.jantvrdik.intellij.latte.completion.LatteCompletionContributor"/>
+		<renamePsiElementProcessor implementation="com.jantvrdik.intellij.latte.refactoring.LatteRenamePsiElementProcessor"/>
 		<lang.smartEnterProcessor implementationClass="com.jantvrdik.intellij.latte.editor.LatteSmartEnterProcessor" />
 
-		<fileBasedIndex implementation="com.jantvrdik.intellij.latte.indexes.LatteIndexExtension"/>
-
-		<dom.fileMetaData implementation="com.jantvrdik.intellij.latte.settings.xml.LatteDomFileDescription" rootTagName="latte" />
+		<!-- needed? -->
+		<referencesSearch implementation="com.jantvrdik.intellij.latte.reference.LatteReferenceSearch"/>
 
 		<stubElementTypeHolder class="com.jantvrdik.intellij.latte.psi.LatteTypes"/>
 		<stubIndex implementation="com.jantvrdik.intellij.latte.indexes.extensions.LatteFilterIndex"/>
@@ -65,14 +56,12 @@
 		<stubIndex implementation="com.jantvrdik.intellij.latte.indexes.extensions.LattePhpStaticVariableIndex"/>
 		<stubIndex implementation="com.jantvrdik.intellij.latte.indexes.extensions.LattePhpTypeIndex"/>
 
- 		<codeStyleSettingsProvider implementation="com.jantvrdik.intellij.latte.codeStyle.LatteCodeStyleSettingsProvider"/>
-		<langCodeStyleSettingsProvider implementation="com.jantvrdik.intellij.latte.codeStyle.LatteLanguageCodeStyleSettingsProvider"/>
-
-		<psi.referenceContributor implementation="com.jantvrdik.intellij.latte.reference.LatteReferenceContributor"/>
 
 		<defaultLiveTemplates file="/liveTemplates/Latte.xml"/>
 		<liveTemplateContext implementation="com.jantvrdik.intellij.latte.liveTemplates.LatteTemplateContext"/>
 		<liveTemplatePreprocessor implementation="com.jantvrdik.intellij.latte.liveTemplates.LatteTemplatePreprocessor"/>
+
+		<postStartupActivity implementation="com.jantvrdik.intellij.latte.ui.LattePluginStartupActivity" />
 
 		<projectConfigurable instance="com.jantvrdik.intellij.latte.ui.LatteSettingsForm"
 							 displayName="Latte"
@@ -173,11 +162,6 @@
 						 displayName="Latte iterable types"
 						 groupName="Latte" enabledByDefault="true"
 						 implementationClass="com.jantvrdik.intellij.latte.inspections.LatteIterableTypeInspection"/>
-
-		<localInspection language="XML" shortName="LatteXmlFileInspection" id="LatteXmlFileInspection"
-						 displayName="Latte XML configuration files"
-						 groupName="Latte" enabledByDefault="true"
-						 implementationClass="com.jantvrdik.intellij.latte.inspections.LatteXmlFileInspection"/>
 	</extensions>
 
 	<application-components>

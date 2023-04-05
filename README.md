@@ -1,7 +1,10 @@
 Latte Plugin for IntelliJ IDEA / PhpStorm
 =========================================
 
+<!-- Plugin description -->
 Provides support for [Latte](https://github.com/nette/latte) – a template engine for PHP.
+It's a must-have plugin for Nette developers.
+<!-- Plugin description end -->
 
 - Plugin page: [IntelliJ plugin Latte](https://plugins.jetbrains.com/plugin/7457-latte)
 - Forum: [Nette forum](https://forum.nette.org/en/32907-upgrades-in-latte-plugin-for-phpstorm)

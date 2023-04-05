@@ -11,7 +11,6 @@ import com.intellij.util.ui.ListTableModel;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.settings.LatteTagSettings;
 import com.jantvrdik.intellij.latte.settings.LatteSettings;
-import com.jantvrdik.intellij.latte.settings.xml.LatteXmlFileData;
 import com.jantvrdik.intellij.latte.utils.LatteIdeHelper;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
@@ -247,7 +246,7 @@ public class LatteCustomMacroSettingsForm implements Configurable {
 
 		@Nullable
 		@Override
-		public LatteXmlFileData.VendorResult valueOf(LatteTagSettings customMacroSettings) {
+		public LatteConfiguration.VendorResult valueOf(LatteTagSettings customMacroSettings) {
 			return LatteConfiguration.getInstance(project).getVendorForTag(customMacroSettings.getMacroName());
 		}
 	}

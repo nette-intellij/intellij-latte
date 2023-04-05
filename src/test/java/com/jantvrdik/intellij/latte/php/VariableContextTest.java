@@ -19,16 +19,11 @@ import java.util.List;
 
 public class VariableContextTest extends BasePsiParsingTestCase {
 
-    public VariableContextTest() {
-        super();
-        HeavyPlatformTestCase.doAutodetectPlatformPrefix();
-    }
-
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         // initialize configuration with test configuration
-        LatteConfiguration.getInstance(getProject(), getXmlFileData());
+        LatteConfiguration.getInstance(getProject());
 
         getProject().registerService(LatteSettings.class);
     }

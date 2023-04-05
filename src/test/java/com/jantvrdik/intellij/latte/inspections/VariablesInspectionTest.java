@@ -17,16 +17,11 @@ import java.util.List;
 
 public class VariablesInspectionTest extends BasePsiParsingTestCase {
 
-    public VariablesInspectionTest() {
-        super();
-        HeavyPlatformTestCase.doAutodetectPlatformPrefix();
-    }
-
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         // initialize configuration with test configuration
-        LatteConfiguration.getInstance(getProject(), getXmlFileData());
+        LatteConfiguration.getInstance(getProject());
 
         getProject().registerService(LatteSettings.class);
     }

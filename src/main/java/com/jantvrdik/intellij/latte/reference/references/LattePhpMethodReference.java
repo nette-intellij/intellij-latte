@@ -2,10 +2,7 @@ package com.jantvrdik.intellij.latte.reference.references;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.pom.PomTargetPsiElement;
 import com.intellij.psi.*;
-import com.intellij.psi.xml.XmlAttributeValue;
-import com.jantvrdik.intellij.latte.config.LatteFileConfiguration;
 import com.jantvrdik.intellij.latte.indexes.LatteIndexUtil;
 import com.jantvrdik.intellij.latte.psi.LattePhpMethod;
 import com.jantvrdik.intellij.latte.php.LattePhpUtil;
@@ -75,10 +72,6 @@ public class LattePhpMethodReference extends PsiReferenceBase<PsiElement> implem
                 results.add(new PsiElementResolveResult(currentFunction));
             }
         }
-
-        for (XmlAttributeValue attributeValue : LatteFileConfiguration.getAllMatchedXmlAttributeValues(project, "function", methodName)) {
-            results.add(new PsiElementResolveResult(attributeValue));
-        }
 /*
         final Collection<LattePhpMethod> methods = LatteIndexUtil.findMethodsByName(project, methodName);
         for (LattePhpMethod method : methods) {
@@ -126,19 +119,6 @@ public class LattePhpMethodReference extends PsiReferenceBase<PsiElement> implem
                 }
             } else if (isFunction && ((LattePhpMethod) element).isFunction()) {
                 return ((LattePhpMethod) element).getMethodName().equals(methodName);
-            }
-        }
-
-        if (isFunction) {
-            PsiElement currentElement = element;
-            if (element instanceof PomTargetPsiElement) {
-                currentElement = LatteFileConfiguration.getPsiElementFromDomTarget("function", element);
-                if (currentElement == null) {
-                    currentElement = element;
-                }
-            }
-            if (currentElement instanceof XmlAttributeValue && LatteFileConfiguration.hasParentXmlTagName(currentElement, "function")) {
-                return ((XmlAttributeValue) currentElement).getValue().equals(methodName);
             }
         }
 

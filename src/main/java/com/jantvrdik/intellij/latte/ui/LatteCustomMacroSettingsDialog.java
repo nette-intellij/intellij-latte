@@ -3,7 +3,6 @@ package com.jantvrdik.intellij.latte.ui;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.table.TableView;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import com.jantvrdik.intellij.latte.config.LatteReparseUtil;
 import com.jantvrdik.intellij.latte.settings.LatteTagSettings;
 
 import javax.swing.*;
@@ -112,8 +111,6 @@ public class LatteCustomMacroSettingsDialog extends JDialog {
         settings.setMultiLine(this.multiLineOnlyUsedCheckBox.isSelected());
         settings.setDeprecated(this.deprecatedCheckBox.isSelected());
         settings.setDeprecatedMessage(this.deprecatedMessageTextField.getText());
-
-        LatteReparseUtil.getInstance(project).reinitialize(this::dispose);
     }
 
     private void setOkState() {

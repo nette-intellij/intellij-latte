@@ -2,10 +2,7 @@ package com.jantvrdik.intellij.latte.reference.references;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.pom.PomTargetPsiElement;
 import com.intellij.psi.*;
-import com.intellij.psi.xml.XmlAttributeValue;
-import com.jantvrdik.intellij.latte.config.LatteFileConfiguration;
 import com.jantvrdik.intellij.latte.php.LattePhpVariableUtil;
 import com.jantvrdik.intellij.latte.php.NettePhpType;
 import com.jantvrdik.intellij.latte.psi.*;
@@ -38,10 +35,6 @@ public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> impl
         LattePhpVariable variable = (LattePhpVariable) getElement();
 
         List<ResolveResult> results = new ArrayList<>();
-        for (XmlAttributeValue attributeValue : LatteFileConfiguration.getAllMatchedXmlAttributeValues(project, "variable", variableName)) {
-            results.add(new PsiElementResolveResult(attributeValue));
-        }
-
         NettePhpType fields = LatteUtil.findFirstLatteTemplateType(getElement().getContainingFile());
         String name = ((BaseLattePhpElement) getElement()).getPhpElementName();
         if (fields != null) {
@@ -97,17 +90,6 @@ public class LattePhpVariableReference extends PsiReferenceBase<PsiElement> impl
     public boolean isReferenceTo(@NotNull PsiElement element) {
         if (element instanceof LattePhpVariable && ((LattePhpVariable) element).isDefinition()) {
             return ((LattePhpVariable) element).getVariableName().equals(variableName);
-        }
-
-        PsiElement currentElement = element;
-        if (element instanceof PomTargetPsiElement) {
-            currentElement = LatteFileConfiguration.getPsiElementFromDomTarget("variable", element);
-            if (currentElement == null) {
-                currentElement = element;
-            }
-        }
-        if (currentElement instanceof XmlAttributeValue && LatteFileConfiguration.hasParentXmlTagName(currentElement, "variable")) {
-            return ((XmlAttributeValue) currentElement).getValue().equals(variableName);
         }
         return super.isReferenceTo(element);
     }
