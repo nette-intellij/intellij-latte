@@ -15,6 +15,7 @@ import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.updateSettings.impl.pluginsAdvertisement.PluginsAdvertiser;
 import com.intellij.openapi.vcs.changes.shelf.ShelveChangesManager;
+import com.intellij.util.Alarm;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -31,17 +32,11 @@ public class LattePluginStartupActivity extends ShelveChangesManager.PostStartup
 
     @Override
     public void runActivity(@NotNull Project project) {
-        try {
-            Thread.sleep(80000);
-
-            ApplicationUtil.tryRunReadAction(() -> {
-                latteProSuggestion("More advanced and faster plugin for Latte with XML configuration support, included files support, documentation, etc. is here!");
-                return null;
-            });
-
-        } catch (InterruptedException e) {
-            //do nothing
-        }
+        Alarm alarm = new Alarm(Alarm.ThreadToUse.SWING_THREAD, project);
+        alarm.addRequest(() -> ApplicationUtil.tryRunReadAction(() -> {
+            latteProSuggestion("More advanced and faster plugin for Latte with XML configuration support, included files support, documentation, etc. is here!");
+            return null;
+        }), 30000);
     }
 
     public static void latteProSuggestion(final @NotNull String message) {

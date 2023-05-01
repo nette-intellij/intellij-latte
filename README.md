@@ -19,11 +19,11 @@ Settings → Plugins → Browse repositories → Find "Latte" → Install Plugin
 Sponsors
 ------
 
-<a href="https://www.futurerockstars.cz/"><img src="https://i.imgur.com/lUsFO7X.png" alt="FutureRockstars" width="188" height="86"></a>
+<a href="https://www.futurerockstars.cz/"><img src=".github/sponsors/future-rockstars.png" alt="FutureRockstars" width="188" height="86"></a>
 
 Does GitHub already have your 💳? Does Nette plugins save you development time? [Send a couple of 💸 a month my way too.](https://github.com/sponsors/mesour) Thank you!
 
-One-time donations through [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=GSDRZW9YGPE5G&source=url) are also accepted. To request an invoice, [contact me](mailto:matous.nemec@mesour.com) through e-mail.
+To request an invoice, [contact me](mailto:matous.nemec@mesour.com) through e-mail.
 
 
 Supported Features
