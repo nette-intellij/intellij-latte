@@ -1,14 +1,12 @@
 package com.jantvrdik.intellij.latte.psi.elements;
 
-import com.intellij.psi.StubBasedPsiElement;
-import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpTypeStub;
 import com.jantvrdik.intellij.latte.php.NettePhpType;
 import com.jantvrdik.intellij.latte.psi.LattePhpTypePart;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface LattePhpTypeElement extends LattePsiElement, StubBasedPsiElement<LattePhpTypeStub> {
+public interface LattePhpTypeElement extends LattePsiElement {
 
     @NotNull
     List<LattePhpTypePart> getPhpTypePartList();

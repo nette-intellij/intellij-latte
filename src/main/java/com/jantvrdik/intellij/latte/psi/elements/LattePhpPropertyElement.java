@@ -1,11 +1,9 @@
 package com.jantvrdik.intellij.latte.psi.elements;
 
-import com.intellij.psi.StubBasedPsiElement;
-import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpPropertyStub;
 import com.jantvrdik.intellij.latte.php.LattePhpTypeDetector;
 import com.jantvrdik.intellij.latte.php.NettePhpType;
 
-public interface LattePhpPropertyElement extends BaseLattePhpElement, StubBasedPsiElement<LattePhpPropertyStub> {
+public interface LattePhpPropertyElement extends BaseLattePhpElement {
 
 	default NettePhpType getPrevReturnType() {
 		return LattePhpTypeDetector.detectPrevPhpType(this);

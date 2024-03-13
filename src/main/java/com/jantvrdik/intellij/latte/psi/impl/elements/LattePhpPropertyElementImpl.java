@@ -2,19 +2,17 @@ package com.jantvrdik.intellij.latte.psi.impl.elements;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.util.IncorrectOperationException;
-import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpPropertyStub;
 import com.jantvrdik.intellij.latte.psi.LatteElementFactory;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpPropertyElement;
-import com.jantvrdik.intellij.latte.psi.impl.LatteStubPhpElementImpl;
+import com.jantvrdik.intellij.latte.psi.impl.LattePhpElementImpl;
 import com.jantvrdik.intellij.latte.psi.impl.LattePsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.T_PHP_IDENTIFIER;
 
-public abstract class LattePhpPropertyElementImpl extends LatteStubPhpElementImpl<LattePhpPropertyStub> implements LattePhpPropertyElement {
+public abstract class LattePhpPropertyElementImpl extends LattePhpElementImpl implements LattePhpPropertyElement {
 
 	private @Nullable String name = null;
 	private @Nullable String propertyName = null;
@@ -22,10 +20,6 @@ public abstract class LattePhpPropertyElementImpl extends LatteStubPhpElementImp
 
 	public LattePhpPropertyElementImpl(@NotNull ASTNode node) {
 		super(node);
-	}
-
-	public LattePhpPropertyElementImpl(final LattePhpPropertyStub stub, final IStubElementType nodeType) {
-		super(stub, nodeType);
 	}
 
 	@Override
@@ -45,12 +39,6 @@ public abstract class LattePhpPropertyElementImpl extends LatteStubPhpElementImp
 	@Override
 	public String getPropertyName() {
 		if (propertyName == null) {
-			final LattePhpPropertyStub stub = getStub();
-			if (stub != null) {
-				propertyName = stub.getPropertyName();
-				return propertyName;
-			}
-
 			PsiElement found = getTextElement();
 			propertyName = found != null ? found.getText() : null;
 		}

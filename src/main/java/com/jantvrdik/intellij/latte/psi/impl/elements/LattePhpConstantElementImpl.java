@@ -2,19 +2,17 @@ package com.jantvrdik.intellij.latte.psi.impl.elements;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.util.IncorrectOperationException;
-import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpConstantStub;
 import com.jantvrdik.intellij.latte.psi.LatteElementFactory;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpConstantElement;
-import com.jantvrdik.intellij.latte.psi.impl.LatteStubPhpElementImpl;
+import com.jantvrdik.intellij.latte.psi.impl.LattePhpElementImpl;
 import com.jantvrdik.intellij.latte.psi.impl.LattePsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.T_PHP_IDENTIFIER;
 
-public abstract class LattePhpConstantElementImpl extends LatteStubPhpElementImpl<LattePhpConstantStub> implements LattePhpConstantElement {
+public abstract class LattePhpConstantElementImpl extends LattePhpElementImpl implements LattePhpConstantElement {
 
 	private @Nullable String name = null;
 	private @Nullable String constantName = null;
@@ -22,10 +20,6 @@ public abstract class LattePhpConstantElementImpl extends LatteStubPhpElementImp
 
 	public LattePhpConstantElementImpl(@NotNull ASTNode node) {
 		super(node);
-	}
-
-	public LattePhpConstantElementImpl(final LattePhpConstantStub stub, final IStubElementType nodeType) {
-		super(stub, nodeType);
 	}
 
 	@Override
@@ -47,12 +41,6 @@ public abstract class LattePhpConstantElementImpl extends LatteStubPhpElementImp
 	@Override
 	public String getConstantName() {
 		if (constantName == null) {
-			final LattePhpConstantStub stub = getStub();
-			if (stub != null) {
-				constantName = stub.getConstantName();
-				return constantName;
-			}
-
 			PsiElement found = getTextElement();
 			constantName = found != null ? found.getText() : null;
 		}

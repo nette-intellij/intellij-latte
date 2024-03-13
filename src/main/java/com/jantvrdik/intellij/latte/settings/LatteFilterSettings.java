@@ -2,7 +2,6 @@ package com.jantvrdik.intellij.latte.settings;
 
 import com.intellij.util.xmlb.annotations.Attribute;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -93,12 +92,7 @@ public class LatteFilterSettings extends BaseLatteSettings implements Serializab
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder()
-				.append(this.modifierName)
-				.append(this.modifierHelp)
-				.append(this.modifierDescription)
-				.append(this.modifierInsert)
-				.toHashCode();
+		return Objects.hash(modifierName, modifierHelp, modifierDescription, modifierInsert);
 	}
 
 	@Override

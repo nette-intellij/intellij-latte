@@ -2,7 +2,6 @@ package com.jantvrdik.intellij.latte.settings;
 
 import com.intellij.util.xmlb.annotations.Attribute;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -88,12 +87,7 @@ public class LatteFunctionSettings extends BaseLatteSettings implements Serializ
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder()
-				.append(this.functionName)
-				.append(this.functionReturnType)
-				.append(this.functionHelp)
-				.append(this.functionDescription)
-				.toHashCode();
+		return Objects.hash(functionName, functionReturnType, functionHelp, functionDescription);
 	}
 
 	@Override

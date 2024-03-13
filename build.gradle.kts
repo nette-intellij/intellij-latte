@@ -11,11 +11,11 @@ plugins {
     // Java support
     id("java")
     // Kotlin support
-    id("org.jetbrains.kotlin.jvm") version "1.8.20"
+    id("org.jetbrains.kotlin.jvm") version "1.9.0"
     // Gradle IntelliJ Plugin
-    id("org.jetbrains.intellij") version "1.13.2"
+    id("org.jetbrains.intellij") version "1.16.0"
     // Gradle GrammarKit Plugin - https://github.com/JetBrains/gradle-grammar-kit-plugin
-    id("org.jetbrains.grammarkit") version "2021.2.1"
+    id("org.jetbrains.grammarkit") version "2022.3.1"
     // Gradle Changelog Plugin
     id("org.jetbrains.changelog") version "2.0.0"
     // Gradle Qodana Plugin
@@ -70,7 +70,7 @@ grammarKit {
     grammarKitRelease.set(properties("grammarKitRelease"))
 
     // Optionally provide an IntelliJ version to build the classpath for GenerateParser/GenerateLexer tasks
-    intellijRelease.set(properties("grammarKitIntelliJRelease"))
+    //intellijRelease.set(properties("grammarKitIntelliJRelease"))
 }
 
 // Configure Gradle Qodana Plugin - read more: https://github.com/JetBrains/gradle-qodana-plugin
@@ -87,7 +87,7 @@ kover.xmlReport {
 }
 
 val generateLatteParser = task("generateLatteParser", GenerateParserTask::class) {
-    source.set("src/main/java/com/jantvrdik/intellij/latte/parser/LatteParser.bnf")
+    sourceFile.set(File("src/main/java/com/jantvrdik/intellij/latte/parser/LatteParser.bnf"))
     targetRoot.set("src/main/gen")
     pathToParser.set("/com/jantvrdik/intellij/latte/parser/LatteParser.java")
     pathToPsiRoot.set("/com/jantvrdik/intellij/latte/psi")
@@ -95,21 +95,21 @@ val generateLatteParser = task("generateLatteParser", GenerateParserTask::class)
 }
 
 val generateLatteMacroContentLexer = task<GenerateLexerTask>("generateLatteMacroContentLexer") {
-    source.set("src/main/java/com/jantvrdik/intellij/latte/lexer/grammars/LatteMacroContentLexer.flex")
+    sourceFile.set(File("src/main/java/com/jantvrdik/intellij/latte/lexer/grammars/LatteMacroContentLexer.flex"))
     targetDir.set("src/main/gen/com/jantvrdik/intellij/latte/lexer/")
     targetClass.set("LatteMacroContentLexer")
     purgeOldFiles.set(true)
 }
 
 val generateLatteMacroLexer = task<GenerateLexerTask>("generateLatteMacroLexer") {
-    source.set("src/main/java/com/jantvrdik/intellij/latte/lexer/grammars/LatteMacroLexer.flex")
+    sourceFile.set(File("src/main/java/com/jantvrdik/intellij/latte/lexer/grammars/LatteMacroLexer.flex"))
     targetDir.set("src/main/gen/com/jantvrdik/intellij/latte/lexer/")
     targetClass.set("LatteMacroLexer")
     purgeOldFiles.set(true)
 }
 
 val generateLatteTopLexer = task<GenerateLexerTask>("generateLatteTopLexer") {
-    source.set("src/main/java/com/jantvrdik/intellij/latte/lexer/grammars/LatteTopLexer.flex")
+    sourceFile.set(File("src/main/java/com/jantvrdik/intellij/latte/lexer/grammars/LatteTopLexer.flex"))
     targetDir.set("src/main/gen/com/jantvrdik/intellij/latte/lexer/")
     targetClass.set("LatteTopLexer")
     purgeOldFiles.set(true)

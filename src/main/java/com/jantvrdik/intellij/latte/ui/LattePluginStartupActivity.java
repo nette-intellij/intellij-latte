@@ -13,8 +13,8 @@ import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.openapi.updateSettings.impl.pluginsAdvertisement.PluginsAdvertiser;
-import com.intellij.openapi.vcs.changes.shelf.ShelveChangesManager;
 import com.intellij.util.Alarm;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,7 +24,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
 
-public class LattePluginStartupActivity extends ShelveChangesManager.PostStartupActivity {
+public class LattePluginStartupActivity implements StartupActivity.Background {
 
     private static final @NotNull Logger LOG = Logger.getInstance(CommandProcessor.class);
     private static final @NotNull String NOTIFICATION_GROUP = "Latte Pro Group";

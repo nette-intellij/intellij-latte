@@ -2,15 +2,13 @@ package com.jantvrdik.intellij.latte.psi.impl.elements;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.icons.LatteIcons;
-import com.jantvrdik.intellij.latte.indexes.stubs.LatteFilterStub;
 import com.jantvrdik.intellij.latte.psi.LatteMacroContent;
 import com.jantvrdik.intellij.latte.psi.LattePhpInBrackets;
 import com.jantvrdik.intellij.latte.psi.elements.LatteMacroModifierElement;
-import com.jantvrdik.intellij.latte.psi.impl.LatteStubElementImpl;
+import com.jantvrdik.intellij.latte.psi.impl.LattePsiElementImpl;
 import com.jantvrdik.intellij.latte.psi.impl.LattePsiImplUtil;
 import com.jantvrdik.intellij.latte.settings.LatteFilterSettings;
 import com.jantvrdik.intellij.latte.utils.LatteUtil;
@@ -21,17 +19,13 @@ import javax.swing.*;
 
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.T_MACRO_FILTERS;
 
-public abstract class LatteMacroModifierElementImpl extends LatteStubElementImpl<LatteFilterStub> implements LatteMacroModifierElement {
+public abstract class LatteMacroModifierElementImpl extends LattePsiElementImpl implements LatteMacroModifierElement {
 
 	private @Nullable String modifierName = null;
 	private @Nullable PsiElement identifier = null;
 
 	public LatteMacroModifierElementImpl(@NotNull ASTNode node) {
 		super(node);
-	}
-
-	public LatteMacroModifierElementImpl(final LatteFilterStub stub, final IStubElementType nodeType) {
-		super(stub, nodeType);
 	}
 
 	@Override
@@ -49,12 +43,6 @@ public abstract class LatteMacroModifierElementImpl extends LatteStubElementImpl
 	@Override
 	public String getModifierName() {
 		if (modifierName == null) {
-			final LatteFilterStub stub = getStub();
-			if (stub != null) {
-				modifierName = stub.getModifierName();
-				return modifierName;
-			}
-
 			PsiElement found = getTextElement();
 			modifierName = found != null ? LatteUtil.normalizeMacroModifier(found.getText()) : null;
 		}

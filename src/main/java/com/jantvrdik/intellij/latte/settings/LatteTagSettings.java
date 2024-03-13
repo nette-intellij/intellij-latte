@@ -2,7 +2,6 @@ package com.jantvrdik.intellij.latte.settings;
 
 import com.intellij.util.xmlb.annotations.Attribute;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import java.io.Serializable;
 import java.util.*;
@@ -219,16 +218,16 @@ public class LatteTagSettings extends BaseLatteSettings implements Serializable 
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder()
-				.append(this.macroName)
-				.append(this.macroType)
-				.append(this.arguments)
-				.append(this.allowedModifiers)
-				.append(this.multiLine)
-				.append(this.deprecated)
-				.append(this.deprecatedMessage)
-				.append(this.argumentSettings)
-				.toHashCode();
+		return Objects.hash(
+				macroName,
+				macroType,
+				arguments,
+				allowedModifiers,
+				multiLine,
+				deprecated,
+				deprecatedMessage,
+				argumentSettings
+		);
 	}
 
 	@Override

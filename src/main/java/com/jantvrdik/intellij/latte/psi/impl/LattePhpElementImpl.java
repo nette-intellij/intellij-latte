@@ -7,7 +7,7 @@ import com.jantvrdik.intellij.latte.psi.elements.LattePhpStatementPartElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class LattePhpElementImpl extends LatteReferencedElementImpl implements BaseLattePhpElement {
+public abstract class LattePhpElementImpl extends LattePsiElementImpl implements BaseLattePhpElement {
 
 	public LattePhpElementImpl(@NotNull ASTNode node) {
 		super(node);

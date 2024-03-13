@@ -1,7 +1,6 @@
 package com.jantvrdik.intellij.latte.settings;
 
 import com.intellij.util.xmlb.annotations.Attribute;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
@@ -194,13 +193,7 @@ public class LatteArgumentSettings implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder()
-				.append(this.name)
-				.append(this.getTypes())
-				.append(this.required)
-				.append(this.validType)
-				.append(this.repeatable)
-				.toHashCode();
+		return Objects.hash(name, getTypes(), required, validType, repeatable);
 	}
 
 	@Override

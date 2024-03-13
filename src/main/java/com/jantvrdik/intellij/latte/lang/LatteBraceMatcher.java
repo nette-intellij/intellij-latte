@@ -1,4 +1,4 @@
-package com.jantvrdik.intellij.latte.reference;
+package com.jantvrdik.intellij.latte.lang;
 
 import com.intellij.lang.BracePair;
 import com.intellij.lang.PairedBraceMatcher;

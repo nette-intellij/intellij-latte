@@ -2,20 +2,18 @@ package com.jantvrdik.intellij.latte.psi.impl.elements;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
-import com.jantvrdik.intellij.latte.indexes.stubs.LattePhpMethodStub;
 import com.jantvrdik.intellij.latte.psi.LatteElementFactory;
 import com.jantvrdik.intellij.latte.psi.elements.LattePhpMethodElement;
-import com.jantvrdik.intellij.latte.psi.impl.LatteStubPhpElementImpl;
+import com.jantvrdik.intellij.latte.psi.impl.LattePhpElementImpl;
 import com.jantvrdik.intellij.latte.psi.impl.LattePsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.jantvrdik.intellij.latte.psi.LatteTypes.*;
 
-public abstract class LattePhpMethodElementImpl extends LatteStubPhpElementImpl<LattePhpMethodStub> implements LattePhpMethodElement {
+public abstract class LattePhpMethodElementImpl extends LattePhpElementImpl implements LattePhpMethodElement {
 
 	private @Nullable String name = null;
 	private @Nullable String methodName = null;
@@ -23,10 +21,6 @@ public abstract class LattePhpMethodElementImpl extends LatteStubPhpElementImpl<
 
 	public LattePhpMethodElementImpl(@NotNull ASTNode node) {
 		super(node);
-	}
-
-	public LattePhpMethodElementImpl(final @NotNull LattePhpMethodStub stub, final IStubElementType nodeType) {
-		super(stub, nodeType);
 	}
 
 	@Override
@@ -54,12 +48,6 @@ public abstract class LattePhpMethodElementImpl extends LatteStubPhpElementImpl<
 	@Override
 	public String getMethodName() {
 		if (methodName == null) {
-			final LattePhpMethodStub stub = getStub();
-			if (stub != null) {
-				methodName = stub.getMethodName();
-				return methodName;
-			}
-
 			PsiElement found = getTextElement();
 			if (found == null) {
 				found = LattePsiImplUtil.findFirstChildWithType(this, T_PHP_NAMESPACE_REFERENCE);

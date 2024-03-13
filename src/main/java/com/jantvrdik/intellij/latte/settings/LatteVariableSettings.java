@@ -3,7 +3,6 @@ package com.jantvrdik.intellij.latte.settings;
 import com.intellij.util.xmlb.annotations.Attribute;
 import com.jantvrdik.intellij.latte.config.LatteConfiguration;
 import com.jantvrdik.intellij.latte.php.NettePhpType;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -57,10 +56,7 @@ public class LatteVariableSettings extends BaseLatteSettings implements Serializ
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder()
-				.append(this.varName)
-				.append(this.varType)
-				.toHashCode();
+		return Objects.hash(varName, varType);
 	}
 
 	@Override
