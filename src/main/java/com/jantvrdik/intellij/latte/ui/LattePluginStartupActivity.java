@@ -24,7 +24,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
 
-public class LattePluginStartupActivity implements StartupActivity.Background {
+public class LattePluginStartupActivity implements StartupActivity {
 
     private static final @NotNull Logger LOG = Logger.getInstance(CommandProcessor.class);
     private static final @NotNull String NOTIFICATION_GROUP = "Latte Pro Group";
